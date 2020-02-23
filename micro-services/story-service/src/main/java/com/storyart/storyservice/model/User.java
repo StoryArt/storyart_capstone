@@ -7,25 +7,24 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
-@Table(name = "story")
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Story extends DateAudit {
+public class User extends DateAudit {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private String title;
-    private int authorId;
+    @Column(unique = true)
+    private String username;
+
+    private String password;
+    private String role;
     private String introContent;
-    private String animation;
+    private String gender;
     private boolean isActive;
-    private boolean isParametered;
-    private String parameterName;
-    private int totalParameterPoints;
-    private float avgRate;
 }

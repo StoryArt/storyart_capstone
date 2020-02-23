@@ -1,6 +1,6 @@
-package com.storyart.userservice.model;
+package com.storyart.commentservice.model;
 
-import com.storyart.userservice.common.DateAudit;
+import com.storyart.commentservice.common.DateAudit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

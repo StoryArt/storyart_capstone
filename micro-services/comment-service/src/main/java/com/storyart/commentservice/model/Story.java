@@ -1,22 +1,24 @@
-package com.storyart.storyservice.model;
+package com.storyart.commentservice.model;
 
-import com.storyart.storyservice.common.DateAudit;
+import com.storyart.commentservice.common.DateAudit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
+import java.util.Set;
 
 @Entity
-@Table(name = "story")
+//@Table(name = "story")
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Story extends DateAudit {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
     private String title;
@@ -28,4 +30,6 @@ public class Story extends DateAudit {
     private String parameterName;
     private int totalParameterPoints;
     private float avgRate;
+
+
 }

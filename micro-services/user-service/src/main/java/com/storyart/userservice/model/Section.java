@@ -10,21 +10,21 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Getter
+//@Table(name = "section")
 @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User extends DateAudit {
+public class Section extends DateAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(unique = true)
-    private String username;
+    private String title;
+    private int storyId;
+    private String content;
+    private int parameterPoint;
+    private boolean isEndSection;
+    private int parentSectionId;
 
-    private String password;
-    private String role;
-    private String introContent;
-    private String gender;
-    private boolean isActive;
 }
