@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
@@ -15,7 +17,7 @@ import java.sql.Timestamp;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Section extends DateAudit {
+public class Section extends DateAudit implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

@@ -1,10 +1,9 @@
 package com.storyart.storyservice.model;
 
 import com.storyart.storyservice.common.DateAudit;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.io.Serializable;
 
 import javax.persistence.*;
 
@@ -14,14 +13,21 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Story extends DateAudit {
+public class Story extends DateAudit implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NonNull
     private String title;
+
+    @NonNull
     private int authorId;
+
+    @NonNull
     private String introContent;
+
+    @NonNull
     private String animation;
     private boolean isActive;
     private boolean isParametered;
