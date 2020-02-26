@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-/** 26/2 ref from pro userController */
+/**
+ * 26/2 ref from pro userController
+ */
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
 
@@ -37,11 +39,19 @@ public class UserServiceImpl implements UserService{
     public User findById(Integer id) {
 
         Optional<User> userOptional = userRepository.findById(id);
-        if(userOptional.isPresent()){
+        if (userOptional.isPresent()) {
             return userOptional.get();
         }
         return null;
     }
+
+    @Override
+    public User findByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        return user;
+
+    }
+
     @Override
     public void update(User us) {
         User save = userRepository.save(us);
