@@ -7,18 +7,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.util.Set;
 
 @Entity
-//@Table(name = "story")
+@Table(name = "story")
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Story extends DateAudit {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String title;
@@ -30,6 +28,4 @@ public class Story extends DateAudit {
     private String parameterName;
     private int totalParameterPoints;
     private float avgRate;
-
-
 }

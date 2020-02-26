@@ -6,17 +6,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
-@Table(name = "tag")
+@Table(name = "rating")
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Tag extends DateAudit {
+public class Rating extends DateAudit {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    private String title;
+    private int userId;
+    @Id
+    private int storyId;
+
+    private int stars;
 }

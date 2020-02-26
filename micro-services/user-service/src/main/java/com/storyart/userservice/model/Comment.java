@@ -1,6 +1,6 @@
 package com.storyart.userservice.model;
 
-import com.storyart.userservice.common.DateAudit;
+import com.storyart.storyservice.common.DateAudit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,20 +9,17 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "section")
+@Table(name = "comment")
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Section extends DateAudit {
+public class Comment extends DateAudit {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private String title;
+    private int userId;
     private int storyId;
     private String content;
-    private int parameterPoint;
-    private boolean isEndSection;
-    private int parentSectionId;
 }

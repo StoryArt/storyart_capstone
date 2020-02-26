@@ -9,21 +9,18 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Getter
+@Table(name = "report")
 @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User extends DateAudit {
+public class Report extends DateAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique = true)
-    private String username;
-
-    private String password;
-    private String role;
-    private String introContent;
-    private String gender;
-    private boolean isActive;
+    private int userId;
+    private int storyid;
+    private int commentId;
+    private String content;
 }

@@ -7,17 +7,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 
 @Entity
-//@Table(name = "section")
+@Table(name = "section")
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Section extends DateAudit {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String title;
@@ -26,5 +25,4 @@ public class Section extends DateAudit {
     private int parameterPoint;
     private boolean isEndSection;
     private int parentSectionId;
-
 }
