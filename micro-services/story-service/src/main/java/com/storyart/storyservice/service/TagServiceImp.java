@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import sun.security.provider.certpath.OCSPResponse;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +23,8 @@ public class TagServiceImp implements TagService {
        if(tagDTO.getTitle().isEmpty()){
            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Sorry Tag Title is required ");
        }
-        if(tagRepository.findTagByTitle(tagDTO.getTitle()) != null ) {
+       Tag checktag = tagRepository.findByTitle(tagDTO.getTitle());
+        if(checktag != null ) {
             throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Sorry Tag Title existed ");
         }
         Tag tag = new Tag();
@@ -35,12 +34,33 @@ public class TagServiceImp implements TagService {
         return tag;
     }
 
+
+   /* @Override
+    public List<Tag> findTagsByActive(boolean isActive) {
+        List<Tag> listTag = tagRepository.findTagsByActive(isActive);
+        return listTag;
+    }
+*/
     @Override
-    public Tag update(Tag tag) {
-        //check tag do exist
+    public Tag update(AddTagDTO tagDTO) {
+        if(tagDTO.getTitle().isEmpty()){
+            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Sorry Tag Title is required ");
+        }
+        Optional<Tag> tagCheck = tagRepository.findById(tagDTO.getId());
+        if(!tagCheck.isPresent())
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, Tag do not exist ");
+        }
+
+        Tag tag = tagCheck.get();
+        tag.setTitle(tagDTO.getTitle());
         return tagRepository.save(tag);
     }
 
+    @Override
+    public Tag updateStatus(Tag tag) {
+        return tagRepository.save(tag);
+    }
 
     @Override
     public List<Tag> findAll() {

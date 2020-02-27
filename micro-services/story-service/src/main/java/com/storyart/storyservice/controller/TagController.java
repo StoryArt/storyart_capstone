@@ -9,15 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.swing.*;
 import javax.validation.Valid;
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -32,32 +25,55 @@ public class TagController implements Serializable {
         return tagservice.findAll();
     }
 
-   // update
-    @PutMapping(value = "/update")
-    public Tag update(@RequestBody @Valid Tag tag){
-        return tagservice.update(tag);
-    }
 
     // create tag
-    @PostMapping
-    public Tag create(@RequestBody @Valid AddTagDTO tag){
 
-        return tagservice.create(tag);
+    @PostMapping("")
+    public ResponseEntity createTag(@RequestBody @Valid AddTagDTO tag){
+        tagservice.create(tag);
+
+        return ResponseEntity.ok("create Success");
+    }
+   // @GetMapping(value = "/isActive")
+   /* public List<Tag> findTagsByStatus(@RequestParam(value = "status", defaultValue="false")  boolean status){
+        List<Tag> list = tagservice.findTagsByActive(status);
+        return list;
+    }*/
+
+    // update
+
+    @PutMapping("")
+    public ResponseEntity updateTag(@RequestBody @Valid AddTagDTO tag){
+        tagservice.update(tag);
+        return ResponseEntity.ok("update Success");
     }
 
-    public Response
 
-    // not working
-    @DeleteMapping(value = "/delete/{id}")
-    public Tag delete(@PathVariable("id") @Valid Integer id){
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity delete(@PathVariable("id") Integer id, @RequestParam(value = "isActive" ) boolean isActive){
         Tag tag = tagservice.findById(id);
         if(tag != null){
-
+            tag.setActive(isActive);
+            tagservice.updateStatus(tag);
         } else {
-
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, Tag do not exist ");
         }
-        return null;
+        if(isActive){
+            return ResponseEntity.ok("active Status Success");
+        }
+        return ResponseEntity.ok("inactive Status Success");
     }
+
+  /*  @PutMapping(value = "/active/{id}")
+    public ResponseEntity activeTag(@PathVariable("id") @Valid Integer id){
+        Tag tag = tagservice.findById(id);
+        if(tag != null){
+            tagservice.updateStatus(tag);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, Tag do not exist ");
+        }
+        return ResponseEntity.ok("delete Success");
+    }*/
 
 
 

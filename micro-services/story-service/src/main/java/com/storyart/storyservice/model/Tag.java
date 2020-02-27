@@ -28,11 +28,11 @@ public class Tag{
     private String title;
     private boolean isActive;
 
-    @CreationTimestamp
+   @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
     @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
+   @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 }
