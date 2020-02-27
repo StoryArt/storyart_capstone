@@ -2,6 +2,7 @@ package com.storyart.commentservice.controller;
 
 import com.storyart.commentservice.model.Comment;
 import com.storyart.commentservice.model.models.commentModels.CreateCommentRequestModel;
+import com.storyart.commentservice.model.models.commentModels.DeleteCommentRequestModel;
 import com.storyart.commentservice.model.models.commentModels.UpdateCommentRequestModel;
 import com.storyart.commentservice.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,15 @@ public class CommentController {
         
         return commentService.create(commentRequestModel);
     }
-    @PostMapping("/update")
+    @PutMapping("/update")
     public Comment update(@RequestBody @Valid UpdateCommentRequestModel updateCommentRequestModel){
 
         return commentService.update(updateCommentRequestModel);
+    }
+
+    @PostMapping("/delete")
+    public Comment delete(@RequestBody @Valid DeleteCommentRequestModel deleteCommentRequestModel){
+
+        return commentService.delete(deleteCommentRequestModel);
     }
 }

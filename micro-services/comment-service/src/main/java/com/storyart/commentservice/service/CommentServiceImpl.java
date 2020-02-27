@@ -4,6 +4,7 @@ import com.storyart.commentservice.model.Comment;
 import com.storyart.commentservice.model.Story;
 import com.storyart.commentservice.model.User;
 import com.storyart.commentservice.model.models.commentModels.CreateCommentRequestModel;
+import com.storyart.commentservice.model.models.commentModels.DeleteCommentRequestModel;
 import com.storyart.commentservice.model.models.commentModels.UpdateCommentRequestModel;
 import com.storyart.commentservice.repository.CommentRepository;
 import com.storyart.commentservice.repository.StoryRepository;
@@ -32,20 +33,19 @@ public class CommentServiceImpl implements CommentService {
             throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED,"Comment cannot be empty");
         }
         //TODO: Remove comment if you want to validate
-        //Optional<User> users = userRepository.findById(cmt.userId);
-        //if (!users.isPresent()){
-        //    throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User does not exist");
-        //}
-        //Optional<Story> stories = storyRepository.findById(cmt.storyId);
-        //if(!stories.isPresent()){
-        //    throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Story does not exist");
-        //}
+        Optional<User> users = userRepository.findById(cmt.userId);
+        if (!users.isPresent()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User does not exist");
+        }
+        Optional<Story> stories = storyRepository.findById(cmt.storyId);
+        if(!stories.isPresent()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Story does not exist");
+        }
         Comment comment = new Comment();
         comment.setContent(cmt.content);
         comment.setStoryId(cmt.userId);
         comment.setUserId(cmt.userId);
-        comment.setCreateAt(new Timestamp(System.currentTimeMillis()));
-        //comment.setUpdateAt(new Timestamp(System.currentTimeMillis()));
+        comment.setActive(true);
         commentRepository.save(comment);
 
         return comment;
@@ -62,23 +62,45 @@ public class CommentServiceImpl implements CommentService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Comment does not exist");
         }
         //TODO: Remove comment if you want to validate
-        //Optional<User> users = userRepository.findById(updateComment.userId);
-        //if (!users.isPresent()){
-        //    throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User does not exist");
-        //}
+        Optional<User> users = userRepository.findById(updateComment.userId);
+        if (!users.isPresent()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User does not exist");
+        }
+
+        if(comments.get().getUserId() != updateComment.userId){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Comment does not belong to this user");
+        }
 
         Comment comment = comments.get();
-        comment.setUpdateAt(new Timestamp(System.currentTimeMillis()));
         comment.setContent(updateComment.content);
-        //commentRepository.save(cmt);
+        commentRepository.save(comment);
         return comment;
     }
 
     @Override
-    public void delete(Integer cmtId) {
-        Comment comment = findById(cmtId);
+    public Comment delete(DeleteCommentRequestModel deleteComment) {
+        Optional<Comment> comments = commentRepository.findById(deleteComment.commentId);
+        if(!comments.isPresent()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Comment does not exist");
+        }
+        //TODO: Remove comment if you want to validate
+        Optional<User> users = userRepository.findById(deleteComment.userId);
+        if (!users.isPresent()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User does not exist");
+        }
+        if(comments.get().getUserId() != deleteComment.userId){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Comment does not belong to this user");
+        }
 
+        Comment comment = comments.get();
+        if(!comment.isActive()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"This comment have been deleted already");
+        }
+        comment.setActive(false);
+        commentRepository.save(comment);
+        return comment;
     }
+
 
     @Override
     public List<Comment> findAll() {
@@ -87,7 +109,10 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment findById(Integer id) {
-        //Comment comment = commentRepository.findById(id);
-        return null;
+        Optional<Comment> comments = commentRepository.findById(id);
+        if(!comments.isPresent()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Comment does not exist");
+        }
+        return comments.get();
     }
 }

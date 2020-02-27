@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -15,7 +17,7 @@ import java.sql.Timestamp;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment extends DateAudit {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -23,9 +25,28 @@ public class Comment extends DateAudit {
     private int userId;
     private int storyId;
     private String content;
+    private boolean isActive;
+    private boolean isDisableByAdmin;
+    @CreationTimestamp
     private Timestamp createAt;
+    @UpdateTimestamp
     private Timestamp updateAt;
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public boolean isDisableByAdmin() {
+        return isDisableByAdmin;
+    }
+
+    public void setDisableByAdmin(boolean disableByAdmin) {
+        isDisableByAdmin = disableByAdmin;
+    }
 
     public Integer getId() {
         return id;
