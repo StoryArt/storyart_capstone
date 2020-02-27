@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.swing.*;
 import javax.validation.Valid;
@@ -37,7 +38,8 @@ public class TagController implements Serializable {
     public List<Tag> findTagByTrue(){
         List<Tag> listtag =  tagservice.findTagByIs_activeIsTrue();
      if(listtag.isEmpty()){
-         return null;
+
+         throw new ResponseStatusException(HttpStatus.NOT_FOUND,"no tag found");
      }
      return listtag;
     }
@@ -47,7 +49,9 @@ public class TagController implements Serializable {
     public List<Tag> findTagByFalse(){
         List<Tag> listtag =  tagservice.findTagByIs_activeIsFalse();
         if(listtag.isEmpty()){
-            return null;
+
+
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"no tag found");
         }
         return listtag;
     }
