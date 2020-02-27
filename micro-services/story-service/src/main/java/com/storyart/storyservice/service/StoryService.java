@@ -10,16 +10,26 @@ import com.storyart.storyservice.repository.UserRepository;
 import com.storyart.storyservice.utils.UUIDUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public interface StoryService {
     HashMap<String, String> validateStoryinfo(AddStoryDto story);
     Story getStoryDetails(int id);
     ResultDto addStory(AddStoryDto story);
     ResultDto updateStory(AddStoryDto story);
+    Page<Story> searchStories(Set<Integer> tags, String keyword, boolean isActive,
+                              boolean isPublished, int page, int itemsPerPage);
+    List<Story> getTrendingStories(int quantity);
 }
 
 @Service
@@ -108,7 +118,9 @@ class StoryServiceImpl implements StoryService{
 
     @Override
     public Story getStoryDetails(int id) {
-        return storyRepository.findById(id).get();
+        Optional<Story> story = storyRepository.findById(id);
+        if(story.isPresent()) return story.get();
+        return null;
     }
 
     @Override
@@ -206,5 +218,19 @@ class StoryServiceImpl implements StoryService{
         }
 
         return resultDto;
+    }
+
+    @Override
+    public Page<Story> searchStories(Set<Integer> tags, String keyword, boolean isActive,
+                                     boolean isPublished, int page, int itemsPerPage) {
+        Pageable pageable =  PageRequest.of(page - 1, itemsPerPage, Sort.by("id").ascending());
+        Page<Story> page1 = storyRepository.findAllBySearchCondition(keyword, tags, isActive, isPublished, pageable);
+        return page1;
+    }
+
+    @Override
+    public List<Story> getTrendingStories(int quantity) {
+        Pageable pageable =  PageRequest.of(0, quantity, Sort.by("avgRate").descending());
+        return storyRepository.findAll(pageable).getContent();
     }
 }

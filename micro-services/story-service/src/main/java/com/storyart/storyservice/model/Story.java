@@ -6,6 +6,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.*;
 
@@ -38,6 +40,7 @@ public class Story implements Serializable {
     private int totalParameterPoints;
     private float avgRate;
     private boolean isPublished;
+
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
