@@ -1,27 +1,20 @@
 package com.storyart.storyservice.service;
 
+import com.storyart.storyservice.model.AddTagDTO;
 import com.storyart.storyservice.model.Tag;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface TagService {
 
-    void create(Tag tag);
+    Tag create(AddTagDTO tag);
 
-    void update(Tag tag);
-
-    void delete(Integer id);
+    Tag update(Tag tag);
 
     List<Tag> findAll();
 
     Tag findById(Integer id);
-    List<Tag> findTagLIKETitle(String title);
 
-    List<Tag> findTagByIs_activeIsFalse();
-    List<Tag> findTagByIs_activeIsTrue();
-
-    void disableTagById(int id);
-
-    void activeTagById(int id);
 
 }

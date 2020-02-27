@@ -1,11 +1,16 @@
 package com.storyart.storyservice.service;
 
 
+import com.storyart.storyservice.model.AddTagDTO;
 import com.storyart.storyservice.model.Tag;
 import com.storyart.storyservice.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import sun.security.provider.certpath.OCSPResponse;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,20 +19,28 @@ public class TagServiceImp implements TagService {
 @Autowired
     TagRepository tagRepository;
 
+
     @Override
-    public void create(Tag tag) {
-    tagRepository.save(tag);
+    public Tag create(AddTagDTO tagDTO) {
+       if(tagDTO.getTitle().isEmpty()){
+           throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Sorry Tag Title is required ");
+       }
+        if(tagRepository.findTagByTitle(tagDTO.getTitle()) != null ) {
+            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Sorry Tag Title existed ");
+        }
+        Tag tag = new Tag();
+        tag.setTitle(tagDTO.getTitle());
+        tag.setActive(true);
+        tagRepository.save(tag);
+        return tag;
     }
 
     @Override
-    public void update(Tag tag) {
-    tagRepository.save(tag);
+    public Tag update(Tag tag) {
+        //check tag do exist
+        return tagRepository.save(tag);
     }
 
-    @Override
-    public void delete(Integer id) {
-        tagRepository.deleteById(id);
-    }
 
     @Override
     public List<Tag> findAll() {
@@ -44,33 +57,4 @@ public class TagServiceImp implements TagService {
         return null;
     }
 
-    @Override
-    public List<Tag> findTagLIKETitle(String title) {
-        List<Tag> tagByTitle = tagRepository.findTagLikeTitle(title);
-
-        return tagByTitle;
-    }
-
-    @Override
-    public List<Tag> findTagByIs_activeIsFalse() {
-        List<Tag> taglist = tagRepository.findTagByIs_activeFalse();
-        return taglist;
-    }
-
-    @Override
-    public List<Tag> findTagByIs_activeIsTrue() {
-        List<Tag> taglist = tagRepository.findTagByIs_active();
-        return taglist;
-    }
-
-    @Override
-    public void disableTagById(int id) {
-         tagRepository.disableTagById(id);
-
-    }
-    @Override
-    public void activeTagById(int id) {
-        tagRepository.activeTagById(id);
-        ;
-    }
 }
