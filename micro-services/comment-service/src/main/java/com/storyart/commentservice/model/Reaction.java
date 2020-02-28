@@ -10,7 +10,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
@@ -19,7 +21,8 @@ import java.sql.Timestamp;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Reaction extends DateAudit {
+@IdClass(ReactionId.class)
+public class Reaction implements Serializable {
     @Id
     private int userId;
     @Id
@@ -27,8 +30,8 @@ public class Reaction extends DateAudit {
 
     private String type;
 
-    //@CreationTimestamp
-    //private Timestamp createAt;
-    //@UpdateTimestamp
-    //private Timestamp updateAt;
+    @CreationTimestamp
+    private Timestamp createAt;
+    @UpdateTimestamp
+    private Timestamp updateAt;
 }

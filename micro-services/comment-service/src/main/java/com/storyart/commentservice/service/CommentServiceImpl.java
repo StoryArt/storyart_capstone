@@ -3,9 +3,9 @@ package com.storyart.commentservice.service;
 import com.storyart.commentservice.model.Comment;
 import com.storyart.commentservice.model.Story;
 import com.storyart.commentservice.model.User;
-import com.storyart.commentservice.model.models.commentModels.CreateCommentRequestModel;
-import com.storyart.commentservice.model.models.commentModels.DeleteCommentRequestModel;
-import com.storyart.commentservice.model.models.commentModels.UpdateCommentRequestModel;
+import com.storyart.commentservice.dto.comment.CreateCommentDTO;
+import com.storyart.commentservice.dto.comment.DeleteCommentDTO;
+import com.storyart.commentservice.dto.comment.UpdateCommentDTO;
 import com.storyart.commentservice.repository.CommentRepository;
 import com.storyart.commentservice.repository.StoryRepository;
 import com.storyart.commentservice.repository.UserRepository;
@@ -14,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,17 +26,17 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     StoryRepository storyRepository;
     @Override
-    public Comment create(CreateCommentRequestModel cmt) {
+    public Comment create(CreateCommentDTO cmt) {
         if(cmt.content.length()<1){
             throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED,"Comment cannot be empty");
         }
         //TODO: Remove comment if you want to validate
-        Optional<User> users = userRepository.findById(cmt.userId);
-        if (!users.isPresent()){
+        Optional<User> user = userRepository.findById(cmt.userId);
+        if (!user.isPresent()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User does not exist");
         }
-        Optional<Story> stories = storyRepository.findById(cmt.storyId);
-        if(!stories.isPresent()){
+        Optional<Story> story = storyRepository.findById(cmt.storyId);
+        if(!story.isPresent()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Story does not exist");
         }
         Comment comment = new Comment();
@@ -52,7 +50,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment update(UpdateCommentRequestModel updateComment) {
+    public Comment update(UpdateCommentDTO updateComment) {
         if(updateComment.content.length()<1){
             throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED,"Comment cannot be empty");
         }
@@ -78,7 +76,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment delete(DeleteCommentRequestModel deleteComment) {
+    public Comment delete(DeleteCommentDTO deleteComment) {
         Optional<Comment> comments = commentRepository.findById(deleteComment.commentId);
         if(!comments.isPresent()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Comment does not exist");
