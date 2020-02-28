@@ -1,4 +1,4 @@
-package com.storyart.commentservice.dto.reaction;
+package com.storyart.commentservice.dto.comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReactionCommentDTO {
+public class RequestLoadListCommentDTO {
     private int userId;
-    private int commentId;
+    private int storyId;
 }

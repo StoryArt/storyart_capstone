@@ -1,9 +1,7 @@
 package com.storyart.commentservice.controller;
 
+import com.storyart.commentservice.dto.comment.*;
 import com.storyart.commentservice.model.Comment;
-import com.storyart.commentservice.dto.comment.CreateCommentDTO;
-import com.storyart.commentservice.dto.comment.DeleteCommentDTO;
-import com.storyart.commentservice.dto.comment.UpdateCommentDTO;
 import com.storyart.commentservice.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,24 +16,29 @@ public class CommentController {
     CommentService commentService;
 
     @GetMapping
-    public List<Comment> getAllComment(){
-        List<Comment> comments = commentService.findAll();
-        return comments;
+    public List<ResponseCommentFromEntityDTO> getAllCommentByStoryId(
+            @RequestBody @Valid RequestLoadListCommentDTO requestLoadListCommentDTO,
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(defaultValue = "numberOfLike") String sortBy){
+
+
+        return commentService.findAllByStoryId(requestLoadListCommentDTO, pageNo, pageSize, sortBy);
     }
     @PostMapping
-    public Comment create(@RequestBody @Valid CreateCommentDTO commentRequestModel){
+    public Comment create(@RequestBody @Valid CreateCommentDTO createCommentDTO){
         
-        return commentService.create(commentRequestModel);
+        return commentService.create(createCommentDTO);
     }
     @PutMapping("/update")
-    public Comment update(@RequestBody @Valid UpdateCommentDTO updateCommentRequestModel){
+    public Comment update(@RequestBody @Valid UpdateCommentDTO updateCommentDTO){
 
-        return commentService.update(updateCommentRequestModel);
+        return commentService.update(updateCommentDTO);
     }
 
     @PostMapping("/delete")
-    public Comment delete(@RequestBody @Valid DeleteCommentDTO deleteCommentRequestModel){
+    public Comment delete(@RequestBody @Valid DeleteCommentDTO deleteCommentDTO){
 
-        return commentService.delete(deleteCommentRequestModel);
+        return commentService.delete(deleteCommentDTO);
     }
 }

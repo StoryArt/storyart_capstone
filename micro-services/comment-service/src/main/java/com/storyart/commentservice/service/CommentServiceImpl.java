@@ -1,21 +1,21 @@
 package com.storyart.commentservice.service;
 
+import com.storyart.commentservice.dto.comment.*;
 import com.storyart.commentservice.model.Comment;
+import com.storyart.commentservice.model.Reaction;
 import com.storyart.commentservice.model.Story;
 import com.storyart.commentservice.model.User;
-import com.storyart.commentservice.dto.comment.CreateCommentDTO;
-import com.storyart.commentservice.dto.comment.DeleteCommentDTO;
-import com.storyart.commentservice.dto.comment.UpdateCommentDTO;
 import com.storyart.commentservice.repository.CommentRepository;
+import com.storyart.commentservice.repository.ReactionRepository;
 import com.storyart.commentservice.repository.StoryRepository;
 import com.storyart.commentservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -25,6 +25,8 @@ public class CommentServiceImpl implements CommentService {
     UserRepository userRepository;
     @Autowired
     StoryRepository storyRepository;
+    @Autowired
+    ReactionRepository reactionRepository;
     @Override
     public Comment create(CreateCommentDTO cmt) {
         if(cmt.content.length()<1){
@@ -99,11 +101,67 @@ public class CommentServiceImpl implements CommentService {
         return comment;
     }
 
-
     @Override
-    public List<Comment> findAll() {
-        return commentRepository.findAll();
+    public List<ResponseCommentFromEntityDTO> findAllByStoryId(RequestLoadListCommentDTO request, int pageNo, int pageSize, String sortBy) {
+        List<Comment> comments = commentRepository.findAllByStoryIdQuery(request.getStoryId());
+        List<Reaction> reactions = reactionRepository.findAll();
+
+        List<ResponseCommentFromEntityDTO> responseComments = new ArrayList<>();
+        for (Comment cmt: comments) {
+            int numberOfLike = 0;
+            int numberOfDislike = 0;
+            boolean amILiked = false;
+            boolean amIDisliked = false;
+            for (Reaction react: reactions) {
+                if(react.getCommentId() == cmt.getId()){
+                    if(react.getType().equals("like")){
+                        numberOfLike++;
+                    }
+                    if(react.getType().equals("dislike")){
+                        numberOfDislike++;
+                    }
+                    if (react.getUserId() == request.getUserId()){
+                        if(react.getType().equals("like")){
+                            amILiked = true;
+                        }
+                        if(react.getType().equals("dislike")){
+                            amIDisliked = true;
+                        }
+                    }
+                }
+
+            }
+            ResponseCommentFromEntityDTO responseComment = new ResponseCommentFromEntityDTO(cmt, numberOfLike,numberOfDislike,amIDisliked,amILiked);
+            responseComments.add(responseComment);
+        }
+        if(sortBy.equals("createAt")){
+            Collections.sort(responseComments, new Comparator<ResponseCommentFromEntityDTO>() {
+                @Override
+                public int compare(ResponseCommentFromEntityDTO o1, ResponseCommentFromEntityDTO o2) {
+                    return o1.getCreateAt().compareTo(o2.getCreateAt());
+                }
+            });
+        }
+        else {
+            Collections.sort(responseComments, new Comparator<ResponseCommentFromEntityDTO>() {
+                @Override
+                public int compare(ResponseCommentFromEntityDTO o1, ResponseCommentFromEntityDTO o2) {
+                    return o2.getNumberOfLike()- o1.getNumberOfLike();
+                }
+            });
+        }
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        int start = (int) pageable.getOffset();
+        int end = (start + pageable.getPageSize()) > responseComments.size() ? responseComments.size() : (start + pageable.getPageSize());
+        Page<ResponseCommentFromEntityDTO> pageResult = new PageImpl<ResponseCommentFromEntityDTO>(responseComments.subList(start,end), pageable, responseComments.size());
+        if(pageResult.hasContent()){
+            return pageResult.getContent();
+        }
+        else {
+            return new ArrayList<ResponseCommentFromEntityDTO>();
+        }
     }
+
 
     @Override
     public Comment findById(Integer id) {
