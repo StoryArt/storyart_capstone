@@ -11,9 +11,7 @@ public interface TagService {
 
     Tag update(AddTagDTO tag);
     List<Tag> findAll();
-    Tag updateStatus(Tag tag);
     Tag findById(Integer id);
-   // List<Tag> findTagsByActive(boolean isActive);
 
 
 }

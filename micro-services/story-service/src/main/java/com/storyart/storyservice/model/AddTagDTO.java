@@ -15,4 +15,5 @@ import javax.persistence.*;
 public class AddTagDTO {
     private Integer id;
     private String title;
+    private boolean isActive;
 }

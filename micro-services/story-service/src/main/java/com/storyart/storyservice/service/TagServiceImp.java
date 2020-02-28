@@ -14,52 +14,56 @@ import java.util.Optional;
 
 @Service
 public class TagServiceImp implements TagService {
-@Autowired
+    @Autowired
     TagRepository tagRepository;
 
 
     @Override
     public Tag create(AddTagDTO tagDTO) {
-       if(tagDTO.getTitle().isEmpty()){
-           throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Sorry Tag Title is required ");
-       }
-       Tag checktag = tagRepository.findByTitle(tagDTO.getTitle());
-        if(checktag != null ) {
-            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Sorry Tag Title existed ");
-        }
         Tag tag = new Tag();
-        tag.setTitle(tagDTO.getTitle());
-        tag.setActive(true);
-        tagRepository.save(tag);
+        Tag checktag = tagRepository.findByTitle(tagDTO.getTitle());
+        if (checktag != null) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Sorry Tag Title existed ");
+        } else if (tagDTO.getTitle().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Sorry Tag Title is required ");
+        } else {
+            tag.setTitle(tagDTO.getTitle());
+            tag.setActive(true);
+            tagRepository.save(tag);
+        }
         return tag;
     }
 
 
-   /* @Override
-    public List<Tag> findTagsByActive(boolean isActive) {
-        List<Tag> listTag = tagRepository.findTagsByActive(isActive);
-        return listTag;
-    }
-*/
+    /* @Override
+     public List<Tag> findTagsByActive(boolean isActive) {
+         List<Tag> listTag = tagRepository.findTagsByActive(isActive);
+         return listTag;
+     }
+ */
     @Override
     public Tag update(AddTagDTO tagDTO) {
-        if(tagDTO.getTitle().isEmpty()){
-            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Sorry Tag Title is required ");
-        }
+
         Optional<Tag> tagCheck = tagRepository.findById(tagDTO.getId());
-        if(!tagCheck.isPresent())
-        {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, Tag do not exist ");
-        }
-
+        Tag checktag = tagRepository.findByTitle(tagDTO.getTitle());
         Tag tag = tagCheck.get();
-        tag.setTitle(tagDTO.getTitle());
-        return tagRepository.save(tag);
-    }
-
-    @Override
-    public Tag updateStatus(Tag tag) {
-        return tagRepository.save(tag);
+        if (!tagCheck.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, Tag do not exist ");
+        } else if (tagDTO.getTitle().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Sorry Tag Title is required ");
+        } else if (checktag != null) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Sorry Tag Title existed ");
+        } else {
+            tag.setTitle(tagDTO.getTitle());
+            boolean flag = tagDTO.isActive();
+            if (!flag) {
+                tag.setActive(false);
+            } else {
+                tag.setActive(true);
+            }
+            tagRepository.save(tag);
+        }
+        return tag;
     }
 
     @Override
@@ -71,7 +75,7 @@ public class TagServiceImp implements TagService {
     @Override
     public Tag findById(Integer id) {
         Optional<Tag> option = tagRepository.findById(id);
-        if(option.isPresent()){
+        if (option.isPresent()) {
             return option.get();
         }
         return null;
