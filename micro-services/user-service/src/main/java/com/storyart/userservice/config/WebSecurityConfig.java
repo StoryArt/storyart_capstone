@@ -1,11 +1,13 @@
 package com.storyart.userservice.config;
 
-import com.storyart.userservice.Jwt.JwtAuthenticationEntryPoint;
-import com.storyart.userservice.controller.JwtRequestFilter;
+import com.storyart.userservice.security.JwtAuthenticationEntryPoint;
+import com.storyart.userservice.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
@@ -27,19 +29,30 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Autowired
-    JwtRequestFilter jwtRequestFilter;
+    JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
-    UserDetailsService userService;
+    UserDetailsService userDetailsService;
+
+
+
 
     // config to let auth know where to load user for matching credentials
     // use BCryptpasswordEncoder
     //todo search BCryptpasswordEncoder
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService).passwordEncoder(passwordEncoder());
+    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+        authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 
     }
+
+
+    @Bean(BeanIds.AUTHENTICATION_MANAGER)
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -47,27 +60,51 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
         //dont need csrf
-        http.csrf().disable()
+        http.
+                cors().
+                    and().
+                csrf().
+                    disable().
+                exceptionHandling().
+                    authenticationEntryPoint(jwtAuthenticationEntryPoint).
+                    and().
+                sessionManagement().
+                    sessionCreationPolicy(SessionCreationPolicy.STATELESS).
+                    and().
                 //dont authenticate this paticulat request
-                .authorizeRequests().antMatchers("/authenticate").permitAll()
+                authorizeRequests().
+                    antMatchers("/",
+                        "/favicon.ico",
+                        "/**/*.png",
+                        "/**/*.gif",
+                        "/**/*.svg",
+                        "/**/*.jpg",
+                        "/**/*.html",
+                        "/**/*.css",
+                        "/**/*.js").
+//todo add more permit api in here
+                        permitAll().
+                antMatchers("/api/v1/auth/**").
+                    permitAll().
+                antMatchers("/api/v1/user/checkingUserAvailability").
+                    permitAll().
+                antMatchers(HttpMethod.POST,"/api/v1/auth/signup/**").permitAll().
+
+                antMatchers(HttpMethod.GET,"/api/v1/user/**").permitAll()
                 // all other reqs need to be authenticated
-                .anyRequest().authenticated().and()
-              // using stateless session , session wont be used to store user state
-                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .anyRequest().
+                    authenticated();
+        // using stateless session , session wont be used to store user state
+        ;
 
 // Add filter to validate the tokens with every request
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     }
+
+
 }

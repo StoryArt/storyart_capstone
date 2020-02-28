@@ -1,22 +1,32 @@
 package com.storyart.userservice.model;
 
-import com.storyart.userservice.model.audit.DateAudit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 
-@Entity
-//@Table(name = "tag")
-@Setter
+
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Tag extends DateAudit {
+@Entity
+@Table(name = "role")
+public class  Role {
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    private String title;
+
+
+    @Enumerated(EnumType.STRING)
+    @NaturalId
+    @Column(length = 60)
+    private RoleName   name;
+
+
 }

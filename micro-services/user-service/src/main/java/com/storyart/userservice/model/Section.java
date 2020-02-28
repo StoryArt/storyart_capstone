@@ -1,13 +1,12 @@
 package com.storyart.userservice.model;
 
-import com.storyart.userservice.common.DateAudit;
+import com.storyart.userservice.model.audit.DateAudit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 
 @Entity
 //@Table(name = "section")
@@ -19,7 +18,6 @@ public class Section extends DateAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-
     private String title;
     private int storyId;
     private String content;

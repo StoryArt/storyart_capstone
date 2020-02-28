@@ -1,14 +1,12 @@
 package com.storyart.userservice.model;
 
-import com.storyart.userservice.common.DateAudit;
+import com.storyart.userservice.model.audit.DateAudit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.util.Set;
 
 @Entity
 //@Table(name = "story")

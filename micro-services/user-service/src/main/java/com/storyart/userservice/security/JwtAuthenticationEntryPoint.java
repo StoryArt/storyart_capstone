@@ -1,5 +1,7 @@
-package com.storyart.userservice.Jwt;
+package com.storyart.userservice.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -17,10 +19,13 @@ import java.io.Serializable;
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint, Serializable {
 
 
-    private static final long serialVersionUID = -7858869558953243875L;
+    public static final Logger lo = LoggerFactory.getLogger(JwtAuthenticationEntryPoint.class);
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
+            throws IOException, ServletException {
+        lo.error("Responding with unauthorized error : message- {}", authException.getMessage());
+
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
 
 
