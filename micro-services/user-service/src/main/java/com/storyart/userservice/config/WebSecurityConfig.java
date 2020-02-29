@@ -92,7 +92,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     permitAll().
                 antMatchers("/api/v1/user/checkingUserAvailability").
                     permitAll().
-                antMatchers(HttpMethod.POST,"/api/v1/auth/signup/**").permitAll().
+                antMatchers(HttpMethod.POST,"/api/v1/auth/signup").permitAll().
 
                 antMatchers(HttpMethod.GET,"/api/v1/user/**").permitAll()
                 // all other reqs need to be authenticated

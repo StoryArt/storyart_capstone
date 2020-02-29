@@ -28,10 +28,10 @@ public class UserPrincipal implements UserDetails {
     private String password;
 
 
-
     public static UserPrincipal create(com.storyart.userservice.model.User user) {
         List<GrantedAuthority> grantedAuthorityList = user.getRoles().stream().map(role ->
-                new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList());
+                new SimpleGrantedAuthority(role.getName().name()))
+                    .collect(Collectors.toList());
         return new UserPrincipal(user.getId(), user.getUsername(), user.getPassword(), grantedAuthorityList);
     }
 

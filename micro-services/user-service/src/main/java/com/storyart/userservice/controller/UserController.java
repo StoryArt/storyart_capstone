@@ -36,7 +36,7 @@ public class UserController {
 
 
     @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    @GetMapping("/{username}")
+    @GetMapping(value = "/username/{username}")
     public User findByUsername(@PathVariable("username") String username) {
         return userService.findByUsername(username);
     }

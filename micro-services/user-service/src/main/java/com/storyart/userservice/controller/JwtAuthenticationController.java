@@ -93,7 +93,7 @@ public class JwtAuthenticationController {
         user.setGender(signUpRequest.getGender());
         user.setActive(true);
         user.setUsername(signUpRequest.getUsername());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
 
 //        Role userRole

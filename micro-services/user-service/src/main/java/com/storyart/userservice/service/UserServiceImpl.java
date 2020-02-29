@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
     //todo mark role_ to above method
 
 
-    @Secured("ROLE_ADMIN")
+//    @Secured("ROLE_ADMIN")
     @Override
     public List<User> findAll() {
 
@@ -66,14 +66,14 @@ public class UserServiceImpl implements UserService {
         return userList;
     }
 
-    @Secured({"ROLE_USER", "ROLE_ADMIN"})
+//    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @Override
     public User findById(Integer id) {
 
         Optional<User> userOptional = userRepository.findById(id);
         return userOptional.orElse(null);
     }
-    @Secured({"ROLE_USER", "ROLE_ADMIN"})
+//    @Secured({"ROLE_USER", "ROLE_ADMIN"})
     @Override
     public User findByUsername(String username) {
         Optional<User> optionalUser = userRepository.findByUsername(username);
