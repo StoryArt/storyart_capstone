@@ -8,6 +8,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.util.List;
+
 @Getter
 @Setter
 public class ResponseCommentFromEntityDTO {
@@ -19,6 +21,8 @@ public class ResponseCommentFromEntityDTO {
     private boolean isDisableByAdmin;
     private Timestamp createAt;
     private Timestamp updateAt;
+    //private List<Integer> likes;
+    //private List<Integer> dislikes;
     private int numberOfLike;
     private int numberOfDislike;
     private boolean amILikeThisComment;

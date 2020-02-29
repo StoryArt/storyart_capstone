@@ -4,6 +4,8 @@ import com.storyart.commentservice.dto.comment.*;
 import com.storyart.commentservice.model.Comment;
 import com.storyart.commentservice.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -40,5 +42,11 @@ public class CommentController {
     public Comment delete(@RequestBody @Valid DeleteCommentDTO deleteCommentDTO){
 
         return commentService.delete(deleteCommentDTO);
+    }
+
+    @PostMapping("/disableAndEnableCommentByAdmin")
+    public ResponseEntity<Boolean> disableByAdmin(@RequestParam (defaultValue = "0") Integer commentId ){
+        commentService.disableAndEnableComment(commentId);
+        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
 }

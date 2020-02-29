@@ -171,4 +171,18 @@ public class CommentServiceImpl implements CommentService {
         }
         return comments.get();
     }
+
+    @Override
+    public void disableAndEnableComment(int commentId) {
+        Comment comment = findById(commentId);
+
+        if (comment.isDisableByAdmin()) {
+            comment.setDisableByAdmin(false);
+        }
+        else {
+            comment.setDisableByAdmin(true);
+        }
+
+        commentRepository.save(comment);
+    }
 }

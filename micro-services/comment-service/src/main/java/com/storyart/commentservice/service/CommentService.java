@@ -12,5 +12,6 @@ public interface CommentService {
     Comment delete(DeleteCommentDTO cmt);
     List<ResponseCommentFromEntityDTO> findAllByStoryId(RequestLoadListCommentDTO request, int pageNo, int pageSize, String sortBy);
     Comment findById(Integer id);
+    void disableAndEnableComment(int commentId);
 
 }
