@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.NaturalId;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -23,4 +24,14 @@ public class SignUpRequest {
     private String password;
     @NotBlank
     String gender;
+
+    @NotBlank
+    @Size(min = 4, max = 40)
+    String name;
+    @NotBlank
+    @Size(max = 40)
+    @NaturalId
+    String email;
+
+
 }

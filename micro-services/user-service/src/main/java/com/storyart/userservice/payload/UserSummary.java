@@ -1,22 +1,19 @@
 package com.storyart.userservice.payload;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
+import javax.persistence.Entity;
 
-
-
-@Getter
 @Setter
-@AllArgsConstructor
+@Getter
 @NoArgsConstructor
-public class LoginRequest {
-
-    @NotBlank
+@AllArgsConstructor
+public class UserSummary {
+    private Integer id;
     private String username;
-    @NotBlank
-    private String password;
+    private String name;
 }

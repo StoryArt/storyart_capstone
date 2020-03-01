@@ -56,7 +56,7 @@ public class JwtAuthenticationController {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUserName(),
+                        loginRequest.getUsername(),
                         loginRequest.getPassword()
                 )
         );
@@ -94,7 +94,8 @@ public class JwtAuthenticationController {
         user.setActive(true);
         user.setUsername(signUpRequest.getUsername());
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-
+        user.setName(signUpRequest.getName());
+        user.setEmail(signUpRequest.getEmail());
 
 //        Role userRole
         //todo : missing role of a user
