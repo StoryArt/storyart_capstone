@@ -10,7 +10,9 @@ import com.storyart.commentservice.repository.ReactionRepository;
 import com.storyart.commentservice.repository.StoryRepository;
 import com.storyart.commentservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -103,63 +105,40 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<ResponseCommentFromEntityDTO> findAllByStoryId(RequestLoadListCommentDTO request, int pageNo, int pageSize, String sortBy) {
-        List<Comment> comments = commentRepository.findAllByStoryIdQuery(request.getStoryId());
-        List<Reaction> reactions = reactionRepository.findAll();
-
-        List<ResponseCommentFromEntityDTO> responseComments = new ArrayList<>();
-        for (Comment cmt: comments) {
-            int numberOfLike = 0;
-            int numberOfDislike = 0;
-            boolean amILiked = false;
-            boolean amIDisliked = false;
-            for (Reaction react: reactions) {
-                if(react.getCommentId() == cmt.getId()){
-                    if(react.getType().equals("like")){
-                        numberOfLike++;
-                    }
-                    if(react.getType().equals("dislike")){
-                        numberOfDislike++;
-                    }
-                    if (react.getUserId() == request.getUserId()){
-                        if(react.getType().equals("like")){
-                            amILiked = true;
-                        }
-                        if(react.getType().equals("dislike")){
-                            amIDisliked = true;
-                        }
-                    }
-                }
-
-            }
-            ResponseCommentFromEntityDTO responseComment = new ResponseCommentFromEntityDTO(cmt, numberOfLike,numberOfDislike,amIDisliked,amILiked);
-            responseComments.add(responseComment);
-        }
-        if(sortBy.equals("createAt")){
-            Collections.sort(responseComments, new Comparator<ResponseCommentFromEntityDTO>() {
-                @Override
-                public int compare(ResponseCommentFromEntityDTO o1, ResponseCommentFromEntityDTO o2) {
-                    return o1.getCreateAt().compareTo(o2.getCreateAt());
-                }
-            });
-        }
-        else {
-            Collections.sort(responseComments, new Comparator<ResponseCommentFromEntityDTO>() {
-                @Override
-                public int compare(ResponseCommentFromEntityDTO o1, ResponseCommentFromEntityDTO o2) {
-                    return o2.getNumberOfLike()- o1.getNumberOfLike();
-                }
-            });
-        }
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        int start = (int) pageable.getOffset();
-        int end = (start + pageable.getPageSize()) > responseComments.size() ? responseComments.size() : (start + pageable.getPageSize());
-        Page<ResponseCommentFromEntityDTO> pageResult = new PageImpl<ResponseCommentFromEntityDTO>(responseComments.subList(start,end), pageable, responseComments.size());
-        if(pageResult.hasContent()){
-            return pageResult.getContent();
+        Page<Comment> commentPage;
+        if(sortBy.equals("createAt")){
+            commentPage = commentRepository.findAllByStoryIdAndOrderByCreateAt(request.getStoryId(),pageable);
         }
         else {
-            return new ArrayList<ResponseCommentFromEntityDTO>();
+            commentPage = commentRepository.findAllByStoryIdAndOrderByReactions(request.getStoryId(),pageable);
         }
+        List<Comment> comments = commentPage.getContent();
+        List<Integer> commentIds = new ArrayList<>();
+        for (Comment comment: comments) {
+            commentIds.add(comment.getId());
+        }
+
+        List<Reaction> reactions = reactionRepository.findListUserId(commentIds);
+        List<ResponseCommentFromEntityDTO> responseList = new ArrayList<>();
+        int count = 0;
+        for (Comment comment: comments) {
+            List<Integer> likeIds = new ArrayList<>();
+            List<Integer> dislikeIds = new ArrayList<>();
+            for (Reaction reaction: reactions) {
+                if(comment.getId() == reaction.getComment().getId()){
+                    if (reaction.getType().equals("like")){
+                        likeIds.add(reaction.getUserId());
+                    }
+                    if (reaction.getType().equals("dislike")){
+                        dislikeIds.add(reaction.getUserId());
+                    }
+                }
+            }
+            ResponseCommentFromEntityDTO response = new ResponseCommentFromEntityDTO(comment, likeIds,dislikeIds);
+            responseList.add(response);
+        }
+        return responseList;
     }
 
 

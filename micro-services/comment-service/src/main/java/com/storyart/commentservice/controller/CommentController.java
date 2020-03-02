@@ -21,8 +21,8 @@ public class CommentController {
     public List<ResponseCommentFromEntityDTO> getAllCommentByStoryId(
             @RequestBody @Valid RequestLoadListCommentDTO requestLoadListCommentDTO,
             @RequestParam(defaultValue = "0") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "numberOfLike") String sortBy){
+            @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "createAt") String sortBy){
 
 
         return commentService.findAllByStoryId(requestLoadListCommentDTO, pageNo, pageSize, sortBy);

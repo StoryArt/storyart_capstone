@@ -8,10 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
@@ -25,8 +22,9 @@ import java.sql.Timestamp;
 public class Reaction implements Serializable {
     @Id
     private int userId;
-    @Id
-    private int commentId;
+    @OneToOne
+    @JoinColumn
+    private Comment comment;
 
     private String type;
 

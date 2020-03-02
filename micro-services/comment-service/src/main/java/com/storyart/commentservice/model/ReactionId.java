@@ -13,6 +13,5 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReactionId implements Serializable {
-    private int commentId;
     private int userId;
 }

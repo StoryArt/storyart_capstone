@@ -21,14 +21,10 @@ public class ResponseCommentFromEntityDTO {
     private boolean isDisableByAdmin;
     private Timestamp createAt;
     private Timestamp updateAt;
-    //private List<Integer> likes;
-    //private List<Integer> dislikes;
-    private int numberOfLike;
-    private int numberOfDislike;
-    private boolean amILikeThisComment;
-    private boolean amIDislikeThisComment;
+    private List<Integer> likes;
+    private List<Integer> dislikes;
 
-    public ResponseCommentFromEntityDTO(Comment comment, int numberOfLike, int numberOfDislike, boolean amIDislikeThisComment, boolean amILikeThisComment) {
+    public ResponseCommentFromEntityDTO(Comment comment, List<Integer> likes, List<Integer> dislikes) {
         this.id = comment.getId();
         this.userId = comment.getUserId();
         this.storyId = comment.getStoryId();
@@ -37,9 +33,7 @@ public class ResponseCommentFromEntityDTO {
         this.isDisableByAdmin = comment.isDisableByAdmin();
         this.createAt = comment.getCreateAt();
         this.updateAt = comment.getUpdateAt();
-        this.numberOfLike = numberOfLike;
-        this.numberOfDislike = numberOfDislike;
-        this.amILikeThisComment = amILikeThisComment;
-        this.amIDislikeThisComment = amIDislikeThisComment;
+        this.likes = likes;
+        this.dislikes = dislikes;
     }
 }
