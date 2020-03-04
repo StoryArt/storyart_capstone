@@ -1,5 +1,5 @@
 import React from 'react';
-import { MDBCol, MDBCard, MDBCardBody, MDBCardImage, MDBCardTitle, MDBCardText, MDBBtn, MDBDropdown, MDBDropdownToggle, MDBDropdownMenu, MDBDropdownItem } from 'mdbreact';
+import { MDBRating  } from 'mdbreact';
 import UserLayout from '../../layouts/UserLayout';
 
 const StoryDetailsPage = () => {
@@ -26,6 +26,11 @@ const StoryDetailsPage = () => {
                            editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum'
                             will uncover many web sites still in their infancy. Various versions have evolved over the years, 
                            sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+                        
+                        <div>
+                            <MDBRating iconRegular />
+                        </div>
+                        
                         <form>
                             <div className="form-group">
                                 <textarea 

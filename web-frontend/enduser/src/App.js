@@ -11,19 +11,28 @@ import StoryDetailsPage from './pages/enduser/StoryDetailsPage';
 import UserProfilePage from './pages/enduser/UserProfilePage';
 import UserHistoryPage from './pages/enduser/UserHistoryPage';
 
+import LoginPage from './pages/common/LoginPage';
+import RegisterPage from './pages/common/RegisterPage';
+import DemoPage from './pages/common/DemoPage';
+
 import DashboardPage from './pages/admin/DashboardPage';
 import UserManagementPage from './pages/admin/AdminManagementPage';
 import StoryManagementPage from './pages/admin/StoryManagementPage';
 import TagManagementPage from './pages/admin/TagManagementPage';
 import ReportManagementPage from './pages/admin/ReportManagementPage';
 import AdminManagementPage from './pages/admin/AdminManagementPage';
-import NotFoundPage from './pages/admin/NotFoundPage';
+import NotFoundPage from './pages/common/NotFoundPage';
 
 function App() {
   
   return (
     <Router>
       <Switch>
+          {/* common routes */}
+          <Route exact path="/login" component={LoginPage}/>
+          <Route exact path="/register" component={RegisterPage}/>
+          <Route exact path="/demo" component={DemoPage}/>
+
           {/* user routes */}
           <Route exact path="/" component={HomePage}/>
           <Route exact path="/home" component={HomePage}/>

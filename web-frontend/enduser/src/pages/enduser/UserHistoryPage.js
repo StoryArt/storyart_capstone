@@ -19,7 +19,7 @@ const UserHistoryPage = () => {
                 <MDBNav className="nav-tabs" className="mb-4">
                     <MDBNavItem>
                         <MDBNavLink to="#" active={activeItem === "1"} onClick={toggle("1")} role="tab" >
-                            Truyen
+                            Doc Truyen
                         </MDBNavLink>
                     </MDBNavItem>
                     <MDBNavItem>
