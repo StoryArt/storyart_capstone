@@ -106,5 +106,7 @@ public class AdminController {
         return userService.findByUsernameLike(page, size, searchtxt);
     }
 
+    //todo: cannot able to active account -that deactived by sys/admin- 2 functions
+
 
 }

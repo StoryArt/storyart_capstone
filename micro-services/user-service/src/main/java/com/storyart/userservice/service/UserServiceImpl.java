@@ -171,7 +171,7 @@ public class UserServiceImpl implements UserService {
 
 
 
-        return optionalUser.orElseThrow(null);
+        return optionalUser.orElse(null);
 
     }
 //todo add admin user method

@@ -69,15 +69,8 @@ public class SystemAdminController {
         //todo : missing role of a user
         Role userRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
                 .orElseThrow(() -> new AppException("User Role not set."));
-
         user.setRoles(Collections.singleton(userRole));
-
-
-
-
-
         User savedUser = userRepository.save(user);
-
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("api/v1/user/username")
                 .buildAndExpand(savedUser.getUsername()).toUri();
         return ResponseEntity.created(location).body(new ApiResponse(true, "Administrator created successfully"));
@@ -86,5 +79,5 @@ public class SystemAdminController {
     //todo change role of user
 // todo; not allow admin to set active of sysadmin
     //todo: update data and login with email
-
+//todo: check lai n-n user vs role?!
 }

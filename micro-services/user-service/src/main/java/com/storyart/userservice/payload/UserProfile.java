@@ -20,9 +20,8 @@ public class UserProfile {
     private String name;
     private String email;
     private Instant joinAt;
-
-
     private Integer storyCount;
-
-
+//todo: bo username
+    //todo: slug
+    //todo: them role
 }
