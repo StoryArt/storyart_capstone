@@ -18,7 +18,7 @@ const TreeUIDemo = (props) => {
 
     props.story.sections.forEach((section, index) => {
         if(section.level !== -1){
-            if(section.nextSectionId){
+            if(section.nextScreenId){
                 
             }
         }

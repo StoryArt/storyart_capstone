@@ -1,7 +1,7 @@
 package com.storyart.storyservice.controller;
 
-import com.storyart.storyservice.model.Section;
-import com.storyart.storyservice.service.SectionService;
+import com.storyart.storyservice.model.Screen;
+import com.storyart.storyservice.service.ScreenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +17,11 @@ import java.util.List;
 public class SectionController {
 
     @Autowired
-    SectionService sectionService;
+    ScreenService screenService;
 
     @GetMapping("all/{storyId}")
     public ResponseEntity getSectionsByStoryId(@PathVariable int storyId){
-        List<Section> sections = sectionService.getSectionsByStoryId(storyId);
+        List<Screen> sections = screenService.getScreensByStoryId(storyId);
         return new ResponseEntity(sections, HttpStatus.OK);
     }
 }

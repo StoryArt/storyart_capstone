@@ -7,4 +7,4 @@ class ValidationUtils{
     }
 }
 
-export default { ValidationUtils };
+export default ValidationUtils;
