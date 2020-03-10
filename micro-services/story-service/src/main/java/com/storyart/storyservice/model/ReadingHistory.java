@@ -16,12 +16,14 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@IdClass(ReadingHistoryId.class)
 public class ReadingHistory extends DateAudit implements Serializable {
-    @Id
-    private int userId;
 
     @Id
-    private int storyId;
+    private Integer userId;
+
+    @Id
+    private Integer storyId ;
 
     private String listSectionId;
 }

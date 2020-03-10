@@ -13,7 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddTagDTO {
-    private Integer id;
+    private int id;
     private String title;
     private boolean isActive;
 }
