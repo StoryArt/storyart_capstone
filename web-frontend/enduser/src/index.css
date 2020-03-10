@@ -237,4 +237,11 @@ main {
 
 .text-bold{
   font-weight: 600;
+<<<<<<< HEAD
+=======
+}
+
+.screen-card{
+  border-radius: 15px;
+>>>>>>> story-service
 }

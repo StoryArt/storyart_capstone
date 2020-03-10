@@ -12,7 +12,11 @@ const UserHistoryPage = () => {
           setActiveItem(tab);
         }
     };
+<<<<<<< HEAD
 // eslint-disable-next-line
+=======
+
+>>>>>>> story-service
     return (
         <UserLayout>
             <div className="container-fluid">

@@ -19,10 +19,15 @@ const DemoPage = () => {
 
     useEffect(() => {
         getPosts();
+<<<<<<< HEAD
         
     }, []);
 
 
+=======
+    }, []);
+
+>>>>>>> story-service
     return (
         <UserLayout>
             <div className="container">

@@ -7,4 +7,8 @@ class ValidationUtils{
     }
 }
 
+<<<<<<< HEAD
 export default { ValidationUtils };
+=======
+export default ValidationUtils;
+>>>>>>> story-service

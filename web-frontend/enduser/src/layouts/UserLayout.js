@@ -1,5 +1,8 @@
 import React from 'react';
+<<<<<<< HEAD
 // eslint-disable-next-line
+=======
+>>>>>>> story-service
 import { Link } from 'react-router-dom';
 // import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
 import UserSideNavigation from '../components/user/UserSideNavigation';
