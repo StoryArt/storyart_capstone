@@ -11,10 +11,7 @@
     "axios": "^0.19.2",
     "google-map-react": "^1.0.6",
     "mdbreact": "^4.9.0",
-<<<<<<< HEAD
     "moment": "^2.24.0",
-=======
->>>>>>> story-service
     "react": "^16.12.0",
     "react-bootstrap": "^1.0.0-beta.16",
     "react-dom": "^16.12.0",

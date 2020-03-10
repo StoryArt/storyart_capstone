@@ -1,12 +1,6 @@
 import axios from 'axios';
 import { API_ENDPOINT_PREFIX } from '../config/api';
 
-<<<<<<< HEAD
-const storyEndpointPrefix = API_ENDPOINT_PREFIX + '/stories';
-
-class StoryService{
-
-=======
 const storyEndpointAPIUrl = API_ENDPOINT_PREFIX + '/stories';
 
 class StoryService{
@@ -19,7 +13,6 @@ class StoryService{
         const url = storyEndpointAPIUrl + '/read/' + storyId;
         return axios.get(url);
     }
->>>>>>> story-service
 }
 
 export default StoryService;

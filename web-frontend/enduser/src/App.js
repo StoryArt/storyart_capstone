@@ -4,13 +4,8 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
 
 import HomePage from './pages/enduser/HomePage';
-<<<<<<< HEAD
-import StoryReadingPage from './pages/enduser/StoryReadingPage';
-import CreateStoryPage from './pages/enduser/CreateStoryPage';
-=======
 import StoryReadingPage from './pages/enduser/story-reading-page/StoryReadingPage';
 import CreateStoryPage from './pages/enduser/create-story-page/CreateStoryPage';
->>>>>>> story-service
 import SearchStoriesPage from './pages/enduser/SearchStoriesPage';
 import StoryDetailsPage from './pages/enduser/StoryDetailsPage';
 import UserProfilePage from './pages/enduser/UserProfilePage';
@@ -41,11 +36,7 @@ function App() {
           {/* user routes */}
           <Route exact path="/" component={HomePage}/>
           <Route exact path="/home" component={HomePage}/>
-<<<<<<< HEAD
-          <Route exact path="/create-story" component={CreateStoryPage}/>
-=======
           <Route exact path="/stories/create" component={CreateStoryPage}/>
->>>>>>> story-service
           <Route exact path="/search-stories" component={SearchStoriesPage}/>
           <Route exact path="/stories/details/" component={StoryDetailsPage}/>
           <Route exact path="/stories/read/:storyId" component={StoryReadingPage}/>

@@ -1,11 +1,6 @@
 import React from 'react';
 import { MDBRating  } from 'mdbreact';
 import UserLayout from '../../layouts/UserLayout';
-<<<<<<< HEAD
-// eslint-disable-next-line
-=======
-
->>>>>>> story-service
 const StoryDetailsPage = () => {
     return (
         <UserLayout>
