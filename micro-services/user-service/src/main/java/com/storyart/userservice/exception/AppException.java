@@ -16,7 +16,7 @@ public class AppException extends RuntimeException{
         super(message, cause);
     }
 
-
+//todo; lam sao handle het exception o phia
 
 
 }

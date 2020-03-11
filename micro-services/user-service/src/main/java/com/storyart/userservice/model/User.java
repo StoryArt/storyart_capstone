@@ -10,7 +10,9 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 @Entity
@@ -45,17 +47,23 @@ public class User extends DateAudit {
 
     /*fetch = FetchType.LAZY tức là khi bạn find, select đối
      tượng User từ database thì nó sẽ không lấy các đối tượng Role liên quan*/
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY,cascade = { CascadeType.ALL })
     /*joinColumns=id of user table , inversejoin=id of role*/
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+
+
+
+
     @Size(max = 300)
     private String introContent;
     private String gender;
+    private String dob;
     private boolean isActive;
+
 
     @Email
     @NotBlank

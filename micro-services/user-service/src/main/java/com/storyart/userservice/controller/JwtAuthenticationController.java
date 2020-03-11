@@ -1,6 +1,7 @@
 package com.storyart.userservice.controller;
 
 import com.storyart.userservice.exception.AppException;
+import com.storyart.userservice.exception.UnauthorizedException;
 import com.storyart.userservice.model.Role;
 import com.storyart.userservice.model.RoleName;
 import com.storyart.userservice.repository.RoleRepository;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,13 +55,18 @@ public class JwtAuthenticationController {
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        Authentication authentication;
+        try {
+          authentication  = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.ok().body(new ApiResponse(false, "Your username or password were incorrect."));
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
+        }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -98,7 +105,6 @@ public class JwtAuthenticationController {
         user.setEmail(signUpRequest.getEmail());
 
 //        Role userRole
-        //todo : missing role of a user
         Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
                 .orElseThrow(() -> new AppException("User Role not set."));
 

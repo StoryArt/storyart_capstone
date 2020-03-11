@@ -1,10 +1,9 @@
 package com.storyart.userservice.controller;
 
 import com.storyart.userservice.exception.ResourceNotFoundException;
+import com.storyart.userservice.exception.UnauthorizedException;
 import com.storyart.userservice.model.User;
-import com.storyart.userservice.payload.ApiResponse;
-import com.storyart.userservice.payload.UserProfile;
-import com.storyart.userservice.payload.UserSummary;
+import com.storyart.userservice.payload.*;
 import com.storyart.userservice.security.CurrentUser;
 import com.storyart.userservice.security.UserPrincipal;
 import com.storyart.userservice.service.UserService;
@@ -23,6 +22,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/user")
+@CrossOrigin
 public class UserController {
 
 
@@ -31,43 +31,73 @@ public class UserController {
 
 
     @GetMapping("/{uid}")
-    public UserProfile get(@PathVariable("uid") Integer uid) {
+    public UserProfileResponse get(@PathVariable("uid") Integer uid) {
         User user = userService.findById(uid);
-        UserProfile userProfile = new UserProfile();
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
 
         if (user == null) {
             throw new ResourceNotFoundException("User", "id", uid);
         } else {
-            userProfile.setName(user.getName());
-            userProfile.setUsername(user.getUsername());
-            userProfile.setEmail(user.getEmail());
-            userProfile.setJoinAt(user.getCreatedAt());
+            userProfileResponse.setName(user.getName());
+            userProfileResponse.setUsername(user.getUsername());
+            userProfileResponse.setEmail(user.getEmail());
+            userProfileResponse.setJoinAt(user.getCreatedAt());
         }
-        return userProfile;
+        return userProfileResponse;
 
     }
+
+
+
+//    @GetMapping("/user/mystories")
+//    public UserStoriesProfile getMyUserProfileAndStory(@CurrentUser UserPrincipal userPrincipal) {
+//
+//        User user = userService.findById(        userPrincipal.getId());
+//        UserStoriesProfile userStoriesProfile = new UserStoriesProfile();
+//
+//        if (user == null) {
+//            throw new ResourceNotFoundException("User", "id", userPrincipal.getId());
+//        } else {
+//            userStoriesProfile.setIntroContent(user.getIntroContent());
+//            userStoriesProfile.setModifiedAt(user.getUpdatedAt());
+//            PagedResponse<Story> userStories= userService.findStoriesByUserId( userPrincipal.getId());
+//            userStoriesProfile.setStoryList(userStories. );
+//
+//            userStoriesProfile.setName(user.getName());
+//            userStoriesProfile.setEmail(user.getEmail());
+//            userStoriesProfile.setJoinAt(user.getCreatedAt());
+//        }
+//        return userStoriesProfile;
+//
+//    }
 
 
     //todo return profile of user, not all data
     @GetMapping(value = "/username/{username}")
-    public UserProfile findByUsername(@PathVariable("username") String username) {
+    public UserProfileResponse findByUsername(@PathVariable("username") String username) {
         User user = userService.findByUsername(username);
-        UserProfile userProfile = new UserProfile();
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
 
         if (user == null) {
             throw new ResourceNotFoundException("User", "username", username);
         } else {
-            userProfile.setName(user.getName());
-            userProfile.setUsername(user.getUsername());
-            userProfile.setEmail(user.getEmail());
-            userProfile.setJoinAt(user.getCreatedAt());
+           userProfileResponse = new UserProfileResponse(user);
         }
-        return userProfile;
+        return userProfileResponse;
     }
 
     @GetMapping(value = "/me")
-    public UserSummary currentUser(@CurrentUser UserPrincipal userPrincipal) {
-        return new UserSummary(userPrincipal.getId(), userPrincipal.getUsername(), userPrincipal.getName());
+    public UserProfileResponse currentUser(@CurrentUser UserPrincipal userPrincipal) {
+        User user = userService.findByUsername(userPrincipal.getUsername());
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+
+        if (user == null) {
+            throw new ResourceNotFoundException("User", "username", userPrincipal.getUsername());
+        } else {
+            userProfileResponse = new UserProfileResponse(user);
+        }
+        return userProfileResponse;
+
     }
 
 
@@ -77,14 +107,23 @@ public class UserController {
 
 
     //todo : what is @Valid
+
+    // todo danh luong xu ly cho ham nay
     @PutMapping(value = "/{uid}")
-    public User update(@PathVariable("uid") Integer uid, @RequestBody @Valid User user, @CurrentUser UserPrincipal userPrincipal) {
+    public User update(@PathVariable("uid") Integer uid,
+                       @RequestBody @Valid UserProfileUpdateRequest user, @CurrentUser UserPrincipal userPrincipal) {
+
+        if(userPrincipal.getId()!= uid){
+            throw new UnauthorizedException("Not authorized for change this user profile");
+        }
+
+
         User userById = userService.findById(uid);
         if (userById == null) {
             throw new ResourceNotFoundException("User", "id", uid);
         }
         if (userPrincipal.getUsername().equals(userById.getUsername())) {
-            userService.update(user);
+            userService.update(uid,user);
         }
         return userService.findById(uid);
     }
@@ -98,17 +137,12 @@ public class UserController {
 //    }
 
 
-    //Response posted user
-    @PostMapping
-    public User register(@RequestBody @Valid User user) {
-        userService.create(user);
-        return user;
-    }
 
     // todo missing check available user (is active or not api)
     /* Deactivating a user without checking it deactived or not */
     @DeleteMapping(value = "/{uid}")
-    public ResponseEntity<?> activate(@PathVariable Integer uid, @Param(value = "setActive") boolean setActive) {
+    public ResponseEntity<?> activate(@PathVariable Integer uid,
+                                      @Param(value = "setActive") boolean setActive) {
         //this user must being active and param: setActive=false
         if (!setActive) {
             userService.deActive(uid);

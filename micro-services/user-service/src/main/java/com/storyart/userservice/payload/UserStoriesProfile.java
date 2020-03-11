@@ -1,27 +1,30 @@
 package com.storyart.userservice.payload;
 
+import com.storyart.userservice.model.Story;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
-
-
-/*show infromation to client to display user profile*/
+import java.util.Date;
+import java.util.List;
 
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserProfile {
+public class UserStoriesProfile {
+
     private Integer id;
-    private String username;
     private String name;
     private String email;
     private Instant joinAt;
-    private Integer storyCount;
-//todo: bo username
-    //todo: slug
-    //todo: them role
+    private Instant modifiedAt;
+    private  String introContent;
+    Date dob;
+    List<Story> storyList;
+
+
+
 }

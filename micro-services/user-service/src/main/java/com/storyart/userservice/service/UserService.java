@@ -1,14 +1,11 @@
 package com.storyart.userservice.service;
 
-import com.storyart.userservice.exception.ResourceNotFoundException;
+import com.storyart.userservice.model.Story;
 import com.storyart.userservice.model.User;
 import com.storyart.userservice.payload.PagedResponse;
-import com.storyart.userservice.payload.UserProfile;
-import com.storyart.userservice.payload.UserSummary;
+import com.storyart.userservice.payload.UserInManagementResponse;
+import com.storyart.userservice.payload.UserProfileUpdateRequest;
 import com.storyart.userservice.security.UserPrincipal;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -17,7 +14,8 @@ public interface UserService {
 
     void create(User us);
 
-    void update(User us);
+
+    void update(Integer uid,UserProfileUpdateRequest us);
 
     void delete(Integer id);
 
@@ -36,5 +34,11 @@ public interface UserService {
 
     PagedResponse<User> getAllUser(UserPrincipal userPrincipal, int page, int size);
 
-    PagedResponse<User> findByUsernameLike( int page, int size ,String search);
+    PagedResponse<UserInManagementResponse> findByUsernameOrEmail( int page, int size ,String search);
+
+    PagedResponse<Story> findStoriesByUserId(Integer id);
+
+    PagedResponse<UserInManagementResponse> findAdminbyUsernameOrEmail(int page, int size , String search);
+
+    PagedResponse<UserInManagementResponse> findOnlyUserByUsernameOrEmail(int page, int size, String searchtxt);
 }
