@@ -86,7 +86,8 @@ public class SystemAdminController {
         return userService.findAdminbyUsernameOrEmail(page, size, searchtxt);
     }
     @DeleteMapping(value = "/admins/{uid}")
-    public ResponseEntity<?> deactiveAdmin(@CurrentUser UserPrincipal systemAdmin, @PathParam("uid") Integer uid, @RequestParam("setActive") boolean setActive) {
+    public ResponseEntity<?> deactiveAdmin(@CurrentUser UserPrincipal
+               systemAdmin, @PathVariable("uid") Integer uid, @RequestParam("setActive") boolean setActive) {
         User adminById = userService.findById(uid);
         if (adminById == null) {
             throw new ResourceNotFoundException("id", "User", uid);
