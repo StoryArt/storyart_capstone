@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
-import MainLayout from '../layouts/MainLayout';
-import TreeUIDemo from '../components/TreeUIDemo';
+import MainLayout from '../../layouts/UserLayout';
+// import TreeUIDemo from '../../components/TreeUIDemo';
 
 const CreateStoryPage = () => {
 
