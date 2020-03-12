@@ -6,8 +6,10 @@ import StoryParameters from './StoryParameters';
 import ScreensList from './ScreensList';
 import ScreensSelect from './ScreensSelect';
 import MyDropdownMenu from './MyDropdownMenu';
+import MyAlert from '../../../components/common/MyAlert';
 
-import { ACTION_TYPES, INFORMATION_TYPES, NUMBER_CONDITIONS, STRING_CONDITIONS, NUMBER_OPERATIONS, STRING_OPERATIONS }  from '../../../common/constants';
+import { ACTION_TYPES, INFORMATION_TYPES, NUMBER_CONDITIONS, STRING_CONDITIONS, 
+    NUMBER_OPERATIONS, STRING_OPERATIONS }  from '../../../common/constants';
 import StoryService from '../../../services/story.service';
 
 
@@ -22,6 +24,7 @@ const CreateStoryPage = () => {
     const [screens, setScreens] = useState([]);
     const [storyParameters, setStoryParameters] = useState([]);
     const [currentScreen, setCurrentScreen] = useState(0);
+    const [alert, setAlert] = useState({ open: false, content: '', type: 'success' });
 
     const parameters = [{
         type: INFORMATION_TYPES.NUMBER,
@@ -189,9 +192,9 @@ const CreateStoryPage = () => {
             if(success) {
                 let msg = 'Luu thanh cong';
                 if(story.isPublished) msg = 'Luu va xuat ban thanh cong';
-                alert(msg);
+                setAlert({ content: msg, type:'success', open: true });
             } else {
-                alert('Khong the luu truyen');
+                setAlert({ content: 'Khong the luu truyen', type:'error', open: true });
             }
         } catch (error) {
             console.log(error);
@@ -326,6 +329,8 @@ const CreateStoryPage = () => {
                 </div>
             
             </div>
+        
+            <MyAlert/>
         </MainLayout>
     );
 };

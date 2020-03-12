@@ -1,13 +1,13 @@
 package com.storyart.storyservice.model;
 
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -17,7 +17,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Story implements Serializable {
+public class Story {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -27,20 +27,32 @@ public class Story implements Serializable {
 
     private int authorId;
 
-    @NonNull
-    private String introContent;
+    private String intro;
 
-    @NonNull
     private String animation;
+    private String image;
 
-    private boolean isActive;
-    private boolean isParametered;
-    private String parameterName;
-    private int minParameterPoints;
-    private int totalParameterPoints;
+    private String firstScreenId;
+
+    @Column(columnDefinition = "float default 0")
     private float avgRate;
+
+    @ColumnDefault("true")
+    private boolean isActive;
+
+    @ColumnDefault("false")
     private boolean isPublished;
 
+
+    @ColumnDefault("false")
+    private Boolean isDeactiveByAdmin;
+
+    @ManyToMany
+    @JoinTable(
+            name = "story_tag",
+            joinColumns = @JoinColumn(name = "story_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    List<Tag> tags;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

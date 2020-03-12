@@ -99,7 +99,7 @@ const StoryParameters = (props) => {
                                                     variant="outlined"
                                                     value={cond.value}
                                                     onChange={(e) => onChangeParamConditions('value', e.target.value, index, param)} 
-                                                    type={param.type === 'number' ? "number" : 'text'}
+                                                    type={param.type === INFORMATION_TYPES.NUMBER ? "number" : 'text'}
                                                 />
                                             </div>
                                             <div className="col-sm-4 px-1">

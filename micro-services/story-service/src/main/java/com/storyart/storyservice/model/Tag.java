@@ -9,8 +9,6 @@ import lombok.Setter;
 import javax.persistence.*;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,4 +22,7 @@ public class Tag extends DateAudit implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String title;
+
+    @ManyToMany(mappedBy = "tags")
+    List<Story> stories;
 }

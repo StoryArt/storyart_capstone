@@ -1,24 +1,46 @@
 package com.storyart.storyservice.service;
 
-import com.storyart.storyservice.model.Section;
-import com.storyart.storyservice.repository.SectionRepository;
+import com.storyart.storyservice.model.*;
+import com.storyart.storyservice.repository.*;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-public interface SectionService {
-    List<Section> getSectionsByStoryId(int storyId);
+public interface
+ScreenService {
+    List<Screen> getScreensByStoryId(int storyId);
 }
 
 @Service
-class SectionServiceImpl implements SectionService{
+class ScreenServiceImpl implements ScreenService {
 
     @Autowired
-    SectionRepository sectionRepository;
+    ScreenRepository screenRepository;
+
+    @Autowired
+    StoryRepository storyRepository;
+
+    @Autowired
+    ActionRepository actionRepository;
+
+    @Autowired
+    InformationRepository informationRepository;
+
+    @Autowired
+    InfoConditionRepository infoConditionRepository;
+
+    @Autowired
+    InformationActionRepository informationActionRepository;
+
+    @Autowired
+    ModelMapper modelMapper;
 
     @Override
-    public List<Section> getSectionsByStoryId(int storyId) {
-        return sectionRepository.findByStoryId(storyId);
+    public List<Screen> getScreensByStoryId(int storyId) {
+        return screenRepository.findByStoryId(storyId);
     }
+
+
 }

@@ -1,8 +1,11 @@
 import React from 'react';
+import { CircularProgress } from '@material-ui/core';
 
 const MySpinner = () => {
     return (
-        <h3 className="text-center">Loading...</h3>
+        <div className="text-center">
+            <CircularProgress color="secondary" />
+        </div>
     );
 };
 

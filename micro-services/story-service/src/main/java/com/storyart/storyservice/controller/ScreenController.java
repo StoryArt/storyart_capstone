@@ -13,15 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/section")
-public class SectionController {
+@RequestMapping("/screen")
+public class ScreenController {
 
     @Autowired
     ScreenService screenService;
 
     @GetMapping("all/{storyId}")
-    public ResponseEntity getSectionsByStoryId(@PathVariable int storyId){
-        List<Screen> sections = screenService.getScreensByStoryId(storyId);
-        return new ResponseEntity(sections, HttpStatus.OK);
+    public ResponseEntity getScreensByStoryId(@PathVariable int storyId){
+        List<Screen> screens = screenService.getScreensByStoryId(storyId);
+        return new ResponseEntity(screens, HttpStatus.OK);
     }
 }

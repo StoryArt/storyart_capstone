@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 // import './assets/bootstrap/bootstrap.min.css';
 import './App.css';
 
-import HomePage from './pages/enduser/HomePage';
+import HomePage from './pages/enduser/home-page/HomePage';
 import StoryReadingPage from './pages/enduser/story-reading-page/StoryReadingPage';
 import CreateStoryPage from './pages/enduser/create-story-page/CreateStoryPage';
-import SearchStoriesPage from './pages/enduser/SearchStoriesPage';
-import StoryDetailsPage from './pages/enduser/StoryDetailsPage';
+import SearchStoriesPage from './pages/enduser/search-stories-page/SearchStoriesPage';
+import StoryDetailsPage from './pages/enduser/story-details-page/StoryDetailsPage';
 import UserProfilePage from './pages/enduser/UserProfilePage';
 import UserHistoryPage from './pages/enduser/UserHistoryPage';
 
@@ -38,7 +38,7 @@ function App() {
           <Route exact path="/home" component={HomePage}/>
           <Route exact path="/stories/create" component={CreateStoryPage}/>
           <Route exact path="/search-stories" component={SearchStoriesPage}/>
-          <Route exact path="/stories/details/" component={StoryDetailsPage}/>
+          <Route exact path="/stories/details/:storyId" component={StoryDetailsPage}/>
           <Route exact path="/stories/read/:storyId" component={StoryReadingPage}/>
           <Route exact path="/user/profile" component={UserProfilePage}/>
           <Route exact path="/user/history" component={UserHistoryPage}/>

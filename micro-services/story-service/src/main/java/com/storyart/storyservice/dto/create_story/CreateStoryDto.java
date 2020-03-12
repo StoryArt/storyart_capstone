@@ -1,4 +1,4 @@
-package com.storyart.storyservice.dto;
+package com.storyart.storyservice.dto.create_story;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,63 +12,15 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-class CreateStoryActionDto{
-    private String id;
-    private String content;
-    private String type;
-    private String operation;
-    private String value;
-    private String nextScreenId;
-}
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-class CreateStoryScreenDto{
-    private String id;
-    private String title;
-    private String content;
-    private String nextScreenId;
-    List<CreateStoryActionDto> actions;
-}
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-class CreateStoryConditionDto{
-    private String id;
-    private String type; //<, >
-
-    private String value;
-    private String nextScreenId;
-}
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-class CreateStoryInformationDto{
-    private String id;
-    private String type; //NUMBER
-    private String name;
-    private String value;
-    List<CreateStoryConditionDto> conditions;
-}
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class AddStoryDto implements Serializable {
-    private Integer id;
+public class CreateStoryDto implements Serializable {
     private String title;
     private int authorId;
-    private String introContent;
+    private String intro;
     private String animation;
+    private String firstScreenId;
     private boolean isPublished;
 
-    private List<CreateStoryScreenDto> sections;
+    private List<CreateStoryScreenDto> screens;
     private List<CreateStoryInformationDto> informations;
+    private List<CreateStoryInformationActionDto> informationActions;
 }

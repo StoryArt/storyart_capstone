@@ -14,22 +14,21 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "section")
+@Table(name = "screen")
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Section implements Serializable{
+public class Screen implements Serializable{
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Column(length = 100)
     private String id;
+    private int storyId;
 
     private String title;
-    private int storyId;
     private String content;
-    private int parameterPoint;
-    private boolean isEndSection;
-    private String parentSectionId;
+    private String nextScreenId;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

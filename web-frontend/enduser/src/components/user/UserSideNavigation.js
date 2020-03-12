@@ -34,6 +34,12 @@ const UserSideNavigation = () => {
                         Quan ly tai khoan
                     </MDBListGroupItem>
                 </NavLink>
+                <NavLink to="/stories/create" activeClassName="activeClass">
+                    <MDBListGroupItem>
+                        <MDBIcon icon="book" className="mr-3"/>
+                        Tao truyen
+                    </MDBListGroupItem>
+                </NavLink>
             </MDBListGroup>
         </div>
     );

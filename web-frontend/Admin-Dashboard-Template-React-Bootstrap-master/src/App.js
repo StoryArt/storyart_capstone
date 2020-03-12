@@ -10,8 +10,8 @@ class App extends Component {
   render() {
     return (
         <div className="flexible-content">
-          {/* <TopNavigation /> */}
-          {/* <SideNavigation /> */}
+          <TopNavigation />
+          <SideNavigation />
           <main id="content" className="p-5">
             <Routes />
           </main>

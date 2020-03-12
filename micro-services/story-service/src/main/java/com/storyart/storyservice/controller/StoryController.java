@@ -1,6 +1,7 @@
 package com.storyart.storyservice.controller;
 
-import com.storyart.storyservice.dto.AddStoryDto;
+import com.storyart.storyservice.dto.GetStoryDto;
+import com.storyart.storyservice.dto.create_story.CreateStoryDto;
 import com.storyart.storyservice.dto.ResultDto;
 import com.storyart.storyservice.model.Story;
 import com.storyart.storyservice.service.StoryService;
@@ -15,7 +16,8 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/story")
+@RequestMapping("/stories")
+@CrossOrigin(origins = "*")
 public class StoryController {
 
     @Autowired
@@ -29,31 +31,37 @@ public class StoryController {
             @RequestParam boolean isPublished,
             @RequestParam int page,
             @RequestParam int itemsPerPage){
-        if(StringUtils.isEmpty(keyword)) keyword = "";
-        Page<Story> stories = storyService.searchStories(tags, keyword, isActive, isPublished, page, itemsPerPage);
+        Page<GetStoryDto> stories = storyService.searchStories(tags, keyword, isActive, isPublished, page, itemsPerPage);
         return new ResponseEntity(stories, HttpStatus.OK);
     }
 
-    @GetMapping("trend-suggestions")
+    @GetMapping("trend")
     public ResponseEntity getTrendStories(@RequestParam int quantity){
-        List<Story> stories = storyService.getTrendingStories(quantity);
+        List<GetStoryDto> stories = storyService.getTrendingStories(quantity);
         return new ResponseEntity(stories, HttpStatus.OK);
     }
 
     @GetMapping("{storyId}")
     public ResponseEntity getStoryDetails(@PathVariable int storyId){
-        Story story = storyService.getStoryDetails(storyId);
+        GetStoryDto story = storyService.getStoryDetails(storyId);
         return new ResponseEntity(story, HttpStatus.OK);
     }
 
+    @GetMapping("read/{storyId}")
+    public ResponseEntity getStoryToRead(@PathVariable int storyId){
+        ResultDto result = storyService.getReadingStory(storyId);
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
+
+
     @PostMapping("")
-    public ResponseEntity addStory(@RequestBody AddStoryDto story){
-        ResultDto result = storyService.addStory(story);
+    public ResponseEntity addStory(@RequestBody CreateStoryDto story){
+        ResultDto result = storyService.createStory(story);
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
     @PutMapping("")
-    public ResponseEntity updateStory(@RequestBody AddStoryDto story){
+    public ResponseEntity updateStory(@RequestBody CreateStoryDto story){
         ResultDto result = storyService.updateStory(story);
         return new ResponseEntity(result, HttpStatus.OK);
     }
