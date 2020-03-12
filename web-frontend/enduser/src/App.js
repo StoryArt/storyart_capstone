@@ -61,6 +61,7 @@ function App() {
 
           {/* other routes */}
           <Route component={NotFoundPage}/>
+          <Route exact path="/notfound" component={NotFoundPage}/>
       </Switch>
     </Router>
   );

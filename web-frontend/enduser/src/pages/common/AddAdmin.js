@@ -11,7 +11,6 @@ const  AddAdmin= () => {
   const [intro_content, setIntro_content] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
-  const [registerResponseMessage, setRegisterResponseMessage] = useState("");
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -31,6 +30,9 @@ const  AddAdmin= () => {
      
     } catch (error) {
       console.log(error);
+
+
+
     }
   }
 
@@ -109,7 +111,6 @@ const  AddAdmin= () => {
                       />
                     </div>
                   </div>
-
                   <button
                     className="btn btn-success float-right ml-0"
                     type="submit"

@@ -58,7 +58,10 @@ class UserService {
   }
 
 
-
+static async logout(){
+  localStorage.removeItem("tokenKey");
+  window.location="http://localhost:3001/home";
+}
 
 
   static async addAdmin(user) {

@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import UserLayout from "../../layouts/UserLayout";
-import { MDBInput, MDBBtn } from "mdbreact";
+import {
+  MDBInput,
+  MDBBtn,
+  MDBModal,
+  MDBModalFooter,
+  MDBModalHeader,
+  MDBModalBody
+} from "mdbreact";
 import UserService from "../../services/user.service";
 
 import SplitDate from "../../utils/splitDate";
@@ -13,12 +20,16 @@ const UserProfilePage = () => {
   const [intro_content, setIntro_content] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
-  const [joinAt, setJoinAt] = useState("");
+  const [jointAt, setJointAt] = useState("");
+  const [modal, setModal] = useState({
+    header: "",
+    status: false,
+    message: []
+  });
 
-
-  const handleSetGender =(event, value)=>{
+  const handleSetGender = (event, value) => {
     setGender(value);
-  }
+  };
 
   async function handleUpdateProfile(event) {
     event.preventDefault();
@@ -27,24 +38,25 @@ const UserProfilePage = () => {
       name: name,
       intro_content: intro_content,
       email: email,
-      dob: "2020-03-01 17:49:20",
+      dob: dob + " " + "00:00:00",
       gender: gender,
-      joinAt: joinAt
+      jointAt: jointAt
     };
+    try {
+      const res = await UserService.updateProfile(user, posts.id);
+      setPosts(res.data);
+      let headerar = <MDBBtn gradient="aqua">SAVED SUCCESS!</MDBBtn>;
+      setModal({ header: headerar, status: true, message: res.data });
+    } catch (error) {
+      let headerar = <MDBBtn color="danger">SAVE ERROR!</MDBBtn>;
 
-
-
-    
-
-    const res = await UserService.updateProfile(user, posts.id);
-    setPosts(res.data);
-
-    if (res.data.username != null) {
-      alert("Saved");
+      setModal({
+        header: headerar,
+        status: true,
+        message: error.response.data
+      });
     }
   }
-
- 
 
   const getPosts = async () => {
     try {
@@ -52,17 +64,20 @@ const UserProfilePage = () => {
 
       const dobT = res.data.dob;
       res.data.dob = SplitDate.splitDate(dobT);
-
-
       setPosts(res.data);
-      setEmail(res.data.name);
+      setEmail(res.data.email);
       setId(res.data.id);
-      setName(res.data.email);
+      setName(res.data.name);
       setGender(res.data.gender);
       setIntro_content(res.data.intro_content);
       setDob(res.data.dob);
-      setJoinAt(res.data.joinAt)
+      setJointAt(res.data.jointAt);
     } catch (error) {}
+  };
+
+  //open modal/ close modal
+  const toggle = () => {
+    setModal({ status: !modal.status });
   };
 
   useEffect(() => {
@@ -72,13 +87,9 @@ const UserProfilePage = () => {
   const statusButton = [];
 
   if (posts.is_active == true) {
-    statusButton.push(
-      <MDBBtn color="success">
-        Active
-      </MDBBtn>
-    );
+    statusButton.push(<MDBBtn color="success">Active</MDBBtn>);
   } else {
-    statusButton.push(<MDBBtn color="deep-orange">Deactivated</MDBBtn>);
+    statusButton.push(<MDBBtn color="danger">Deactivated</MDBBtn>);
   }
 
   return (
@@ -120,37 +131,32 @@ const UserProfilePage = () => {
                       <MDBInput
                         type="textarea"
                         label="Gioi thieu ban than"
-                        value={
-                          intro_content == null ? "" : intro_content
-                        }
+                        value={intro_content == null ? "" : intro_content}
                         onChange={e => setIntro_content(e.target.value)}
                         outline
                       />
-                    </div>{" "}
+                    </div>
                     <div className="col-sm-6">
-                      <MDBBtn color="info"
-                        type="textarea"
-                        label="Joint at"
-                        value={joinAt}
-                        outline
-                      >{joinAt}</MDBBtn>
+                      <MDBBtn color="info" label="Joint at" value={jointAt}>
+                        {jointAt}
+                      </MDBBtn>
                     </div>{" "}
                     <div className="col-sm-6">{statusButton}</div>{" "}
                     <div className="col-sm-6">
-                      <label>Gioi tinh</label> {":" +gender}
+                      <label>Gioi tinh</label> {": " + gender}
                       <br />
                       <input
                         type="radio"
                         name="materialExampleRadios"
                         // checked={gender !== ""?gender==="female": posts.gender==="female" }
-                        onChange={e => handleSetGender(e,"male")}
+                        onChange={e => handleSetGender(e, "male")}
                       />{" "}
                       Nam
                       <input
                         type="radio"
                         name="materialExampleRadios"
                         // checked={gender !== ""?gender==="male": posts.gender==="male"}
-                        onChange={e => handleSetGender(e,"female")}
+                        onChange={e => handleSetGender(e, "female")}
                       />{" "}
                       Nu
                     </div>
@@ -158,9 +164,21 @@ const UserProfilePage = () => {
                       className="btn btn-success float-right"
                       style={{ fontSize: "1.1em" }}
                     >
-                      {" "}
-                      Luu{" "}
+                      Save
                     </button>{" "}
+                    <MDBModal isOpen={modal.status} toggle={toggle}>
+                      <MDBModalHeader toggle={toggle}>
+                        {modal.header}
+                      </MDBModalHeader>
+                      <MDBModalBody>
+                        {JSON.stringify(modal.message)}
+                      </MDBModalBody>
+                      <MDBModalFooter>
+                        <MDBBtn color="secondary" onClick={toggle}>
+                          Close
+                        </MDBBtn>
+                      </MDBModalFooter>
+                    </MDBModal>
                   </div>
                 </form>{" "}
               </div>{" "}
