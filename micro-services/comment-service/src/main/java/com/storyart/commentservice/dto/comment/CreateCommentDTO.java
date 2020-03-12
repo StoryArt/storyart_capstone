@@ -10,7 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateCommentDTO {
-    public String content;
-    public int userId;
-    public int storyId;
+    private String content;
+    private int userId;
+    private int storyId;
+    //cai nay bi bat loi nhieu lam,,  chphai de private và chi dc truy cap bang getter setter, chac a quen, hoac nham` :v ok
 }

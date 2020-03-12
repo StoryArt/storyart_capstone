@@ -1,6 +1,6 @@
-package com.storyart.commentservice.model;
+package com.storyart.commentservice.dto.comment;
 
-import com.storyart.commentservice.common.DateAudit;
+import com.storyart.commentservice.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,30 +8,22 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.sql.Timestamp;
 
-@Entity
-@Table(name = "comment")
-@Setter
 @Getter
-@NoArgsConstructor
+@Setter
 @AllArgsConstructor
-public class Comment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+@NoArgsConstructor
+public class CommentHistoryResponseDTO {
     private Integer id;
-    @ManyToOne
-    @JoinColumn
-    private User user;
-    @ManyToOne
-    @JoinColumn
-    private Story story;
+    private String authorName;
+    private String storyName;
     private String content;
     private boolean isActive;
     private boolean isDisableByAdmin;
-    @CreationTimestamp
     private Timestamp createdAt;
-    @UpdateTimestamp
     private Timestamp updatedAt;
+
 }

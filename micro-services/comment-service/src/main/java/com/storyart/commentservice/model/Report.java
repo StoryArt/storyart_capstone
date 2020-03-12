@@ -29,7 +29,7 @@ public class Report {
     private String content;
     private boolean isHandled;
     @CreationTimestamp
-    private Timestamp createAt;
+    private Timestamp createdAt;
     @UpdateTimestamp
-    private Timestamp updateAt;
+    private Timestamp updatedAt;
 }

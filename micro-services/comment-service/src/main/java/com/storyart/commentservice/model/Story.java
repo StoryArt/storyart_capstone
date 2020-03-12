@@ -20,7 +20,9 @@ public class Story extends DateAudit {
     private Integer id;
 
     private String title;
-    private int authorId;
+    @OneToOne
+    @JoinColumn
+    private User author;
     private String introContent;
     private String animation;
     private boolean isActive;
