@@ -68,7 +68,7 @@ public class SystemAdminController {
         //todo : missing role of a user
         Role userRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
                 .orElseThrow(() -> new AppException("User Role not set."));
-        user.setRoles(Collections.singleton(userRole));
+        user.setRole(userRole);
         User savedUser = userRepository.save(user);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("api/v1/user/username")
                 .buildAndExpand(savedUser.getUsername()).toUri();

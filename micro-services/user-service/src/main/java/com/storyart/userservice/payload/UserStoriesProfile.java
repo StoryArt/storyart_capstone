@@ -19,7 +19,7 @@ public class UserStoriesProfile {
     private Integer id;
     private String name;
     private String email;
-    private Instant joinAt;
+    private Instant jointAt;
     private Instant modifiedAt;
     private  String introContent;
     Date dob;

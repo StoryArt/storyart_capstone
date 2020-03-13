@@ -144,6 +144,9 @@ public class UserServiceImpl implements UserService {
 //todo: get Stories by id feign client
 
 //todo hoi ve chuyen trang va validation
+
+
+        //sua thong tin admin, them quyen cho system ad, figma, toa truyen doc truyen,
     }
 
     /**
@@ -234,7 +237,6 @@ public class UserServiceImpl implements UserService {
         byId.setGender(us.getGender());
         byId.setDob(us.getDob());
         byId.setIntroContent(us.getIntro_content());
-
 
         userRepository.save(byId);
     }

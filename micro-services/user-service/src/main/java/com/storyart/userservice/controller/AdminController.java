@@ -44,7 +44,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/admin/user")
 @CrossOrigin
-@Secured({"ROLE_ADMIN"})
+@Secured({"ROLE_ADMIN","ROLE_SYSTEM_ADMIN"})
 public class AdminController {
 
 
@@ -147,15 +147,6 @@ public class AdminController {
 
 
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public ResponseEntity<?> validationError(MethodArgumentNotValidException ex) {
-        BindingResult result = ex.getBindingResult();
-        final FieldError fieldError = result.getFieldError();
-
-        return new ResponseEntity(new ApiResponse(false,fieldError.getField()+" "+fieldError.getDefaultMessage()), HttpStatus.BAD_REQUEST);
-    }
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -178,7 +169,7 @@ public class AdminController {
         Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
                 .orElseThrow(() -> new AppException("User Role not set."));
 
-        user.setRoles(Collections.singleton(userRole));
+        user.setRole(userRole);
 
 
         /**
