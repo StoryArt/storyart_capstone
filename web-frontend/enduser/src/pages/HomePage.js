@@ -113,7 +113,7 @@ const HomePage = () => {
             },
         ]
     }
-
+// eslint-disable-next-line
     const [story, setStory] = useState(tempStory);
     const [currentSection, setCurrentSection] = useState({ title: tempStory.title, content: tempStory.intro });
     const [selectedSections, setSelectedSections] = useState([]);

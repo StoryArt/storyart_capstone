@@ -16,11 +16,13 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+
+@IdClass(RatingId.class)
 public class Rating extends DateAudit implements Serializable {
     @Id
     private int userId;
     @Id
     private int storyId;
 
-    private int stars;
+    private double stars;
 }

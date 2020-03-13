@@ -1,9 +1,13 @@
 package com.storyart.storyservice.model;
 
-import com.storyart.storyservice.common.DateAudit;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.*;
 
@@ -13,7 +17,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Story extends DateAudit implements Serializable {
+public class Story implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -21,7 +25,6 @@ public class Story extends DateAudit implements Serializable {
     @NonNull
     private String title;
 
-    @NonNull
     private int authorId;
 
     @NonNull
@@ -29,9 +32,21 @@ public class Story extends DateAudit implements Serializable {
 
     @NonNull
     private String animation;
+
     private boolean isActive;
     private boolean isParametered;
     private String parameterName;
+    private int minParameterPoints;
     private int totalParameterPoints;
     private float avgRate;
+    private boolean isPublished;
+
+
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
 }
