@@ -3,7 +3,7 @@ import React from 'react';
 import { MenuItem, TextField } from '@material-ui/core';
 
 import ScreensSelect from './ScreensSelect';
-import MyDropdownMenu from './MyDropdownMenu';
+import MyDropdownMenu from '../../../components/common/MyDropdownMenu';
 import ActionsList from './ActionsList';
 
 const ScreensList = (props) => {

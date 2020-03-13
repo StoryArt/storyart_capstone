@@ -8,6 +8,7 @@ import ValidationUtils from '../../../utils/validation';
 
 import NotFound from '../../../components/common/NotFound';
 import MySpinner from '../../../components/common/MySpinner';
+import TagList from '../../../components/common/TagList';
 
 const StoryDetailsPage = (props) => {
 
@@ -36,12 +37,6 @@ const StoryDetailsPage = (props) => {
         setIsLoadingStory(false);
     }
 
-    const getBadgeClassname = (index) => {
-        if(index % 3 == 0) return 'badge-primary';
-        else if(index % 3 === 1) return 'badge-danger';
-        return 'badge-warning';
-    }
-
 
     return (
         <UserLayout>
@@ -66,12 +61,7 @@ const StoryDetailsPage = (props) => {
                         <h3 className="font-weight-bold">{story.title} / <small>Nguyen Van A</small></h3>
                         <strong style={{ fontSize: '1.2em' }}>{story.avgRate} stars</strong>
                         <p>{story.intro}</p>
-                        {story.tags.map((tag, index) => (
-                            <div 
-                                key={tag.id} 
-                                className={`badge ${getBadgeClassname(index)} mr-2`}>{tag.title}</div>
-                        ))}
-                         
+                        <TagList tags={story.tags} />
                          <div>
                              <MDBRating iconRegular />
                          </div>
@@ -93,9 +83,6 @@ const StoryDetailsPage = (props) => {
                         <hr/>
                          <div>
                              <strong>Tac gia: </strong>Nguyen Van A
-                         </div>
-                         <div>
-                             <strong>Tags: </strong>Co tich, thieu nhi
                          </div>
                          <div>
                              <strong>Ngay tao: </strong>{new Date(story.createdAt).toLocaleDateString()}

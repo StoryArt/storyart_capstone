@@ -5,7 +5,8 @@ import MainLayout from '../../../layouts/UserLayout';
 import StoryParameters from './StoryParameters';
 import ScreensList from './ScreensList';
 import ScreensSelect from './ScreensSelect';
-import MyDropdownMenu from './MyDropdownMenu';
+
+import MyDropdownMenu from '../../../components/common/MyDropdownMenu';
 import MyAlert from '../../../components/common/MyAlert';
 
 import { ACTION_TYPES, INFORMATION_TYPES, NUMBER_CONDITIONS, STRING_CONDITIONS, 

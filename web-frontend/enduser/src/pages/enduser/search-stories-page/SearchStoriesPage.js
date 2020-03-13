@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
-import { MDBBtn, MDBInputGroup, MDBModal, MDBModalHeader, MDBModalBody } from 'mdbreact';
-import { Select, MenuItem, Input, ListItemText, Checkbox, Chip, FormControl, InputLabel, Button } from '@material-ui/core';
-
+import { MDBBtn, MDBInputGroup, MDBModal, MDBModalHeader, MDBModalBody, MDBCard,
+        MDBCardBody, MDBBreadcrumb, MDBBreadcrumbItem, MDBFormInline, MDBIcon } from 'mdbreact';
+import { Select, MenuItem, Input, ListItemText, Checkbox, Chip, 
+    FormControl, InputLabel, Button } from '@material-ui/core';
+import { Pagination } from '@material-ui/lab';
 import UserLayout from '../../../layouts/UserLayout';
 import StoryService from '../../../services/story.service';
 import TagService from '../../../services/tag.service';
@@ -10,7 +12,9 @@ import TagService from '../../../services/tag.service';
 
 import MySpinner from '../../../components/common/MySpinner';
 import StoryCard from '../../../components/common/StoryCard';
+import TagList from '../../../components/common/TagList';
 
+let searchTimeout = null;
 
 const SearchStoriesPage = () => {
 
@@ -46,6 +50,16 @@ const SearchStoriesPage = () => {
     const changeFilters = (prop, value) => {
         filters[prop] = value;
         setFilters({ ...filters });
+        if(prop === 'tags') return;
+        if(prop === 'keyword'){
+            clearTimeout(searchTimeout);
+            searchTimeout = window.setTimeout(() => {
+                setFilters({ ...filters, page: 1 });
+                searchStories();
+            }, 300);
+        } else {
+            searchStories();
+        }
     }
 
     const getTags = async () => {
@@ -79,19 +93,22 @@ const SearchStoriesPage = () => {
     }
 
     const searchStories = async () => {
-        setFilters({ ...filters, page: 1 });
         const stories = await getStories();
         setStories(stories);
     }
-
-    const loadMoreStories = async () => {
-        changeFilters('page', filters.page + 1);
-        const data = await getStories();
-        setStories([...stories, ...data]);
+  
+    const handleSearch = (e) => {
+        e.preventDefault();
+        searchStories();
     }
 
     const toggleModal = () => {
         setOpenModal(!openModal);
+    }
+
+    const changePage = (e, value) => {
+        console.log(value);
+        changeFilters('page', value);
     }
 
     const selectedTags = tags.filter(tag => filters.tags.indexOf(tag.id) > -1);
@@ -100,37 +117,81 @@ const SearchStoriesPage = () => {
         <UserLayout>
             <div className="container-fluid">
                 <div className="row mb-4">
-                    <div className="col-sm-6 mx-auto">
-                    <MDBInputGroup
-                        hint="Tim truyen..."
-                        
-                        onChange={(e) => changeFilters('keyword', e.target.value)}
-                        containerClassName="mb-3"
-                        append={
-                            <MDBBtn onClick={toggleModal} outline className="m-0 px-3 py-2 z-depth-0">
-                                Bo loc
-                            </MDBBtn>
-                        }
-                        />
+                    <div className="col-12">
+                        <MDBCard className="mb-5">
+                            <MDBCardBody id="breadcrumb" className="d-flex align-items-center justify-content-between">
+                               <div className="col-6">
+                                    <FormControl style={{ width: '100%' }}>
+                                    <InputLabel>Chon tag yeu thich</InputLabel>
+                                    <Select
+                                        multiple
+                                        value={filters.tags}
+                                        onChange={(e) => changeFilters('tags', e.target.value)}
+                                        input={<Input />}
+                                        renderValue={selected => (
+                                            <div>
+                                                {selectedTags.map(tag => (
+                                                    <Chip key={tag.id} label={tag.title} />
+                                                ))}
+                                            </div>
+                                        )}
+                                        MenuProps={MenuProps}
+                                    >
+                                        {tags.map(tag => (
+                                            <MenuItem key={tag.id} value={tag.id}>
+                                                <Checkbox checked={filters.tags.indexOf(tag.id) > -1} />
+                                                <ListItemText primary={tag.title} />
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                    
+                                </FormControl>
+                               </div>
+                               <div className="col-6 mt-3">
+                                    <MDBFormInline 
+                                        style={{ width: '100%' }}
+                                        className="md-form m-0" onSubmit={e => e.preventDefault()}>
+                                        <input 
+                                            className="form-control form-control-sm" type="search" 
+                                            onChange={(e) => changeFilters('keyword', e.target.value)}
+                                            placeholder="Tim kiem truyen" aria-label="Search"/>
+                                        <MDBBtn 
+                                            size="sm" 
+                                            color="primary" 
+                                            className="my-0" 
+                                            type="submit">
+                                                <MDBIcon icon="search" />
+                                        </MDBBtn>
+                                    </MDBFormInline>
+                               </div>
+                            </MDBCardBody>
+                        </MDBCard>
                     </div>
                 </div>
-                <h3 className="text-bold">Tat ca truyen</h3>
-                <hr style={{ border: '1px solid #ccc' }}/>
                 <div className="row">
-                    {stories.map(story => (
-                        <div className="col-sm-3 px-2" key={story.id}>
-                          <StoryCard story={story} />
-                        </div>
-                    ))}
-                </div>
-
-                {(!isLoadingStories && totalPages > filters.page) && (
-                    <div className="text-center">
-                        <Button 
-                            variant="outlined" 
+                    <div className="col-sm-3">
+                        <h3 className="text-bold">Tat ca truyen</h3>
+                    </div>
+                    <div className="col-sm-9">
+                        <Pagination 
+                            style={{float: 'right'}}
+                            count={totalPages} 
+                            page={filters.page}
                             color="primary" 
-                            onClick={loadMoreStories}>Xem them</Button>
-                    </div>    
+                            onChange={changePage} />
+                         <div className="clearfix"></div>
+                    </div>
+                </div>
+                
+                <hr style={{ border: '1px solid #ccc' }}/>
+                {(!isLoadingStories) && (
+                    <div className="row" style={{ marginBottom: '50px' }}>
+                        {stories.map(story => (
+                            <div className="col-sm-3 px-2" key={story.id}>
+                                <StoryCard story={story} />
+                            </div>
+                        ))}
+                    </div>
                 )}
 
                 {(isLoadingStories) && (
@@ -138,42 +199,6 @@ const SearchStoriesPage = () => {
                 )}
                 
            </div>
-
-           <MDBModal backdrop={false} isOpen={openModal} toggle={toggleModal} style={{ paddingBottom: '100px' }}>
-            <MDBModalHeader toggle={toggleModal}></MDBModalHeader>
-                <MDBModalBody>
-                        <FormControl style={{ width: '100%' }}>
-                            <InputLabel>Chon tag yeu thich</InputLabel>
-                            <Select
-                                multiple
-                                value={filters.tags}
-                                onChange={(e) => changeFilters('tags', e.target.value)}
-                                input={<Input />}
-                                renderValue={selected => (
-                                    <div>
-                                        {selectedTags.map(tag => (
-                                            <Chip key={tag.id} label={tag.title} />
-                                        ))}
-                                    </div>
-                                )}
-                                MenuProps={MenuProps}
-                            >
-                                {tags.map(tag => (
-                                    <MenuItem key={tag.id} value={tag.id}>
-                                        <Checkbox checked={filters.tags.indexOf(tag.id) > -1} />
-                                        <ListItemText primary={tag.title} />
-                                    </MenuItem>
-                                ))}
-                            </Select>
-               
-                        </FormControl>
-                       
-                </MDBModalBody>
-            {/* <MDBModalFooter>
-                <MDBBtn color="secondary" onClick={this.toggle}>Close</MDBBtn>
-                <MDBBtn color="primary">Save changes</MDBBtn>
-            </MDBModalFooter> */}
-        </MDBModal>
         </UserLayout>
     );
 };

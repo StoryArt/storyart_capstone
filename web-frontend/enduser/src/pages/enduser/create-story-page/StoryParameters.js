@@ -1,7 +1,7 @@
 import React from 'react';
 import { Select, MenuItem, TextField, InputLabel, FormControl } from '@material-ui/core';
 import ScreensSelect from './ScreensSelect';
-import MyDropdownMenu from './MyDropdownMenu';
+import MyDropdownMenu from '../../../components/common/MyDropdownMenu';
 import { INFORMATION_TYPES } from '../../../common/constants';
 
 const StoryParameters = (props) => {

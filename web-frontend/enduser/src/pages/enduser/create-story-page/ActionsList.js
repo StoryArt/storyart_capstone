@@ -1,7 +1,7 @@
 import React from 'react';
 import { TextField, Select, FormControl, InputLabel, MenuItem } from '@material-ui/core';
 import ScreensSelect from './ScreensSelect';
-import MyDropdownMenu from './MyDropdownMenu';
+import MyDropdownMenu from '../../../components/common/MyDropdownMenu';
 import { ACTION_TYPES } from '../../../common/constants';
 
 const ActionsList = (props) => {
