@@ -5,12 +5,12 @@ import UserSideNavigation from '../components/user/UserSideNavigation';
 import UserTopNavigation from '../components/user/UserTopNavigation';
 
 const MainLayout = (props) => {
-    const { backgound } = props
+    
     return (
         <div className="flexible-content">
             <UserTopNavigation />
             <UserSideNavigation />
-            <main id="content" className="p-5" style={{ background: backgound === null ? '' : backgound }}>
+            <main id="content" className="p-5" >
                 { props.children }
             </main>
             {/* <Footer /> */}

@@ -1,0 +1,116 @@
+[33mcommit 93b0c1fb7dc537888f7a4f211e4249c272dabaa0[m[33m ([m[1;36mHEAD -> [m[1;32muser-service[m[33m)[m
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Thu Mar 12 04:36:19 2020 +0700
+
+    fix bugs in 3 page: user profile, admin manage, user amnage
+
+[33mcommit 86defb881900ccce7004722e9831fd9caf8c7359[m[33m ([m[1;31morigin/user-service[m[33m)[m
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Thu Mar 12 03:28:06 2020 +0700
+
+    fix bug for enduser page of user management and adminmanagment
+
+[33mcommit 06094922d5ac89a055429b81cbc45776ba677ce9[m
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Wed Mar 4 23:23:51 2020 +0700
+
+    update gitignore
+
+[33mcommit c647b7f53d2209fd9997ef7483c4c6395f646458[m
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Wed Mar 4 23:19:58 2020 +0700
+
+    add gitignore in web-frontend, delete .idea
+
+[33mcommit be6cee0c8d9716dcdeffc2072a587c53d9fd994b[m
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Wed Mar 4 23:03:30 2020 +0700
+
+    add some todo
+
+[33mcommit 2340c23991af15253609044277c7df63ca7827d8[m
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Wed Mar 4 23:02:39 2020 +0700
+
+    add some todo
+
+[33mcommit b93595e638b0feb70e7c7c155b14aa1a8cb6d6d4[m
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Wed Mar 4 22:54:49 2020 +0700
+
+    Rename README_USER)SERVICE.md to README_USER_SERVICE.md
+
+[33mcommit d7ee5e1d2ae4df1af72774f6e9412f08504438a5[m
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Mon Mar 2 02:53:13 2020 +0700
+
+    add 3 roles include in role.sql
+    AdminController: return paging username by PagedResponse
+    add email and name into table User
+    + SystemAdminController: have addadminaccount(), and all methods in admin and user role
+    UserController : change data return from get() -to specific data: UserProfile -- to avoid see password
+    + RoleName : 3 emum role
+    + Change type of id to Identity
+    + set limit to data in User
+
+[33mcommit cd571ef051435097d9fd751750fc3aeb4682c817[m
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Sat Feb 29 10:30:15 2020 +0700
+
+    #1 :Exception thrown: when parse createAt/updateAt from table 'user' is 0000-00-00 00:00:00 -> fix = set ''?zeroDateTimeBehavior=convertToNull' -> data got is null
+    #2 Ambigous api : when GET to user-controller
+
+[33mcommit 9f807b79c801d4a29177e461e8132262168637f6[m
+Merge: cf8875b f543d6a
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Sat Feb 29 02:20:30 2020 +0700
+
+    Merge branch 'user-service' of https://github.com/StoryArt/storyart_capstone into user-service
+
+[33mcommit cf8875bf906dfef0375c631119ccd25d572fa4cb[m
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Sat Feb 29 02:18:35 2020 +0700
+
+    add dateAudit and sign in/sign up check, add role repo , 3 role consist: ROLE_ADMIN, ROLE_SYSTEM_ADMIN and ROLE_USER, bug: cannot login/register to authorized
+
+[33mcommit f543d6a3ca3e845f8792666606f4cec1335a5211[m
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Fri Feb 28 01:06:07 2020 +0700
+
+    describe about user-service
+
+[33mcommit d4476120745bb26cef22b3564cf432cacd81eff2[m
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Wed Feb 26 20:33:38 2020 +0700
+
+    make jwt authen barrier before each request to user-service. token expired at 1AM/27/02
+
+[33mcommit 6192786d6b747ed08ff0a6cad10af8a5933ee918[m[33m ([m[1;32mmaster[m[33m)[m
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Wed Feb 26 11:47:32 2020 +0700
+
+    add service and controler api in basiclly(add , find, list, update, del)
+
+[33mcommit f913523d430c39f292b9903d30af8a39279521b1[m
+Author: tramanh9999 <43420892+tramanh9999@users.noreply.github.com>
+Date:   Mon Feb 24 18:45:16 2020 +0700
+
+    change into FeignClient except Eurekaserver
+
+[33mcommit 9a97c0b5dfc827d0786a2a8dec4f22bc34deb703[m
+Author: Taibdse <buiductai232@gmail.com>
+Date:   Sun Feb 23 16:00:16 2020 +0700
+
+    add enduser frontend
+
+[33mcommit 2287dfd8103bc779abd326c71f28e6bb5bbe7fdd[m
+Author: Taibdse <buiductai232@gmail.com>
+Date:   Sun Feb 23 15:56:24 2020 +0700
+
+    add readme.md, comment-service, web-service
+
+[33mcommit 2ee03a1f88849866272febc43fcc69f8f5a31f25[m
+Author: Taibdse <buiductai232@gmail.com>
+Date:   Fri Feb 21 22:25:59 2020 +0700
+
+    initial commit

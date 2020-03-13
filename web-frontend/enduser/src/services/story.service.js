@@ -35,7 +35,6 @@ class StoryService{
         return axios.get(url);
     }
 
-    
 }
 
 export default StoryService;

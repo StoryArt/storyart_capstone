@@ -1,18 +1,34 @@
-import React, { useState } from 'react';
-import { MDBInput  } from 'mdbreact';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { MDBInput } from "mdbreact";
+import { Link } from "react-router-dom";
+import UserService from "../../services/user.service";
 
 const LoginPage = () => {
 
     const [user, setUser] = useState({ username: '', password: '' });
+    const [loginResponseMessage, setLoginResponseMessage] = useState("");
 
     const changeUser = (prop, value) => setUser({ ...user, [prop]: value });
 
     const clearForm = () => setUser({ username: '', password: '' });
 
-    const login = (e) => {
+    const login = async (e) => {
         e.preventDefault();
-        console.log(user);
+        try {
+          const res = await UserService.login(user);
+    
+          console.log(res.data);
+          setLoginResponseMessage(res.data);
+          if (res.data.accessToken !== null) {
+            localStorage.setItem("tokenKey",
+            res.data.tokenType +
+              " " +
+              res.data.accessToken);
+            window.location = "/home";
+          }
+        } catch (error) {
+          console.log(error);
+        }
     }
 
     return (

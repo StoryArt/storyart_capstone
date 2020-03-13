@@ -13,15 +13,22 @@ import UserHistoryPage from './pages/enduser/UserHistoryPage';
 
 import LoginPage from './pages/common/LoginPage';
 import RegisterPage from './pages/common/RegisterPage';
-import DemoPage from './pages/common/DemoPage';
 
 import DashboardPage from './pages/admin/DashboardPage';
 import UserManagementPage from './pages/admin/AdminManagementPage';
+
+import AddUser from './pages/common/AddUser';
+import DemoPage from './pages/common/DemoPage';
+
 import StoryManagementPage from './pages/admin/StoryManagementPage';
 import TagManagementPage from './pages/admin/TagManagementPage';
 import ReportManagementPage from './pages/admin/ReportManagementPage';
 import AdminManagementPage from './pages/admin/AdminManagementPage';
 import NotFoundPage from './pages/common/NotFoundPage';
+
+
+import AddAdmin from './pages/common/AddAdmin';
+
 
 function App() {
   
@@ -36,15 +43,27 @@ function App() {
           {/* user routes */}
           <Route exact path="/" component={HomePage}/>
           <Route exact path="/home" component={HomePage}/>
+
           <Route exact path="/stories/create" component={CreateStoryPage}/>
           <Route exact path="/search-stories" component={SearchStoriesPage}/>
           <Route exact path="/stories/details/:storyId" component={StoryDetailsPage}/>
+
+          <Route exact path="/create-story" component={CreateStoryPage}/>
+          <Route exact path="/search-stories" component={SearchStoriesPage}/>
+          <Route exact path="/stories/details/" component={StoryDetailsPage}/>
+
           <Route exact path="/stories/read/:storyId" component={StoryReadingPage}/>
           <Route exact path="/user/profile" component={UserProfilePage}/>
           <Route exact path="/user/history" component={UserHistoryPage}/>
 
           {/* admin routes */}
+
+
+          <Route exact path="/admin/add" component={AddAdmin}/>
+
           <Route exact path="/admin" component={DashboardPage}/>
+          <Route exact path="/admin/users/add" component={AddUser}/>
+
           <Route exact path="/admin/dashboard" component={DashboardPage}/>
           <Route exact path="/admin/users" component={UserManagementPage}/>
           <Route exact path="/admin/stories" component={StoryManagementPage}/>
@@ -55,6 +74,7 @@ function App() {
 
           {/* other routes */}
           <Route component={NotFoundPage}/>
+          <Route exact path="/notfound" component={NotFoundPage}/>
       </Switch>
     </Router>
   );

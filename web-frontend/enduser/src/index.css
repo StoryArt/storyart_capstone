@@ -67,6 +67,7 @@ main {
   display: block !important;
   transition: background-color 0.3s;
   padding: 10px 10px;
+
 }
 
 .list-group-item:hover {
@@ -243,11 +244,6 @@ main {
   border-radius: 15px;
 }
 
-.screen-card{
-  /* background-color: transparent; */
-  
-}
-
 .screen-card-header h5{
   font-size: 2.5em!important;
   font-weight: bold;
@@ -265,6 +261,5 @@ main {
 }
 
 .screen-card-body .action-content:hover{
-
   color: lightskyblue;
 }

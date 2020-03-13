@@ -19,6 +19,7 @@ const DemoPage = () => {
 
     useEffect(() => {
         getPosts();
+        console.log(localStorage.getItem("accessToken"));
     }, []);
 
     return (

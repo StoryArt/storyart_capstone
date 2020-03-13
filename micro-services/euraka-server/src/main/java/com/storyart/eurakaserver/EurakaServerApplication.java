@@ -10,5 +10,4 @@ public class EurakaServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(EurakaServerApplication.class, args);
 	}
-
 }
