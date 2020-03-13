@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { MDBInput , MDBAlert} from "mdbreact";
+import { MDBInput } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
 
@@ -14,9 +14,6 @@ const RegisterPage = () => {
   const [gender, setGender] = useState("");
   const [registerResponseMessage, setRegisterResponseMessage] = useState("");
 
-  const [errorMessage, setErrorMessage] = useState("");
-
-  
   async function handleSubmit(event) {
     event.preventDefault();
     let user = {
@@ -30,51 +27,15 @@ const RegisterPage = () => {
     };
     try {
       const res = await UserService.register(user);
-      // if(res.data.success==false){
-      //   setErrorMessage((<MDBAlert color="danger">{res.data.message}</MDBAlert>));
-  
-      //  }else{
-      //   setRegisterResponseMessage(res.data);
 
-      //  }
-       window.location.href = "/login";
+      console.log(res.data);
+      setRegisterResponseMessage(res.data);
+
+      window.location="/admin/users";
     } catch (error) {
-
-      let field = error.response.data.errors[0].field;
-      var userfriendlyField = "Enter ";
-      switch (field) {
-        case "username":
-          userfriendlyField += "Tên đăng nhập ";
-          break;
-        case "email":
-          userfriendlyField += "Email ";
-          break;
-        case "dob":
-          userfriendlyField += "Ngày sinh ";
-          break;
-        case "gender":
-          userfriendlyField += "Giới tính ";
-          break;
-        case "password":
-          userfriendlyField += "Mật khẩu ";
-          break;
-
-          case "name":
-            userfriendlyField += "Tên ";
-            break;
-        default:
-          break;
+      console.log(error);
     }
-    setErrorMessage(
-      <MDBAlert color="danger" >
-      {userfriendlyField + error.response.data.errors[0].defaultMessage}
-              
-      </MDBAlert>
-    );
-
   }
-}
- 
 
   return (
     <div className="pt-5">
@@ -84,7 +45,6 @@ const RegisterPage = () => {
           <div className="col-sm-8 mx-auto">
             <div className="card">
               <div className="card-body">
-              {errorMessage}
                 <form onSubmit={handleSubmit}>
                   <div className="row">
                     <div className="col-sm-6">
