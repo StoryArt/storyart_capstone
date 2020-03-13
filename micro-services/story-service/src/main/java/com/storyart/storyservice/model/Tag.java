@@ -21,6 +21,8 @@ public class Tag extends DateAudit implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+
     private String title;
 
     @ManyToMany(mappedBy = "tags")

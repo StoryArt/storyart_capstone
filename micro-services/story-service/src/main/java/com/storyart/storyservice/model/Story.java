@@ -4,12 +4,14 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.validator.constraints.Range;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "story")
@@ -23,28 +25,38 @@ public class Story {
     private Integer id;
 
     @NonNull
+    @Column(length = 250)
+    @Size(min = 5, max = 250)
     private String title;
 
     private int authorId;
 
+    @Column(length = 10000)
+    @Size(min = 10, max = 10000)
     private String intro;
 
+    @Column(length = 100)
+    @Size(max = 100)
     private String animation;
+
+    @Column(length = 1000)
+    @Size(max = 1000)
     private String image;
 
     private String firstScreenId;
 
     @Column(columnDefinition = "float default 0")
+    @Range(min = 0, max = 5)
     private float avgRate;
 
-    @ColumnDefault("true")
+    @Column(columnDefinition="tinyint(1) default 0")
     private boolean isActive;
 
-    @ColumnDefault("false")
+    @Column(columnDefinition="tinyint(1) default 0")
     private boolean isPublished;
 
 
-    @ColumnDefault("false")
+    @Column(columnDefinition="tinyint(1) default 0")
     private Boolean isDeactiveByAdmin;
 
     @ManyToMany

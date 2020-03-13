@@ -275,7 +275,7 @@ class StoryServiceImpl implements StoryService{
             story.setImage("https://mdbootstrap.com/img/Photos/Others/images/43.jpg");
             story.setActive(true);
             story.setIsDeactiveByAdmin(false);
-            story.setTags(getRandomTags(7));
+            story.setTags(getRandomTags(10));
 
             stories.add(story);
         }
@@ -286,8 +286,11 @@ class StoryServiceImpl implements StoryService{
         List<Tag> tagsList = tagRepository.findAll();
         int length = tagsList.size();
         List<Tag> list = new ArrayList<>();
+        List<Integer> indexes = new ArrayList<>();
         for(int i = 1; i <= quantity; i++){
             int index = new Random().nextInt(length);
+            if(indexes.contains(index)) continue;
+            indexes.add(index);
             list.add(tagsList.get(index));
         }
         return list;
