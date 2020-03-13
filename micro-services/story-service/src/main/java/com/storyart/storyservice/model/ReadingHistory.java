@@ -11,17 +11,19 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "rating")
+@Table(name = "reading_history")
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(RatingId.class)
-public class Rating extends DateAudit implements Serializable {
-    @Id
-    private int userId;
-    @Id
-    private int storyId;
+@IdClass(ReadingHistoryId.class)
+public class ReadingHistory extends DateAudit implements Serializable {
 
-    private double stars;
+    @Id
+    private Integer userId;
+
+    @Id
+    private Integer storyId ;
+
+    private String listSectionId;
 }

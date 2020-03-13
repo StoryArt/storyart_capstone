@@ -14,6 +14,7 @@ const HomePage = () => {
     const [suggestedStories, setSuggestedStories] = useState([]);
     const [suggestedStoriesLoading, setSuggestedStoriesLoading] = useState(false);
 
+
     useEffect(() => {
         getSuggestedStories();
         getTrendStories();
@@ -33,8 +34,19 @@ const HomePage = () => {
     }
 
     const getSuggestedStories = async () => {
+        setSuggestedStoriesLoading(true);
+        try {
+            const res = await StoryService.getSuggestionStories();
+            console.log(res);
+            setSuggestedStories(res.data);
 
+        } catch (error) {
+            console.log(error);
+        }
+        setSuggestedStoriesLoading(false);
     }
+
+
 
     return (
         <UserLayout>

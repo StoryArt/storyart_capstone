@@ -24,6 +24,7 @@ public class Tag extends DateAudit implements Serializable{
 
 
     private String title;
+    private boolean isActive;
 
     @ManyToMany(mappedBy = "tags")
     List<Story> stories;

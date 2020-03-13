@@ -35,6 +35,12 @@ class StoryService{
         return axios.get(url);
     }
 
+    static async getSuggestionStories(quantity){
+        if(!quantity) quantity = 12;
+        const url = 'http://localhost:8003/rating/suggestRated1';
+        return axios.get(url);
+    }
+
     
 }
 
