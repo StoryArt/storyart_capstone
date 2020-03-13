@@ -117,13 +117,13 @@ getMyProfile();
   const data = {
     columns: [
       {
-        label: "Username",
+        label: "Tên đăng nhập",
         field: "username",
         sort: "asc",
         width: 150
       },
       {
-        label: "Name",
+        label: "Tên",
         field: "name",
         sort: "asc",
         width: 270
@@ -135,20 +135,20 @@ getMyProfile();
         width: 200
       },
       {
-        label: "Date of Birth",
+        label: "Ngày sinh",
         field: "dob",
         sort: "asc",
         width: 100
       },
 
       {
-        label: "Joint At",
+        label: "Tham gia vào",
         field: "jointAt",
         sort: "asc",
         width: 100
       },
       {
-        label: "Status",
+        label: "Trạng thái",
         field: "active",
         sort: "asc",
         width: 200
@@ -165,8 +165,8 @@ getMyProfile();
 
   return (
     <UserLayout>
-      <h3> UserManagementPage </h3>
-      <input type="button" value="+ Account" onClick={addUser}  />
+      <h3> Quản lý người dùng </h3>
+      <input type="button" value="Tạo user" onClick={addUser}  />
       <MDBDataTable striped bordered small data={data}
        pagesAmount={convertedList.totalPages}/>
     </UserLayout>

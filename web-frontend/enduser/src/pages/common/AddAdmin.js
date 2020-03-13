@@ -49,14 +49,14 @@ const  AddAdmin= () => {
                     <div className="col-sm-6">
                       <MDBInput
                         value={username}
-                        label="Ten dang nhap"
+                        label="Tên đăng nhập"
                         onChange={e => setUsername(e.target.value)}
                       />
                     </div>
                     <div className="col-sm-6">
                       <MDBInput
                         value={name}
-                        label="Ten day du"
+                        label="Tên đầy đủ"
                         onChange={e => setName(e.target.value)}
                       />
                     </div>
@@ -72,20 +72,20 @@ const  AddAdmin= () => {
                       <MDBInput
                         value={password}
                         type="password"
-                        label="Mat khau"
+                        label="Mật khẩu"
                         onChange={e => setPassword(e.target.value)}
                       />
                     </div>
                     <div className="col-sm-6">
                       <MDBInput
                         value={dob}
-                        label="Ngay sinh"
+                        label="Ngày sinh"
                         type="date"
                         onChange={e => setDob(e.target.value)}
                       />
                     </div>
                     <div className="col-sm-6">
-                      <label>Gioi tinh</label>
+                      <label>Giới tính</label>
                       <br />
                       <input defaultChecked
                         type="radio"
@@ -106,7 +106,7 @@ const  AddAdmin= () => {
                         type="textarea"
                         rows="3"
                         value={intro_content}
-                        label="Nhap thong tin gioi thieu"
+                        label="Giới thiệu"
                         onChange={e => setIntro_content(e.target.value)}
                       />
                     </div>

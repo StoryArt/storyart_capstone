@@ -26,6 +26,10 @@ const UserProfilePage = () => {
     status: false,
     message: []
   });
+  //open modal/ close modal
+  const toggle = () => {
+    setModal({ status: !modal.status });
+  };
 
   const handleSetGender = (event, value) => {
     setGender(value);
@@ -45,10 +49,10 @@ const UserProfilePage = () => {
     try {
       const res = await UserService.updateProfile(user, posts.id);
       setPosts(res.data);
-      let headerar = <MDBBtn gradient="aqua">SAVED SUCCESS!</MDBBtn>;
+      let headerar = <MDBBtn gradient="aqua">Đã lưu</MDBBtn>;
       setModal({ header: headerar, status: true, message: res.data });
     } catch (error) {
-      let headerar = <MDBBtn color="danger">SAVE ERROR!</MDBBtn>;
+      let headerar = <MDBBtn color="danger">Đã xảy ra lỗi!</MDBBtn>;
 
       setModal({
         header: headerar,
@@ -75,10 +79,7 @@ const UserProfilePage = () => {
     } catch (error) {}
   };
 
-  //open modal/ close modal
-  const toggle = () => {
-    setModal({ status: !modal.status });
-  };
+  
 
   useEffect(() => {
     getPosts();
@@ -99,14 +100,14 @@ const UserProfilePage = () => {
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <h4> Thong tin tai khoan </h4>{" "}
-              </div>{" "}
+                <h4>{"Thông tin tài khoản"}</h4>{" "}
+              </div>
               <div className="card-body">
                 <form onSubmit={handleUpdateProfile}>
                   <div className="row">
                     <div className="col-sm-6">
                       <MDBInput
-                        label="Ten day du"
+                        label="Tên đầy đủ"
                         value={name}
                         onChange={e => setName(e.target.value)}
                       />
@@ -122,7 +123,7 @@ const UserProfilePage = () => {
                     <div className="col-sm-6">
                       <MDBInput
                         value={dob}
-                        label="Ngay sinh"
+                        label="Ngày sinh"
                         type="date"
                         onChange={e => setDob(e.target.value)}
                       />
@@ -130,7 +131,7 @@ const UserProfilePage = () => {
                     <div className="col-sm-6">
                       <MDBInput
                         type="textarea"
-                        label="Gioi thieu ban than"
+                        label="Giới thiệu bản thân"
                         value={intro_content == null ? "" : intro_content}
                         onChange={e => setIntro_content(e.target.value)}
                         outline

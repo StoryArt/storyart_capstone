@@ -39,23 +39,23 @@ const CreateAccount = () => {
       var userfriendlyField = "Enter ";
       switch (field) {
         case "username":
-          userfriendlyField += "Ten dang nhap ";
+          userfriendlyField += "Tên đăng nhập ";
           break;
         case "email":
           userfriendlyField += "Email ";
           break;
         case "dob":
-          userfriendlyField += "Ngay sinh ";
+          userfriendlyField += "Ngày sinh ";
           break;
         case "gender":
-          userfriendlyField += "Gioi tinh ";
+          userfriendlyField += "Giới tính ";
           break;
         case "password":
-          userfriendlyField += "Mat khau ";
+          userfriendlyField += "Mật khẩu ";
           break;
 
           case "name":
-            userfriendlyField += "Ten ";
+            userfriendlyField += "Tên ";
             break;
         default:
           break;
@@ -85,14 +85,14 @@ const CreateAccount = () => {
                     <div className="col-sm-6">
                       <MDBInput
                         value={username}
-                        label="Ten dang nhap"
+                        label="Ten đăng nhập"
                         onChange={e => setUsername(e.target.value)}
                       />
                     </div>
                     <div className="col-sm-6">
                       <MDBInput
                         value={name}
-                        label="Ten day du"
+                        label="Tên đầy đủ"
                         onChange={e => setName(e.target.value)}
                       />
                     </div>
@@ -108,20 +108,20 @@ const CreateAccount = () => {
                       <MDBInput
                         value={password}
                         type="password"
-                        label="Mat khau"
+                        label="Mật khẩu"
                         onChange={e => setPassword(e.target.value)}
                       />
                     </div>
                     <div className="col-sm-6">
                       <MDBInput
                         value={dob}
-                        label="Ngay sinh"
+                        label="Ngày sinh"
                         type="date"
                         onChange={e => setDob(e.target.value)}
                       />
                     </div>
                     <div className="col-sm-6">
-                      <label>Gioi tinh</label>
+                      <label>Giới tính</label>
                       <br />
                       <input
                         defaultChecked
@@ -143,7 +143,7 @@ const CreateAccount = () => {
                         type="textarea"
                         rows="3"
                         value={intro_content}
-                        label="Nhap thong tin gioi thieu"
+                        label="Thông tin giới thiệu"
                         onChange={e => setIntro_content(e.target.value)}
                       />
                     </div>

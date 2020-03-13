@@ -111,13 +111,13 @@ const AdminManagementPage = () => {
   const data = {
     columns: [
       {
-        label: "Username",
+        label: "Tên đăng nhập",
         field: "username",
         sort: "asc",
         width: 150
       },
       {
-        label: "Name",
+        label: "Tên",
         field: "name",
         sort: "asc",
         width: 270
@@ -129,20 +129,20 @@ const AdminManagementPage = () => {
         width: 200
       },
       {
-        label: "Date of Birth",
+        label: "Ngày sinh",
         field: "dob",
         sort: "asc",
         width: 100
       },
 
       {
-        label: "Joint At",
+        label: "Tham gia vào",
         field: "jointAt",
         sort: "asc",
         width: 100
       },
       {
-        label: "Status",
+        label: "Trạng thái",
         field: "active",
         width: 200
       },
@@ -158,8 +158,8 @@ const AdminManagementPage = () => {
 
   return (
     <AdminLayout>
-      <h3> AdminManagementPage </h3>
-      <input type="button" value="+ Account" onClick={addAdmin} />
+      <h3> Quản lý administrator </h3>
+      <input type="button" value="Tạo tài khoản" onClick={addAdmin} />
       <MDBDataTable striped bordered small data={data} />
     </AdminLayout>
   );

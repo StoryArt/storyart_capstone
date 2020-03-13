@@ -49,14 +49,14 @@ const RegisterPage = () => {
                     <div className="col-sm-6">
                       <MDBInput
                         value={username}
-                        label="Ten dang nhap"
+                        label="Tên đăng nhập"
                         onChange={e => setUsername(e.target.value)}
                       />
                     </div>
                     <div className="col-sm-6">
                       <MDBInput
                         value={name}
-                        label="ten day du"
+                        label="Tên đầy đủ"
                         onChange={e => setName(e.target.value)}
                       />
                     </div>
@@ -72,20 +72,20 @@ const RegisterPage = () => {
                       <MDBInput
                         value={password}
                         type="password"
-                        label="Mat khau"
+                        label="Mật khẩu"
                         onChange={e => setPassword(e.target.value)}
                       />
                     </div>
                     <div className="col-sm-6">
                       <MDBInput
                         value={dob}
-                        label="Ngay sinh"
+                        label="Ngày sinh"
                         type="date"
                         onChange={e => setDob(e.target.value)}
                       />
                     </div>
                     <div className="col-sm-6">
-                      <label>Gioi tinh</label>
+                      <label>Giới tính</label>
                       <br />
                       <input
                         defaultChecked
@@ -107,7 +107,7 @@ const RegisterPage = () => {
                         type="textarea"
                         rows="3"
                         value={intro_content}
-                        label="Nhap thong tin gioi thieu"
+                        label="Giới thiệu"
                         onChange={e => setIntro_content(e.target.value)}
                       />
                     </div>
@@ -117,14 +117,14 @@ const RegisterPage = () => {
                     className="btn btn-success float-right ml-0"
                     type="submit"
                   >
-                    Dang ky
+                    Đăng ký
                   </button>
 
                   <div className="clearfix"></div>
                   <div>
-                    Neu ban da co tai khoan, vui long{" "}
+                    Nếu đã có tài khoản vui lòng{" "}
                     <Link style={{ color: "green" }} to="/login">
-                      dang nhap
+                      đăng nhập
                     </Link>
                     !
                   </div>
