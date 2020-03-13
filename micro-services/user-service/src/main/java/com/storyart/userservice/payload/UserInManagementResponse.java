@@ -34,7 +34,7 @@ public class UserInManagementResponse {
         this.isActive= u.isActive();
         this.name= u.getName();
         this.username= u.getUsername();
-        this.role = u.getRoles()== null? null : u.getRoles().iterator().next().getName();
+        this.role = u.getRole()== null? null : u.getRole().getName();
         this.jointAt = u.getCreatedAt();
     }
 }

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { MDBInput } from "mdbreact";
+import { MDBInput, MDBAlert } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
 
+
+
 const LoginPage = () => {
+  const [errorMessage, setErrorMessage] = useState("");
 
     const [user, setUser] = useState({ username: '', password: '' });
     const [loginResponseMessage, setLoginResponseMessage] = useState("");
@@ -27,7 +30,39 @@ const LoginPage = () => {
             window.location = "/home";
           }
         } catch (error) {
-          console.log(error);
+          let field = error.response.data.errors[0].field;
+          var userfriendlyField = "Enter ";
+          switch (field) {
+            case "username":
+              userfriendlyField += "Tên đăng nhập ";
+              break;
+            case "email":
+              userfriendlyField += "Email ";
+              break;
+            case "dob":
+              userfriendlyField += "Ngày sinh ";
+              break;
+            case "gender":
+              userfriendlyField += "Giới tính ";
+              break;
+            case "password":
+              userfriendlyField += "Mật khẩu ";
+              break;
+    
+              case "name":
+                userfriendlyField += "Tên ";
+                break;
+            default:
+              break;
+        }
+          setErrorMessage(
+            <MDBAlert color="danger" >
+            {userfriendlyField + error.response.data.errors[0].defaultMessage}
+                    
+            </MDBAlert>
+          );
+
+          
         }
     }
 

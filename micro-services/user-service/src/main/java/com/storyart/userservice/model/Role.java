@@ -1,14 +1,12 @@
 package com.storyart.userservice.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,9 +29,10 @@ public class  Role implements Serializable {
     @NaturalId
     @Column(length = 60)
     private RoleName name;
-
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-    Set<User> users = new HashSet<>();
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    Collection<User> users;
 
 
 

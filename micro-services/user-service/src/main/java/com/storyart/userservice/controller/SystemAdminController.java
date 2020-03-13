@@ -2,6 +2,7 @@ package com.storyart.userservice.controller;
 
 
 import com.storyart.userservice.exception.AppException;
+import com.storyart.userservice.exception.BadRequestException;
 import com.storyart.userservice.exception.ResourceNotFoundException;
 import com.storyart.userservice.model.Role;
 import com.storyart.userservice.model.RoleName;
@@ -53,9 +54,7 @@ public class SystemAdminController {
     @PostMapping
     public ResponseEntity<?> createAdminAccount(@RequestBody @Valid SignUpRequest signUpRequest) {
         if (userService.findByUsername(signUpRequest.getUsername()) != null) {
-            return new ResponseEntity<>(new ApiResponse(false,
-                    "Username is already taken!"),
-                    HttpStatus.BAD_REQUEST);
+            throw new BadRequestException("Username is already taken");
         }
         User user = new User();
         user.setGender(signUpRequest.getGender());
@@ -68,26 +67,28 @@ public class SystemAdminController {
         //todo : missing role of a user
         Role userRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
                 .orElseThrow(() -> new AppException("User Role not set."));
-        user.setRoles(Collections.singleton(userRole));
+        user.setRole(userRole);
         User savedUser = userRepository.save(user);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("api/v1/user/username")
                 .buildAndExpand(savedUser.getUsername()).toUri();
         return ResponseEntity.created(location).body(new ApiResponse(true, "Administrator created successfully"));
     }
-// todo; not allow admin to set active of sysadmin
+
+    // todo; not allow admin to set active of sysadmin
     //todo: update data and login with email
 //todo: check lai n-n user vs role?!
     @GetMapping("/admins")
     public PagedResponse<UserInManagementResponse> getAllAdmin(@RequestParam(value = "page",
             defaultValue = AppContants.DEFAULT_PAGE_NUMBER) int page,
                                                                @RequestParam(value = "size",
-                                                   defaultValue = AppContants.DEFAULT_PAGE_SIZE) int size,
+                                                                       defaultValue = AppContants.DEFAULT_PAGE_SIZE) int size,
                                                                @RequestParam(value = "s") String searchtxt) {
         return userService.findAdminbyUsernameOrEmail(page, size, searchtxt);
     }
+
     @DeleteMapping(value = "/admins/{uid}")
     public ResponseEntity<?> deactiveAdmin(@CurrentUser UserPrincipal
-               systemAdmin, @PathVariable("uid") Integer uid, @RequestParam("setActive") boolean setActive) {
+                                                   systemAdmin, @PathVariable("uid") Integer uid, @RequestParam("setActive") boolean setActive) {
         User adminById = userService.findById(uid);
         if (adminById == null) {
             throw new ResourceNotFoundException("id", "User", uid);

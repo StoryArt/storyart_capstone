@@ -29,6 +29,7 @@ const AdminManagementPage = () => {
       callElement.target.innerText = "Active";
     }
 
+
     const res = await UserService.setStatusAdmin(url);
   }
 
@@ -42,19 +43,19 @@ const AdminManagementPage = () => {
     // setUserList(res.data.content);
   }
 
-  async function checkIfSystemAdmin() {
-    try {
-      const res = await UserService.getMyProfile();
-      if (res.data.role != "ROLE_SYSTEM_ADMIN") {
-        window.location = "/notfound";
-        return <Redirect to={NotFoundPage} />;
-      }
-    } catch (error) {
-      window.location = "/notfound";
+  // async function checkIfSystemAdmin() {
+  //   try {
+  //     const res = await UserService.getMyProfile();
+  //     if (res.data.role != "ROLE_SYSTEM_ADMIN") {
+  //       window.location = "/notfound";
+  //       return <Redirect to={NotFoundPage} />;
+  //     }
+  //   } catch (error) {
+  //     window.location = "/notfound";
 
-      return <Redirect to={NotFoundPage} />;
-    }
-  }
+  //     return <Redirect to={NotFoundPage} />;
+  //   }
+  // }
 
   function addDataToAdminGlobal(data) {
     var adminList = data.content;
@@ -105,7 +106,7 @@ const AdminManagementPage = () => {
     setAdminGlobaldata(rowsData);
   }
   useEffect(() => {
-    checkIfSystemAdmin();
+    // checkIfSystemAdmin();
     LoadAdminsByPage();
   }, []);
 
@@ -157,7 +158,11 @@ const AdminManagementPage = () => {
     rows: adminGlobaldata
   };
 
+
+
+
   return (
+    
     <AdminLayout>
       <h3> AdminManagementPage </h3>
       <input type="button" value="+ Account" onClick={addAdmin} />

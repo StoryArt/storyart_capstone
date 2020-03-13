@@ -15,7 +15,7 @@ import LoginPage from './pages/common/LoginPage';
 import RegisterPage from './pages/common/RegisterPage';
 
 import DashboardPage from './pages/admin/DashboardPage';
-import UserManagementPage from './pages/admin/AdminManagementPage';
+import UserManagementPage from './pages/admin/UserManagementPage';
 
 import AddUser from './pages/common/AddUser';
 import DemoPage from './pages/common/DemoPage';

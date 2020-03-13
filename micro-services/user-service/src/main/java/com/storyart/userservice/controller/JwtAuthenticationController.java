@@ -90,9 +90,7 @@ public class JwtAuthenticationController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         if (userService.findByUsername(signUpRequest.getUsername()) != null) {
-            return new ResponseEntity<>(new ApiResponse(false,
-                    "Username is already taken!"),
-                    HttpStatus.BAD_REQUEST);
+            throw new BadCredentialsException("Username is already taken!");
         }
 
         User user = new User();
@@ -107,7 +105,7 @@ public class JwtAuthenticationController {
         Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
                 .orElseThrow(() -> new AppException("User Role not set."));
 
-        user.setRoles(Collections.singleton(userRole));
+        user.setRole(userRole);
 
 
         /**

@@ -1,10 +1,7 @@
 package com.storyart.userservice.model;
 
 import com.storyart.userservice.model.audit.DateAudit;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -46,14 +43,11 @@ public class User extends DateAudit {
     @Size(max = 100, min = 5)
     private String password;
 
-    /*fetch = FetchType.LAZY tức là khi bạn find, select đối
-     tượng User từ database thì nó sẽ không lấy các đối tượng Role liên quan*/
-    @ManyToMany(fetch = FetchType.LAZY,cascade = { CascadeType.ALL })
-    /*joinColumns=id of user table , inversejoin=id of role*/
-    @JoinTable(name = "user_role",
-            joinColumns = @JoinColumn(name = "user_rid"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Role role;
 
     @Size(max = 300)
     @Column(length = 300)

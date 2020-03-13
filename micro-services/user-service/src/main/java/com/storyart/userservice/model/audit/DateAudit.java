@@ -39,6 +39,7 @@ is invisible since all the base class properties are simply
 @Getter
 @Setter
 public abstract class DateAudit implements Serializable {
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private Instant createdAt;

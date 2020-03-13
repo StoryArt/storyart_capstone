@@ -9,7 +9,8 @@ import { MDBBtn } from "mdbreact";
 
 import NotFoundPage from '../../pages/common/NotFoundPage';
 const UserManagementPage = () => {
-  const [convertedList, setConvertedList] = useState("");
+  const [convertedList, setConvertedList] = useState([]);
+
 
 
   function addUser() {
@@ -23,13 +24,9 @@ const UserManagementPage = () => {
     let status = callElement.target.value;
     if (status == "true") {
       url += "?setActive=false";
-      callElement.target.innerText = "Deactivated";
-      callElement.target.style.backgroundColor = "deep-orange";
       //TODO: cannot change inner text of button
     } else if (status == "false") {
       url += "?setActive=true";
-      callElement.target.innerText = "Active";
-      callElement.target.style.backgroundColor = "Active";
     }
 
     const headers = {
@@ -38,6 +35,9 @@ const UserManagementPage = () => {
     };
 
     const res = await UserService.setStatusUser(url);
+    if(res.data.success){
+      
+    }
   }
 
   async function LoadUsersByPage(event) {
@@ -45,7 +45,8 @@ const UserManagementPage = () => {
       "http://localhost:8002/api/v1/admin/user/userOnly?page=" + 0 + "&size=10&s=";
 
     const res = await UserService.getUsersList();
-// setPageLenght(res.data.totalPages);
+// setPageLenght(res.data.totalPages)
+console.log(res.data);
     ConvertUserList(res.data);
     // setUserList(res.data.content);
   }
@@ -107,6 +108,7 @@ const UserManagementPage = () => {
 
     setConvertedList(rowsData);
   }
+
   useEffect(() => {
 getMyProfile();
 

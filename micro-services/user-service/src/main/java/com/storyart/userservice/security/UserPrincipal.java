@@ -1,6 +1,7 @@
 package com.storyart.userservice.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.storyart.userservice.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,9 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -32,7 +31,11 @@ public class UserPrincipal implements UserDetails {
 
 
     public static UserPrincipal create(com.storyart.userservice.model.User user) {
-        List<GrantedAuthority> grantedAuthorityList = user.getRoles().stream().map(role ->
+
+        Set<Role> roles= new HashSet<>();
+        roles.add(user.getRole());
+
+        List<GrantedAuthority> grantedAuthorityList = roles.stream().map(role ->
                 new SimpleGrantedAuthority(role.getName().name()))
                     .collect(Collectors.toList());
         return new UserPrincipal(user.getId(), user.getUsername(), user.getPassword(),user.getName(),  grantedAuthorityList);

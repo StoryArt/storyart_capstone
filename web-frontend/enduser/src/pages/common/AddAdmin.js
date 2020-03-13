@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { MDBInput } from "mdbreact";
+import { MDBInput,MDBAlert } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
 
@@ -11,6 +11,9 @@ const  AddAdmin= () => {
   const [intro_content, setIntro_content] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
+
+
+  const [errorMessage, setErrorMessage] = useState("");
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -29,7 +32,40 @@ const  AddAdmin= () => {
       window.location="/admin/admin";
      
     } catch (error) {
-      console.log(error);
+
+      let field = error.response.data.errors[0].field;
+      var userfriendlyField = "Enter ";
+      switch (field) {
+        case "username":
+          userfriendlyField += "Tên đăng nhập ";
+          break;
+        case "email":
+          userfriendlyField += "Email ";
+          break;
+        case "dob":
+          userfriendlyField += "Ngày sinh ";
+          break;
+        case "gender":
+          userfriendlyField += "Giới tính ";
+          break;
+        case "password":
+          userfriendlyField += "Mật khẩu ";
+          break;
+
+          case "name":
+            userfriendlyField += "Tên ";
+            break;
+        default:
+          break;
+    }
+    setErrorMessage(
+      <MDBAlert color="danger" >
+      {userfriendlyField + error.response.data.errors[0].defaultMessage}
+              
+      </MDBAlert>
+    );
+
+  
 
 
 
@@ -44,6 +80,8 @@ const  AddAdmin= () => {
           <div className="col-sm-8 mx-auto">
             <div className="card">
               <div className="card-body">
+              {errorMessage}
+
                 <form onSubmit={handleSubmit}>
                   <div className="row">
                     <div className="col-sm-6">

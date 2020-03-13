@@ -41,11 +41,13 @@ public class UserController {
             userProfileResponse.setName(user.getName());
             userProfileResponse.setUsername(user.getUsername());
             userProfileResponse.setEmail(user.getEmail());
-            userProfileResponse.setJoinAt(user.getCreatedAt());
+            userProfileResponse.setJointAt(user.getCreatedAt());
         }
         return userProfileResponse;
 
     }
+
+
 
 //    @GetMapping("/user/mystories")
 //    public UserStoriesProfile getMyUserProfileAndStory(@CurrentUser UserPrincipal userPrincipal) {
@@ -106,7 +108,7 @@ public class UserController {
 
     // todo danh luong xu ly cho ham nay
     @PutMapping(value = "/{uid}")
-    public User update(@PathVariable("uid") Integer uid,
+    public UserProfileResponse update(@PathVariable("uid") Integer uid,
                        @RequestBody @Valid UserProfileUpdateRequest user, @CurrentUser UserPrincipal userPrincipal) {
 
         if(userPrincipal.getId()!= uid){
@@ -121,7 +123,10 @@ public class UserController {
         if (userPrincipal.getUsername().equals(userById.getUsername())) {
             userService.update(uid,user);
         }
-        return userService.findById(uid);
+
+
+        UserProfileResponse us= new UserProfileResponse(userService.findById(uid));
+        return us ;
     }
 
 //    //todo what is responseEntity

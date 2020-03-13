@@ -41,8 +41,8 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/admin/user")
-@CrossOrigin
+@RequestMapping("/api/v1/admin")
+@CrossOrigin("*")
 @Secured({"ROLE_ADMIN"})
 public class AdminController {
 
@@ -144,15 +144,7 @@ public class AdminController {
     //todo: cannot able to active account -that deactived by sys/admin- 2 functions
 
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public ResponseEntity<?> validationError(MethodArgumentNotValidException ex) {
-        BindingResult result = ex.getBindingResult();
-        final FieldError fieldError = result.getFieldError();
 
-        return new ResponseEntity(new ApiResponse(false,fieldError.getField()+" "+fieldError.getDefaultMessage()), HttpStatus.BAD_REQUEST);
-    }
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -160,7 +152,7 @@ public class AdminController {
     public ResponseEntity<?> creatUser(@RequestBody
                                            @Valid SignUpRequest signUpRequest) {
         if (userService.findByUsername(signUpRequest.getUsername()) != null) {
-            throw new BadRequestException("User");
+            throw new BadRequestException("Username is already taken");
         }
 
         User user = new User();
@@ -175,7 +167,7 @@ public class AdminController {
         Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
                 .orElseThrow(() -> new AppException("User Role not set."));
 
-        user.setRoles(Collections.singleton(userRole));
+        user.setRole(userRole);
 
 
         /**
@@ -192,6 +184,4 @@ public class AdminController {
         return ResponseEntity.created(location).body(new ApiResponse(true, "User created successfully"));
 
     }
-
-
 }
