@@ -1,9 +1,12 @@
 package com.storyart.commentservice.service;
 
-import com.storyart.commentservice.dto.report.ReportCommentDTO;
+import com.storyart.commentservice.dto.report.ReportCommentRequestDTO;
+import com.storyart.commentservice.dto.report.ReportCommentResponseDTO;
+import org.springframework.data.domain.Page;
 
 public interface ReportService {
-    void reportComment(ReportCommentDTO reportCommentDTO);
+    void reportComment(ReportCommentRequestDTO reportCommentRequestDTO);
+    Page<ReportCommentResponseDTO> getListReportComment(int pageNo, int pageSize);
     //minh co can lam tinh nang huy repỏt ko, chắc là k
     //k thay thằng nào làm vụ này :v
 

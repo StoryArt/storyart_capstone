@@ -1,8 +1,10 @@
 package com.storyart.commentservice.controller;
 
-import com.storyart.commentservice.dto.report.ReportCommentDTO;
+import com.storyart.commentservice.dto.report.ReportCommentRequestDTO;
+import com.storyart.commentservice.dto.report.ReportCommentResponseDTO;
 import com.storyart.commentservice.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +19,17 @@ public class ReportController {
     ReportService reportService;
 
     @PostMapping("/reportComment")
-    public ResponseEntity<Boolean> reportComment(@RequestBody @Valid ReportCommentDTO reportCommentDTO){
-        reportService.reportComment(reportCommentDTO);
+    public ResponseEntity<Boolean> reportComment(@RequestBody @Valid ReportCommentRequestDTO reportCommentRequestDTO){
+        reportService.reportComment(reportCommentRequestDTO);
 
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    }
+
+    @GetMapping("/getCommentReports")
+    public Page<ReportCommentResponseDTO> getCommentReports(
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize){
+
+        return reportService.getListReportComment(pageNo, pageSize);
     }
 }

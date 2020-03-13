@@ -22,10 +22,15 @@ public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    private int userId;
-    private int storyId;
-    private int commentId;
+    @OneToOne
+    @JoinColumn
+    private User user;
+    @OneToOne
+    @JoinColumn
+    private Story story;
+    @OneToOne
+    @JoinColumn
+    private Comment comment;
     private String content;
     private boolean isHandled;
     @CreationTimestamp
