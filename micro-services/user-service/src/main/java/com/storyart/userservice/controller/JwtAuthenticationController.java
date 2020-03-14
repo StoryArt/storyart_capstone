@@ -1,6 +1,7 @@
 package com.storyart.userservice.controller;
 
 import com.storyart.userservice.exception.AppException;
+import com.storyart.userservice.exception.BadRequestException;
 import com.storyart.userservice.exception.UnauthorizedException;
 import com.storyart.userservice.model.Role;
 import com.storyart.userservice.model.RoleName;
@@ -90,9 +91,12 @@ public class JwtAuthenticationController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         if (userService.findByUsername(signUpRequest.getUsername()) != null) {
-            throw new BadCredentialsException("Username is already taken!");
+            throw new BadCredentialsException("Tên đăng nhập  này đã được đăng ký bởi ai đó!");
         }
+        if (userService.findByEmail(signUpRequest.getEmail()) != null) {
+            throw new BadRequestException("Email này đã được đăng ký bơi người khác");
 
+        }
         User user = new User();
         user.setGender(signUpRequest.getGender());
         user.setActive(true);

@@ -152,8 +152,12 @@ public class AdminController {
     public ResponseEntity<?> creatUser(@RequestBody
                                            @Valid SignUpRequest signUpRequest) {
         if (userService.findByUsername(signUpRequest.getUsername()) != null) {
-            throw new BadRequestException("Username is already taken");
-        } if (userService.findByUsername(signUpRequest.getUsername()) == null) {
+            throw new BadRequestException("Tên đăng nhập  này đã  được đăng ký bơi người khác");
+        }
+
+        if (userService.findByEmail(signUpRequest.getEmail()) != null) {
+
+            throw new BadRequestException("Email này đã được đăng ký bơi người khác");
 
         }
 

@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -54,7 +55,12 @@ public class SystemAdminController {
     @PostMapping
     public ResponseEntity<?> createAdminAccount(@RequestBody @Valid SignUpRequest signUpRequest) {
         if (userService.findByUsername(signUpRequest.getUsername()) != null) {
-            throw new BadRequestException("Username is already taken");
+            throw new BadCredentialsException("Tên đăng nhập này đã đã được đăng ký bởi ai đó!");
+        }
+        if (userService.findByEmail(signUpRequest.getEmail()) != null) {
+
+            throw new BadRequestException("Email này đã được đăng ký bởi ai đó!");
+
         }
         User user = new User();
         user.setGender(signUpRequest.getGender());

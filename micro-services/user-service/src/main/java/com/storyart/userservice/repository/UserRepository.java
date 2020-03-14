@@ -16,6 +16,9 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByUsername(String username);
 
+    @Query("SELECT u FROM com.storyart.userservice.model.User u WHERE u.email=:email")
+    Optional<User> findByEmail(String email);
+
     @Query("SELECT u FROM com.storyart.userservice.model.User u WHERE u.username LIKE CONCAT('%',:search,'%')")
     Page<User> findByUsernameLike( Pageable pageable, String search);
 
@@ -28,6 +31,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             countQuery = "SELECT count(u)  FROM  com.storyart.userservice.model.User u  JOIN u.role role WHERE  role.id =3 and  (u.username LIKE CONCAT('%',:search,'%') or u.email LIKE CONCAT('%',:search,'%'))"
     )
     Page<User> findOnlyUserByUsernameOrEmail(Pageable pageable, String search);
+
+
+
 
 
 

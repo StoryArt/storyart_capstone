@@ -1,5 +1,6 @@
 package com.storyart.userservice.controller;
 
+import com.storyart.userservice.exception.BadRequestException;
 import com.storyart.userservice.exception.ResourceNotFoundException;
 import com.storyart.userservice.exception.UnauthorizedException;
 import com.storyart.userservice.model.User;
@@ -114,7 +115,10 @@ public class UserController {
         if(userPrincipal.getId()!= uid){
             throw new UnauthorizedException("Not authorized for change this user profile");
         }
+        if (userService.findByEmail(user.getEmail()) != null) {
+            throw new BadRequestException("Email đã được đăng ký bởi ai đó!");
 
+        }
 
         User userById = userService.findById(uid);
         if (userById == null) {

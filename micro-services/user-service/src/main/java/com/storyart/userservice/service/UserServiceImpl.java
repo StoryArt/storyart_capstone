@@ -269,6 +269,13 @@ public class UserServiceImpl implements UserService {
         return optionalUser.orElse(null);
 
     }
+
+    @Override
+    public User findByEmail(String email) {
+        Optional<User> byEmail = userRepository.findByEmail(email);
+        return byEmail.orElse(null);
+
+    }
 //todo add admin user method
 
 
