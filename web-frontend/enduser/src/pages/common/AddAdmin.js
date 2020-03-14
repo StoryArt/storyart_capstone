@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { MDBInput,MDBAlert } from "mdbreact";
+import { MDBInput, MDBAlert } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
 
-const  AddAdmin= () => {
+const AddAdmin = () => {
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -11,8 +11,10 @@ const  AddAdmin= () => {
   const [intro_content, setIntro_content] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
-  const [addAdminResponseMessage, setAddAdminResponseMessage] = useState({success:"", message:""});
-
+  const [addAdminResponseMessage, setAddAdminResponseMessage] = useState({
+    success: false,
+    message: ""
+  });
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -30,31 +32,24 @@ const  AddAdmin= () => {
     try {
       const res = await UserService.addAdmin(user);
 
-
-      
       console.log(res.data);
-      setAddAdminResponseMessage({sucess:res.data.success, message:res.data.message});
+      setAddAdminResponseMessage({
+        success: res.data.success,
+        message: res.data.message
+      });
       if (addAdminResponseMessage.success == true) {
         window.location.href = "/admin/admin";
       }
-     
     } catch (error) {
-
       console.log(JSON.stringify(error));
 
       var err;
-      if (typeof error.response.data.message == "string") {
-        err= error.response.data.message
-     }else
-      if (typeof error.response.data.errors[0].defaultMessage == "string") {
+      if (typeof error.response.data.errors != "undefined") {
         err = error.response.data.errors[0].defaultMessage;
-      } 
+      } else if (typeof error.response.data.message == "string") {
+        err = error.response.data.message;
+      }
       setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
-
-  
-
-
-
     }
   }
 
@@ -66,7 +61,7 @@ const  AddAdmin= () => {
           <div className="col-sm-8 mx-auto">
             <div className="card">
               <div className="card-body">
-              {errorMessage}
+                {errorMessage}
 
                 <form onSubmit={handleSubmit}>
                   <div className="row">
@@ -85,7 +80,7 @@ const  AddAdmin= () => {
                       />
                     </div>
                     <div className="col-sm-6">
-                      <MDBInput 
+                      <MDBInput
                         value={email}
                         type="email"
                         label="Email"
@@ -111,7 +106,8 @@ const  AddAdmin= () => {
                     <div className="col-sm-6">
                       <label>Gioi tinh</label>
                       <br />
-                      <input defaultChecked
+                      <input
+                        defaultChecked
                         type="radio"
                         checked={gender === "male"}
                         onClick={e => setGender("male")}
@@ -143,7 +139,6 @@ const  AddAdmin= () => {
                   </button>
 
                   <div className="clearfix"></div>
-                 
                 </form>
               </div>
             </div>

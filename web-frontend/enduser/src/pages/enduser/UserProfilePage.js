@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import UserLayout from "../../layouts/UserLayout";
 import {
-  MDBInput, MDBAlert,
+  MDBInput,
+  MDBAlert,
   MDBBtn,
   MDBModal,
   MDBModalFooter,
@@ -50,21 +51,26 @@ const UserProfilePage = () => {
     try {
       const res = await UserService.updateProfile(user, posts.id);
       setPosts(res.data);
-      // let headerar = <MDBBtn gradient="aqua">SAVED SUCCESS!</MDBBtn>;
-      // setModal({ header: headerar, status: true, message: res.data });
 
+      //thong bao success, còn thông báo err khi bắt đuọc lỗi
       setUpdateResponse({
         success: true,
         message: <MDBAlert color="success">SAVED SUCCESS!</MDBAlert>
       });
     } catch (error) {
       var err;
-      if (typeof error.response.data.errors[0].defaultMessage == "string") {
+      //bắt lỗi ở field
+      if (typeof error.response.data.errors != "undefined") {
         err = error.response.data.errors[0].defaultMessage;
-      } else if (typeof error.message == "string") {
+        //băt lỗi email/username trùng
+      } else if (typeof error.response.data.message == "string") {
         err = error.response.data.message;
       }
-    setUpdateResponse({success:false,message:<MDBAlert color="danger">{err}</MDBAlert>});
+      //thong bao err
+      setUpdateResponse({
+        success: false,
+        message: <MDBAlert color="danger">{err}</MDBAlert>
+      });
     }
   }
 

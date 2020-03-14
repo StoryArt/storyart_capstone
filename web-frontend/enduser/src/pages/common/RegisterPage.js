@@ -1,6 +1,5 @@
-
 import React, { useState } from "react";
-import { MDBInput } from "mdbreact";
+import { MDBInput, MDBAlert } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
 
@@ -12,7 +11,12 @@ const RegisterPage = () => {
   const [intro_content, setIntro_content] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
-  const [registerResponseMessage, setRegisterResponseMessage] = useState("");
+  const [registerResponseMessage, setRegisterResponseMessage] = useState({
+    success: false,
+    message: ""
+  });
+  const [errorMessage, setErrorMessage] = useState("");
+
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -29,11 +33,22 @@ const RegisterPage = () => {
       const res = await UserService.register(user);
 
       console.log(res.data);
-      setRegisterResponseMessage(res.data);
-
-      window.location="/admin/users";
+      setRegisterResponseMessage({
+        success: res.data.success,
+        message: res.data.message
+      });
+      if (registerResponseMessage.success == true) {
+        window.location.href = "/admin/users";
+      }
     } catch (error) {
-      console.log(error);
+      var err;
+      if (typeof error.response.data.errors != "undefined") {
+        err = error.response.data.errors[0].defaultMessage;
+      } else if (typeof error.response.data.message == "string") {
+        err = error.response.data.message;
+      }
+      setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
+
     }
   }
 
@@ -45,6 +60,7 @@ const RegisterPage = () => {
           <div className="col-sm-8 mx-auto">
             <div className="card">
               <div className="card-body">
+                {errorMessage}
                 <form onSubmit={handleSubmit}>
                   <div className="row">
                     <div className="col-sm-6">

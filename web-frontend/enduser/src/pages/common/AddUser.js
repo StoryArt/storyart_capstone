@@ -12,7 +12,10 @@ const CreateAccount = () => {
   const [intro_content, setIntro_content] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
-  const [registerResponseMessage, setRegisterResponseMessage] = useState({success:"", message:""});
+  const [registerResponseMessage, setRegisterResponseMessage] = useState({
+    success: false,
+    message: ""
+  });
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -31,7 +34,10 @@ const CreateAccount = () => {
       const res = await UserService.addUser(user);
 
       console.log(res.data);
-      setRegisterResponseMessage({sucess:res.data.success, message:res.data.message});
+      setRegisterResponseMessage({
+        success: res.data.success,
+        message: res.data.message
+      });
       if (registerResponseMessage.success == true) {
         window.location.href = "/admin/users";
       }
@@ -39,14 +45,13 @@ const CreateAccount = () => {
       console.log(JSON.stringify(error));
 
       var err;
-      if (typeof error.response.data.errors[0].defaultMessage == "string") {
+      if (typeof error.response.data.errors != "undefined") {
         err = error.response.data.errors[0].defaultMessage;
-      } else if (typeof error.message == "string") {
-         err= error.response.data.message
+      } else if (typeof error.response.data.message == "string") {
+        err = error.response.data.message;
       }
-      setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
 
-     
+      setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
     }
   }
 
