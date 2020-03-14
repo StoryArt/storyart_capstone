@@ -148,7 +148,7 @@ public class AdminController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
-    @PostMapping("users/add")
+    @PostMapping("/users/add")
     public ResponseEntity<?> creatUser(@RequestBody
                                            @Valid SignUpRequest signUpRequest) {
         if (userService.findByUsername(signUpRequest.getUsername()) != null) {

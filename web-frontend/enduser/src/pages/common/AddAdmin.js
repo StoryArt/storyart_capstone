@@ -11,6 +11,7 @@ const  AddAdmin= () => {
   const [intro_content, setIntro_content] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
+  const [addAdminResponseMessage, setAddAdminResponseMessage] = useState({success:"", message:""});
 
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -29,41 +30,26 @@ const  AddAdmin= () => {
     try {
       const res = await UserService.addAdmin(user);
 
-      window.location="/admin/admin";
+
+      
+      console.log(res.data);
+      setAddAdminResponseMessage({sucess:res.data.success, message:res.data.message});
+      if (addAdminResponseMessage.success == true) {
+        window.location.href = "/admin/admin";
+      }
      
     } catch (error) {
 
-      let field = error.response.data.errors[0].field;
-      var userfriendlyField = "Enter ";
-      switch (field) {
-        case "username":
-          userfriendlyField += "Tên đăng nhập ";
-          break;
-        case "email":
-          userfriendlyField += "Email ";
-          break;
-        case "dob":
-          userfriendlyField += "Ngày sinh ";
-          break;
-        case "gender":
-          userfriendlyField += "Giới tính ";
-          break;
-        case "password":
-          userfriendlyField += "Mật khẩu ";
-          break;
+      console.log(JSON.stringify(error));
 
-          case "name":
-            userfriendlyField += "Tên ";
-            break;
-        default:
-          break;
-    }
-    setErrorMessage(
-      <MDBAlert color="danger" >
-      {userfriendlyField + error.response.data.errors[0].defaultMessage}
-              
-      </MDBAlert>
-    );
+      var err;
+      if (typeof error.response.data.message == "string") {
+        err= error.response.data.message
+     }else
+      if (typeof error.response.data.errors[0].defaultMessage == "string") {
+        err = error.response.data.errors[0].defaultMessage;
+      } 
+      setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
 
   
 
