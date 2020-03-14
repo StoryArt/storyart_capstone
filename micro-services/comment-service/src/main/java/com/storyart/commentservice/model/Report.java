@@ -5,8 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "report")
@@ -14,13 +18,23 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Report extends DateAudit {
+public class Report extends DateAudit{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @OneToOne
+    @JoinColumn
+    private User user;
+    @OneToOne
+    @JoinColumn
+    private Story story;
 
-    private int userId;
-    private int storyid;
-    private int commentId;
+    @OneToOne
+    @JoinColumn
+    private Comment comment;
+
     private String content;
+
+    private boolean isHandled;
+
 }

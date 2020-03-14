@@ -9,6 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -19,22 +21,25 @@ import java.util.Date;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Screen implements Serializable{
+public class Screen extends DateAudit{
     @Id
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
 //    @Column(length = 100)
+
     private String id;
+
     private int storyId;
 
+    @Size(max = 100)
     private String title;
+
+    @Column(length = 10000)
+    @Size(min = 10)
+    @NotBlank
     private String content;
+
     private String nextScreenId;
 
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
 
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;
+
 }

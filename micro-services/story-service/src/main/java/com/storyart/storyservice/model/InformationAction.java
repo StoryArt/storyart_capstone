@@ -1,11 +1,10 @@
 package com.storyart.storyservice.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Entity
@@ -17,14 +16,17 @@ import java.io.Serializable;
 @IdClass(InformationActionId.class)
 public class InformationAction {
     @Id
-    @Column(length = 100)
+    @NotNull
     private String actionId;
 
     @Id
-    @Column(length = 100)
+    @NotNull
     private String informationId;
 
+    @NotBlank
     private String value;
+
+    @NotBlank
     private String operation;
 }
 

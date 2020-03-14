@@ -15,10 +15,10 @@ public class StoryServiceApplication {
 		SpringApplication.run(StoryServiceApplication.class, args);
 	}
 
-//	@Bean
-//	public CommandLineRunner createTestStories(StoryService storyService){
-//		return args -> {
-//			storyService.createTempStories();
-//		};
-//	}
+	@Bean
+	public CommandLineRunner createTestStories(StoryService storyService){
+		return args -> {
+			storyService.createTempStories();
+		};
+	}
 }

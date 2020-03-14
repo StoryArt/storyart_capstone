@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "comment")
@@ -14,12 +17,21 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment extends DateAudit {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-
-    private int userId;
-    private int storyId;
+    @ManyToOne
+    @JoinColumn
+    private User user;
+    @ManyToOne
+    @JoinColumn
+    private Story story;
     private String content;
+    private boolean isActive;
+    private boolean isDisableByAdmin;
+    @CreationTimestamp
+    private Timestamp createdAt;
+    @UpdateTimestamp
+    private Timestamp updatedAt;
 }

@@ -276,6 +276,7 @@ class StoryServiceImpl implements StoryService{
             story.setActive(true);
             story.setIsDeactiveByAdmin(false);
             story.setTags(getRandomTags(10));
+            story.setPublished(true);
 
             stories.add(story);
         }
