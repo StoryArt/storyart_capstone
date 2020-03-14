@@ -57,9 +57,11 @@ class TagServiceImpl implements TagService{
         Tag tag = new Tag();
         Tag checktag = tagRepository.findByTitle(tagDTO.getTitle());
         if (checktag != null) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Sorry Tag Title existed ");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Xin lỗi, nhãn này đã Tồn tại");
         } else if (tagDTO.getTitle().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Sorry Tag Title is required ");
+            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Xin hãy nhập Nhãn vào ");
+        }else if (tagDTO.getTitle().length() > 15) {
+            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Độ dài nhãn không thể quá 15 ký tự");
         } else {
             tag.setTitle(tagDTO.getTitle());
             tag.setActive(true);
@@ -71,19 +73,25 @@ class TagServiceImpl implements TagService{
     @Override
     public Tag update(AddTagDTO tagDTO) {
         Optional<Tag> tagCheck = tagRepository.findById(tagDTO.getId());
+        boolean isUpdate = tagDTO.isUpdate();
         Tag tag = tagCheck.get();
-        if (!tagCheck.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, Tag do not exist ");
-        } else if (tagDTO.getTitle().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Sorry Tag Title is required ");
+       if (tagDTO.getTitle().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Xin hãy nhập Nhãn vào ");
+        }else if (tagDTO.getTitle().length() > 15) {
+            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Độ dài nhãn không thể quá 15 ký tự");
         } else {
-            tag.setTitle(tagDTO.getTitle());
-            boolean flag = tagDTO.isActive();
-            if (!flag) {
-                tag.setActive(false);
-            } else {
-                tag.setActive(true);
+            if(!isUpdate){
+                if (!tagCheck.isPresent()) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Xin lỗi, nhãn này đã Tồn tại");
+                }
             }
+           tag.setTitle(tagDTO.getTitle());
+           boolean flag = tagDTO.isActive();
+           if (!flag) {
+               tag.setActive(false);
+           } else {
+               tag.setActive(true);
+           }
             tagRepository.save(tag);
         }
         return tag;
@@ -93,7 +101,7 @@ class TagServiceImpl implements TagService{
     @Override
     public Page<Tag> findAll() {
         Pageable sort =
-                PageRequest.of(0, 50, Sort.by("title").descending().and(Sort.by("isActive")));
+                PageRequest.of(0, 50, Sort.by("title").ascending().and(Sort.by("isActive")));
         Page<Tag> list = tagRepository.findAll(sort);
         return list;
     }
@@ -106,4 +114,5 @@ class TagServiceImpl implements TagService{
         }
         return null;
     }
+
 }

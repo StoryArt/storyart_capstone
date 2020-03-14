@@ -9,6 +9,34 @@ class TagService {
         return axios.get(url);
     }
 
+    
+    static async updateTag(tag){
+        const config = {
+            headers: {
+              "Content-Type": "application/json"
+            }
+          };
+          console.log(tag);
+          const url = "http://localhost:8003/tags";
+         return axios.put(url, tag, config);
+    }
+
+    static async insertTag(tag){
+        const config = {
+            headers: {
+              "Content-Type": "application/json"
+            }
+          };
+          console.log(tag);
+          const url = "http://localhost:8003/tags";
+         return axios.post(url, tag, config);
+    }
+
+    static async getAllTag(){
+        const url = "http://localhost:8003/tags/getAll";
+        return axios.get(url);
+    }
+
 }
 
 export default TagService;

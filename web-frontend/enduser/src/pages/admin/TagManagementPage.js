@@ -22,6 +22,7 @@ import {
   MDBBadge,
   MDBCard
 } from "mdbreact";
+
 // import Moment from "react-moment";
 
 class TagManagementPage extends React.Component {
@@ -73,8 +74,8 @@ class TagManagementPage extends React.Component {
     this.setState({ visible3: false });
   };
   loadData = () => {
-    const url = "http://localhost:8003/tags/getAll";
-    axios.get(url).then(res => {
+
+     TagService.getAllTag().then(res => {
       console.log(res.data);
       this.setState({ data: res.data.content });
       this.setState({ loading: true });
@@ -94,14 +95,8 @@ class TagManagementPage extends React.Component {
       title: titles,
       active: active
     };
-    const config = {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
-    console.log(tag);
-    const url = "http://localhost:8003/tags";
-    axios.post(url, tag, config).then(res => {
+
+    TagService.insertTag(tag).then(res => {
       console.log(tag);
       this.setState({ visible: false });
       this.setState({ status: "", currId: "", title: "" });
@@ -131,14 +126,8 @@ class TagManagementPage extends React.Component {
       active: status,
       isUpdate: isUpdate
     };
-    const config = {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
-    console.log(tag);
-    const url = "http://localhost:8003/tags";
-    axios.put(url, tag, config).then(res => {
+
+   TagService.updateTag(tag).then(res => {
       console.log(tag);
       this.setState({ visible3: false });
       this.setState({ status: "", currId: "", title: "" });
@@ -267,6 +256,7 @@ class TagManagementPage extends React.Component {
                     label="Nhập vào tên nhãn"
                     icon="fas fa-hashtag"
                     value={this.state.title}
+                    requi
                     onChange={e => this.handleChange(e)}
                     validate
                     error="wrong"
