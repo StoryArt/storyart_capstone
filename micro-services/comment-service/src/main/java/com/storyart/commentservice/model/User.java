@@ -1,7 +1,6 @@
 package com.storyart.commentservice.model;
 
 import com.storyart.commentservice.common.DateAudit;
-import com.storyart.userservice.model.audit.DateAudit;
 import lombok.*;
 
 import javax.persistence.*;
@@ -46,7 +45,6 @@ public class User extends DateAudit {
     @Size(max = 300)
     @Column(length = 300)
     private String introContent;
-    private String gender;
     private boolean isActive;
 
     @Email

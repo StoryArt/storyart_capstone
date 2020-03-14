@@ -1,14 +1,12 @@
-package com.storyart.userservice.model;
+package com.storyart.storyservice.model;
 
+import com.storyart.storyservice.common.constants.RoleName;
 import lombok.*;
-import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 
 @Getter

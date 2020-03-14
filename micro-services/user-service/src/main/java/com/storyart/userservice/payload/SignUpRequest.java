@@ -39,22 +39,7 @@ public class SignUpRequest {
     @Size(max = 100, min = 8, message = "Mật khẩu phải có từ 8 đến 100 ký tự")
     private String password;
 
-
-
-    @NotBlank(message = "Ngày sinh không được để trống")
-    String dob;
-
-
-    @NotBlank(message = "Giới tính không được để trống")
-    String gender;
-
-
-
-
-
     @Size(max = 300, message = "Thông tin giới thiệu có độ dài tối đa là 300 ký tự")
-    String intro_content;
-
-
+    String introContent;
 
 }

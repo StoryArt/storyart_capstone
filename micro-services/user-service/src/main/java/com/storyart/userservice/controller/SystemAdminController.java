@@ -63,7 +63,6 @@ public class SystemAdminController {
 
         }
         User user = new User();
-        user.setGender(signUpRequest.getGender());
         user.setActive(true);
         user.setUsername(signUpRequest.getUsername());
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));

@@ -1,6 +1,5 @@
 package com.storyart.userservice.service;
 
-import com.storyart.userservice.model.Story;
 import com.storyart.userservice.model.User;
 import com.storyart.userservice.payload.PagedResponse;
 import com.storyart.userservice.payload.UserInManagementResponse;
@@ -36,8 +35,6 @@ public interface UserService {
     PagedResponse<User> getAllUser(UserPrincipal userPrincipal, int page, int size);
 
     PagedResponse<UserInManagementResponse> findByUsernameOrEmail( int page, int size ,String search);
-
-    PagedResponse<Story> findStoriesByUserId(Integer id);
 
     PagedResponse<UserInManagementResponse> findAdminbyUsernameOrEmail(int page, int size , String search);
 

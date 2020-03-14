@@ -16,8 +16,6 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserProfileUpdateRequest {
-
-
     @NotBlank(message = "Tên không được để trống")
     @Size(max = 40, min = 4, message = "Tên phải có từ 3 đến 40 ký tự")
     private String name;
@@ -25,24 +23,6 @@ public class UserProfileUpdateRequest {
     @NotBlank(message = "Email không được để trống")
     @NaturalId
     String email;
-
-
-
-    @NotBlank(message = "Ngày sinh không được để trống")
-    String dob;
-    @NotBlank
-    String gender;
-
-
     @Size(max = 300, message = "Thông tin giới thiệu có độ dài tối đa là 300 ký tự")
     String intro_content;
-
-
-
-
-
-
-
-
-
 }

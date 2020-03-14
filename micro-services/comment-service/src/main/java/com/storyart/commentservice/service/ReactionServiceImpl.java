@@ -1,12 +1,15 @@
 package com.storyart.commentservice.service;
 
+import com.netflix.discovery.converters.Auto;
 import com.storyart.commentservice.dto.comment.CommentHistoryResponseDTO;
 import com.storyart.commentservice.dto.reaction.ReactionCommentDTO;
 import com.storyart.commentservice.dto.reaction.ReactionHistoryResponseDTO;
 import com.storyart.commentservice.model.Comment;
 import com.storyart.commentservice.model.Reaction;
+import com.storyart.commentservice.model.User;
 import com.storyart.commentservice.repository.CommentRepository;
 import com.storyart.commentservice.repository.ReactionRepository;
+import com.storyart.commentservice.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,14 +27,18 @@ import java.util.function.Function;
 public class ReactionServiceImpl implements ReactionService {
     @Autowired
     ReactionRepository reactionRepository;
+
     @Autowired
     CommentRepository commentRepository;
 
+    @Autowired
+    UserRepository userRepository;
 
     @Override
     public void react(ReactionCommentDTO reactionDTO) {
         Optional<Reaction> react = reactionRepository.findReactionByCommentIdAndUserId(reactionDTO.getCommentId(), reactionDTO.getUserId());
         Optional<Comment> comment = commentRepository.findById(reactionDTO.getCommentId());
+        Optional<User> user = userRepository.findById(reactionDTO.getUserId());
 
         if(!reactionDTO.getType().equals("like") && !reactionDTO.getType().equals("dislike")){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Loại reaction chỉ được là 'like' hoặc 'dislike'");
@@ -43,7 +50,7 @@ public class ReactionServiceImpl implements ReactionService {
 
         if(react.isPresent()){
             Reaction reaction = react.get();
-            if(reaction.getType().equals(reactionDTO.getType()) || reactionDTO.getType().length()<1){
+            if(reaction.getType().equals(reactionDTO.getType())){
                reaction.setActive(false);
                reactionRepository.save(reaction);
             }
@@ -51,16 +58,14 @@ public class ReactionServiceImpl implements ReactionService {
                 reaction.setType(reactionDTO.getType());
                 reactionRepository.save(reaction);
             }
-        }
-        else {
+        } else {
             Reaction newReaction = new Reaction();
             newReaction.setComment(comment.get());
-            newReaction.setUserId(reactionDTO.getUserId());
+            newReaction.setUser(user.get());
             newReaction.setType(reactionDTO.getType());
             newReaction.setActive(true);
             reactionRepository.save(newReaction);
         }
-
     }
 
     @Override
@@ -72,23 +77,15 @@ public class ReactionServiceImpl implements ReactionService {
         }
         if(reaction.isPresent()){
             Reaction updateReaction = reaction.get();
-            //tai sao cho nay ton tai minh add like v anh, k phai add, ma` la neu dang ton tai dislike thi update thanh like
-            //no
-            //neu da ton tai, like => bo like
-            //dislike => bo dislike
-            //a dang check xem co ton` tai reaction hay k thoi, da~ like r thi` front end call remove reaction, k phai ham nay
-            //anh lam v thi cuc thoi, voi lai cho nay neu ton tai thi thanh like thay no ko logic lam
-            //cho nay anh noi dung //vi du. comment do' a dang dislike, a bam like => check reaction exist, update reaction thanh` like thoi.
-            //neu k dislike nua thi call remove => chu a hieu cho nay lam
-//
+
             updateReaction.setType("like");
-//
             reactionRepository.save(updateReaction);
         }
         else {
             Reaction newReaction = new Reaction();
             newReaction.setComment(comment.get());
-            newReaction.setUserId(reactionDTO.getUserId());
+//            newReaction.setUserId(reactionDTO.getUserId());
+            newReaction.setUser(null);
             newReaction.setType("like");
             reactionRepository.save(newReaction);
         }
@@ -114,7 +111,8 @@ public class ReactionServiceImpl implements ReactionService {
         else {
             Reaction newReaction = new Reaction();
             newReaction.setComment(comment.get());
-            newReaction.setUserId(reactionDTO.getUserId());
+//            newReaction.setUserId(reactionDTO.getUserId());
+            newReaction.setUser(null);
             newReaction.setType("dislike");
 //
             reactionRepository.save(newReaction);

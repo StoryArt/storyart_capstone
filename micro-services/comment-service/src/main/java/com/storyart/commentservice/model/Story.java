@@ -1,6 +1,6 @@
 package com.storyart.commentservice.model;
 
-import com.storyart.storyservice.common.DateAudit;
+import com.storyart.commentservice.common.DateAudit;
 import lombok.*;
 import org.hibernate.validator.constraints.Range;
 

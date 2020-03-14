@@ -21,15 +21,20 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 public class Reaction extends DateAudit {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int reactionId;
-    private int userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @OneToOne
+    @JoinColumn
+    private User user;
+
     @OneToOne
     @JoinColumn
     private Comment comment;
 
     private String type;
-    private boolean isActive;
 
+    @Column(columnDefinition="tinyint(1) default 1")
+    private boolean isActive;
 
 }

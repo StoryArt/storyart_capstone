@@ -1,6 +1,5 @@
 package com.storyart.userservice.payload;
 
-import com.storyart.userservice.model.Story;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,16 +14,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserStoriesProfile {
-
     private Integer id;
     private String name;
     private String email;
-    private Instant jointAt;
-    private Instant modifiedAt;
+    private Date jointAt;
+    private Date modifiedAt;
     private  String introContent;
-    Date dob;
-    List<Story> storyList;
-
-
 
 }

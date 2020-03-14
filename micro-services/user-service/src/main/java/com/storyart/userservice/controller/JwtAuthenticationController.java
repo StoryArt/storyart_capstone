@@ -98,12 +98,12 @@ public class JwtAuthenticationController {
 
         }
         User user = new User();
-        user.setGender(signUpRequest.getGender());
         user.setActive(true);
         user.setUsername(signUpRequest.getUsername());
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setName(signUpRequest.getName());
         user.setEmail(signUpRequest.getEmail());
+        user.setIntroContent(signUpRequest.getIntroContent());
 
 //        Role userRole
         Role userRole = roleRepository.findByName(RoleName.ROLE_USER)

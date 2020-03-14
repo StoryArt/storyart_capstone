@@ -26,8 +26,10 @@ import java.util.function.Function;
 public class CommentServiceImpl implements CommentService {
     @Autowired
     CommentRepository commentRepository;
-//    @Autowired
-//    UserRepository userRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
     @Autowired
     StoryRepository storyRepository;
     @Autowired
@@ -39,10 +41,10 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public ResponseListCommentDTO create(CreateCommentDTO cmt) {
-//        Optional<User> user = userRepository.findById(cmt.getUserId());
-//        if (!user.isPresent()) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errUserNotFound);
-//        }
+        Optional<User> user = userRepository.findById(cmt.getUserId());
+        if (!user.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errUserNotFound);
+        }
         Optional<Story> story = storyRepository.findById(cmt.getStoryId());
         if (!story.isPresent()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, errStoryNotFound);
@@ -56,7 +58,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = new Comment();
         comment.setContent(cmt.getContent());
         comment.setStory(story.get());//storyId chu nhi :v ok sao anh ko de private field
-//        comment.setUser(user.get());
+        comment.setUser(user.get());
         comment.setActive(true);
         commentRepository.save(comment);
 
@@ -171,10 +173,10 @@ public class CommentServiceImpl implements CommentService {
             for (Reaction reaction : reactions) { //cái reactions nay la lay tu comment id o tren// e phai biet comment id nao`, thi` add vo comment id do'
                 if (comment.getId() == reaction.getComment().getId()) { //cho nay co can check ko, co' de add list vo comment id xac' dinh
                     if (reaction.getType().equals("like")) {
-                        likeIds.add(reaction.getUserId());
+                        likeIds.add(reaction.getUser().getId());
                     }
                     if (reaction.getType().equals("dislike")) {
-                        dislikeIds.add(reaction.getUserId());
+                        dislikeIds.add(reaction.getUser().getId());
                     }
                 }
             }

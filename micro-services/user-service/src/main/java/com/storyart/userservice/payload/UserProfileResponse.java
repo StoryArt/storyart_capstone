@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
+import java.util.Date;
 
 
 /*show infromation to client to display user profile*/
@@ -26,7 +27,7 @@ public class UserProfileResponse {
     private String username;
     private String name;
     private String email;
-    private Instant jointAt;
+    private Date jointAt;
     private Integer storyCount;
 
     private String gender;
@@ -44,10 +45,7 @@ public class UserProfileResponse {
         this.setEmail(user.getEmail());
         this.setJointAt(user.getCreatedAt());
         this.setIntro_content(user.getIntroContent());
-        this.setGender(user.getGender());
-        this.setDob(user.getDob() == null ? Instant.now() :
-                stringToInstant(user.getDob(),
-                        "yyyy-MM-dd HH:mm:ss"));
+
         this.role=(user.getRole().getName());
 
     }

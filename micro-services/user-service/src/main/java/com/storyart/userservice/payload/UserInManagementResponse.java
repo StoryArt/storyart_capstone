@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
+import java.util.Date;
 
 @Setter
 @Getter
@@ -19,17 +19,12 @@ public class UserInManagementResponse {
     private String username;
     private String name;
     private RoleName role;
-    private String gender;
-    private String dob;
     private boolean isActive;
     private String email;
-    private Instant jointAt;
-
+    private Date jointAt;
 
     public UserInManagementResponse(User u) {
         this.id=u.getId();
-        this.dob=u.getDob();
-        this.gender= u.getGender();
         this.email= u.getEmail();
         this.isActive= u.isActive();
         this.name= u.getName();

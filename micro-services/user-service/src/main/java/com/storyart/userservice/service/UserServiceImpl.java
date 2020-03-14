@@ -1,7 +1,6 @@
 package com.storyart.userservice.service;
 
 import com.storyart.userservice.exception.BadRequestException;
-import com.storyart.userservice.model.Story;
 import com.storyart.userservice.model.User;
 import com.storyart.userservice.payload.PagedResponse;
 import com.storyart.userservice.payload.UserInManagementResponse;
@@ -20,8 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -138,14 +135,6 @@ public class UserServiceImpl implements UserService {
                 userPage.getTotalPages(), userPage.isLast());
     }
 
-    @Override
-    public PagedResponse<Story> findStoriesByUserId(Integer id) {
-        return null;
-//todo: get Stories by id feign client
-
-//todo hoi ve chuyen trang va validation
-    }
-
     /**
      * Tim kiem admin theo
      *
@@ -231,8 +220,6 @@ public class UserServiceImpl implements UserService {
 //5
         byId.setName(us.getName());
         byId.setEmail(us.getEmail());
-        byId.setGender(us.getGender());
-        byId.setDob(us.getDob());
         byId.setIntroContent(us.getIntro_content());
 
 

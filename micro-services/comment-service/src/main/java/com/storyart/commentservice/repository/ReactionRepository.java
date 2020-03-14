@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReactionRepository extends JpaRepository<Reaction, Integer> {
-    @Query("SELECT r FROM Reaction r WHERE r.comment.id = ?1 AND r.userId = ?2 and r.isActive=true")
+    @Query("SELECT r FROM Reaction r WHERE r.comment.id = ?1 AND r.user.id = ?2 and r.isActive=true")
     Optional<Reaction> findReactionByCommentIdAndUserId(int commentId, int userId);
     //phai lay r.type nua, moi map dc, umk v lay 2 cái, ok
     //cho na anh fix sau nhe ok e
@@ -20,6 +20,6 @@ public interface ReactionRepository extends JpaRepository<Reaction, Integer> {
     List<Reaction> findListUserId(@Param("commentIds") List<Integer> commentIds);
     //@Query("delete FROM Reaction r WHERE r.comment.id = ?1 AND r.userId = ?2 ")
     //void deleteByCommentIdAndUserId(int commentId, int userId);
-    @Query("select r from Reaction r where  r.userId =?1 and r.isActive = true order by r.createAt desc")
+    @Query("select r from Reaction r where  r.user.id =?1 and r.isActive = true order by r.createdAt desc")
     Page<Reaction> getReactionsHistoryByUserId(int userId, Pageable pageable);
 }
