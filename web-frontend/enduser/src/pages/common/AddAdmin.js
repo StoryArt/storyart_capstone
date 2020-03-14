@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { MDBInput,MDBAlert } from "mdbreact";
+import { MDBInput, MDBAlert } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
 
-const  AddAdmin= () => {
+const AddAdmin = () => {
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -11,7 +11,10 @@ const  AddAdmin= () => {
   const [intro_content, setIntro_content] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
-
+  const [addAdminResponseMessage, setAddAdminResponseMessage] = useState({
+    success: false,
+    message: ""
+  });
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -29,46 +32,24 @@ const  AddAdmin= () => {
     try {
       const res = await UserService.addAdmin(user);
 
-      window.location="/admin/admin";
-     
+      console.log(res.data);
+      setAddAdminResponseMessage({
+        success: res.data.success,
+        message: res.data.message
+      });
+      if (addAdminResponseMessage.success == true) {
+        window.location.href = "/admin/admin";
+      }
     } catch (error) {
+      console.log(JSON.stringify(error));
 
-      let field = error.response.data.errors[0].field;
-      var userfriendlyField = "Enter ";
-      switch (field) {
-        case "username":
-          userfriendlyField += "Tên đăng nhập ";
-          break;
-        case "email":
-          userfriendlyField += "Email ";
-          break;
-        case "dob":
-          userfriendlyField += "Ngày sinh ";
-          break;
-        case "gender":
-          userfriendlyField += "Giới tính ";
-          break;
-        case "password":
-          userfriendlyField += "Mật khẩu ";
-          break;
-
-          case "name":
-            userfriendlyField += "Tên ";
-            break;
-        default:
-          break;
-    }
-    setErrorMessage(
-      <MDBAlert color="danger" >
-      {userfriendlyField + error.response.data.errors[0].defaultMessage}
-              
-      </MDBAlert>
-    );
-
-  
-
-
-
+      var err;
+      if (typeof error.response.data.errors != "undefined") {
+        err = error.response.data.errors[0].defaultMessage;
+      } else if (typeof error.response.data.message == "string") {
+        err = error.response.data.message;
+      }
+      setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
     }
   }
 
@@ -80,7 +61,7 @@ const  AddAdmin= () => {
           <div className="col-sm-8 mx-auto">
             <div className="card">
               <div className="card-body">
-              {errorMessage}
+                {errorMessage}
 
                 <form onSubmit={handleSubmit}>
                   <div className="row">
@@ -99,7 +80,7 @@ const  AddAdmin= () => {
                       />
                     </div>
                     <div className="col-sm-6">
-                      <MDBInput 
+                      <MDBInput
                         value={email}
                         type="email"
                         label="Email"
@@ -125,7 +106,8 @@ const  AddAdmin= () => {
                     <div className="col-sm-6">
                       <label>Gioi tinh</label>
                       <br />
-                      <input defaultChecked
+                      <input
+                        defaultChecked
                         type="radio"
                         checked={gender === "male"}
                         onClick={e => setGender("male")}
@@ -157,7 +139,6 @@ const  AddAdmin= () => {
                   </button>
 
                   <div className="clearfix"></div>
-                 
                 </form>
               </div>
             </div>

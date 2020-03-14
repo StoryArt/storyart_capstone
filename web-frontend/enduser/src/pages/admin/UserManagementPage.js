@@ -20,7 +20,7 @@ const UserManagementPage = () => {
   // ham nay nhan 2 tham so va 1 doi tuong goi la:
   async function HandleSetStatus(userId, callElement) {
     callElement.preventDefault();
-    let url = "http://localhost:8002/api/v1/admin/user/" + userId;
+    let url = "http://localhost:8002/api/v1/admin/users/" + userId;
     let status = callElement.target.value;
     if (status == "true") {
       url += "?setActive=false";
@@ -42,7 +42,7 @@ const UserManagementPage = () => {
 
   async function LoadUsersByPage(event) {
     const url =
-      "http://localhost:8002/api/v1/admin/user/userOnly?page=" + 0 + "&size=10&s=";
+      "http://localhost:8002/api/v1/admin/users/userOnly?page=" + 0 + "&size=10&s=";
 
     const res = await UserService.getUsersList();
 // setPageLenght(res.data.totalPages)

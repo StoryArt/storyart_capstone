@@ -19,11 +19,14 @@ class UserService {
   }
   static async addUser(user) {
     const url = API_ENDPOINT_URL + "/admin/users/add";
-    return axios.post(url, user);
+    const headers = {
+      "Authorization": localStorage.getItem("tokenKey")
+    };
+    return axios.post(url, user, {headers: headers});
   }
 
   static async getUsersList(page, size, search) {
-    const url = API_ENDPOINT_URL + "/admin/user/userOnly?page=0&size=10&s=";
+    const url = API_ENDPOINT_URL + "/admin/users/userOnly?page=0&size=10&s=";
     const headers = {
       "Authorization": localStorage.getItem("tokenKey")
     };
@@ -39,6 +42,9 @@ class UserService {
   }
   
   static async setStatusUser(url) {
+
+
+
     const headers = {
       "Authorization": localStorage.getItem("tokenKey")
     };

@@ -1,8 +1,8 @@
-
 import React, { useState, useEffect } from "react";
 import UserLayout from "../../layouts/UserLayout";
 import {
   MDBInput,
+  MDBAlert,
   MDBBtn,
   MDBModal,
   MDBModalFooter,
@@ -22,6 +22,11 @@ const UserProfilePage = () => {
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
   const [jointAt, setJointAt] = useState("");
+  const [updateResponse, setUpdateResponse] = useState({
+    success: false,
+    message: ""
+  });
+
   const [modal, setModal] = useState({
     header: "",
     status: false,
@@ -46,15 +51,25 @@ const UserProfilePage = () => {
     try {
       const res = await UserService.updateProfile(user, posts.id);
       setPosts(res.data);
-      let headerar = <MDBBtn gradient="aqua">SAVED SUCCESS!</MDBBtn>;
-      setModal({ header: headerar, status: true, message: res.data });
-    } catch (error) {
-      let headerar = <MDBBtn color="danger">SAVE ERROR!</MDBBtn>;
 
-      setModal({
-        header: headerar,
-        status: true,
-        message: error.response.data
+      //thong bao success, còn thông báo err khi bắt đuọc lỗi
+      setUpdateResponse({
+        success: true,
+        message: <MDBAlert color="success">SAVED SUCCESS!</MDBAlert>
+      });
+    } catch (error) {
+      var err;
+      //bắt lỗi ở field
+      if (typeof error.response.data.errors != "undefined") {
+        err = error.response.data.errors[0].defaultMessage;
+        //băt lỗi email/username trùng
+      } else if (typeof error.response.data.message == "string") {
+        err = error.response.data.message;
+      }
+      //thong bao err
+      setUpdateResponse({
+        success: false,
+        message: <MDBAlert color="danger">{err}</MDBAlert>
       });
     }
   }
@@ -103,6 +118,7 @@ const UserProfilePage = () => {
                 <h4> Thong tin tai khoan </h4>{" "}
               </div>{" "}
               <div className="card-body">
+                {updateResponse.message}
                 <form onSubmit={handleUpdateProfile}>
                   <div className="row">
                     <div className="col-sm-6">

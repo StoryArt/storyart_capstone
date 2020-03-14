@@ -3,6 +3,7 @@ import { MDBInput, MDBAlert } from "mdbreact";
 
 import UserService from "../../services/user.service";
 
+import SyntaxHightlight from "../../utils/syntaxHighlight";
 const CreateAccount = () => {
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
@@ -11,7 +12,10 @@ const CreateAccount = () => {
   const [intro_content, setIntro_content] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
-  const [registerResponseMessage, setRegisterResponseMessage] = useState({});
+  const [registerResponseMessage, setRegisterResponseMessage] = useState({
+    success: false,
+    message: ""
+  });
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -30,43 +34,24 @@ const CreateAccount = () => {
       const res = await UserService.addUser(user);
 
       console.log(res.data);
-      setRegisterResponseMessage(res.data.success);
+      setRegisterResponseMessage({
+        success: res.data.success,
+        message: res.data.message
+      });
       if (registerResponseMessage.success == true) {
-        window.location = "/login";
+        window.location.href = "/admin/users";
       }
     } catch (error) {
-      let field = error.response.data.errors[0].field;
-      var userfriendlyField = "Enter ";
-      switch (field) {
-        case "username":
-          userfriendlyField += "Ten dang nhap ";
-          break;
-        case "email":
-          userfriendlyField += "Email ";
-          break;
-        case "dob":
-          userfriendlyField += "Ngay sinh ";
-          break;
-        case "gender":
-          userfriendlyField += "Gioi tinh ";
-          break;
-        case "password":
-          userfriendlyField += "Mat khau ";
-          break;
+      console.log(JSON.stringify(error));
 
-          case "name":
-            userfriendlyField += "Ten ";
-            break;
-        default:
-          break;
+      var err;
+      if (typeof error.response.data.errors != "undefined") {
+        err = error.response.data.errors[0].defaultMessage;
+      } else if (typeof error.response.data.message == "string") {
+        err = error.response.data.message;
       }
 
-      setErrorMessage(
-        <MDBAlert color="danger" >
-        {userfriendlyField + error.response.data.errors[0].defaultMessage}
-                
-        </MDBAlert>
-      );
+      setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
     }
   }
 
@@ -79,8 +64,8 @@ const CreateAccount = () => {
             <div className="card">
               <div className="card-body">
                 <form onSubmit={handleSubmit}>
-                {errorMessage}
-                  
+                  {errorMessage}
+
                   <div className="row">
                     <div className="col-sm-6">
                       <MDBInput

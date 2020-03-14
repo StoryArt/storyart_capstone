@@ -6,8 +6,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 
+import javax.persistence.Column;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,23 +18,30 @@ import javax.validation.constraints.Size;
 public class UserProfileUpdateRequest {
 
 
-
-
-    @NotBlank
-    String gender;
-    @NotBlank
-    @Size(min = 4, max = 40)
-    String name;
-    @NotBlank
-    @Size(max = 40)
+    @NotBlank(message = "Tên không được để trống")
+    @Size(max = 40, min = 4, message = "Tên phải có từ 3 đến 40 ký tự")
+    private String name;
+    @Email
+    @NotBlank(message = "Email không được để trống")
     @NaturalId
     String email;
 
-    @Size(min = 0, max = 200)
+
+
+    @NotBlank(message = "Ngày sinh không được để trống")
+    String dob;
+    @NotBlank
+    String gender;
+
+
+    @Size(max = 300, message = "Thông tin giới thiệu có độ dài tối đa là 300 ký tự")
     String intro_content;
 
-    @NotBlank
-    String dob;
+
+
+
+
+
 
 
 

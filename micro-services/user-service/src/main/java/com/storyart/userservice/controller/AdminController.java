@@ -62,7 +62,7 @@ public class AdminController {
 
     // todo missing check available user (is active or not api)
     /* Deactivating a user without checking it deactived or not */
-    @DeleteMapping(value = "/{uid}")
+    @DeleteMapping(value = "/users/{uid}")
     public ResponseEntity<?>
     setStatus(@PathVariable Integer uid,
               @RequestParam(value = "setActive") boolean setActive) {
@@ -119,7 +119,7 @@ public class AdminController {
 
 
     // search user by username contains %username%
-    @GetMapping("/all")
+    @GetMapping("/users/all")
     public PagedResponse<UserInManagementResponse> findAll(@RequestParam(value = "page",
             defaultValue = AppContants.DEFAULT_PAGE_NUMBER) int page,
                                                            @RequestParam(value = "size",
@@ -130,7 +130,7 @@ public class AdminController {
         return userService.findByUsernameOrEmail(page, size, searchtxt);
     }
 
-    @GetMapping("/userOnly")
+    @GetMapping("/users/userOnly")
     public PagedResponse<UserInManagementResponse> findOnlyUserByUsernameLike(@RequestParam(value = "page",
             defaultValue = AppContants.DEFAULT_PAGE_NUMBER) int page,
           @RequestParam(value = "size",
@@ -148,11 +148,17 @@ public class AdminController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
-    @PostMapping("users/add")
+    @PostMapping("/users/add")
     public ResponseEntity<?> creatUser(@RequestBody
                                            @Valid SignUpRequest signUpRequest) {
         if (userService.findByUsername(signUpRequest.getUsername()) != null) {
-            throw new BadRequestException("Username is already taken");
+            throw new BadRequestException("Tên đăng nhập  này đã  được đăng ký bơi người khác");
+        }
+
+        if (userService.findByEmail(signUpRequest.getEmail()) != null) {
+
+            throw new BadRequestException("Email này đã được đăng ký bơi người khác");
+
         }
 
         User user = new User();
