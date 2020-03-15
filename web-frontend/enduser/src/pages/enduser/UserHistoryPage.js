@@ -47,15 +47,17 @@ const UserHistoryPage = () => {
         }
     }
 
+    const [modalError, setModalError] = useState('');
     const updateComment = async () => {
         try {
             const res = await CommentService.updateComment(updateCommentRequest);
             setModalState({ ...modalState, editModal: false });
             var array = [...comments];
             setComments(array.map(item => item.id === updateCommentRequest.commentId ? { ...item, content: updateCommentRequest.content } : item));
-
+            setModalError('');
         } catch (error) {
-            console.log(error);
+            //console.log(error);
+            setModalError(error.response.data.message);
         }
     }
 
@@ -67,7 +69,7 @@ const UserHistoryPage = () => {
     });
     const [comments, setComments] = useState([]);
     const [reactions, setReactions] = useState([]);
-    const forceUpdateComments = useCallback(() => setComments({}), []);
+    //const forceUpdateComments = useCallback(() => setComments({}), []);
 
 
     const [userId, setUserId] = useState(2);
@@ -91,6 +93,7 @@ const UserHistoryPage = () => {
     };
     //TODO
     //const [isShowMore, setShowMore] = useState(false);
+
     const getCommentHistory = async () => {
         try {
             var array = [...comments];
@@ -147,6 +150,7 @@ const UserHistoryPage = () => {
             setCommentIndex({ commentIndex: index });
             if (modalState.editModal === true) {
                 setModalState({ ...modalState, editModal: false });
+                setModalError('');
             }
             else {
                 setModalState({ ...modalState, editModal: true });
@@ -231,7 +235,7 @@ const UserHistoryPage = () => {
                         ))}
                         {comments.length < 1 &&
                             <div className="text-center">
-                                <small>Không có lịch sử react</small>
+                                <small>Không có lịch sử bình luận</small>
                             </div>
                         }
                         <br>
@@ -264,6 +268,7 @@ const UserHistoryPage = () => {
                     <MDBModal isOpen={modalState.editModal} toggle={toggleModal('editModal')}>
                         <MDBModalHeader toggle={toggleModal('editModal')}>Chỉnh sửa bình luận</MDBModalHeader>
                         <MDBModalBody>
+                            {modalError.length > 0 && <small style={{ color: 'red' }}>(*){modalError}</small>}
                             <form className='mx-3 grey-text'>
                                 <MDBInput
                                     type='textarea'
