@@ -8,8 +8,9 @@ import StoryReadingPage from './pages/enduser/story-reading-page/StoryReadingPag
 import CreateStoryPage from './pages/enduser/create-story-page/CreateStoryPage';
 import SearchStoriesPage from './pages/enduser/search-stories-page/SearchStoriesPage';
 import StoryDetailsPage from './pages/enduser/story-details-page/StoryDetailsPage';
-import UserProfilePage from './pages/enduser/UserProfilePage';
-import UserHistoryPage from './pages/enduser/UserHistoryPage';
+import UserProfilePage from './pages/enduser/user-profile-page/UserProfilePage';
+import UserPublicProfilePage from './pages/enduser/user-profile-page/UserPublicProfilePage';
+import UserHistoryPage from './pages/enduser/user-history-page/UserHistoryPage';
 
 import LoginPage from './pages/common/LoginPage';
 import RegisterPage from './pages/common/RegisterPage';
@@ -45,15 +46,12 @@ function App() {
           <Route exact path="/home" component={HomePage}/>
 
           <Route exact path="/stories/create" component={CreateStoryPage}/>
-          <Route exact path="/search-stories" component={SearchStoriesPage}/>
+          <Route exact path="/stories/search" component={SearchStoriesPage}/>
           <Route exact path="/stories/details/:storyId" component={StoryDetailsPage}/>
-
-          <Route exact path="/create-story" component={CreateStoryPage}/>
-          <Route exact path="/search-stories" component={SearchStoriesPage}/>
-          <Route exact path="/stories/details/" component={StoryDetailsPage}/>
-
           <Route exact path="/stories/read/:storyId" component={StoryReadingPage}/>
-          <Route exact path="/user/profile" component={UserProfilePage}/>
+          
+          <Route exact path="/user/edit-profile" component={UserProfilePage}/>
+          <Route exact path="/user/profile/:userId" component={UserPublicProfilePage}/>
           <Route exact path="/user/history" component={UserHistoryPage}/>
 
           {/* admin routes */}

@@ -38,6 +38,7 @@ const AdminManagementPage = () => {
       "http://localhost:8002/api/v1/systemad/admins?page=" + 0 + "&size=10&s=";
 
     const res = await UserService.getAdminsList();
+    console.log(res.data);
     // setPageLenght(res.data.totalPages);
     addDataToAdminGlobal(res.data);
     // setUserList(res.data.content);
@@ -78,7 +79,6 @@ const AdminManagementPage = () => {
       const id = adminList[index].id;
       rowItem["name"] = adminList[index].username;
       rowItem["role"] = adminList[index].role;
-      rowItem["dob"] = adminList[index].dob;
       rowItem["active"] =
         adminList[index].active == true ? (
           <MDBBtn
@@ -130,13 +130,6 @@ const AdminManagementPage = () => {
         sort: "asc",
         width: 200
       },
-      {
-        label: "Date of Birth",
-        field: "dob",
-        sort: "asc",
-        width: 100
-      },
-
       {
         label: "Joint At",
         field: "jointAt",

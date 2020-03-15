@@ -68,7 +68,7 @@ const SearchStoriesPage = () => {
             setTags(res.data);
            
         } catch (error) {
-            console.log9(error);
+            console.log(error);
         }
     }
 

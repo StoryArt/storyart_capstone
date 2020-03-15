@@ -2,18 +2,21 @@ package com.storyart.storyservice.model;
 
 import com.storyart.storyservice.common.DateAudit;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
 @Table(name = "user",
         uniqueConstraints = {@UniqueConstraint(columnNames = "username"),
                 @UniqueConstraint(columnNames = "email") })
@@ -32,7 +35,6 @@ public class User extends DateAudit {
     @Column(length = 40)
     private String name;
 
-
     @NotBlank(message = "Mật khẩu không được để trống")
     //size 100 is encoded password,, signup request has passord <=15
     @Size(max = 100, min = 8, message = "Mật khẩu phải có từ 8 đến 100 ký tự")
@@ -41,11 +43,7 @@ public class User extends DateAudit {
     @Size(max = 1000, message = "̣")
     private String avatar;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Role role;
+    private int roleId;
 
     @Size(max = 300, message = "Thông tin giới thiệu có độ dài tối đa là 300 ký tự")
     @Column(length = 300)
@@ -56,14 +54,12 @@ public class User extends DateAudit {
     @NotBlank(message = "Email không được để trống")
     private String email;
 
-//    @CreationTimestamp
-//    @Temporal(TemporalType.TIMESTAMP)
-//    private Date createdAt;
-//
-//    @UpdateTimestamp
-//    @Temporal(TemporalType.TIMESTAMP)
-//    private Date updatedAt;
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
 
-    //todo add  @blank and @size for another class
+    @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
 
 }

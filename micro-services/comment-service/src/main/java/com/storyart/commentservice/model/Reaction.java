@@ -25,11 +25,11 @@ public class Reaction extends DateAudit {
     private int id;
 
     @OneToOne
-    @JoinColumn
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToOne
-    @JoinColumn
+    @JoinColumn(name = "comment_id")
     private Comment comment;
 
     private String type;

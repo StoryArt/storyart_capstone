@@ -6,6 +6,7 @@ import com.storyart.storyservice.model.Rating;
 import com.storyart.storyservice.model.Story;
 import com.storyart.storyservice.repository.RatingRepository;
 import com.storyart.storyservice.repository.StoryRepository;
+import com.storyart.storyservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,9 @@ class RatingServiceIml implements RatingService {
     @Autowired
     RatingRepository ratingRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
     @Override
     public List<Story> getSuggestion(Integer id) {
 
@@ -40,6 +44,7 @@ class RatingServiceIml implements RatingService {
             List<Rating> ratingUser = ratingRepository.findRatingByStoryIdEXceptId(story, id);
 
             for (Rating rate : ratingUser) {
+
                 List<Rating> userRating = ratingRepository.findRatingByUserId(rate.getUserId());
                 RatingDTO dtoUSER = new RatingDTO();
 
@@ -63,8 +68,8 @@ class RatingServiceIml implements RatingService {
 
                     for (Rating rateUser : userRating) {
 
-                        if (storyid.equals(rateUser.getStoryId())) {
-                            ratedDTO.setStoryId(rateUser.getStoryId());
+                        if (storyid.equals(rateUser.getUserId())) {
+                            ratedDTO.setStoryId(rateUser.getUserId());
                             double userPoint = rateUser.getStars() - normalizeNumber;
                             ratedDTO.setRatedPoint(userPoint);
                             flag = false;
@@ -107,7 +112,6 @@ class RatingServiceIml implements RatingService {
                         ratedDTO.setRatedPoint(userPoint);
                         flag = false;
                     }
-
                 }
                 if(flag){
                     ratedDTO.setStoryId(storyid);

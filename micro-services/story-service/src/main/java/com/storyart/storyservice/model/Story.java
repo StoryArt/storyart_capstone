@@ -2,12 +2,14 @@ package com.storyart.storyservice.model;
 
 import com.storyart.storyservice.common.DateAudit;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.Range;
-
-import java.util.List;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "story")
@@ -25,7 +27,7 @@ public class Story extends DateAudit {
     @Size(min = 5, max = 250)
     private String title;
 
-    private int authorId;
+    private int userId;
 
     @Column(length = 10000)
     @Size(min = 10, max = 10000)
@@ -51,14 +53,14 @@ public class Story extends DateAudit {
     @Column(columnDefinition="tinyint(1) default 0")
     private boolean isPublished;
 
-
     @Column(columnDefinition="tinyint(1) default 0")
     private Boolean isDeactiveByAdmin;
 
-    @ManyToMany
-    @JoinTable(
-            name = "story_tag",
-            joinColumns = @JoinColumn(name = "story_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    List<Tag> tags;
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
 }

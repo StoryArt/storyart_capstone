@@ -1,6 +1,6 @@
 package com.storyart.commentservice.model;
 
-import com.storyart.commentservice.common.constants.STRING_CONDITIONS;
+import com.storyart.commentservice.common.constants.RoleName;
 import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
@@ -23,7 +23,7 @@ public class Role implements Serializable {
     @Enumerated(EnumType.STRING)
     @NaturalId
     @Column(length = 60)
-    private STRING_CONDITIONS.RoleName name;
+    private RoleName name;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude

@@ -7,39 +7,39 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.validator.constraints.Range;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.*;
-
-
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-class RatingId implements Serializable {
+class ReactionId implements Serializable {
     private int userId;
-    private int storyId;
+    private int commentId;
 }
 
 @Entity
-@Table(name = "rating")
+@Table(name = "reaction")
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(Rating.class)
-public class Rating extends DateAudit {
+@IdClass(ReactionId.class)
+public class Reaction extends DateAudit {
+
     @Id
     private int userId;
 
     @Id
-    private int storyId;
+    private int commentId;
 
-    @Range(min=0, max=5)
-    private double stars;
+    private String type;
+
+    @Column(columnDefinition="tinyint(1) default 1")
+    private boolean isActive;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -48,4 +48,5 @@ public class Rating extends DateAudit {
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
 }

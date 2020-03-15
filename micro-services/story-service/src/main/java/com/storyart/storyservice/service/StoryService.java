@@ -80,7 +80,8 @@ class StoryServiceImpl implements StoryService{
         Optional<Story> story = storyRepository.findById(id);
         if(!story.isPresent()) return null;
         GetStoryDto dto = modelMapper.map(story.get(), GetStoryDto.class);
-        dto.setTags(tagService.mapModelToDto(story.get().getTags()));
+        List<Tag> tags = tagRepository.findAllByStoryId(story.get().getId());
+        dto.setTags(tagService.mapModelToDto(tags));
         return dto;
     }
 
@@ -228,7 +229,7 @@ class StoryServiceImpl implements StoryService{
         Page<GetStoryDto> page2 = page1.map(new Function<Story, GetStoryDto>() {
             @Override
             public GetStoryDto apply(Story story) {
-                List<Tag> tagList = story.getTags();
+                List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
                 GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
                 dto.setTags(tagService.mapModelToDto(tagList));
                 return dto;
@@ -245,7 +246,8 @@ class StoryServiceImpl implements StoryService{
         List<Story> storyList = storyRepository.findAll(pageable).getContent();
         return storyList.stream().map(s -> {
             GetStoryDto dto = modelMapper.map(s, GetStoryDto.class);
-            dto.setTags(tagService.mapModelToDto(s.getTags()));
+            List<Tag> tags = tagRepository.findAllByStoryId(s.getId());
+            dto.setTags(tagService.mapModelToDto(tags));
             return dto;
         }).collect(Collectors.toList());
     }
@@ -275,7 +277,6 @@ class StoryServiceImpl implements StoryService{
             story.setImage("https://mdbootstrap.com/img/Photos/Others/images/43.jpg");
             story.setActive(true);
             story.setIsDeactiveByAdmin(false);
-            story.setTags(getRandomTags(10));
             story.setPublished(true);
 
             stories.add(story);

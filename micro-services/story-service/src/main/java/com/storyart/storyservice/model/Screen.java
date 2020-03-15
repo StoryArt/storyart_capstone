@@ -22,10 +22,10 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Screen extends DateAudit{
-    @Id
+
 //    @GeneratedValue(strategy = GenerationType.IDENTITY)
 //    @Column(length = 100)
-
+    @Id
     private String id;
 
     private int storyId;
@@ -39,7 +39,5 @@ public class Screen extends DateAudit{
     private String content;
 
     private String nextScreenId;
-
-
 
 }

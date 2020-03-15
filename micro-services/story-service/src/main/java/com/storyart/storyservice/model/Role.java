@@ -15,7 +15,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @Entity
 @Table(name = "role")
-public class  Role implements Serializable {
+public class Role implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -24,10 +24,4 @@ public class  Role implements Serializable {
     @NaturalId
     @Column(length = 60)
     private RoleName name;
-
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    Collection<User> users;
-
 }

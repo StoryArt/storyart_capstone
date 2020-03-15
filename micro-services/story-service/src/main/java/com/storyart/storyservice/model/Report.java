@@ -1,18 +1,18 @@
-package com.storyart.commentservice.model;
+package com.storyart.storyservice.model;
 
-import com.storyart.commentservice.common.DateAudit;
+import com.storyart.storyservice.common.DateAudit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.sql.Timestamp;
+import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "report")
@@ -20,22 +20,16 @@ import java.sql.Timestamp;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Report extends DateAudit{
+public class Report extends DateAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    private int userId;
 
-    @OneToOne
-    @JoinColumn(name = "story_id")
-    private Story story;
+    private int storyId;
 
-    @OneToOne
-    @JoinColumn(name = "comment_id")
-    private Comment comment;
+    private int commentId;
 
     @Column(length = 1000)
     @Size(max = 1000)
@@ -43,5 +37,13 @@ public class Report extends DateAudit{
     private String content;
 
     private boolean isHandled;
+
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt;
 
 }

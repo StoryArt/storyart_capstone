@@ -24,7 +24,9 @@ public class Story extends DateAudit {
     @Size(min = 5, max = 250)
     private String title;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     private int authorId;
+    private User user;
 
     @Column(length = 10000)
     @Size(min = 10, max = 10000)

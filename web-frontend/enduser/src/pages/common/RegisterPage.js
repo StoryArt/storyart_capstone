@@ -8,7 +8,7 @@ const RegisterPage = () => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [intro_content, setIntro_content] = useState("");
+  const [introContent, setIntroContent] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
   const [registerResponseMessage, setRegisterResponseMessage] = useState({
@@ -24,7 +24,7 @@ const RegisterPage = () => {
       name: name,
       username: username,
       password: password,
-      intro_content: intro_content,
+      introContent: introContent,
       email: email,
       dob: dob,
       gender: gender
@@ -93,39 +93,13 @@ const RegisterPage = () => {
                         onChange={e => setPassword(e.target.value)}
                       />
                     </div>
-                    <div className="col-sm-6">
-                      <MDBInput
-                        value={dob}
-                        label="Ngay sinh"
-                        type="date"
-                        onChange={e => setDob(e.target.value)}
-                      />
-                    </div>
-                    <div className="col-sm-6">
-                      <label>Gioi tinh</label>
-                      <br />
-                      <input
-                        defaultChecked
-                        type="radio"
-                        checked={gender === "male"}
-                        onClick={e => setGender("male")}
-                      />{" "}
-                      Nam
-                      <input
-                        type="radio"
-                        className="ml-3"
-                        checked={gender === "female"}
-                        onClick={e => setGender("female")}
-                      />{" "}
-                      Nu
-                    </div>
                     <div className="col-12">
                       <MDBInput
                         type="textarea"
                         rows="3"
-                        value={intro_content}
+                        value={introContent}
                         label="Nhap thong tin gioi thieu"
-                        onChange={e => setIntro_content(e.target.value)}
+                        onChange={e => setIntroContent(e.target.value)}
                       />
                     </div>
                   </div>
