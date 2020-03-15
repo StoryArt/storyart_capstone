@@ -45,11 +45,7 @@ public class ReadingHistory extends DateAudit {
 
     private String listSectionId;
 
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 }

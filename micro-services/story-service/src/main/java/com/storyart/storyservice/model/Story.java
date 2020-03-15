@@ -56,11 +56,17 @@ public class Story extends DateAudit {
     @Column(columnDefinition="tinyint(1) default 0")
     private Boolean isDeactiveByAdmin;
 
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = new Date();
+    }
 }
