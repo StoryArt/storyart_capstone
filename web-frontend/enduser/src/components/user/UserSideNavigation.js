@@ -16,7 +16,7 @@ const UserSideNavigation = () => {
                         Trang chu
                     </MDBListGroupItem>
                 </NavLink>
-                <NavLink to="/search-stories" activeClassName="activeClass">
+                <NavLink to="/stories/search" activeClassName="activeClass">
                     <MDBListGroupItem>
                         <MDBIcon icon="user" className="mr-3"/>
                         Tim kiem truyen
