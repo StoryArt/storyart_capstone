@@ -10,8 +10,6 @@ const CreateAccount = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [intro_content, setIntro_content] = useState("");
-  const [dob, setDob] = useState("");
-  const [gender, setGender] = useState("");
   const [registerResponseMessage, setRegisterResponseMessage] = useState({
     success: false,
     message: ""
@@ -26,8 +24,6 @@ const CreateAccount = () => {
       password: password,
       intro_content: intro_content,
       email: email,
-      dob: dob,
-      gender: gender,
       name: name
     };
     try {
@@ -38,8 +34,15 @@ const CreateAccount = () => {
         success: res.data.success,
         message: res.data.message
       });
-      if (registerResponseMessage.success == true) {
-        window.location.href = "/admin/users";
+      if (res.data.success == true) {
+        window.setTimeout(function() {
+          // Move to a new location or you can do something else
+          setErrorMessage(
+            <MDBAlert color="success">{res.data.message}</MDBAlert>
+          );
+
+          window.location.href = "/admin/users";
+        }, 2000);
       }
     } catch (error) {
       console.log(JSON.stringify(error));
@@ -97,32 +100,7 @@ const CreateAccount = () => {
                         onChange={e => setPassword(e.target.value)}
                       />
                     </div>
-                    <div className="col-sm-6">
-                      <MDBInput
-                        value={dob}
-                        label="Ngay sinh"
-                        type="date"
-                        onChange={e => setDob(e.target.value)}
-                      />
-                    </div>
-                    <div className="col-sm-6">
-                      <label>Gioi tinh</label>
-                      <br />
-                      <input
-                        defaultChecked
-                        type="radio"
-                        checked={gender === "male"}
-                        onClick={e => setGender("male")}
-                      />{" "}
-                      Nam
-                      <input
-                        type="radio"
-                        className="ml-3"
-                        checked={gender === "female"}
-                        onClick={e => setGender("female")}
-                      />{" "}
-                      Nu
-                    </div>
+                   
                     <div className="col-12">
                       <MDBInput
                         type="textarea"
