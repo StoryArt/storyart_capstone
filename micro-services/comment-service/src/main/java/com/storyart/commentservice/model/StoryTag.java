@@ -1,13 +1,22 @@
-package com.storyart.storyservice.model;
+package com.storyart.commentservice.model;
 
-import com.storyart.storyservice.model.ids.StoryTagId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
+
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+class StoryTagId implements Serializable {
+    private int tagId;
+    private int storyId;
+}
 
 @Entity
 @Table(name = "story_tag")

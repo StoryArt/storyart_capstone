@@ -12,14 +12,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReactionRepository extends JpaRepository<Reaction, Integer> {
-    @Query("SELECT r FROM Reaction r WHERE r.comment.id = ?1 AND r.user.id = ?2 and r.isActive=true")
+    @Query("SELECT r FROM Reaction r WHERE r.commentId = ?1 AND r.userId = ?2 and r.isActive=true")
     Optional<Reaction> findReactionByCommentIdAndUserId(int commentId, int userId);
     //phai lay r.type nua, moi map dc, umk v lay 2 cái, ok
     //cho na anh fix sau nhe ok e
-    @Query("SELECT r from Reaction r where r.comment.id in (:commentIds) and r.isActive = true") //cho nay anh chi can lay userid thoi nha, ko dc mlay may thon tin khac
+    @Query("SELECT r from Reaction r where r.commentId in (:commentIds) and r.isActive = true") //cho nay anh chi can lay userid thoi nha, ko dc mlay may thon tin khac
     List<Reaction> findListUserId(@Param("commentIds") List<Integer> commentIds);
     //@Query("delete FROM Reaction r WHERE r.comment.id = ?1 AND r.userId = ?2 ")
     //void deleteByCommentIdAndUserId(int commentId, int userId);
-    @Query("select r from Reaction r where  r.user.id =?1 and r.isActive = true order by r.createdAt desc")
+    @Query("select r from Reaction r where  r.userId =?1 and r.isActive = true order by r.createdAt desc")
     Page<Reaction> getReactionsHistoryByUserId(int userId, Pageable pageable);
 }

@@ -7,36 +7,40 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.validator.constraints.Range;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 
-@Entity
-@Table(name = "report")
+import javax.persistence.*;
+
+
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Report extends DateAudit {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+class RatingId implements Serializable {
+    private int userId;
+    private int storyId;
+}
 
+@Entity
+@Table(name = "rating")
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@IdClass(Rating.class)
+public class Rating extends DateAudit {
+    @Id
     private int userId;
 
+    @Id
     private int storyId;
 
-    private int commentId;
-
-    @Column(length = 1000)
-    @Size(max = 1000)
-    @NotBlank
-    private String content;
-
-    private boolean isHandled;
+    @Range(min=0, max=5)
+    private double stars;
 
     private Date createdAt;
 

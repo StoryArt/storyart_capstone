@@ -25,17 +25,17 @@ public class ReactionController {
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
 
-    @PostMapping("/like")
-    public ResponseEntity<Boolean> like(@RequestBody @Valid ReactionCommentDTO reactionDTO){
-        reactionService.like(reactionDTO);
-        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
-    }
-
-    @PostMapping("/dislike")
-    public ResponseEntity<Boolean> dislike(@RequestBody @Valid ReactionCommentDTO reactionDTO){
-        reactionService.dislike(reactionDTO);
-        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
-    }
+    //@PostMapping("/like")
+    //public ResponseEntity<Boolean> like(@RequestBody @Valid ReactionCommentDTO reactionDTO){
+    //    reactionService.like(reactionDTO);
+    //    return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    //}
+//
+    //@PostMapping("/dislike")
+    //public ResponseEntity<Boolean> dislike(@RequestBody @Valid ReactionCommentDTO reactionDTO){
+    //    reactionService.dislike(reactionDTO);
+    //    return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    //}
 
     @PostMapping("/delete")
     public ResponseEntity<Boolean> removeReaction(@RequestBody @Valid ReactionCommentDTO reactionDTO){

@@ -63,6 +63,9 @@ class StoryServiceImpl implements StoryService{
     TagService tagService;
 
     @Autowired
+    StoryTagRepository storyTagRepository;
+
+    @Autowired
     ModelMapper modelMapper;
 
     @Override
@@ -278,13 +281,20 @@ class StoryServiceImpl implements StoryService{
             story.setActive(true);
             story.setIsDeactiveByAdmin(false);
             story.setPublished(true);
-
             stories.add(story);
+            Story saved = storyRepository.save(story);
+            List<Integer> tagList = getRandomTags(7);
+            tagList.stream().forEach(t -> {
+                StoryTag st = new StoryTag();
+                st.setStoryId(saved.getId());
+                st.setTagId(t);
+                storyTagRepository.save(st);
+            });
         }
         storyRepository.saveAll(stories);
     }
 
-    List<Tag> getRandomTags(int quantity){
+    List<Integer> getRandomTags(int quantity){
         List<Tag> tagsList = tagRepository.findAll();
         int length = tagsList.size();
         List<Tag> list = new ArrayList<>();
@@ -295,7 +305,7 @@ class StoryServiceImpl implements StoryService{
             indexes.add(index);
             list.add(tagsList.get(index));
         }
-        return list;
+        return list.stream().map(t -> t.getId()).collect(Collectors.toList());
     }
 
 

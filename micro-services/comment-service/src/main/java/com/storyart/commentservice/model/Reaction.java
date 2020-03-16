@@ -7,11 +7,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.util.Date;
+
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+class ReactionId implements Serializable {
+    private int userId;
+    private int commentId;
+}
 
 @Entity
 @Table(name = "reaction")
@@ -19,22 +27,31 @@ import java.sql.Timestamp;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@IdClass(ReactionId.class)
 public class Reaction extends DateAudit {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int userId;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @OneToOne
-    @JoinColumn(name = "comment_id")
-    private Comment comment;
+    @Id
+    private int commentId;
 
     private String type;
 
     @Column(columnDefinition="tinyint(1) default 1")
     private boolean isActive;
 
+    private Date createdAt;
+
+    private Date updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = new Date();
+    }
 }

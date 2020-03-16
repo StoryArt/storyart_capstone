@@ -4,14 +4,12 @@ import AdminLayout from "../../layouts/AdminLayout";
 import { MDBDataTable } from "mdbreact";
 import { MDBBtn } from "mdbreact";
 import UserService from "../../services/user.service";
-import { Redirect } from "react-router-dom";
-import NotFoundPage from "../../pages/common/NotFoundPage";
 
-const AdminManagementPage = () => {
+const AdminManagementPage = (props) => {
   const [adminGlobaldata, setAdminGlobaldata] = useState("");
 
   function addAdmin() {
-    window.location = "/admin/add";
+    props.history.push('/admin/add');
   }
 
   // ham nay nhan 2 tham so va 1 doi tuong goi la:
@@ -150,8 +148,6 @@ const AdminManagementPage = () => {
     ],
     rows: adminGlobaldata
   };
-
-
 
 
   return (

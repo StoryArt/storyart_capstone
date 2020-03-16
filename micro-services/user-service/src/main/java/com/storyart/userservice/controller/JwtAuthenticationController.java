@@ -35,21 +35,32 @@ public class JwtAuthenticationController {
 
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    AuthenticationManager authenticationManager;
+
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    JwtTokenProvider jwtTokenProvider;
+
     @Autowired
-    private JwtUserDetailsService userDetailsService;
+    JwtUserDetailsService userDetailsService;
 
     @Autowired
     RoleRepository roleRepository;
 
+    @Autowired
+    UserService userService;
 
+    @Autowired
+    JwtUserDetailsService jwtUserDetailsService;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    UserRepository userRepository;
     /**
      * above is demo
      * 10:57 PM 27/2/2020 add sign in an sign up api
      */
-
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -72,18 +83,7 @@ public class JwtAuthenticationController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
-    @Autowired
-    UserService userService;
-    @Autowired
-    JwtUserDetailsService jwtUserDetailsService;
 
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-
-    @Autowired
-    UserRepository userRepository;
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {

@@ -33,12 +33,14 @@ public class JwtTokenProvider implements Serializable {
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
         return Jwts.builder()
                 .setSubject(Integer.toString(userPrincipal.getId()))
+                .claim("username", userPrincipal.getUsername())
+                .claim("name", userPrincipal.getName())
+                .claim("role", userPrincipal.getAuthorities().toArray()[0].toString())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
-
 
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 

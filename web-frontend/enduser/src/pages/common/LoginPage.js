@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { MDBInput, MDBAlert } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
+import { saveTokenToLocal, setAuthHeader, getAuthUserInfo } from '../../config/auth';
+import { ROLE_NAMES } from "../../common/constants";
 
 
 
@@ -9,7 +11,6 @@ const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
     const [user, setUser] = useState({ username: '', password: '' });
-    const [loginResponseMessage, setLoginResponseMessage] = useState("");
 
     const changeUser = (prop, value) => setUser({ ...user, [prop]: value });
 
@@ -21,13 +22,27 @@ const LoginPage = () => {
           const res = await UserService.login(user);
     
           console.log(res.data);
-          setLoginResponseMessage(res.data);
           if (res.data.accessToken !== null) {
-            localStorage.setItem("tokenKey",
-            res.data.tokenType +
-              " " +
-              res.data.accessToken);
-            window.location = "/home";
+            const { tokenType, accessToken } = res.data;
+            const token = tokenType + " " + accessToken;
+            saveTokenToLocal(token);
+            setAuthHeader(token);
+
+            alert('Dang nhap thanh cong');
+            
+            //wait for 400 miliseconds to redirect
+            window.setTimeout(() => {
+                const userInfo = getAuthUserInfo();
+                let url = '/home';
+                if(userInfo.role === ROLE_NAMES.ROLE_ADMIN){
+                  url = '/admin'
+                } else if(userInfo.role === ROLE_NAMES.ROLE_SYSTEM_ADMIN){
+                  url = '/admin/admin';
+                }
+
+                window.location.href = url;
+              
+            }, 400);
           }
         } catch (error) {
           let field = error.response.data.errors[0].field;
@@ -61,7 +76,6 @@ const LoginPage = () => {
                     
             </MDBAlert>
           );
-
           
         }
     }
