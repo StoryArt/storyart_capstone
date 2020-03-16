@@ -307,11 +307,14 @@ const StoryDetailsPage = (props) => {
                     </div>
                     <div className="col-sm-9">
                         <h3 className="font-weight-bold">{story.title} / <small>Nguyen Van A</small></h3>
-                        <strong style={{ fontSize: '1.2em' }}>{story.avgRate} stars</strong>
-                        <p>{story.intro}</p>
-                        <TagList tags={story.tags} />
-                         <div>
-                             <MDBRating iconRegular />
+                        <strong style={{ fontSize: '1.2em', color: 'orange' }}>Diem trung binh: {story.avgRate}</strong>
+                        <div className="my-3">
+                            <strong>Gioi thieu</strong>
+                            <p>{story.intro}</p>
+                        </div>
+                        <strong>Tags:</strong> <TagList tags={story.tags} />
+                         <div className="my-3">
+                             <strong>Danh gia truyen:</strong> <MDBRating iconRegular />
                          </div>
                          
                          {commentError.length > 0 && <small style={{ color: 'red' }}>(*){commentError}</small>}
@@ -340,14 +343,14 @@ const StoryDetailsPage = (props) => {
                          </div>
                     </div>
                     <div className="col-sm-9">
-                         <tr>
-                            <th>
+                         <div className="row">
+                            <div className="col-sm-4">
                                 <h4 className="text-bold">
                                     Bình luận
                                 </h4>
-                            </th>
-                            <th>
-                                <MDBDropdown>
+                            </div>
+                           <div className="col-sm-8">
+                            <MDBDropdown className="float-right">
                                     <MDBDropdownToggle caret color="ins">
                                         Sắp xếp
                                 </MDBDropdownToggle>
@@ -356,8 +359,8 @@ const StoryDetailsPage = (props) => {
                                         <MDBDropdownItem onClick={e => getCommentsBySort('createdAt')}>Mới nhất</MDBDropdownItem>
                                     </MDBDropdownMenu>
                                 </MDBDropdown>
-                            </th>
-                        </tr>
+                           </div>
+                        </div>
                          {/* danh sach binh luan */}
                          {comments.map((comment, index) => (
                             <div className="row mb-3" key={comment.id}>

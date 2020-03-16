@@ -8,4 +8,5 @@ public interface RoleService {
 
     Role findRoleByRoleName(RoleName roleName);
 
+    void createDefaultRoles();
 }

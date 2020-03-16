@@ -11,10 +11,8 @@ import NotFoundPage from '../../pages/common/NotFoundPage';
 const UserManagementPage = () => {
   const [convertedList, setConvertedList] = useState([]);
 
-
-
   function addUser() {
-    window.location = "/admin/users/add";
+    window.location.href = "/admin/users/add";
   }
 
   // ham nay nhan 2 tham so va 1 doi tuong goi la:
@@ -28,11 +26,6 @@ const UserManagementPage = () => {
     } else if (status == "false") {
       url += "?setActive=true";
     }
-
-    const headers = {
-      "Content-Type": "application/json",
-      "Authorization": localStorage.getItem("tokenKey")
-    };
 
     const res = await UserService.setStatusUser(url);
     if(res.data.success){

@@ -32,3 +32,9 @@ export const NUMBER_OPERATIONS = {
 export const STRING_OPERATIONS = {
     REPLACE: 'REPLACE'
 }
+
+export const ROLE_NAMES = {
+    ROLE_USER: 'ROLE_USER',
+    ROLE_ADMIN: 'ROLE_ADMIN',
+    ROLE_SYSTEM_ADMIN: 'ROLE_SYSTEM_ADMIN',
+}
