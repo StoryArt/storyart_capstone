@@ -1,6 +1,7 @@
 package com.storyart.userservice.service;
 
 import com.storyart.userservice.exception.BadRequestException;
+import com.storyart.userservice.model.Story;
 import com.storyart.userservice.model.User;
 import com.storyart.userservice.payload.PagedResponse;
 import com.storyart.userservice.payload.UserInManagementResponse;
@@ -54,11 +55,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deActive(Integer id) {
+    public void deActive(Integer id, boolean deadmin) {
+
+
         Optional<User> byId = userRepository.findById(id);
+
 
         if (byId.isPresent()) {
             User user = byId.get();
+            user.setDeactiveByAdmin(deadmin);
             user.setActive(false);
             userRepository.save(user);
         }
@@ -67,9 +72,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void active(Integer uid) {
         Optional<User> byId = userRepository.findById(uid);
-
         if (byId.isPresent()) {
             User user = byId.get();
+            user.setDeactiveByAdmin(false);
             user.setActive(true);
             userRepository.save(user);
         }
@@ -122,7 +127,7 @@ public class UserServiceImpl implements UserService {
     public PagedResponse<UserInManagementResponse> findByUsernameOrEmail(int page, int size, String search) {
         validatePageNumberAndSize(page, size);
         Pageable pageable = PageRequest.of(page, size);
-        Page<User> userPage = userRepository.findByUsernameLike(pageable, search);
+        Page<User> userPage = userRepository.findByUsernameLike( search,pageable);
         List<User> usersList = userPage.toList();
 
         List<UserInManagementResponse> users= convertUserlist(usersList);
@@ -133,6 +138,14 @@ public class UserServiceImpl implements UserService {
         return new PagedResponse<UserInManagementResponse>(users, userPage.getNumber(), userPage.getSize(),
                 userPage.getTotalElements(),
                 userPage.getTotalPages(), userPage.isLast());
+    }
+
+    @Override
+    public PagedResponse<Story> findStoriesByUserId(Integer id) {
+        return null;
+//todo: get Stories by id feign client
+
+//todo hoi ve chuyen trang va validation
     }
 
     /**
@@ -158,7 +171,7 @@ public class UserServiceImpl implements UserService {
 
 
 
-        Page<User> userPage = userRepository.findAdminByUsernameOrEmail(pageable, search);
+        Page<User> userPage = userRepository.findAdminByUsernameOrEmail( search,pageable);
         List<User> usersList = userPage.toList();
 
        List<UserInManagementResponse> users= convertUserlist(usersList);
@@ -188,7 +201,7 @@ public class UserServiceImpl implements UserService {
 //        TypedQuery<User> querry=entityManager.createQuery("")
 
 
-        Page<User> userPage = userRepository.findOnlyUserByUsernameOrEmail(pageable, searchtxt);
+        Page<User> userPage = userRepository.findOnlyUserByUsernameOrEmail( searchtxt,pageable);
         List<User> usersList = userPage.toList();
 
         List<UserInManagementResponse> users= convertUserlist(usersList);

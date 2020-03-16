@@ -2,9 +2,8 @@
 import React, { useState, useEffect } from "react";
 import UserLayout from "../../../layouts/UserLayout";
 import {
-  MDBInput,
+  MDBInput, MDBAlert,
   MDBBtn,
-  MDBModal,
   MDBModalFooter,
   MDBModalHeader,
   MDBModalBody
@@ -20,14 +19,8 @@ const UserProfilePage = () => {
   const [email, setEmail] = useState("");
   const [intro_content, setIntro_content] = useState("");
   const [jointAt, setJointAt] = useState("");
-  const [modal, setModal] = useState({
-    header: "",
-    status: false,
-    message: []
-  });
-
-
-
+  const [is_active, setIsActive] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   async function handleUpdateProfile(event) {
     event.preventDefault();
     let user = {
@@ -40,16 +33,21 @@ const UserProfilePage = () => {
     try {
       const res = await UserService.updateProfile(user, profile.id);
       setProfile(res.data);
-      let headerar = <MDBBtn gradient="aqua">SAVED SUCCESS!</MDBBtn>;
-      setModal({ header: headerar, status: true, message: res.data });
+      
+    
+        setErrorMessage(
+        <MDBAlert color="success">Lưu thành công</MDBAlert>
+        );
     } catch (error) {
-      let headerar = <MDBBtn color="danger">SAVE ERROR!</MDBBtn>;
+      console.log(JSON.stringify(error));
 
-      setModal({
-        header: headerar,
-        status: true,
-        message: error.response.data
-      });
+      var err;
+      if (typeof error.response.data.errors != "undefined") {
+        err = error.response.data.errors[0].defaultMessage;
+      } else if (typeof error.response.data.message == "string") {
+        err = error.response.data.message;
+      }
+      setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
     }
   }
 
@@ -63,16 +61,16 @@ const UserProfilePage = () => {
       setId(res.data.id);
       setName(res.data.name);
       setIntro_content(res.data.intro_content);
-      setJointAt(res.data.jointAt);
+     var date= new Date(res.data.jointAt);
+
+      setJointAt(date.toString());
+      setIsActive(res.data.is_active);
     } catch (error) {
         console.log(error);
     }
   };
 
-  //open modal/ close modal
-  const toggle = () => {
-    setModal({ status: !modal.status });
-  };
+  
 
   useEffect(() => {
     getProfile();
@@ -96,6 +94,7 @@ const UserProfilePage = () => {
                 <h4> Thong tin tai khoan </h4>{" "}
               </div>{" "}
               <div className="card-body">
+                {errorMessage}
                 <form onSubmit={handleUpdateProfile}>
                   <div className="row">
                     <div className="col-sm-6">
@@ -103,9 +102,10 @@ const UserProfilePage = () => {
                         label="Ten day du"
                         value={name}
                         onChange={e => setName(e.target.value)}
+                        outline
                       />
-                    </div>{" "}
-                    <div className="col-sm-6">
+                    </div>
+                    <div className="col-sm-6" padding="20px">
                       <MDBInput
                         label="Email"
                         value={email}
@@ -122,35 +122,26 @@ const UserProfilePage = () => {
                         onChange={e => setIntro_content(e.target.value)}
                         outline
                       />
-                    </div>
-                    <div className="col-sm-6">
-                      <MDBBtn color="info" label="Joint at" value={jointAt}>
-                        {jointAt}
-                      </MDBBtn>
                     </div>{" "}
-                    <div className="col-sm-6">{statusButton}</div>{" "}
+                    <div className="col-sm-6">
+                      
+                      <i>
+                        Joint at:
+                        {jointAt}
+                      </i>
+                    </div>{" "}
+                <div className="col-sm-6">{statusButton}</div>{" "}
+
                     
                     <button
                       className="btn btn-success float-right"
                       style={{ fontSize: "1.1em" }}
                     >
-                      Save
+                      Lưu thay đổi
                     </button>{" "}
-                    <MDBModal isOpen={modal.status} toggle={toggle}>
-                      <MDBModalHeader toggle={toggle}>
-                        {modal.header}
-                      </MDBModalHeader>
-                      <MDBModalBody>
-                        {JSON.stringify(modal.message)}
-                      </MDBModalBody>
-                      <MDBModalFooter>
-                        <MDBBtn color="secondary" onClick={toggle}>
-                          Close
-                        </MDBBtn>
-                      </MDBModalFooter>
-                    </MDBModal>
                   </div>
                 </form>{" "}
+
               </div>{" "}
             </div>{" "}
           </div>{" "}

@@ -1,11 +1,11 @@
 package com.storyart.userservice.controller;
 
 
+import com.storyart.userservice.common.constants.RoleName;
 import com.storyart.userservice.exception.AppException;
 import com.storyart.userservice.exception.BadRequestException;
 import com.storyart.userservice.exception.ResourceNotFoundException;
 import com.storyart.userservice.model.Role;
-import com.storyart.userservice.model.RoleName;
 import com.storyart.userservice.model.User;
 import com.storyart.userservice.payload.ApiResponse;
 import com.storyart.userservice.payload.PagedResponse;
@@ -15,6 +15,7 @@ import com.storyart.userservice.repository.RoleRepository;
 import com.storyart.userservice.repository.UserRepository;
 import com.storyart.userservice.security.CurrentUser;
 import com.storyart.userservice.security.UserPrincipal;
+import com.storyart.userservice.service.RoleService;
 import com.storyart.userservice.service.UserService;
 import com.storyart.userservice.util.AppContants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import javax.websocket.server.PathParam;
 import java.net.URI;
-import java.util.Collections;
 
 @RestController
 @RequestMapping("/api/v1/systemad")
@@ -53,7 +52,8 @@ public class SystemAdminController {
     UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> createAdminAccount(@RequestBody @Valid SignUpRequest signUpRequest) {
+    public ResponseEntity<?>
+    createAdminAccount(@RequestBody @Valid SignUpRequest signUpRequest) {
         if (userService.findByUsername(signUpRequest.getUsername()) != null) {
             throw new BadCredentialsException("Tên đăng nhập này đã đã được đăng ký bởi ai đó!");
         }
@@ -70,9 +70,9 @@ public class SystemAdminController {
         user.setEmail(signUpRequest.getEmail());
 //        Role userRole
         //todo : missing role of a user
-        Role userRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
+        Role userRole = roleRepository.findRoleByName(RoleName.ROLE_ADMIN)
                 .orElseThrow(() -> new AppException("User Role not set."));
-        user.setRole(userRole);
+        user.setRoleId(userRole.getId());
         User savedUser = userRepository.save(user);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("api/v1/user/username")
                 .buildAndExpand(savedUser.getUsername()).toUri();
@@ -83,29 +83,43 @@ public class SystemAdminController {
     //todo: update data and login with email
 //todo: check lai n-n user vs role?!
     @GetMapping("/admins")
-    public PagedResponse<UserInManagementResponse> getAllAdmin(@RequestParam(value = "page",
+    public PagedResponse<UserInManagementResponse>
+    getAllAdmin(@RequestParam(value = "page",
             defaultValue = AppContants.DEFAULT_PAGE_NUMBER) int page,
-                                                               @RequestParam(value = "size",
-                                                                       defaultValue = AppContants.DEFAULT_PAGE_SIZE) int size,
-                                                               @RequestParam(value = "s") String searchtxt) {
+                @RequestParam(value = "size",
+                        defaultValue = AppContants.DEFAULT_PAGE_SIZE) int size,
+                @RequestParam(value = "s") String searchtxt) {
         return userService.findAdminbyUsernameOrEmail(page, size, searchtxt);
     }
 
+    @Autowired
+    RoleService roleService;
+
+
+    //system admin khong the dung api nay de set status cho no duoc
     @DeleteMapping(value = "/admins/{uid}")
-    public ResponseEntity<?> deactiveAdmin(@CurrentUser UserPrincipal
-                                                   systemAdmin, @PathVariable("uid") Integer uid, @RequestParam("setActive") boolean setActive) {
+    public ResponseEntity<?>
+    setStatusAdmin(@CurrentUser UserPrincipal
+                           systemAdmin, @PathVariable("uid") Integer uid, @RequestParam("setActive") boolean setActive) {
         User adminById = userService.findById(uid);
         if (adminById == null) {
             throw new ResourceNotFoundException("id", "User", uid);
         }
+        Role roleById = roleService.findRoleById(adminById.getRoleId());
+         //check role xem co phải role khac admin hay khong
+        // neu khac thi khong cho set status boi ssytemad không có quyền đó
+       if (roleById.getName() != RoleName.ROLE_ADMIN) {
+            return new ResponseEntity<>(new ApiResponse(false, "Khóa tài khoản thất bại!"), HttpStatus.BAD_REQUEST);
+        }
         if (!setActive) {
             // todo add them ly do deactive cho ca hai
-            userService.deActive(uid);
-            return new ResponseEntity<>(new ApiResponse(true, "Admin: " + adminById + " was deactivated by " + systemAdmin.getUsername()), HttpStatus.OK);
-
+            userService.deActive(uid, true);
+            return new ResponseEntity<>(new ApiResponse(false, "Đã khóa tài khoản '"+adminById.getUsername()+"'"), HttpStatus.OK);
         } else {
+
             userService.active(uid);
-            return new ResponseEntity<>(new ApiResponse(true, "Admin: " + adminById + " was activated by " + systemAdmin.getUsername()), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse(true, "Mở tài khoản '"+adminById.getUsername()+"' thành công!"), HttpStatus.OK);
+
         }
     }
 

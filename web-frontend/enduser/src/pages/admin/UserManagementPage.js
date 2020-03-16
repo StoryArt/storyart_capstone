@@ -24,9 +24,13 @@ const UserManagementPage = () => {
     let status = callElement.target.value;
     if (status == "true") {
       url += "?setActive=false";
+      callElement.target.innerText = "Deactivated";
+
       //TODO: cannot change inner text of button
     } else if (status == "false") {
       url += "?setActive=true";
+      callElement.target.innerText = "Active";
+
     }
 
     const headers = {
@@ -76,12 +80,11 @@ console.log(res.data);
       let rowItem = {};
       rowItem["username"] = userList[index].username;
       rowItem["username"] = (
-        <a href={`/user/${userList[index].id}`}>{rowItem["username"]}</a>
+        <a href={`/user/profile/${userList[index].id}`}>{rowItem["username"]}</a>
       );
       const id = userList[index].id;
       rowItem["name"] = userList[index].username;
       rowItem["role"] = userList[index].role;
-      rowItem["dob"] = userList[index].dob;
       rowItem["active"] =
         userList[index].active == true ? (
           <MDBBtn
@@ -136,12 +139,7 @@ getMyProfile();
         sort: "asc",
         width: 200
       },
-      {
-        label: "Date of Birth",
-        field: "dob",
-        sort: "asc",
-        width: 100
-      },
+    
 
       {
         label: "Joint At",

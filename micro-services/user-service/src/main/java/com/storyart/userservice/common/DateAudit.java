@@ -30,11 +30,5 @@ is invisible since all the base class properties are simply
 @Getter
 @Setter
 public abstract class DateAudit implements Serializable {
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
 
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;
 }

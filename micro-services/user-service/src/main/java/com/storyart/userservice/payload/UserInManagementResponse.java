@@ -1,8 +1,10 @@
 package com.storyart.userservice.payload;
 
 
-import com.storyart.userservice.model.RoleName;
+import com.storyart.userservice.common.constants.RoleName;
 import com.storyart.userservice.model.User;
+import com.storyart.userservice.service.BeanUtil;
+import com.storyart.userservice.service.RoleService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,9 +21,14 @@ public class UserInManagementResponse {
     private String username;
     private String name;
     private RoleName role;
+
     private boolean isActive;
     private String email;
     private Date jointAt;
+
+
+
+
 
     public UserInManagementResponse(User u) {
         this.id=u.getId();
@@ -29,7 +36,7 @@ public class UserInManagementResponse {
         this.isActive= u.isActive();
         this.name= u.getName();
         this.username= u.getUsername();
-        this.role = u.getRole()== null? null : u.getRole().getName();
+        this.role = BeanUtil.getBean(RoleService.class).findRoleById(u.getRoleId()).getName();
         this.jointAt = u.getCreatedAt();
     }
 }

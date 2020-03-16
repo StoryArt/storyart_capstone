@@ -1,10 +1,12 @@
 package com.storyart.userservice.controller;
 
 
+import com.storyart.userservice.common.constants.RoleName;
 import com.storyart.userservice.exception.AppException;
 import com.storyart.userservice.exception.BadRequestException;
+import com.storyart.userservice.exception.ResourceNotFoundException;
+import com.storyart.userservice.exception.UnauthorizedException;
 import com.storyart.userservice.model.Role;
-import com.storyart.userservice.model.RoleName;
 import com.storyart.userservice.model.User;
 import com.storyart.userservice.payload.ApiResponse;
 import com.storyart.userservice.payload.PagedResponse;
@@ -12,33 +14,20 @@ import com.storyart.userservice.payload.SignUpRequest;
 import com.storyart.userservice.payload.UserInManagementResponse;
 import com.storyart.userservice.repository.RoleRepository;
 import com.storyart.userservice.repository.UserRepository;
-import com.storyart.userservice.security.CurrentUser;
-import com.storyart.userservice.security.JwtAuthenticationFilter;
 import com.storyart.userservice.security.JwtTokenProvider;
-import com.storyart.userservice.security.UserPrincipal;
+import com.storyart.userservice.service.RoleService;
 import com.storyart.userservice.service.UserService;
 import com.storyart.userservice.util.AppContants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -60,83 +49,63 @@ public class AdminController {
     @Autowired
     RoleRepository roleRepository;
 
+    @Autowired
+    RoleService roleService;
     // todo missing check available user (is active or not api)
     /* Deactivating a user without checking it deactived or not */
     @DeleteMapping(value = "/users/{uid}")
     public ResponseEntity<?>
-    setStatus(@PathVariable Integer uid,
-              @RequestParam(value = "setActive") boolean setActive) {
+    setStatusUser(@PathVariable Integer uid,
+                  @RequestParam(value = "setActive") boolean setActive) {
 
-        boolean afterSetStatus = false;
+        User userById = userService.findById(uid);
+        if (userById == null) {
+            throw new ResourceNotFoundException("id", "User", uid);
+        }
+        Role roleById = roleService.findRoleById(userById.getRoleId());
+        //check role xem co phải role khac admin hay khong
+        // neu khac thi khong cho set status boi ssytemad không có quyền đó
+        if (roleById.getName() != RoleName.ROLE_USER) {
+            throw new UnauthorizedException("Bạn không thể chỉnh sửa nội dung này!");
+        }
         if (!setActive) {
-            userService.deActive(uid);
-
+            userService.deActive(uid, true);
         } else {
             userService.active(uid);
         }
-        afterSetStatus = userService.findById(uid).isActive();
-
+        User byId = userService.findById(uid);
+        boolean afterSetStatus = byId.isActive();
 
         //todo thieu set deactive by admin account record
         if (afterSetStatus) {
-            return new ResponseEntity<>(new ApiResponse(true, "Account activated successfully"), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse(true, "Mở tài khoản '"+byId.getUsername()+"' thành công!"), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(new ApiResponse(true, "Account deactivated successfully"), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse(true, "Đã khóa tài khoản '"+byId.getUsername()+"'"), HttpStatus.OK);
         }
 
     }
-//    @Autowired
-//    PasswordEncoder passwordEncoder;
-
-//    @PostMapping
-//    public ResponseEntity<?> createUserAccount(@RequestBody @Valid SignUpRequest signUpRequest) {
-//
-//        if (userService.findByUsername(signUpRequest.getUsername()) != null) {
-//            return new ResponseEntity<>(new ApiResponse(false,
-//                    "Username is already taken!"),
-//                    HttpStatus.BAD_REQUEST);
-//        }
-//
-//        User user = new User();
-//        user.setGender(signUpR    equest.getGender());
-//        user.setActive(true);
-//        user.setUsername(signUpRequest.getUsername());
-//        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-//        user.setName(signUpRequest.getName());
-//        user.setEmail(signUpRequest.getEmail());
-//
-////        Role userRole
-//        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
-//                .orElseThrow(() -> new AppException("User Role not set."));
-//
-//        user.setRoles(Collections.singleton(userRole));
-//        User savedUser = userRepository.save(user);
-//        URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("api/v1/user/username")
-//                .buildAndExpand(savedUser.getUsername()).toUri();
-//        return ResponseEntity.created(location).body(new ApiResponse(true, "Administrator created successfully"));
-//
-//    }
-
 
     // search user by username contains %username%
     @GetMapping("/users/all")
-    public PagedResponse<UserInManagementResponse> findAll(@RequestParam(value = "page",
+    public PagedResponse<UserInManagementResponse>
+    findAll(@RequestParam(value = "page",
             defaultValue = AppContants.DEFAULT_PAGE_NUMBER) int page,
-                                                           @RequestParam(value = "size",
+            @RequestParam(value = "size",
 
-                                                                   defaultValue = AppContants.DEFAULT_PAGE_SIZE) int size,
-                                                           @RequestParam(value = "s") String searchtxt) {
+                    defaultValue = AppContants.DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(value = "s") String searchtxt) {
 
         return userService.findByUsernameOrEmail(page, size, searchtxt);
     }
 
     @GetMapping("/users/userOnly")
-    public PagedResponse<UserInManagementResponse> findOnlyUserByUsernameLike(@RequestParam(value = "page",
+    public PagedResponse<UserInManagementResponse>
+    findOnlyUserByUsernameLike(@RequestParam(value = "page",
             defaultValue = AppContants.DEFAULT_PAGE_NUMBER) int page,
-          @RequestParam(value = "size",
+                               @RequestParam(value = "size",
 
-                  defaultValue = AppContants.DEFAULT_PAGE_SIZE) int size,
-          @RequestParam(value = "s") String searchtxt) {
+                                       defaultValue = AppContants.DEFAULT_PAGE_SIZE) int size,
+                               @RequestParam(value = "s") String searchtxt) {
 
         return userService.findOnlyUserByUsernameOrEmail(page, size, searchtxt);
     }
@@ -144,13 +113,13 @@ public class AdminController {
     //todo: cannot able to active account -that deactived by sys/admin- 2 functions
 
 
-
-
     @Autowired
     PasswordEncoder passwordEncoder;
+
     @PostMapping("/users/add")
-    public ResponseEntity<?> creatUser(@RequestBody
-                                           @Valid SignUpRequest signUpRequest) {
+    public ResponseEntity<?>
+    createUser(@RequestBody
+              @Valid SignUpRequest signUpRequest) {
         if (userService.findByUsername(signUpRequest.getUsername()) != null) {
             throw new BadRequestException("Tên đăng nhập  này đã  được đăng ký bơi người khác");
         }
@@ -167,12 +136,13 @@ public class AdminController {
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setName(signUpRequest.getName());
         user.setEmail(signUpRequest.getEmail());
+        user.setIntroContent(signUpRequest.getIntro_content());
 
 //        Role userRole
-        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+        Role userRole = roleRepository.findRoleByName(RoleName.ROLE_USER)
                 .orElseThrow(() -> new AppException("User Role not set."));
 
-        user.setRole(userRole);
+        user.setRoleId(userRole.getId());
 
 
         /**
