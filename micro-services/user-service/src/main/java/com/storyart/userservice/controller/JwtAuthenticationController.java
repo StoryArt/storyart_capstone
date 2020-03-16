@@ -73,7 +73,7 @@ public class JwtAuthenticationController {
                     )
             );
         } catch (BadCredentialsException e) {
-            return ResponseEntity.ok().body(new ApiResponse(false, "Your username or password were incorrect."));
+            throw new BadRequestException("Sai tên đăng nhập hoặc mật khẩu!");
 
         }
 
@@ -91,7 +91,7 @@ public class JwtAuthenticationController {
             throw new BadCredentialsException("Tên đăng nhập  này đã được đăng ký bởi ai đó!");
         }
         if (userService.findByEmail(signUpRequest.getEmail()) != null) {
-            throw new BadRequestException("Email này đã được đăng ký bơi người khác");
+            throw new BadRequestException("Email này đã được đăng ký bởi người khác");
 
         }
         User user = new User();

@@ -46,6 +46,7 @@ public class UserController {
             userProfileResponse.setName(user.getName());
             userProfileResponse.setUsername(user.getUsername());
             userProfileResponse.setEmail(user.getEmail());
+            userProfileResponse.setActive(user.isActive());
             userProfileResponse.setJointAt(user.getCreatedAt());
         }
         return userProfileResponse;
