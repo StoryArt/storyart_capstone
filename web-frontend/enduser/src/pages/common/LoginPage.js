@@ -29,55 +29,29 @@ const LoginPage = () => {
             setAuthHeader(token);
 
             alert('Dang nhap thanh cong');
-            
+            const userInfo = getAuthUserInfo();
+            let url = '/home';
+            if(userInfo.role === ROLE_NAMES.ROLE_ADMIN){
+              url = '/admin/users'
+            } else if(userInfo.role === ROLE_NAMES.ROLE_SYSTEM_ADMIN){
+              url = '/admin/admin';
+            }
             //wait for 400 miliseconds to redirect
             window.setTimeout(() => {
-                const userInfo = getAuthUserInfo();
-                let url = '/home';
-                if(userInfo.role === ROLE_NAMES.ROLE_ADMIN){
-                  url = '/admin'
-                } else if(userInfo.role === ROLE_NAMES.ROLE_SYSTEM_ADMIN){
-                  url = '/admin/admin';
-                }
-
                 window.location.href = url;
-              
             }, 400);
           }
         } catch (error) {
-          let field = error.response.data.errors[0].field;
-          var userfriendlyField = "Enter ";
-          switch (field) {
-            case "username":
-              userfriendlyField += "Tên đăng nhập ";
-              break;
-            case "email":
-              userfriendlyField += "Email ";
-              break;
-            case "dob":
-              userfriendlyField += "Ngày sinh ";
-              break;
-            case "gender":
-              userfriendlyField += "Giới tính ";
-              break;
-            case "password":
-              userfriendlyField += "Mật khẩu ";
-              break;
-    
-              case "name":
-                userfriendlyField += "Tên ";
-                break;
-            default:
-              break;
-        }
           setErrorMessage(
             <MDBAlert color="danger" >
-            {userfriendlyField + error.response.data.errors[0].defaultMessage}
-                    
+            {error.response.data.message}
             </MDBAlert>
           );
-          
         }
+      
+         
+          
+        
     }
 
     return (
@@ -88,6 +62,7 @@ const LoginPage = () => {
                     <div className="col-sm-6 mx-auto">
                         <div className="card">
                             <div className="card-body">
+                              {errorMessage}
                                 <form onSubmit={login}>
                                     <MDBInput 
                                         value={user.username}

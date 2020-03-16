@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { MDBInput, MDBAlert } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
+import { setAuthHeader } from "../../config/auth";
+
 
 const AddAdmin = () => {
   const [username, setUsername] = useState("");
@@ -9,10 +11,7 @@ const AddAdmin = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [intro_content, setIntro_content] = useState("");
-  const [addAdminResponseMessage, setAddAdminResponseMessage] = useState({
-    success: false,
-    message: ""
-  });
+ 
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -26,13 +25,12 @@ const AddAdmin = () => {
       name: name
     };
     try {
+    setAuthHeader(localStorage.getItem("jwt-token"));
+
       const res = await UserService.addAdmin(user);
 
       console.log(res.data);
-      setAddAdminResponseMessage({
-        success: res.data.success,
-        message: res.data.message
-      });
+      
       if (res.data.success == true) {
         window.setTimeout(function() {
           // Move to a new location or you can do something else
@@ -52,6 +50,7 @@ const AddAdmin = () => {
       } else if (typeof error.response.data.message == "string") {
         err = error.response.data.message;
       }
+
       setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
     }
   }

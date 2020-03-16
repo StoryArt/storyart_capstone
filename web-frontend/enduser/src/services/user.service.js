@@ -25,12 +25,12 @@ class UserService {
   }
 
   static async getUsersList(page, size, search) {
-    const url = baseUrl + "/admin/users/userOnly?page=0&size=10&s=";
+    const url = baseUrl + "/admin/users/userOnly?page="+page+"&size="+size+"&s="+search;
     return axios.get(url);
   }
   
   static async getAdminsList(page, size, search) {
-    const url = baseUrl + "/systemad/admins?page=0&size=10&s=";
+    const url = baseUrl + "/systemad/admins?page="+page+"&size="+size+"&s="+search;
     return  axios.get(url);
   }
   
@@ -60,6 +60,10 @@ class UserService {
 
   static async getMyProfile() {
     let url = baseUrl + "/user/me";
+    return axios.get(url);
+  }
+  static async getProById(userId) {
+    let url = baseUrl + "/user/"+userId;
     return axios.get(url);
   }
 

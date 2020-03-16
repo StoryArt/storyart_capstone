@@ -1,13 +1,15 @@
-
 import React, { useState, useEffect } from "react";
 import UserLayout from "../../../layouts/UserLayout";
 import {
-  MDBInput, MDBAlert,
+  MDBInput,
+  MDBAlert,
   MDBBtn,
   MDBModalFooter,
   MDBModalHeader,
   MDBModalBody
 } from "mdbreact";
+import { setAuthHeader } from "../../../config/auth";
+
 import UserService from "../../../services/user.service";
 
 import SplitDate from "../../../utils/splitDate";
@@ -16,6 +18,7 @@ const UserProfilePage = () => {
   const [profile, setProfile] = useState([]);
   const [id, setId] = useState("");
   const [name, setName] = useState("");
+  const [us, setUs] = useState("");
   const [email, setEmail] = useState("");
   const [intro_content, setIntro_content] = useState("");
   const [jointAt, setJointAt] = useState("");
@@ -25,6 +28,7 @@ const UserProfilePage = () => {
     event.preventDefault();
     let user = {
       id: id,
+      username: us,
       name: name,
       intro_content: intro_content,
       email: email,
@@ -33,11 +37,8 @@ const UserProfilePage = () => {
     try {
       const res = await UserService.updateProfile(user, profile.id);
       setProfile(res.data);
-      
-    
-        setErrorMessage(
-        <MDBAlert color="success">Lưu thành công</MDBAlert>
-        );
+
+      setErrorMessage(<MDBAlert color="success">Lưu thành công</MDBAlert>);
     } catch (error) {
       console.log(JSON.stringify(error));
 
@@ -53,6 +54,7 @@ const UserProfilePage = () => {
 
   const getProfile = async () => {
     try {
+      setAuthHeader(localStorage.getItem("jwt-token"));
       const res = await UserService.getMyProfile();
       console.log(res.data);
 
@@ -60,17 +62,16 @@ const UserProfilePage = () => {
       setEmail(res.data.email);
       setId(res.data.id);
       setName(res.data.name);
+      setUs(res.data.username);
       setIntro_content(res.data.intro_content);
-     var date= new Date(res.data.jointAt);
+      var date = new Date(res.data.jointAt);
 
       setJointAt(date.toString());
       setIsActive(res.data.is_active);
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
   };
-
-  
 
   useEffect(() => {
     getProfile();
@@ -79,9 +80,17 @@ const UserProfilePage = () => {
   const statusButton = [];
 
   if (profile.is_active == true) {
-    statusButton.push(<MDBBtn color="success">Active</MDBBtn>);
+    statusButton.push(
+      <MDBBtn style={{ margin: 0, fontSize: "0.8em" }}color="success">
+        Active
+      </MDBBtn>
+    );
   } else {
-    statusButton.push(<MDBBtn color="danger">Deactivated</MDBBtn>);
+    statusButton.push(
+      <MDBBtn style={{ margin: 0, fontSize: "0.8em" }} color="danger">
+        Deactivated
+      </MDBBtn>
+    );
   }
 
   return (
@@ -90,58 +99,94 @@ const UserProfilePage = () => {
         <div className="row mb-5">
           <div className="col-12">
             <div className="card">
-              <div className="card-header">
-                <h4> Thong tin tai khoan </h4>{" "}
+              <div className="card-header ">
+                <div className="row">
+                <div className="col-sm-2">  <h2>
+                  
+                  <strong> Account </strong>
+                </h2></div>
+                <div className="col-sm-6">{statusButton}</div>
+                </div>
+               
               </div>{" "}
               <div className="card-body">
                 {errorMessage}
                 <form onSubmit={handleUpdateProfile}>
                   <div className="row">
                     <div className="col-sm-6">
-                      <MDBInput
-                        label="Ten day du"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        outline
-                      />
-                    </div>
-                    <div className="col-sm-6" padding="20px">
-                      <MDBInput
-                        label="Email"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        outline
-                      />
-                    </div>{" "}
-                   
-                    <div className="col-sm-6">
-                      <MDBInput
-                        type="textarea"
-                        label="Gioi thieu ban than"
-                        value={intro_content == null ? "" : intro_content}
-                        onChange={e => setIntro_content(e.target.value)}
-                        outline
-                      />
-                    </div>{" "}
-                    <div className="col-sm-6">
-                      
-                      <i>
-                        Joint at:
-                        {jointAt}
-                      </i>
-                    </div>{" "}
-                <div className="col-sm-6">{statusButton}</div>{" "}
+                      <div className="form-group">
+                        <label htmlFor="name">
+                          <strong>Name</strong>
+                        </label>
+                        <input
+                          type="text"
+                          id="name"
+                          value={name}
+                          outline
+                          className="form-control"
+                          onChange={e => setName(e.target.value)}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="username">
+                          <strong>Username</strong>
+                        </label>
+                        <input
+                          type="text"
+                          id="username"
+                          value={us}
+                          outline
+                          className="form-control"
+                          onChange={e => setUs(e.target.value)}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="email">
+                          <strong>Email</strong>
+                        </label>
+                        <input
+                          type="text"
+                          id="email"
+                          value={email}
+                          outline
+                          className="form-control"
+                          onChange={e => setEmail(e.target.value)}
+                        />
+                      </div>
 
-                    
-                    <button
-                      className="btn btn-success float-right"
-                      style={{ fontSize: "1.1em" }}
-                    >
-                      Lưu thay đổi
-                    </button>{" "}
+                      <div className="form-group">
+                        {" "}
+                        <button
+                          className="btn float-left"
+                          style={{
+                            clear: "both",
+                            fontSize: "1.1em",
+                            margin: 0,
+                            color: "#fff",
+                            backgroundColor: "#007bff"
+                          }}
+                        >
+                          Save changes
+                        </button>
+                      </div>
+                    </div>
+                    <div className="col-sm-6">
+                      <div className="form-group">
+                        <label htmlFor="intro_content">
+                          <strong>Intro</strong>
+                        </label>
+                        <input
+                          type="textarea"
+                          id="intro_content"
+                          value={intro_content == null ? "" : intro_content}
+                          outline
+                          className="form-control"
+                          onChange={e => setName(e.target.value)}
+                        />
+                      </div>
+                    </div>{" "}
                   </div>
                 </form>{" "}
-
               </div>{" "}
             </div>{" "}
           </div>{" "}

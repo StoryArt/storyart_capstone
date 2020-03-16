@@ -1,15 +1,47 @@
-
 import React, { useState, useEffect } from "react";
 import AdminLayout from "../../layouts/AdminLayout";
 import { MDBDataTable } from "mdbreact";
 import { MDBBtn } from "mdbreact";
 import UserService from "../../services/user.service";
+import Axios from "axios";
+import { setAuthHeader } from "../../config/auth";
+import Pagination from "@material-ui/lab/Pagination";
 
-const AdminManagementPage = (props) => {
+const AdminManagementPage = props => {
   const [adminGlobaldata, setAdminGlobaldata] = useState("");
+  const [pageInfo, setPageInfo] = useState({
+    page: 1,
+    size: 10,
+    totalElement: 10,
+    totalPages: 1,
+    last: true
+  });
+  const [pageNo, setPageNo] = useState(1);
 
+  useEffect(() => {
+    // checkIfSystemAdmin();
+    LoadAdminsByPage();
+  }, []);
+
+  const changePage = async (event, value) => {
+    if (value !== pageNo) {
+      setPageNo(value);
+      try {
+        const res = await UserService.getAdminsList(value, 10, "");
+        setPageInfo({
+          ...pageInfo,
+          page: Number(res.data.page),
+          size: Number(res.data.size),
+          totalElement: Number(res.data.totalElement),
+          totalPages: Number(res.data.totalPages),
+          last: Boolean(res.data.last)
+        });
+        addDataToAdminGlobal(res.data);
+      } catch (error) {}
+    }
+  };
   function addAdmin() {
-    props.history.push('/admin/add');
+    props.history.push("/admin/add");
   }
 
   // ham nay nhan 2 tham so va 1 doi tuong goi la:
@@ -27,47 +59,20 @@ const AdminManagementPage = (props) => {
       callElement.target.innerText = "Active";
     }
 
-
     const res = await UserService.setStatusAdmin(url);
   }
+ 
 
   async function LoadAdminsByPage(event) {
-    const url =
-      "http://localhost:8002/api/v1/systemad/admins?page=" + 0 + "&size=10&s=";
-
-    const res = await UserService.getAdminsList();
-    console.log(res.data);
-    // setPageLenght(res.data.totalPages);
+    setAuthHeader(localStorage.getItem("jwt-token"));
+    const res = await UserService.getAdminsList(1, 10, "");
     addDataToAdminGlobal(res.data);
-    // setUserList(res.data.content);
   }
-
-  // async function checkIfSystemAdmin() {
-  //   try {
-  //     const res = await UserService.getMyProfile();
-  //     if (res.data.role != "ROLE_SYSTEM_ADMIN") {
-  //       window.location = "/notfound";
-  //       return <Redirect to={NotFoundPage} />;
-  //     }
-  //   } catch (error) {
-  //     window.location = "/notfound";
-
-  //     return <Redirect to={NotFoundPage} />;
-  //   }
-  // }
 
   function addDataToAdminGlobal(data) {
     var adminList = data.content;
     var rowsData = [];
-    //   let rowItem = {};
-    /*"page": 0,
-      "size": 10,
-      "totalElement": 12,
-      "totalPages": 2,
-      "last": false*/
-    //   rowItem["totalPages"] = data.totalPages;
-    //   rowItem["totalElement"] = data.totalElement;
-    //   rowsData.push(rowItem);
+
     for (var index = 0; index < adminList.length; index++) {
       let rowItem = {};
       rowItem["username"] = adminList[index].username;
@@ -88,7 +93,7 @@ const AdminManagementPage = (props) => {
           </MDBBtn>
         ) : (
           <MDBBtn
-            color="deep-orange"
+            color="danger"
             value="false"
             onClick={e => HandleSetStatus(id, e)}
           >
@@ -103,11 +108,7 @@ const AdminManagementPage = (props) => {
 
     setAdminGlobaldata(rowsData);
   }
-  useEffect(() => {
-    // checkIfSystemAdmin();
-    LoadAdminsByPage();
-  }, []);
-
+ 
   const data = {
     columns: [
       {
@@ -149,13 +150,25 @@ const AdminManagementPage = (props) => {
     rows: adminGlobaldata
   };
 
-
   return (
-    
     <AdminLayout>
       <h3> AdminManagementPage </h3>
       <input type="button" value="+ Account" onClick={addAdmin} />
-      <MDBDataTable striped bordered small data={data} />
+      <MDBDataTable
+        striped
+        bordered
+        small
+        data={data}
+        entrieslabel={""}
+        paging={false}
+        displayEntries={false}
+      />
+      <Pagination
+        // count={pageInfo.totalPages}
+        color="primary"
+        boundaryCount={2}
+        onChange={changePage}
+      />
     </AdminLayout>
   );
 };

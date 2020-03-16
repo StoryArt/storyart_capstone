@@ -29,11 +29,7 @@ const CreateAccount = () => {
     try {
       const res = await UserService.addUser(user);
 
-      console.log(res.data);
-      setRegisterResponseMessage({
-        success: res.data.success,
-        message: res.data.message
-      });
+    
       if (res.data.success == true) {
         window.setTimeout(function() {
           // Move to a new location or you can do something else
