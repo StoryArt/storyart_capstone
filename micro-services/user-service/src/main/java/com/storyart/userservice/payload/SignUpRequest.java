@@ -11,7 +11,6 @@ import javax.persistence.Column;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -39,7 +38,10 @@ public class SignUpRequest {
     @Size(max = 100, min = 8, message = "Mật khẩu phải có từ 8 đến 100 ký tự")
     private String password;
 
+
     @Size(max = 300, message = "Thông tin giới thiệu có độ dài tối đa là 300 ký tự")
-    String introContent;
+    String intro_content;
+
+
 
 }

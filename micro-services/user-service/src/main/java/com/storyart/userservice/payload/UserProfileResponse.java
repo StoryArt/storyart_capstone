@@ -1,18 +1,15 @@
 package com.storyart.userservice.payload;
 
-import com.storyart.userservice.model.RoleName;
+import com.storyart.userservice.common.constants.RoleName;
 import com.storyart.userservice.model.User;
+import com.storyart.userservice.service.BeanUtil;
+import com.storyart.userservice.service.RoleService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 
 
@@ -30,13 +27,12 @@ public class UserProfileResponse {
     private Date jointAt;
     private Integer storyCount;
 
-    private String gender;
     private String intro_content;
-    private Instant dob;
     private RoleName role;
 //todo: bo username
     //todo: slug
     //todo: them role
+
 
     public UserProfileResponse(User user) {
         this.setId(user.getId());
@@ -45,18 +41,10 @@ public class UserProfileResponse {
         this.setEmail(user.getEmail());
         this.setJointAt(user.getCreatedAt());
         this.setIntro_content(user.getIntroContent());
-
-        this.role=(user.getRole().getName());
+              this.role = BeanUtil.getBean(RoleService.class).findRoleById(user.getRoleId()).getName();
 
     }
 
 
-    public Instant stringToInstant(String timestamp, String pattern) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
 
-        TemporalAccessor temporalAccessor = formatter.parse(timestamp);
-        LocalDateTime localDateTime = LocalDateTime.from(temporalAccessor);
-        ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
-        return Instant.from(zonedDateTime);
-    }
 }

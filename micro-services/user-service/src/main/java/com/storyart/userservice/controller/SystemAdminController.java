@@ -1,11 +1,11 @@
 package com.storyart.userservice.controller;
 
 
+import com.storyart.userservice.common.constants.RoleName;
 import com.storyart.userservice.exception.AppException;
 import com.storyart.userservice.exception.BadRequestException;
 import com.storyart.userservice.exception.ResourceNotFoundException;
 import com.storyart.userservice.model.Role;
-import com.storyart.userservice.model.RoleName;
 import com.storyart.userservice.model.User;
 import com.storyart.userservice.payload.ApiResponse;
 import com.storyart.userservice.payload.PagedResponse;
@@ -27,9 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import javax.websocket.server.PathParam;
 import java.net.URI;
-import java.util.Collections;
 
 @RestController
 @RequestMapping("/api/v1/systemad")
@@ -70,9 +68,9 @@ public class SystemAdminController {
         user.setEmail(signUpRequest.getEmail());
 //        Role userRole
         //todo : missing role of a user
-        Role userRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
+        Role userRole = roleRepository.findRoleByName(RoleName.ROLE_ADMIN)
                 .orElseThrow(() -> new AppException("User Role not set."));
-        user.setRole(userRole);
+        user.setRoleId(userRole.getId());
         User savedUser = userRepository.save(user);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("api/v1/user/username")
                 .buildAndExpand(savedUser.getUsername()).toUri();

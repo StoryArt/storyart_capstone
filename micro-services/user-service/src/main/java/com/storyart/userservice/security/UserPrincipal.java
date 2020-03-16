@@ -2,6 +2,8 @@ package com.storyart.userservice.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.storyart.userservice.model.Role;
+import com.storyart.userservice.service.BeanUtil;
+import com.storyart.userservice.service.RoleService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,7 +35,8 @@ public class UserPrincipal implements UserDetails {
     public static UserPrincipal create(com.storyart.userservice.model.User user) {
 
         Set<Role> roles= new HashSet<>();
-        roles.add(user.getRole());
+
+        roles.add(BeanUtil.getBean(RoleService.class).findRoleById(user.getRoleId()));
 
         List<GrantedAuthority> grantedAuthorityList = roles.stream().map(role ->
                 new SimpleGrantedAuthority(role.getName().name()))

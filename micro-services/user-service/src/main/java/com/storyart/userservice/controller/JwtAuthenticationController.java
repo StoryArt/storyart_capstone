@@ -1,22 +1,20 @@
 package com.storyart.userservice.controller;
 
+import com.storyart.userservice.common.constants.RoleName;
 import com.storyart.userservice.exception.AppException;
 import com.storyart.userservice.exception.BadRequestException;
-import com.storyart.userservice.exception.UnauthorizedException;
 import com.storyart.userservice.model.Role;
-import com.storyart.userservice.model.RoleName;
-import com.storyart.userservice.repository.RoleRepository;
-import com.storyart.userservice.security.JwtTokenProvider;
 import com.storyart.userservice.model.User;
+import com.storyart.userservice.payload.SignUpRequest;
+import com.storyart.userservice.repository.RoleRepository;
+import com.storyart.userservice.repository.UserRepository;
+import com.storyart.userservice.security.JwtTokenProvider;
 import com.storyart.userservice.payload.ApiResponse;
 import com.storyart.userservice.payload.JwtAuthenticationResponse;
 import com.storyart.userservice.payload.LoginRequest;
-import com.storyart.userservice.payload.SignUpRequest;
-import com.storyart.userservice.repository.UserRepository;
 import com.storyart.userservice.security.JwtUserDetailsService;
 import com.storyart.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,7 +27,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Collections;
 
 @RestController
 @CrossOrigin
@@ -103,13 +100,13 @@ public class JwtAuthenticationController {
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setName(signUpRequest.getName());
         user.setEmail(signUpRequest.getEmail());
-        user.setIntroContent(signUpRequest.getIntroContent());
+        user.setIntroContent(signUpRequest.getIntro_content());
 
 //        Role userRole
-        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+        Role userRole = roleRepository.findRoleByName(RoleName.ROLE_USER)
                 .orElseThrow(() -> new AppException("User Role not set."));
 
-        user.setRole(userRole);
+        user.setRoleId(userRole.getId());
 
 
         /**
