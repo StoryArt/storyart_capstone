@@ -113,9 +113,10 @@ public class UserController {
                        @RequestBody @Valid UserProfileUpdateRequest user, @CurrentUser UserPrincipal userPrincipal) {
 
         if(userPrincipal.getId()!= uid){
-            throw new UnauthorizedException("Not authorized for change this user profile");
+            throw new UnauthorizedException("Bạn không thể chỉnh sửa nội dung này!");
         }
-        if (userService.findByEmail(user.getEmail()) != null) {
+        //nếu tìm được user khác user hiện tại, có email trùng thì báo lõi trùng email
+        if (userService.findByEmail(user.getEmail()).getId() != userPrincipal.getId()) {
             throw new BadRequestException("Email đã được đăng ký bởi ai đó!");
 
         }
@@ -149,6 +150,10 @@ public class UserController {
     public ResponseEntity<?> activate(@PathVariable Integer uid,
                                       @Param(value = "setActive") boolean setActive) {
         //this user must being active and param: setActive=false
+
+
+        //todo : set active ,deactive by admin, sysadmin
+
         if (!setActive) {
             userService.deActive(uid);
             return new ResponseEntity<>(new ApiResponse(true, " Account deactivated successfully!"), HttpStatus.OK);
