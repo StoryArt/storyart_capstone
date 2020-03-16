@@ -19,7 +19,7 @@ public interface UserService {
 
     void delete(Integer id);
 
-    void deActive(Integer id);
+    void deActive(Integer id, boolean deadmin);
 
 
     List<User> findAll();

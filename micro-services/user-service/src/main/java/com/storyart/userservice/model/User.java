@@ -55,6 +55,8 @@ public class User extends DateAudit {
 
     private Date updatedAt;
 
+    boolean isDeactiveByAdmin;
+
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();

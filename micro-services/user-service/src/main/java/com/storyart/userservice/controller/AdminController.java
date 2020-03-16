@@ -4,6 +4,8 @@ package com.storyart.userservice.controller;
 import com.storyart.userservice.common.constants.RoleName;
 import com.storyart.userservice.exception.AppException;
 import com.storyart.userservice.exception.BadRequestException;
+import com.storyart.userservice.exception.ResourceNotFoundException;
+import com.storyart.userservice.exception.UnauthorizedException;
 import com.storyart.userservice.model.Role;
 import com.storyart.userservice.model.User;
 import com.storyart.userservice.payload.ApiResponse;
@@ -13,6 +15,7 @@ import com.storyart.userservice.payload.UserInManagementResponse;
 import com.storyart.userservice.repository.RoleRepository;
 import com.storyart.userservice.repository.UserRepository;
 import com.storyart.userservice.security.JwtTokenProvider;
+import com.storyart.userservice.service.RoleService;
 import com.storyart.userservice.service.UserService;
 import com.storyart.userservice.util.AppContants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,50 +49,63 @@ public class AdminController {
     @Autowired
     RoleRepository roleRepository;
 
+    @Autowired
+    RoleService roleService;
     // todo missing check available user (is active or not api)
     /* Deactivating a user without checking it deactived or not */
     @DeleteMapping(value = "/users/{uid}")
     public ResponseEntity<?>
-    setStatus(@PathVariable Integer uid,
-              @RequestParam(value = "setActive") boolean setActive) {
+    setStatusUser(@PathVariable Integer uid,
+                  @RequestParam(value = "setActive") boolean setActive) {
 
-        boolean afterSetStatus = false;
+        User userById = userService.findById(uid);
+        if (userById == null) {
+            throw new ResourceNotFoundException("id", "User", uid);
+        }
+        Role roleById = roleService.findRoleById(userById.getRoleId());
+        //check role xem co phải role khac admin hay khong
+        // neu khac thi khong cho set status boi ssytemad không có quyền đó
+        if (roleById.getName() != RoleName.ROLE_USER) {
+            throw new UnauthorizedException("Bạn không thể chỉnh sửa nội dung này!");
+        }
         if (!setActive) {
-            userService.deActive(uid);
-
+            userService.deActive(uid, true);
         } else {
             userService.active(uid);
         }
-        afterSetStatus = userService.findById(uid).isActive();
-
+        User byId = userService.findById(uid);
+        boolean afterSetStatus = byId.isActive();
 
         //todo thieu set deactive by admin account record
         if (afterSetStatus) {
-            return new ResponseEntity<>(new ApiResponse(true, "Account activated successfully"), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse(true, "Mở tài khoản '"+byId.getUsername()+"' thành công!"), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(new ApiResponse(true, "Account deactivated successfully"), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse(true, "Đã khóa tài khoản '"+byId.getUsername()+"'"), HttpStatus.OK);
         }
 
     }
+
     // search user by username contains %username%
     @GetMapping("/users/all")
-    public PagedResponse<UserInManagementResponse> findAll(@RequestParam(value = "page",
+    public PagedResponse<UserInManagementResponse>
+    findAll(@RequestParam(value = "page",
             defaultValue = AppContants.DEFAULT_PAGE_NUMBER) int page,
-                                                           @RequestParam(value = "size",
+            @RequestParam(value = "size",
 
-                                                                   defaultValue = AppContants.DEFAULT_PAGE_SIZE) int size,
-                                                           @RequestParam(value = "s") String searchtxt) {
+                    defaultValue = AppContants.DEFAULT_PAGE_SIZE) int size,
+            @RequestParam(value = "s") String searchtxt) {
 
         return userService.findByUsernameOrEmail(page, size, searchtxt);
     }
 
     @GetMapping("/users/userOnly")
-    public PagedResponse<UserInManagementResponse> findOnlyUserByUsernameLike(@RequestParam(value = "page",
+    public PagedResponse<UserInManagementResponse>
+    findOnlyUserByUsernameLike(@RequestParam(value = "page",
             defaultValue = AppContants.DEFAULT_PAGE_NUMBER) int page,
-          @RequestParam(value = "size",
+                               @RequestParam(value = "size",
 
-                  defaultValue = AppContants.DEFAULT_PAGE_SIZE) int size,
-          @RequestParam(value = "s") String searchtxt) {
+                                       defaultValue = AppContants.DEFAULT_PAGE_SIZE) int size,
+                               @RequestParam(value = "s") String searchtxt) {
 
         return userService.findOnlyUserByUsernameOrEmail(page, size, searchtxt);
     }
@@ -97,13 +113,13 @@ public class AdminController {
     //todo: cannot able to active account -that deactived by sys/admin- 2 functions
 
 
-
-
     @Autowired
     PasswordEncoder passwordEncoder;
+
     @PostMapping("/users/add")
-    public ResponseEntity<?> creatUser(@RequestBody
-                                           @Valid SignUpRequest signUpRequest) {
+    public ResponseEntity<?>
+    createUser(@RequestBody
+              @Valid SignUpRequest signUpRequest) {
         if (userService.findByUsername(signUpRequest.getUsername()) != null) {
             throw new BadRequestException("Tên đăng nhập  này đã  được đăng ký bơi người khác");
         }
