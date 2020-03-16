@@ -99,9 +99,12 @@ public class UserController {
             throw new UnauthorizedException("Bạn không thể chỉnh sửa nội dung này!");
         }
         //nếu tìm được user khác user hiện tại, có email trùng thì báo lõi trùng email
-        if (userService.findByEmail(user.getEmail()).getId() != userPrincipal.getId()) {
-            throw new BadRequestException("Email đã được đăng ký bởi ai đó!");
+       User user1= userService.findByEmail(user.getEmail());
+        if (user1!= null) {
 
+            if (user1.getId() != userPrincipal.getId()) {
+                throw new BadRequestException("Email đã được đăng ký bởi ai đó!");
+            }
         }
 
         User userById = userService.findById(uid);

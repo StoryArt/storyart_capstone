@@ -136,6 +136,7 @@ public class AdminController {
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setName(signUpRequest.getName());
         user.setEmail(signUpRequest.getEmail());
+        user.setIntroContent(signUpRequest.getIntro_content());
 
 //        Role userRole
         Role userRole = roleRepository.findRoleByName(RoleName.ROLE_USER)

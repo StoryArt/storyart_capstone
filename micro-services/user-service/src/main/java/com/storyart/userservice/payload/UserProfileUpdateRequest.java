@@ -18,13 +18,13 @@ public class UserProfileUpdateRequest {
 
 
     @NotBlank(message = "Tên không được để trống")
-    @Size(max = 40, min = 4, message = "Tên phải có từ 3 đến 40 ký tự")
+    @Size(max = 40, min = 3, message = "Tên phải có từ 3 đến 40 ký tự")
     private String name;
-    @Email
-    @NotBlank(message = "Email không được để trống")
+    @Email(message = "Nhập sai định dạng email!")
+    @NotBlank(message = "Email không được để trống!")
     @NaturalId
     String email;
-    @Size(max = 300, message = "Thông tin giới thiệu có độ dài tối đa là 300 ký tự")
+    @Size(max = 300, message = "Thông tin giới thiệu có độ dài tối đa là 300 ký tự!")
     String intro_content;
 
 
