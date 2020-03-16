@@ -9,46 +9,43 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
-@Entity
-@Table(name = "report")
+
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Report extends DateAudit {
+class ReadingHistoryId implements Serializable {
+    private int userId;
+    private int storyId;
+}
+
+
+@Entity
+@Table(name = "reading_history")
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@IdClass(ReadingHistoryId.class)
+public class ReadingHistory extends DateAudit {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private int id;
 
-    private int userId;
+    @NotNull
+    private Integer userId;
 
-    private int storyId;
+    @NotNull
+    private Integer storyId;
 
-    private int commentId;
-
-    @Column(length = 1000)
-    @Size(max = 1000)
-    @NotBlank
-    private String content;
-
-    private boolean isHandled;
+    private String listSectionId;
 
     private Date createdAt;
 
     private Date updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = new Date();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = new Date();
-    }
 }

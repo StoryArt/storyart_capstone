@@ -1,7 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import UserLayout from '../../../layouts/UserLayout';
-import { MDBNavItem, MDBNavLink, MDBTabContent, MDBTabPane, MDBNav, MDBModal, 
-    MDBModalHeader, MDBModalBody, MDBModalFooter, MDBBtn, MDBInput,  } from 'mdbreact';
+import {
+    MDBNavItem, MDBNavLink, MDBTabContent, MDBTabPane, MDBNav, MDBModal,
+    MDBModalHeader, MDBModalBody, MDBModalFooter, MDBBtn, MDBInput,
+} from 'mdbreact';
 import CommentService from '../../../services/comment.service';
 import ReactionService from '../../../services/reaction.service';
 import moment from 'moment';
@@ -19,7 +21,7 @@ const UserHistoryPage = () => {
     const [commentIndex, setCommentIndex] = useState(-1);
     const [reactionIndex, setReactionIndex] = useState(-1);
     const [deleteRequest, setDeleteRequest] = useState({
-        userId: 2,
+        userId: 1,
         commentId: 0,
     });
     const deleteComment = async () => {
@@ -48,15 +50,16 @@ const UserHistoryPage = () => {
             console.log(error.response.request._response);
         }
     }
-
+    const [modalError, setModalError] = useState('');
     const updateComment = async () => {
         try {
             const res = await CommentService.updateComment(updateCommentRequest);
             setModalState({ ...modalState, editModal: false });
             var array = [...comments];
             setComments(array.map(item => item.id === updateCommentRequest.commentId ? { ...item, content: updateCommentRequest.content } : item));
-
+            setModalError('');
         } catch (error) {
+            setModalError(error.response.data.message);
             console.log(error);
         }
     }
@@ -64,7 +67,7 @@ const UserHistoryPage = () => {
 
     const [updateCommentRequest, setUpdateCommentRequest] = useState({
         content: '',
-        userId: 2,
+        userId: 1,
         commentId: 0
     });
     const [comments, setComments] = useState([]);
@@ -72,7 +75,7 @@ const UserHistoryPage = () => {
     const forceUpdateComments = useCallback(() => setComments({}), []);
 
 
-    const [userId, setUserId] = useState(2);
+    const [userId, setUserId] = useState(1);
     const [commentPageNo, setCommentPageNo] = useState(1);
 
     const toggle = tab => e => {
@@ -142,6 +145,7 @@ const UserHistoryPage = () => {
             setCommentIndex({ commentIndex: index });
             if (modalState.deleteModal === true) {
                 setModalState({ ...modalState, deleteModal: false });
+
             }
             else {
                 setModalState({ ...modalState, deleteModal: true });
@@ -149,9 +153,11 @@ const UserHistoryPage = () => {
             setDeleteRequest({ ...deleteRequest, commentId: commentIdSpec });
         }
         if (modal === 'editModal') {
+
             setCommentIndex({ commentIndex: index });
             if (modalState.editModal === true) {
                 setModalState({ ...modalState, editModal: false });
+                setModalError('');
             }
             else {
                 setModalState({ ...modalState, editModal: true });
@@ -195,59 +201,59 @@ const UserHistoryPage = () => {
                     </MDBNavItem>
                 </MDBNav>
                 <MDBTabContent activeItem={activeItem} >
-                <MDBTabPane tabId="1" role="tabpanel">
-                <div className="row">
-                    {[1,2,3,4,5,6,7,8,9,10].map(item => (
-                        <div className="col-8">
-                            <div className="card mb-3">
-                                <div className="row no-gutters">
-                                    <div className="col-md-4">
-                                        <img src="https://mdbootstrap.com/img/Photos/Others/images/43.jpg" className="card-img"/>
-                                    </div>
-                                    <div className="col-md-8">
-                                        <div className="card-body">
-                                            <h5 className="card-title">Truyen ma nua dem</h5>
-                                            <p className="card-text">This is a story inro content ...</p>
-                                            <div>
-                                                <button className="btn btn-warning float-right">Doc truyen</button>
+                    <MDBTabPane tabId="1" role="tabpanel">
+                        <div className="row">
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(item => (
+                                <div className="col-8">
+                                    <div className="card mb-3">
+                                        <div className="row no-gutters">
+                                            <div className="col-md-4">
+                                                <img src="https://mdbootstrap.com/img/Photos/Others/images/43.jpg" className="card-img" />
+                                            </div>
+                                            <div className="col-md-8">
+                                                <div className="card-body">
+                                                    <h5 className="card-title">Truyen ma nua dem</h5>
+                                                    <p className="card-text">This is a story inro content ...</p>
+                                                    <div>
+                                                        <button className="btn btn-warning float-right">Doc truyen</button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
-                </MDBTabPane>
-                <MDBTabPane tabId="2" role="tabpanel">
+                    </MDBTabPane>
+                    <MDBTabPane tabId="2" role="tabpanel">
 
-                    {comments.map((comment, index) => (
-                        <div className="clearfix" key={comment.id}>
-                            Bạn đã <strong>bình luận</strong> vào truyện <strong>{comment.storyName}</strong> của tác giả <strong>{comment.authorName}</strong>:
-                            <p> "{comment.content}"
+                        {comments.map((comment, index) => (
+                            <div className="clearfix" key={comment.id}>
+                                Bạn đã <strong>bình luận</strong> vào truyện <strong>{comment.storyName}</strong>:
+                                <p> "{comment.content}"
                             </p>
-                            <div>
-                                <small>{moment(comment.createdAt).format('HH:mm DD/MM/YYYY')}</small>
+                                <div>
+                                    <small>{moment(comment.createdAt).format('HH:mm DD/MM/YYYY')}</small>
+                                </div>
+                                <button className="btn btn-danger float-right" onClick={toggleModal('deleteModal', comment.id, index)}>Xóa</button>
+                                <button className="btn btn-warning float-right" onClick={toggleModal('editModal', comment.id, index)}>Chỉnh sửa</button>
+
                             </div>
-                            <button className="btn btn-danger float-right" onClick={toggleModal('deleteModal', comment.id, index)}>Xóa</button>
-                            <button className="btn btn-warning float-right" onClick={toggleModal('editModal', comment.id, index)}>Chỉnh sửa</button>
+                        ))}
+                        {comments.length < 1 &&
+                            <div className="text-center">
+                                <small>Không có lịch sử react</small>
+                            </div>
+                        }
+                        <br>
 
-                        </div>
-                    ))}
-                    {comments.length < 1 &&
-                        <div className="text-center">
-                            <small>Không có lịch sử react</small>
-                        </div>
-                    }
-                    <br>
+                        </br>
 
-                    </br>
-
-                    {comments.length > 0 &&
-                        <div className="text-center">
-                            <button className="btn btn-secondary" onClick={getCommentHistory}>Xem thêm</button>
-                        </div>
-                    }
+                        {comments.length > 0 &&
+                            <div className="text-center">
+                                <button className="btn btn-secondary" onClick={getCommentHistory}>Xem thêm</button>
+                            </div>
+                        }
 
 
 
@@ -255,78 +261,79 @@ const UserHistoryPage = () => {
                     </MDBTabPane>
 
                     <MDBModal isOpen={modalState.deleteModal} toggle={toggleModal('deleteModal')}>
-                    <MDBModalHeader toggle={toggleModal('deleteModal')}>Xóa bình luận</MDBModalHeader>
-                    <MDBModalBody>
-                        Bạn có muốn xóa bình luận này không?
+                        <MDBModalHeader toggle={toggleModal('deleteModal')}>Xóa bình luận</MDBModalHeader>
+                        <MDBModalBody>
+                            Bạn có muốn xóa bình luận này không?
                     </MDBModalBody>
-                    <MDBModalFooter>
-                        <MDBBtn color='success' onClick={toggleModal('deleteModal')}>
-                            Không
+                        <MDBModalFooter>
+                            <MDBBtn color='success' onClick={toggleModal('deleteModal')}>
+                                Không
                     </MDBBtn>
-                        <MDBBtn color='danger' onClick={deleteComment}>Có</MDBBtn>
-                    </MDBModalFooter>
+                            <MDBBtn color='danger' onClick={deleteComment}>Có</MDBBtn>
+                        </MDBModalFooter>
                     </MDBModal>
                     <MDBModal isOpen={modalState.editModal} toggle={toggleModal('editModal')}>
-                    <MDBModalHeader toggle={toggleModal('editModal')}>Chỉnh sửa bình luận</MDBModalHeader>
-                    <MDBModalBody>
-                        <form className='mx-3 grey-text'>
-                            <MDBInput
-                                type='textarea'
-                                rows='2'
-                                label='Nội dung bình luận'
-                                value={updateCommentRequest.content}
-                                onChange={e => setUpdateCommentRequest({ ...updateCommentRequest, content: e.target.value })}
-                            />
-                        </form>
-                    </MDBModalBody>
-                    <MDBModalFooter>
-                        <MDBBtn color='success' onClick={toggleModal('editModal')}>
-                            Hủy
+                        <MDBModalHeader toggle={toggleModal('editModal')}>Chỉnh sửa bình luận</MDBModalHeader>
+                        <MDBModalBody>
+                            {modalError.length > 0 && <small style={{ color: 'red' }}>(*){modalError}</small>}
+                            <form className='mx-3 grey-text'>
+                                <MDBInput
+                                    type='textarea'
+                                    rows='2'
+                                    label='Nội dung bình luận'
+                                    value={updateCommentRequest.content}
+                                    onChange={e => setUpdateCommentRequest({ ...updateCommentRequest, content: e.target.value })}
+                                />
+                            </form>
+                        </MDBModalBody>
+                        <MDBModalFooter>
+                            <MDBBtn color='success' onClick={toggleModal('editModal')}>
+                                Hủy
                     </MDBBtn>
-                        <MDBBtn color='warning' onClick={updateComment}>Chỉnh sửa</MDBBtn>
-                    </MDBModalFooter>
+                            <MDBBtn color='warning' onClick={updateComment}>Chỉnh sửa</MDBBtn>
+                        </MDBModalFooter>
                     </MDBModal>
                     <MDBTabPane tabId="3" role="tabpanel">
 
-                    {reactions.map((reaction, index) => (
-                        <div className="clearfix" key={reaction.id}>
-                            Bạn đã <strong>{reaction.type}</strong> bình luận của <strong>{reaction.commentOwnerName}</strong> trong truyện <strong>{reaction.storyName}</strong>
-                            <div>
-                                <small>{moment(reaction.createdAt).format('HH:mm DD/MM/YYYY')}</small>
+                        {reactions.map((reaction, index) => (
+                            <div className="clearfix" key={reaction.id}>
+                                Bạn đã <strong>{reaction.type}</strong> bình luận của <strong>{reaction.commentOwnerName}</strong> trong truyện <strong>{reaction.storyName}</strong>
+                                <div>
+                                    <small>{moment(reaction.createdAt).format('HH:mm DD/MM/YYYY')}</small>
+                                </div>
+                                <button className="btn btn-danger float-right" onClick={toggleModal('deleteReactionModal', reaction.commentId, index)}>Xóa</button>
+
                             </div>
-                            <button className="btn btn-danger float-right" onClick={toggleModal('deleteReactionModal', reaction.commentId, index)}>Xóa</button>
-
-                        </div>
-                    ))}
-                    {reactions.length < 1 &&
-                        <div className="text-center">
-                            <small>Không có lịch sử react</small>
-                        </div>
-                    }
-                    <br>
-                    </br>
+                        ))}
+                        {reactions.length < 1 &&
+                            <div className="text-center">
+                                <small>Không có lịch sử react</small>
+                            </div>
+                        }
+                        <br>
+                        </br>
 
 
-                    {reactions.length > 0 &&
-                        <div className="text-center">
-                            <button className="btn btn-secondary" onClick={getReactionHistory}>Xem thêm</button>
-                        </div>
-                    }
+                        {reactions.length > 0 &&
+                            <div className="text-center">
+                                <button className="btn btn-secondary" onClick={getReactionHistory}>Xem thêm</button>
+                            </div>
+                        }
 
 
-                    <MDBModal isOpen={modalState.deleteReactionModal} toggle={toggleModal('deleteReactionModal')}>
-                        <MDBModalHeader toggle={toggleModal('deleteReactionModal')}>Xóa bình luận</MDBModalHeader>
-                        <MDBModalBody>
-                            Bạn có muốn xóa reaction này không?
+                        <MDBModal isOpen={modalState.deleteReactionModal} toggle={toggleModal('deleteReactionModal')}>
+                            <MDBModalHeader toggle={toggleModal('deleteReactionModal')}>Xóa bình luận</MDBModalHeader>
+                            <MDBModalBody>
+                                Bạn có muốn xóa reaction này không?
                     </MDBModalBody>
-                        <MDBModalFooter>
-                            <MDBBtn color='success' onClick={toggleModal('deleteReactionModal')}>
-                                Không
+                            <MDBModalFooter>
+                                <MDBBtn color='success' onClick={toggleModal('deleteReactionModal')}>
+                                    Không
                     </MDBBtn>
-                            <MDBBtn color='danger' onClick={deleteReaction}>Có</MDBBtn>
-                        </MDBModalFooter>
-                    </MDBModal>
-                    {/* {[1, 2, 3, 4].map(item => (
+                                <MDBBtn color='danger' onClick={deleteReaction}>Có</MDBBtn>
+                            </MDBModalFooter>
+                        </MDBModal>
+                        {/* {[1, 2, 3, 4].map(item => (
                         <div className="clearfix">
                             Ban da <strong>danh gia</strong> vao truyen <strong>Nghin le mot dem</strong> cua tac gia <strong>Nguyen Van A</strong> voi <strong>4 sao</strong>
                             <div>
@@ -337,7 +344,7 @@ const UserHistoryPage = () => {
                     </MDBTabPane>
 
                 </MDBTabContent>
-                    
+
             </div>
         </UserLayout>
     );

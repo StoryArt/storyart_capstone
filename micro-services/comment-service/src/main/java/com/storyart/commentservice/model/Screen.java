@@ -11,44 +11,33 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "report")
+@Table(name = "screen")
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Report extends DateAudit {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class Screen extends DateAudit{
 
-    private int userId;
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Column(length = 100)
+    @Id
+    private String id;
 
     private int storyId;
 
-    private int commentId;
+    @Size(max = 100)
+    private String title;
 
-    @Column(length = 1000)
-    @Size(max = 1000)
+    @Column(length = 10000)
+    @Size(min = 10)
     @NotBlank
     private String content;
 
-    private boolean isHandled;
+    private String nextScreenId;
 
-    private Date createdAt;
-
-    private Date updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = new Date();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = new Date();
-    }
 }

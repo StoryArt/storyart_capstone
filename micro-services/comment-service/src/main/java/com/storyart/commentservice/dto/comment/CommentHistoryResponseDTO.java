@@ -18,8 +18,8 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public class CommentHistoryResponseDTO {
     private Integer id;
-    private String authorName;
     private String storyName;
+    private int storyId;
     private String content;
     private boolean isActive;
     private boolean isDisableByAdmin;

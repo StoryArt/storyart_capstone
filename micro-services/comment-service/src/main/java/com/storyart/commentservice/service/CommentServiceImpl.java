@@ -57,16 +57,16 @@ public class CommentServiceImpl implements CommentService {
 
         Comment comment = new Comment();
         comment.setContent(cmt.getContent());
-        comment.setStory(story.get());//storyId chu nhi :v ok sao anh ko de private field
-        comment.setUser(user.get());
+        comment.setStoryId(cmt.getStoryId());//storyId chu nhi :v ok sao anh ko de private field
+        comment.setUserId(cmt.getUserId());
         comment.setActive(true);
         commentRepository.save(comment);
 
 
         ModelMapper mm = new ModelMapper();
         ResponseListCommentDTO response = mm.map(comment, ResponseListCommentDTO.class);
-        response.setUserId(comment.getUser().getId());
-        response.setUsername(comment.getUser().getUsername());
+        response.setUserId(user.get().getId());
+        response.setUsername(user.get().getUsername());
         response.setLikes(new ArrayList<>());
         response.setDislikes(new ArrayList<>());
         
@@ -95,7 +95,7 @@ public class CommentServiceImpl implements CommentService {
             throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, errCommentEmpty);
         }
 
-        if (comment.get().getUser().getId() != updateComment.userId) {
+        if (comment.get().getUserId() != updateComment.userId) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Bình luận này không phải là bình luận của bạn.");
         }
 
@@ -119,7 +119,7 @@ public class CommentServiceImpl implements CommentService {
 //        if (!user.isPresent()) {
 //            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errUserNotFound);
 //        }
-        if (cmt.get().getUser().getId() != deleteComment.userId) {
+        if (cmt.get().getUserId() != deleteComment.userId) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Bình luận này không phải là bình luận của bạn.");
         }
 
@@ -157,11 +157,17 @@ public class CommentServiceImpl implements CommentService {
         });
 
         List<ResponseListCommentDTO> responseList = responsePage.getContent();
+        List<Comment> commentList = commentPage.getContent();
 
         List<Integer> commentIds = new ArrayList<>();
-        for (ResponseListCommentDTO comment : responseList) {
+        List<Integer> userIds = new ArrayList<>();
+
+        for (Comment comment : commentList) {
             commentIds.add(comment.getId());
+            userIds.add(comment.getUserId());
         }
+
+        List<User> users = userRepository.findAllById(userIds);
 
         List<Reaction> reactions = reactionRepository.findListUserId(commentIds);
 
@@ -171,19 +177,25 @@ public class CommentServiceImpl implements CommentService {
             List<Integer> dislikeIds = new ArrayList<>();
             //a ra commentIds la list, ok
             for (Reaction reaction : reactions) { //cái reactions nay la lay tu comment id o tren// e phai biet comment id nao`, thi` add vo comment id do'
-                if (comment.getId() == reaction.getComment().getId()) { //cho nay co can check ko, co' de add list vo comment id xac' dinh
+                if (comment.getId() == reaction.getCommentId()) { //cho nay co can check ko, co' de add list vo comment id xac' dinh
                     if (reaction.getType().equals("like")) {
-                        likeIds.add(reaction.getUser().getId());
+                        likeIds.add(reaction.getUserId());
                     }
                     if (reaction.getType().equals("dislike")) {
-                        dislikeIds.add(reaction.getUser().getId());
+                        dislikeIds.add(reaction.getUserId());
                     }
+                }
+            }
+            for (User user:users) {
+                if(comment.getUserId() == user.getId()){
+                    comment.setUsername(user.getUsername());
+                    break;
                 }
             }
             comment.setLikes(likeIds);
             comment.setDislikes(dislikeIds);
-            comment.setUserId(commentPage.getContent().get(index).getUser().getId());
-            comment.setUsername(commentPage.getContent().get(index).getUser().getUsername());
+            //comment.setUserId(commentPage.getContent().get(index).getUserId());
+
             index++;
         }
 //        cho nay anh chua doi content cua responpage ha
@@ -236,11 +248,25 @@ public class CommentServiceImpl implements CommentService {
             }
         });
 
+        List<Integer> storyIds = new ArrayList<>();
+        List<Comment> comments = commentPage.getContent();
+
+        for (Comment comment: comments) {
+            storyIds.add(comment.getStoryId());
+        }
+
+        List<Story> stories = storyRepository.findAllById(storyIds);
+
+
         List<CommentHistoryResponseDTO> responseList = responsePage.getContent();
         int index = 0;
-        for (CommentHistoryResponseDTO response : responseList) {
-//            response.setAuthorName(commentPage.getContent().get(index).getStory().getAuthor().getUsername());
-            response.setStoryName(commentPage.getContent().get(index).getStory().getTitle());
+        for (Comment comment : comments) {
+            for (Story story: stories) {
+                if(comment.getStoryId() == story.getId()){
+                    CommentHistoryResponseDTO response = responseList.get(index);
+                    response.setStoryName(story.getTitle());
+                }
+            }
             index++;
         }
 
