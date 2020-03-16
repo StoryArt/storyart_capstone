@@ -42,10 +42,6 @@ import UserService from './services/user.service';
 
 function App() {
 
-  const redirectToLoginPage = () => {
-    window.location.href = '/login';
-  }
-
   // redirect to login page when response status is 401 or 403
   interceptResponse(() => {
     UserService.logout();

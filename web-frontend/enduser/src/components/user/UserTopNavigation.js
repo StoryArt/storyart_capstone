@@ -4,9 +4,8 @@ import { MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavbarToggler,
     MDBCollapse, MDBNavItem, MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem, MDBNavLink, MDBFormInline } from 'mdbreact';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../../context/user.context';
-import ValidationUtils from '../../utils/validation';
-import { ROLE_NAMES } from '../../common/constants';
 import { isUserAuth } from '../../config/auth';
+import UserService from '../../services/user.service';
 
 const UserTopNavigation = () => {
  
@@ -23,6 +22,11 @@ const UserTopNavigation = () => {
     //         dropdownOpen: !this.state.dropdownOpen
     //     });
     // }
+
+    const logout = (e) => {
+        e.preventDefault();
+        UserService.logout();
+    }
 
     return (
         <MDBNavbar className="fixed-top" light expand="md">
@@ -68,7 +72,7 @@ const UserTopNavigation = () => {
                                     className="border border-light rounded mr-1 nav-link Ripple-parent">{user.name}</Link>
                             </MDBNavItem>
                             <MDBNavItem>
-                                <Link to="/login" 
+                                <Link onClick={logout} 
                                     className="border border-light rounded mr-1 nav-link Ripple-parent">Dang xuat</Link>
                             </MDBNavItem>
                          </>
