@@ -58,11 +58,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deActive(Integer id) {
+    public void deActive(Integer id, boolean deadmin) {
+
+
         Optional<User> byId = userRepository.findById(id);
+
 
         if (byId.isPresent()) {
             User user = byId.get();
+            user.setDeactiveByAdmin(deadmin);
             user.setActive(false);
             userRepository.save(user);
         }
@@ -71,9 +75,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void active(Integer uid) {
         Optional<User> byId = userRepository.findById(uid);
-
         if (byId.isPresent()) {
             User user = byId.get();
+            user.setDeactiveByAdmin(false);
             user.setActive(true);
             userRepository.save(user);
         }

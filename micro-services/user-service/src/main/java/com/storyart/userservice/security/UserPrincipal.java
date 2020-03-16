@@ -38,8 +38,8 @@ public class UserPrincipal implements UserDetails {
 
         roles.add(BeanUtil.getBean(RoleService.class).findRoleById(user.getRoleId()));
 
-        List<GrantedAuthority> grantedAuthorityList = roles.stream().map(role ->
-                new SimpleGrantedAuthority(role.getName().name()))
+        List<GrantedAuthority> grantedAuthorityList = roles.stream().
+                map(role ->new SimpleGrantedAuthority(role.getName().name()))
                     .collect(Collectors.toList());
         return new UserPrincipal(user.getId(), user.getUsername(), user.getPassword(),user.getName(),  grantedAuthorityList);
     }

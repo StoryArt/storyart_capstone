@@ -24,10 +24,4 @@ public class Role implements Serializable {
     @NaturalId
     @Column(length = 60)
     private RoleName name;
-
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    Collection<User> users;
-
 }
