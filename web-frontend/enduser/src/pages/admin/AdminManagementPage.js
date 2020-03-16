@@ -8,6 +8,11 @@ import UserService from "../../services/user.service";
 const AdminManagementPage = (props) => {
   const [adminGlobaldata, setAdminGlobaldata] = useState("");
 
+  useEffect(() => {
+    // checkIfSystemAdmin();
+    LoadAdminsByPage();
+  }, []);
+
   function addAdmin() {
     props.history.push('/admin/add');
   }
@@ -103,10 +108,7 @@ const AdminManagementPage = (props) => {
 
     setAdminGlobaldata(rowsData);
   }
-  useEffect(() => {
-    // checkIfSystemAdmin();
-    LoadAdminsByPage();
-  }, []);
+ 
 
   const data = {
     columns: [

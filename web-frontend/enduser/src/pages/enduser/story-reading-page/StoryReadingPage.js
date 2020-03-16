@@ -31,6 +31,7 @@ const ReadStoryPage = (props) => {
 
     const changeCurrentScreen = (screenId) => {
         const screen = screens.find(scr => scr.id === screenId);
+        console.log(screen);
         setCurrentScreen(screen);
     }
   
@@ -139,42 +140,28 @@ const ReadStoryPage = (props) => {
                                     <div className="screen-card-header">
                                         <h5 className="text-center">{ currentScreen.title }</h5>
                                     </div>
-                                    <Transition  
-                                        from={{ opacity: 0 }}
-                                        to={{ opacity: 1 }}
-                                        native
-                                        items={!ValidationUtils.isEmpty(currentScreen)}
-                                        >
-                                            {show => show && (props => (
-                                                <animated.div style={props}>
-                                                    <div className="screen-card-body" style={props}>
-                                                        <p className="text-center">{ currentScreen.content }</p><br/>
-                                                        <div className="row">
-                                                            {currentScreen.actions.map(action => (
-                                                                <div className="col-6" key={action.id}>
-                                                                    <p 
-                                                                        onClick={() => handleSelectAction(action)}
-                                                                        className="action-content text-center">
-                                                                            
-                                                                        {action.type === ACTION_TYPES.REDIRECT && (
-                                                                            <a href={action.value} target="_blank">
-                                                                                {action.content}
-                                                                            </a>
-                                                                        )}
-                                                                        {action.type !== ACTION_TYPES.REDIRECT && (
-                                                                            <>{ action.content }</>
-                                                                        )}
-                                                                    </p>
-                                                                </div>
-                                                            ))}
-                                                        </div>
+                                        <div className="screen-card-body" style={props}>
+                                            <p className="text-center">{ currentScreen.content }</p><br/>
+                                            <div className="row">
+                                                {currentScreen.actions.map(action => (
+                                                    <div className="col-6" key={action.id}>
+                                                        <p 
+                                                            onClick={() => handleSelectAction(action)}
+                                                            className="action-content text-center">
+                                                                
+                                                            {action.type === ACTION_TYPES.REDIRECT && (
+                                                                <a href={action.value} target="_blank">
+                                                                    {action.content}
+                                                                </a>
+                                                            )}
+                                                            {action.type !== ACTION_TYPES.REDIRECT && (
+                                                                <>{ action.content }</>
+                                                            )}
+                                                        </p>
                                                     </div>
-                                        
-                                                </animated.div>
-                                                
-                                            ))}
-                                    </Transition>
-                                    
+                                                ))}
+                                            </div>
+                                        </div>
                                 </div>
                             )}
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 
 import { MDBModal, MDBDropdown, MDBDropdownItem, MDBDropdownMenu, MDBDropdownToggle,
@@ -16,8 +16,12 @@ import NotFound from '../../../components/common/NotFound';
 import MySpinner from '../../../components/common/MySpinner';
 import TagList from '../../../components/common/TagList';
 
+import { UserContext } from '../../../context/user.context';
+
 const StoryDetailsPage = (props) => {
-    console.log(props.match.params.storyId);
+
+    const userContext = useContext(UserContext);
+    const { user } = userContext;
 
     const [story, setStory] = useState({});
     const [storyNotfound, setStoryNotfound] = useState(false);

@@ -27,8 +27,9 @@ public class Action extends DateAudit {
     @Size(max = 255)
     private String screenId;
 
-    @Size(min = 10, max = 10000)
+    @Size(max = 10000)
     @Column(length = 10000)
+    @NotBlank
     private String content;
 
     @Size(max = 255)

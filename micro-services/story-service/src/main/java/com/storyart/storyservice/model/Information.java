@@ -32,7 +32,6 @@ public class Information extends DateAudit {
     @NotBlank
     private String value;
 
-    @NotBlank
     private String unit;
 
     @Enumerated(EnumType.STRING)
