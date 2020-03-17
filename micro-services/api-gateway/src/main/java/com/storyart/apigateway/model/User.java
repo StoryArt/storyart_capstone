@@ -1,6 +1,6 @@
-package com.storyart.userservice.model;
+package com.storyart.apigateway.model;
 
-import com.storyart.userservice.common.DateAudit;
+import com.storyart.apigateway.common.DateAudit;
 import lombok.*;
 
 import javax.persistence.*;

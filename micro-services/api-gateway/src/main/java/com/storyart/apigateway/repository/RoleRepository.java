@@ -1,7 +1,9 @@
-package com.storyart.userservice.repository;
+package com.storyart.apigateway.repository;
 
-import com.storyart.userservice.common.constants.RoleName;
-import com.storyart.userservice.model.Role;
+import com.storyart.apigateway.common.constants.RoleName;
+import com.storyart.apigateway.model.Role;
+
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

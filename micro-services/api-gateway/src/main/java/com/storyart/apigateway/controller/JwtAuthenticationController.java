@@ -1,19 +1,20 @@
-package com.storyart.userservice.controller;
+package com.storyart.apigateway.controller;
 
-import com.storyart.userservice.common.constants.RoleName;
-import com.storyart.userservice.exception.AppException;
-import com.storyart.userservice.exception.BadRequestException;
-import com.storyart.userservice.model.Role;
-import com.storyart.userservice.model.User;
-import com.storyart.userservice.payload.SignUpRequest;
-import com.storyart.userservice.repository.RoleRepository;
-import com.storyart.userservice.repository.UserRepository;
-import com.storyart.userservice.security.JwtTokenProvider;
-import com.storyart.userservice.payload.ApiResponse;
-import com.storyart.userservice.payload.JwtAuthenticationResponse;
-import com.storyart.userservice.payload.LoginRequest;
-import com.storyart.userservice.security.JwtUserDetailsService;
-import com.storyart.userservice.service.UserService;
+import com.storyart.apigateway.common.constants.RoleName;
+import com.storyart.apigateway.exception.AppException;
+import com.storyart.apigateway.exception.BadRequestException;
+import com.storyart.apigateway.model.Role;
+import com.storyart.apigateway.model.User;
+import com.storyart.apigateway.payload.ApiResponse;
+import com.storyart.apigateway.payload.JwtAuthenticationResponse;
+import com.storyart.apigateway.payload.LoginRequest;
+import com.storyart.apigateway.payload.SignUpRequest;
+import com.storyart.apigateway.repository.RoleRepository;
+import com.storyart.apigateway.repository.UserRepository;
+import com.storyart.apigateway.security.JwtTokenProvider;
+import com.storyart.apigateway.security.JwtUserDetailsService;
+import com.storyart.apigateway.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -119,7 +120,7 @@ public class JwtAuthenticationController {
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("api/v1/user/username")
                 .buildAndExpand(savedUser.getUsername()).toUri();
-        return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
+        return ResponseEntity.created(location).body(new ApiResponse(true, "Đăng ký thành công!"));
 
     }
 

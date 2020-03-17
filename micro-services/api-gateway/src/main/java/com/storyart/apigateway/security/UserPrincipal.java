@@ -1,11 +1,11 @@
-package com.storyart.userservice.security;
+package com.storyart.apigateway.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.storyart.userservice.common.constants.RoleName;
-import com.storyart.userservice.model.Role;
-import com.storyart.userservice.repository.RoleRepository;
-import com.storyart.userservice.service.BeanUtil;
-import com.storyart.userservice.service.RoleService;
+import com.storyart.apigateway.common.constants.RoleName;
+import com.storyart.apigateway.model.Role;
+import com.storyart.apigateway.repository.RoleRepository;
+import com.storyart.apigateway.service.BeanUtil;
+import com.storyart.apigateway.service.RoleService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,7 +35,7 @@ public class UserPrincipal implements UserDetails {
     private RoleName roleName;
 
 
-    public static UserPrincipal create(com.storyart.userservice.model.User user) {
+    public static UserPrincipal create(com.storyart.apigateway.model.User user) {
 
         Set<Role> roles= new HashSet<>();
 
@@ -44,7 +44,11 @@ public class UserPrincipal implements UserDetails {
         List<GrantedAuthority> grantedAuthorityList = roles.stream().
                 map(role ->new SimpleGrantedAuthority(role.getName().name()))
                     .collect(Collectors.toList());
-        return new UserPrincipal(user.getId(), user.getUsername(), user.getPassword(),user.getName(),BeanUtil.getBean(RoleRepository.class).findRoleById(user.getRoleId()).get().getName(),  grantedAuthorityList);
+        return new UserPrincipal(user.getId(), user.getUsername(),
+                user.getPassword(),user.getName(),
+                BeanUtil.getBean(RoleRepository.class)
+                        .findRoleById(user.getRoleId()).get().getName(),
+                grantedAuthorityList);
     }
 
     private Collection<? extends GrantedAuthority> authorities;

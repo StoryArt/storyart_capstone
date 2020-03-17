@@ -1,14 +1,14 @@
-package com.storyart.userservice.security;
+package com.storyart.apigateway.security;
 
-import com.storyart.userservice.model.User;
-import com.storyart.userservice.service.UserService;
+import com.storyart.apigateway.model.User;
+import com.storyart.apigateway.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
@@ -21,7 +21,6 @@ public class JwtUserDetailsService implements UserDetailsService {
     PasswordEncoder passwordEncoder;
 
     @Override
-    @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User byUsername = userService.findByUsername(username);
         if (byUsername != null) {
@@ -34,7 +33,6 @@ public class JwtUserDetailsService implements UserDetailsService {
     }
 
 
-    @Transactional
     public UserDetails loadUserById(Integer id) {
         User user = userService.findById(id);
         if (user != null) {

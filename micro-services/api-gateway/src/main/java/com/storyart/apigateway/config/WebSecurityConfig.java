@@ -1,7 +1,7 @@
 package com.storyart.apigateway.config;
 
-import com.storyart.userservice.security.JwtAuthenticationEntryPoint;
-import com.storyart.userservice.security.JwtAuthenticationFilter;
+import com.storyart.apigateway.security.JwtAuthenticationEntryPoint;
+import com.storyart.apigateway.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,13 +35,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     UserDetailsService userDetailsService;
 
 
-
-
     // config to let auth know where to load user for matching credentials
     // use BCryptpasswordEncoder
     @Autowired
-    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder)
+            throws Exception {
+        authenticationManagerBuilder.userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder());
 
     }
 
@@ -65,18 +65,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         //dont need csrf
         http.
                 cors().
-                    and().
+                and().
                 csrf().
-                    disable().
+                disable().
                 exceptionHandling().
-                    authenticationEntryPoint(jwtAuthenticationEntryPoint).
-                    and().
+                authenticationEntryPoint(jwtAuthenticationEntryPoint).
+                and().
                 sessionManagement().
-                    sessionCreationPolicy(SessionCreationPolicy.STATELESS).
-                    and().
+                sessionCreationPolicy(SessionCreationPolicy.STATELESS).
+                and().
                 //dont authenticate this paticulat request
-                authorizeRequests().
-                    antMatchers("/",
+                        authorizeRequests().
+                antMatchers("/",
                         "/favicon.ico",
                         "/**/*.png",
                         "/**/*.gif",
@@ -86,17 +86,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js").
 //todo add more permit api in here
-                        permitAll().
+        permitAll().
                 antMatchers("/api/v1/auth/**").
-                    permitAll().
-                antMatchers("/api/v1/user/checkingUserAvailability").
-                    permitAll().
-                antMatchers(HttpMethod.POST,"/api/v1/auth/signup").permitAll().
+                permitAll().
 
-                antMatchers(HttpMethod.GET,"/api/v1/user/**").permitAll()
+                antMatchers(HttpMethod.POST, "/api/v1/auth/signup").permitAll().
+// hien tai chi cho login va signup la khong can authentication
                 // all other reqs need to be authenticated
-                .anyRequest().
-                    authenticated();
+                        anyRequest().
+                authenticated();
         // using stateless session , session wont be used to store user state
         ;
 

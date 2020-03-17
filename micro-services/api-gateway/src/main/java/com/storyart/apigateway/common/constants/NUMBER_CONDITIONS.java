@@ -1,4 +1,4 @@
-package com.storyart.userservice.common.constants;
+package com.storyart.apigateway.common.constants;
 
 public class NUMBER_CONDITIONS {
     private static String GREATER = ">";

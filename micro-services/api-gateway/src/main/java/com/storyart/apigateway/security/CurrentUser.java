@@ -1,4 +1,4 @@
-package com.storyart.userservice.security;
+package com.storyart.apigateway.security;
 
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

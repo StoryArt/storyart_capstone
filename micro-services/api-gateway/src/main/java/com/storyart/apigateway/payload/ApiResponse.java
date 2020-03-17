@@ -1,4 +1,4 @@
-package com.storyart.userservice.payload;
+package com.storyart.apigateway.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

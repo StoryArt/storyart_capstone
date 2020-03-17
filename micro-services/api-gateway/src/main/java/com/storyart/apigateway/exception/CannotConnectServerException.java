@@ -1,4 +1,4 @@
-package com.storyart.userservice.exception;
+package com.storyart.apigateway.exception;
 import com.netflix.discovery.shared.transport.TransportException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

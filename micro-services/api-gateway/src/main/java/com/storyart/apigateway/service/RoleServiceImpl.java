@@ -1,8 +1,9 @@
-package com.storyart.userservice.service;
+package com.storyart.apigateway.service;
 
-import com.storyart.userservice.common.constants.RoleName;
-import com.storyart.userservice.model.Role;
-import com.storyart.userservice.repository.RoleRepository;
+import com.storyart.apigateway.common.constants.RoleName;
+import com.storyart.apigateway.model.Role;
+import com.storyart.apigateway.repository.RoleRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

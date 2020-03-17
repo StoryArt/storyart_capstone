@@ -1,7 +1,6 @@
-package com.storyart.userservice.exception;
+package com.storyart.apigateway.exception;
 
 
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
