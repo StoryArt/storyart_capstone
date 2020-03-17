@@ -1,88 +1,69 @@
-
 import React, { useState, useEffect } from "react";
 import UserLayout from "../../../layouts/UserLayout";
-import {
-  MDBInput, MDBAlert,
-  MDBBtn,
-  MDBModalFooter,
-  MDBModalHeader,
-  MDBModalBody
-} from "mdbreact";
+import { MDBInput, MDBBtn } from "mdbreact";
 import UserService from "../../../services/user.service";
-
-import SplitDate from "../../../utils/splitDate";
-
-const UserPublicProfilePage = () => {
+const UserPublicProfilePage = props => {
   const [profile, setProfile] = useState([]);
-  const [id, setId] = useState("");
   const [name, setName] = useState("");
+  const [us, setUs] = useState("");
+
   const [email, setEmail] = useState("");
   const [intro_content, setIntro_content] = useState("");
-  const [jointAt, setJointAt] = useState("");
   const [is_active, setIsActive] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  async function handleUpdateProfile(event) {
-    event.preventDefault();
-    let user = {
-      id: id,
-      name: name,
-      intro_content: intro_content,
-      email: email,
-      jointAt: jointAt
-    };
+
+  //   async function handleUpdateProfile(event) {
+  //     event.preventDefault();
+  //     let user = {
+  //       id: id,
+  //       name: name,
+  //       intro_content: intro_content,
+  //       email: email,
+  //       jointAt: jointAt
+  //     };
+  //     try {
+  //       const res = await UserService.updateProfile(user, profile.id);
+  //       setProfile(res.data);
+
+  //         setErrorMessage(
+  //         <MDBAlert color="success">Lưu thành công</MDBAlert>
+  //         );
+  //     } catch (error) {
+  //       console.log(JSON.stringify(error));
+
+  //       var err;
+  //       if (typeof error.response.data.errors != "undefined") {
+  //         err = error.response.data.errors[0].defaultMessage;
+  //       } else if (typeof error.response.data.message == "string") {
+  //         err = error.response.data.message;
+  //       }
+  //       setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
+  //     }
+  //   }
+
+  const GetProById = async (userId) => {
     try {
-      const res = await UserService.updateProfile(user, profile.id);
-      setProfile(res.data);
-      
-    
-        setErrorMessage(
-        <MDBAlert color="success">Lưu thành công</MDBAlert>
-        );
-    } catch (error) {
-      console.log(JSON.stringify(error));
-
-      var err;
-      if (typeof error.response.data.errors != "undefined") {
-        err = error.response.data.errors[0].defaultMessage;
-      } else if (typeof error.response.data.message == "string") {
-        err = error.response.data.message;
-      }
-      setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
-    }
-  }
-
-  const getProfileById = async () => {
-    try {
-      const res = await UserService.getProfileById();
-      console.log(res.data);
-
-      setProfile(res.data);
-      setEmail(res.data.email);
-      setId(res.data.id);
+      const res = await UserService.getProById(userId);
       setName(res.data.name);
       setIntro_content(res.data.intro_content);
-     var date= new Date(res.data.jointAt);
+      //  var date= new Date(res.data.jointAt);
 
-      setJointAt(date.toString());
+      //   setJointAt(date.toString());
       setIsActive(res.data.is_active);
+      setEmail(res.data.email);
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
   };
 
-  
-
   useEffect(() => {
-    getProfileById();
+    const { userId } = props.match.params;
+    GetProById(userId);
   }, []);
 
   const statusButton = [];
+statusButton.push(<MDBBtn color={profile.is_active?"success": "danger"}>{profile.is_active?"Active":"Deactivated"}</MDBBtn>);
 
-  if (profile.is_active == true) {
-    statusButton.push(<MDBBtn color="success">Active</MDBBtn>);
-  } else {
-    statusButton.push(<MDBBtn color="danger">Deactivated</MDBBtn>);
-  }
 
   return (
     <UserLayout>
@@ -91,62 +72,69 @@ const UserPublicProfilePage = () => {
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <h4> Thong tin tai khoan </h4>{" "}
+                <h4>
+                  {" "}
+                  <strong> Account </strong>
+                </h4>{" "}
               </div>{" "}
               <div className="card-body">
                 {errorMessage}
-                <form onSubmit={handleUpdateProfile}>
+                <form>
                   <div className="row">
                     <div className="col-sm-6">
-                      <MDBInput
-                        label="Ten day du"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        outline
-                      />
-                    </div>
-                    <div className="col-sm-6" padding="20px">
-                      <MDBInput
-                        label="Email"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        outline
-                      />
-                    </div>{" "}
-                   
-                    <div className="col-sm-6">
-                      <MDBInput
-                        type="textarea"
-                        label="Gioi thieu ban than"
-                        value={intro_content == null ? "" : intro_content}
-                        onChange={e => setIntro_content(e.target.value)}
-                        outline
-                      />
-                    </div>{" "}
-                    <div className="col-sm-6">
-                      
-                      <i>
-                        Joint at:
-                        {jointAt}
-                      </i>
-                    </div>{" "}
-                <div className="col-sm-6">{statusButton}</div>{" "}
+                      <div className="form-group">
+                        <label htmlFor="name">
+                          <strong>Name</strong>
+                        </label>
+                        <input
+                          type="text"
+                          id="name"
+                          value={name}
+                          outline
+                          className="form-control"
+                          onChange={e => setName(e.target.value)}
+                        />
+                      </div>
+                     
+                      <div className="form-group">
+                        <label htmlFor="email">
+                          <strong>Email</strong>
+                        </label>
+                        <input
+                          type="text"
+                          id="email"
+                          value={email}
+                          outline
+                          className="form-control"
+                          onChange={e => setEmail(e.target.value)}
+                        />
+                      </div>
 
-                    
-                    <button
-                      className="btn btn-success float-right"
-                      style={{ fontSize: "1.1em" }}
-                    >
-                      Lưu thay đổi
-                    </button>{" "}
+                     
+                    </div>
+                    <div className="col-sm-6">
+                      <div className="form-group">
+                        <label htmlFor="intro_content">
+                          <strong>Intro</strong>
+                        </label>
+                        <input
+                          type="textarea"
+                          id="intro_content"
+                          value={intro_content == null ? "" : intro_content}
+                          outline
+                          className="form-control"
+                          onChange={e => setName(e.target.value)}
+                        />
+                      </div>
+                      <div className="form-group">{statusButton}</div>
+                    </div>{" "}
                   </div>
                 </form>{" "}
-
               </div>{" "}
             </div>{" "}
           </div>{" "}
         </div>
-        <h3 className="text-bold"> Truyen cua ban </h3>{" "}
+        <h3 className="text-bold"> Truyện của tác giả </h3>{" "}
         <hr style={{ border: "1px solid #ccc" }} />{" "}
         <div className="row">
           {" "}

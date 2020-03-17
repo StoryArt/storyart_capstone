@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
-import { TextField, MenuItem, Tooltip } from '@material-ui/core';
+import { TextField, MenuItem } from '@material-ui/core';
 import MainLayout from '../../../layouts/UserLayout';
 
 import StoryParameters from './StoryParameters';
 import ScreensList from './ScreensList';
 import ScreensSelect from './ScreensSelect';
-import MyEditor from '../../../components/common/MyEditor';
-
+import AllScreenSnapshots from './AllScreenSnapshots';
 import MyDropdownMenu from '../../../components/common/MyDropdownMenu';
 import MyAlert from '../../../components/common/MyAlert';
+import MyEditor from '../../../components/common/MyEditor';
+
 
 import { ACTION_TYPES, INFORMATION_TYPES, NUMBER_CONDITIONS, STRING_CONDITIONS, 
     NUMBER_OPERATIONS, STRING_OPERATIONS }  from '../../../common/constants';
+
+    
 import StoryService from '../../../services/story.service';
-import AllScreenSnapshots from './AllScreenSnapshots';
 
 
 const CreateStoryPage = () => {
@@ -290,17 +292,6 @@ const CreateStoryPage = () => {
                             setCurrentScreen={setCurrentScreen}
                             currentScreen={currentScreen}
                         />
-                        {/* {screens.map((screen, index) => (
-                            <Tooltip 
-                                title={screen.title.length == 0 ? "Chua co tieu de" : screen.title} 
-                                key={screen.id}>
-                                <button 
-                                    style={{ width: '35px', height: '35px', padding: '0px', borderRadius: '5px' }}
-                                    onClick={() => setCurrentScreen(index)}
-                                    className={`btn ${currentScreen == index ? 'btn-success' : 'btn-secondary'}`} 
-                                    >{index + 1}</button>
-                            </Tooltip>
-                        ))} */}
                         <br/>
                         <button 
                             className="btn btn-primary btn-block my-3" 

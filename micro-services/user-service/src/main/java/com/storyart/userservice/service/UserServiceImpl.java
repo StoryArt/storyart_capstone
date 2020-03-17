@@ -82,6 +82,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
         }
     }
+
     //this used for search user of admin and sysadmin.
     // data responsed depend on T of PageResponse
     @Override
@@ -123,10 +124,10 @@ public class UserServiceImpl implements UserService {
     public PagedResponse<UserInManagementResponse> findByUsernameOrEmail(int page, int size, String search) {
         validatePageNumberAndSize(page, size);
         Pageable pageable = PageRequest.of(page, size);
-        Page<User> userPage = userRepository.findByUsernameLike( search,pageable);
+        Page<User> userPage = userRepository.findByUsernameLike(search, pageable);
         List<User> usersList = userPage.toList();
 
-        List<UserInManagementResponse> users= convertUserlist(usersList);
+        List<UserInManagementResponse> users = convertUserlist(usersList);
 
         return new PagedResponse<UserInManagementResponse>(users, userPage.getNumber(), userPage.getSize(),
                 userPage.getTotalElements(),
@@ -156,35 +157,34 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public PagedResponse<UserInManagementResponse> findAdminbyUsernameOrEmail(int page, int size, String search) {
-
+        page = page - 1;
         validatePageNumberAndSize(page, size);
         Pageable pageable = PageRequest.of(page, size);
 
 
-
-        Page<User> userPage = userRepository.findAdminByUsernameOrEmail( search,pageable);
+        Page<User> userPage = userRepository.findAdminByUsernameOrEmail(search, pageable);
         List<User> usersList = userPage.toList();
 
-       List<UserInManagementResponse> users= convertUserlist(usersList);
+        List<UserInManagementResponse> users = convertUserlist(usersList);
 
 
-        return new PagedResponse<UserInManagementResponse>(users, userPage.getNumber(), userPage.getSize(),
+        return new PagedResponse<UserInManagementResponse>(users, userPage.getNumber() + 1, userPage.getSize(),
                 userPage.getTotalElements(),
                 userPage.getTotalPages(), userPage.isLast());
     }
 
 
-   public List<UserInManagementResponse> convertUserlist(List<User> users){
-       List<UserInManagementResponse> convertUserlist = new ArrayList<>();
-       for(User u: users){
+    public List<UserInManagementResponse> convertUserlist(List<User> users) {
+        List<UserInManagementResponse> convertUserlist = new ArrayList<>();
+        for (User u : users) {
             convertUserlist.add(new UserInManagementResponse(u));
         }
-       return convertUserlist;
+        return convertUserlist;
     }
 
     @Override
     public PagedResponse<UserInManagementResponse> findOnlyUserByUsernameOrEmail(int page, int size, String searchtxt) {
-
+page=page-1;
         validatePageNumberAndSize(page, size);
         Pageable pageable = PageRequest.of(page, size);
 
@@ -192,13 +192,13 @@ public class UserServiceImpl implements UserService {
 //        TypedQuery<User> querry=entityManager.createQuery("")
 
 
-        Page<User> userPage = userRepository.findOnlyUserByUsernameOrEmail( searchtxt,pageable);
+        Page<User> userPage = userRepository.findOnlyUserByUsernameOrEmail(searchtxt, pageable);
         List<User> usersList = userPage.toList();
 
-        List<UserInManagementResponse> users= convertUserlist(usersList);
+        List<UserInManagementResponse> users = convertUserlist(usersList);
 
 
-        return new PagedResponse<UserInManagementResponse>(users, userPage.getNumber(), userPage.getSize(),
+        return new PagedResponse<UserInManagementResponse>(users, 1+userPage.getNumber(), userPage.getSize(),
                 userPage.getTotalElements(),
                 userPage.getTotalPages(), userPage.isLast());
     }
@@ -206,7 +206,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void createDefaultSysAdmin() {
         Optional<User> found = userRepository.findByUsername("systemadmin");
-        if(found.isPresent()) return;
+        if (found.isPresent()) return;
         User user = new User();
         user.setUsername("systemadmin");
         user.setPassword("12345678");
@@ -219,11 +219,11 @@ public class UserServiceImpl implements UserService {
 
     private void validatePageNumberAndSize(int page, int size) {
         if (page < 0) {
-            throw new BadRequestException("Page number cannot be zero");
+            throw new BadRequestException("Trang không dưới 0");
         }
 
         if (size > AppContants.MAX_PAGE_SIZE) {
-            throw new BadRequestException("Page size cannot be greater than " + AppContants.MAX_PAGE_SIZE);
+            throw new BadRequestException("Số lượng trong  một trang không quá " + AppContants.MAX_PAGE_SIZE);
 
         }
     }

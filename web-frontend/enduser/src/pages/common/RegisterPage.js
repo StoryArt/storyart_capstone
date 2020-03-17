@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { MDBInput, MDBAlert } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
+import { setAuthHeader } from "../../config/auth";
 
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
@@ -14,6 +15,7 @@ const RegisterPage = () => {
 
 
   async function handleSubmit(event) {
+    
     event.preventDefault();
     let user = {
       name: name,
@@ -22,19 +24,16 @@ const RegisterPage = () => {
       introContent: introContent,
       email: email,
     };
+   
     try {
       const res = await UserService.register(user);
-
-      console.log(res.data);
-      const { success } = res.data;
-    
-      if (success) {
-        alert('Dang ki tai khoan thanh cong');
+      if (res.data.success == true) {
+        setErrorMessage(
+          <MDBAlert color="success">{res.data.message}</MDBAlert>
+        );
         window.setTimeout(() => {
           window.location.href = "/login";
         }, 400);
-      } else {
-        alert('Dang ki tai khoan khong thanh cong, vui long kiem tra lai thong tin');
       }
     } catch (error) {
       var err;
