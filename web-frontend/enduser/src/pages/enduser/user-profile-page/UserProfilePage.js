@@ -79,19 +79,8 @@ const UserProfilePage = () => {
 
   const statusButton = [];
 
-  if (profile.is_active == true) {
-    statusButton.push(
-      <MDBBtn style={{ margin: 0, fontSize: "0.8em" }}color="success">
-        Active
-      </MDBBtn>
-    );
-  } else {
-    statusButton.push(
-      <MDBBtn style={{ margin: 0, fontSize: "0.8em" }} color="danger">
-        Deactivated
-      </MDBBtn>
-    );
-  }
+  statusButton.push(<MDBBtn style={{padding:0}} color={profile.active?"success": "danger"}>{profile.active?"Active":"Deactivated"}</MDBBtn>);
+
 
   return (
     <UserLayout>
@@ -100,14 +89,15 @@ const UserProfilePage = () => {
           <div className="col-12">
             <div className="card">
               <div className="card-header ">
-                <div className="row">
-                <div className="col-sm-2">  <h2>
-                  
-                  <strong> Account </strong>
-                </h2></div>
-                <div className="col-sm-6">{statusButton}</div>
-                </div>
-               
+              <div className="row">
+                  <div  style={{paddingRight:0}} className="col-sm-2">
+                    <h2 style={{ marginRight:0}}> 
+                      <strong>Account</strong>
+                    </h2>
+                  </div>
+                  <div style={{padding:0}} className="col-sm-3">{statusButton}</div>
+                
+              </div>{" "}
               </div>{" "}
               <div className="card-body">
                 {errorMessage}
@@ -175,13 +165,12 @@ const UserProfilePage = () => {
                         <label htmlFor="intro_content">
                           <strong>Intro</strong>
                         </label>
-                        <input
-                          type="textarea"
+                        <textarea
                           id="intro_content"
                           value={intro_content == null ? "" : intro_content}
                           outline
                           className="form-control"
-                          onChange={e => setName(e.target.value)}
+                          onChange={e => setIntro_content(e.target.value)}
                         />
                       </div>
                     </div>{" "}

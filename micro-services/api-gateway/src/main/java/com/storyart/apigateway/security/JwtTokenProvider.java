@@ -60,15 +60,15 @@ public class JwtTokenProvider implements Serializable {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
             return true;
         } catch (SignatureException ex) {
-            logger.error("Sai cú pháp token!");
+            logger.error("Invalid JWT signature");
         } catch (MalformedJwtException ex) {
-            logger.error("Token không đúng");
+            logger.error("Invalid JWT token");
         } catch (ExpiredJwtException ex) {
-            logger.error("Token đã hết hạn");
+            logger.error("Expired JWT token");
         } catch (UnsupportedJwtException ex) {
-            logger.error("Không hỗ trợ jwt token");
+            logger.error("Unsupported JWT token");
         } catch (IllegalArgumentException ex) {
-            logger.error("Chuối token chứa claim không hợp lệ");
+            logger.error("JWT claims string is empty.");
         }
         return false;
     }

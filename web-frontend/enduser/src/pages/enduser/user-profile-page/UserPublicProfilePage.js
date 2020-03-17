@@ -12,44 +12,14 @@ const UserPublicProfilePage = props => {
   const [is_active, setIsActive] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  //   async function handleUpdateProfile(event) {
-  //     event.preventDefault();
-  //     let user = {
-  //       id: id,
-  //       name: name,
-  //       intro_content: intro_content,
-  //       email: email,
-  //       jointAt: jointAt
-  //     };
-  //     try {
-  //       const res = await UserService.updateProfile(user, profile.id);
-  //       setProfile(res.data);
-
-  //         setErrorMessage(
-  //         <MDBAlert color="success">Lưu thành công</MDBAlert>
-  //         );
-  //     } catch (error) {
-  //       console.log(JSON.stringify(error));
-
-  //       var err;
-  //       if (typeof error.response.data.errors != "undefined") {
-  //         err = error.response.data.errors[0].defaultMessage;
-  //       } else if (typeof error.response.data.message == "string") {
-  //         err = error.response.data.message;
-  //       }
-  //       setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
-  //     }
-  //   }
 
   const GetProById = async (userId) => {
     try {
       const res = await UserService.getProById(userId);
+      setProfile(res.data);
       setName(res.data.name);
       setIntro_content(res.data.intro_content);
-      //  var date= new Date(res.data.jointAt);
-
-      //   setJointAt(date.toString());
-      setIsActive(res.data.is_active);
+      setIsActive(res.data.active);
       setEmail(res.data.email);
     } catch (error) {
       console.log(error);
@@ -62,7 +32,7 @@ const UserPublicProfilePage = props => {
   }, []);
 
   const statusButton = [];
-statusButton.push(<MDBBtn color={profile.is_active?"success": "danger"}>{profile.is_active?"Active":"Deactivated"}</MDBBtn>);
+  statusButton.push(<MDBBtn style={{padding:0}} color={profile.active?"success": "danger"}>{profile.active?"Active":"Deactivated"}</MDBBtn>);
 
 
   return (
@@ -72,10 +42,14 @@ statusButton.push(<MDBBtn color={profile.is_active?"success": "danger"}>{profile
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <h4>
-                  {" "}
-                  <strong> Account </strong>
-                </h4>{" "}
+              <div className="row">
+                  <div  style={{paddingRight:0}} className="col-sm-2">
+                    <h2 style={{ marginRight:0}}> 
+                      <strong>Account</strong>
+                    </h2>
+                  </div>
+                  <div style={{padding:0}} className="col-sm-3">{statusButton}</div>
+                </div>
               </div>{" "}
               <div className="card-body">
                 {errorMessage}
@@ -86,7 +60,7 @@ statusButton.push(<MDBBtn color={profile.is_active?"success": "danger"}>{profile
                         <label htmlFor="name">
                           <strong>Name</strong>
                         </label>
-                        <input
+                        <input disabled
                           type="text"
                           id="name"
                           value={name}
@@ -100,7 +74,7 @@ statusButton.push(<MDBBtn color={profile.is_active?"success": "danger"}>{profile
                         <label htmlFor="email">
                           <strong>Email</strong>
                         </label>
-                        <input
+                        <input disabled
                           type="text"
                           id="email"
                           value={email}
@@ -117,16 +91,15 @@ statusButton.push(<MDBBtn color={profile.is_active?"success": "danger"}>{profile
                         <label htmlFor="intro_content">
                           <strong>Intro</strong>
                         </label>
-                        <input
+                        <textarea disabled
                           type="textarea"
                           id="intro_content"
                           value={intro_content == null ? "" : intro_content}
                           outline
                           className="form-control"
-                          onChange={e => setName(e.target.value)}
+                          onChange={e => setIntro_content(e.target.value)}
                         />
                       </div>
-                      <div className="form-group">{statusButton}</div>
                     </div>{" "}
                   </div>
                 </form>{" "}
