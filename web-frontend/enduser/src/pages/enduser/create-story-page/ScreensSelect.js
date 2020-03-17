@@ -14,7 +14,7 @@ const ScreensSelect = (props) => {
             >
                 {screens.map((screen, index) => (
                     <MenuItem key={screen.id} value={screen.id}>
-                        Man hinh {index + 1} ({ screen.title.length > 0 ? screen.title : 'Chua co tieu de' })
+                        Màn hình {index + 1} ({ screen.title.length > 0 ? screen.title : 'Chưa có tiêu đề' })
                     </MenuItem>
                 ))}
         </Select>
