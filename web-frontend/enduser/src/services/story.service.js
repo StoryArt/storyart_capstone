@@ -35,6 +35,18 @@ class StoryService{
         return axios.get(url);
     }
 
+    static async getSuggestStoryByRating(pageNo){
+        let pagesize = 4;
+        const url = "http://localhost:8003/rating/suggestRated1?pageNo=".concat(pageNo).concat('&pageSize=').concat(pagesize);
+        return axios.get(url);
+    }
+
+    static async getSuggestStoryByHistory(pageNo){
+        let pagesize = 4;
+        const url = "http://localhost:8003/history/suggestRated1?pageNo=".concat(pageNo).concat('&pageSize=').concat(pagesize);
+        return axios.get(url);
+    }
+
 }
 
 export default StoryService;

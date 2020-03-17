@@ -1,19 +1,28 @@
 package com.storyart.storyservice.service;
 
+import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.story_suggestion.HistoryDTO;
 import com.storyart.storyservice.model.ReadingHistory;
 import com.storyart.storyservice.model.Story;
+import com.storyart.storyservice.model.Tag;
 import com.storyart.storyservice.repository.HistoryRepository;
 import com.storyart.storyservice.repository.StoryRepository;
+import com.storyart.storyservice.repository.TagRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public interface HistoryService {
-    List<Story> jaccardCalculate(Integer id);
+    Page<GetStoryDto> jaccardCalculate(Integer id, int pageNo, int pageSize);
 }
 
 @Service
@@ -25,8 +34,14 @@ class HistoryServiceIml implements HistoryService {
     @Autowired
     StoryRepository storyRepository;
 
+    @Autowired
+    TagService tagService;
+
+    @Autowired
+    TagRepository tagRepository;
+
     @Override
-    public List<Story> jaccardCalculate(Integer id) {
+    public  Page<GetStoryDto> jaccardCalculate(Integer id, int PageNo, int pageSize) {
         List<ReadingHistory> CurrentUserHistory = historyRepository.findHistoryById(id);
         HistoryDTO currentUserH = new HistoryDTO();
         currentUserH.setUserid(id);
@@ -37,7 +52,6 @@ class HistoryServiceIml implements HistoryService {
         currentUserH.setListStory(listCurr);
 
         List<HistoryDTO> listHistory = new ArrayList<>();
-
 
         List<Integer> check = historyRepository.findUserIdHistoryExceptId(id);
         // get list history except current
@@ -71,18 +85,22 @@ class HistoryServiceIml implements HistoryService {
         List<Integer> MostFitHistory = historyRepository.findListHistory(MostFitId);
         List<Story> listStory = new ArrayList<>();
         MostFitHistory.removeAll(currentUserH.getListStory());
+        Pageable pageable = PageRequest.of(PageNo, pageSize);
+        Page<Story> storyPage = storyRepository.findAllByStoryIds(MostFitHistory, pageable);
+
+        ModelMapper mm = new ModelMapper();
+        Page<GetStoryDto> responsePage = storyPage.map(new Function<Story, GetStoryDto>() {
+            @Override
+            public GetStoryDto apply(Story story) {
+                List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
+                GetStoryDto dto = mm.map(story, GetStoryDto.class);
+                dto.setTags(tagService.mapModelToDto(tagList));
+                return dto;
 
 
-        // get list story
-        for (Integer i : MostFitHistory) {
-            Optional<Story> story = storyRepository.findById(i);
-            if (story.isPresent()) {
-                listStory.add(story.get());
             }
-        }
-
-
-        return listStory;
+        });
+        return responsePage;
     }
 
 

@@ -60,10 +60,11 @@ class TagManagementPage extends React.Component {
     this.setState({ visible3: false });
   };
   loadData = () => {
-    const url = "http://localhost:8003/tags/getAll";
-    axios.get(url).then(res => {
+   TagService.getAllTag().then(res => {
       this.setState({ data: res.data.content });
       this.setState({ loading: true });
+    }).catch(error => {
+      console.log(error);
     });
   };
 
@@ -74,9 +75,7 @@ class TagManagementPage extends React.Component {
   handleSubmit = e => {
     let tag = { title: this.state.title };
     
-    const url = "http://localhost:8003/tags";
-    axios.post(url, tag)
-    .then(res => {
+    TagService.addTag(tag).then(res => {
       this.setState({ visible: false });
       this.setState({ status: "", currId: "", title: "" });
       this.loadData();
@@ -106,16 +105,12 @@ class TagManagementPage extends React.Component {
       active: status,
       isUpdate: isUpdate
     };
-    const config = {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
-    const url = "http://localhost:8003/tags";
-    axios.put(url, tag, config).then(res => {
+     TagService.updateTag(tag).then(res => {
       this.setState({ visible3: false });
       this.setState({ status: "", currId: "", title: "" });
       this.loadData();
+    }).catch(error => {
+      console.log(error);
     });
   };
 

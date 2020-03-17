@@ -29,4 +29,10 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
 
     @Query(value = "SELECT * FROM story where id = :storyid", nativeQuery = true)
     Story findStoryById (@Param("storyid") Integer storyid);
+
+
+    @Query(value = "SELECT * FROM storyart_db.story order by  story.created_at DESC", nativeQuery = true)
+    Page<Story> findStoryOrderByCreateAt(Pageable page);
+    @Query("select s from Story s where s.id in (:storyIds)")
+    Page<Story> findAllByStoryIds(@Param("storyIds") List<Integer> storyIds, Pageable pageable); //mo dum cai file luc nay
 }

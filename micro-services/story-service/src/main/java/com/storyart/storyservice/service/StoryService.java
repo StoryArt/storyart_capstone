@@ -33,6 +33,8 @@ public interface StoryService {
     Page<GetStoryDto> searchStories(Set<Integer> tags, String keyword, boolean isActive,
                               boolean isPublished, int page, int itemsPerPage);
     List<GetStoryDto> getTrendingStories(int quantity);
+    Page<Story> getNewReleaseStory(int quantity);
+
     void createTempStories();
 }
 
@@ -250,6 +252,13 @@ class StoryServiceImpl implements StoryService{
             dto.setTags(tagService.mapModelToDto(tags));
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<Story> getNewReleaseStory(int quantity) {
+        Pageable pageable =  PageRequest.of(0, quantity, Sort.by("created_at").descending());
+        return storyRepository.findStoryOrderByCreateAt(pageable);
+
     }
 
     @Override
