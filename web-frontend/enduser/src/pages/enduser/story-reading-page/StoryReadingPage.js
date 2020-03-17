@@ -4,6 +4,7 @@ import { Button } from '@material-ui/core';
 import MainLayout from '../../../layouts/UserLayout';
 import StoryService from '../../../services/story.service';
 import ValidationUtils from '../../../utils/validation';
+import StringUtils from '../../../utils/string';
 import { ACTION_TYPES, INFORMATION_TYPES, STRING_OPERATIONS,
      NUMBER_OPERATIONS, STRING_CONDITIONS, NUMBER_CONDITIONS } from '../../../common/constants';
 
@@ -151,11 +152,11 @@ const ReadStoryPage = (props) => {
                                                                 
                                                             {action.type === ACTION_TYPES.REDIRECT && (
                                                                 <a href={action.value} target="_blank">
-                                                                    {action.content}
+                                                                    { action.content }
                                                                 </a>
                                                             )}
                                                             {action.type !== ACTION_TYPES.REDIRECT && (
-                                                                <>{ action.content }</>
+                                                                <>{ StringUtils.parseHtml(action.content)  }</>
                                                             )}
                                                         </p>
                                                     </div>

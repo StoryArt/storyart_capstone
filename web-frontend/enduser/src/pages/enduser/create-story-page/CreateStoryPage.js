@@ -5,6 +5,7 @@ import MainLayout from '../../../layouts/UserLayout';
 import StoryParameters from './StoryParameters';
 import ScreensList from './ScreensList';
 import ScreensSelect from './ScreensSelect';
+import MyEditor from '../../../components/common/MyEditor';
 
 import MyDropdownMenu from '../../../components/common/MyDropdownMenu';
 import MyAlert from '../../../components/common/MyAlert';
@@ -12,6 +13,7 @@ import MyAlert from '../../../components/common/MyAlert';
 import { ACTION_TYPES, INFORMATION_TYPES, NUMBER_CONDITIONS, STRING_CONDITIONS, 
     NUMBER_OPERATIONS, STRING_OPERATIONS }  from '../../../common/constants';
 import StoryService from '../../../services/story.service';
+import AllScreenSnapshots from './AllScreenSnapshots';
 
 
 const CreateStoryPage = () => {
@@ -178,7 +180,7 @@ const CreateStoryPage = () => {
             });
         }
         
-        story.published = isPublished;
+        story.isPublished = isPublished;
         story.screens = screens;
         story.informations = storyParameters;
         story.informationActions = informationActions;
@@ -195,10 +197,11 @@ const CreateStoryPage = () => {
                 if(story.isPublished) msg = 'Luu va xuat ban thanh cong';
                 setAlert({ content: msg, type:'success', open: true });
             } else {
-                setAlert({ content: 'Khong the luu truyen', type:'error', open: true });
+                
             }
         } catch (error) {
             console.log(error);
+            setAlert({ content: 'Khong the luu truyen', type:'error', open: true });
         }
     }
 
@@ -253,14 +256,20 @@ const CreateStoryPage = () => {
                                    
                             </div>
                             <div className="card-body">
-                                <TextField 
+                                {/* <TextField 
                                     style={{ width: '100%' }}
                                     label="Noi dung gioi thieu"
                                     multiline
                                     variant="outlined"
                                     rows="3"
                                     value={story.content} 
-                                    onChange={(e) => changeStory('intro', e.target.value)} />
+                                    onChange={(e) => changeStory('intro', e.target.value)} /> */}
+
+                                <MyEditor
+                                    placeholder="Noi dung gioi thieu"
+                                    value={story.intro}
+                                    onChange={(value) => changeStory('intro', value)}
+                                />
                                 
                               <div className="text-right mt-2">
                                 <MyDropdownMenu >
@@ -276,7 +285,12 @@ const CreateStoryPage = () => {
                     <div className="col-sm-3">
                         <h3 style={{ fontSize: '1.2em' }}>Tat ca man hinh</h3>
                         <hr style={{ border: '1px solid #ccc' }} />
-                        {screens.map((screen, index) => (
+                        <AllScreenSnapshots
+                            screens={screens}
+                            setCurrentScreen={setCurrentScreen}
+                            currentScreen={currentScreen}
+                        />
+                        {/* {screens.map((screen, index) => (
                             <Tooltip 
                                 title={screen.title.length == 0 ? "Chua co tieu de" : screen.title} 
                                 key={screen.id}>
@@ -286,7 +300,7 @@ const CreateStoryPage = () => {
                                     className={`btn ${currentScreen == index ? 'btn-success' : 'btn-secondary'}`} 
                                     >{index + 1}</button>
                             </Tooltip>
-                        ))}
+                        ))} */}
                         <br/>
                         <button 
                             className="btn btn-primary btn-block my-3" 
@@ -331,7 +345,8 @@ const CreateStoryPage = () => {
             
             </div>
         
-            <MyAlert/>
+            <MyAlert 
+                alert={alert}/>
         </MainLayout>
     );
 };

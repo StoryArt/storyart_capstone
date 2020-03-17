@@ -10,6 +10,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -29,7 +30,7 @@ public class Action extends DateAudit {
 
     @Size(max = 10000)
     @Column(length = 10000)
-    @NotBlank
+    @NotBlank(message = "Nội dung hành động không được để trống")
     private String content;
 
     @Size(max = 255)
@@ -37,7 +38,7 @@ public class Action extends DateAudit {
 //    private String operation;//+ - * /
 
     @NotBlank
-    @Size(max = 255)
+    @Size(max = 255, message = "Chưa có giá trị tác động")
     private String value; // gia tri tac dong
 
     @Enumerated(EnumType.STRING)

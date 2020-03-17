@@ -157,7 +157,7 @@ const SearchStoriesPage = () => {
                                             placeholder="Tim kiem truyen" aria-label="Search"/>
                                         <MDBBtn 
                                             size="sm" 
-                                            color="primary" 
+                                            color="success" 
                                             className="my-0" 
                                             type="submit">
                                                 <MDBIcon icon="search" />
@@ -177,7 +177,7 @@ const SearchStoriesPage = () => {
                             style={{float: 'right'}}
                             count={totalPages} 
                             page={filters.page}
-                            color="primary" 
+                            color="success" 
                             onChange={changePage} />
                          <div className="clearfix"></div>
                     </div>

@@ -68,11 +68,6 @@ class UserService {
     return axios.put(url1, user);
   }
 
-  static async logout(user, uid){
-    let url1 = baseUrl + "/user/" + uid;
-    return axios.put(url1, user);
-  }
-
 }
 
 export default UserService;

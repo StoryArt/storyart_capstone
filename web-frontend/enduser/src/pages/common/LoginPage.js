@@ -22,7 +22,7 @@ const LoginPage = () => {
           const res = await UserService.login(user);
     
           console.log(res.data);
-          if (res.data.accessToken !== null) {
+          if (res.data.accessToken != null) {
             const { tokenType, accessToken } = res.data;
             const token = tokenType + " " + accessToken;
             saveTokenToLocal(token);
@@ -43,6 +43,8 @@ const LoginPage = () => {
                 window.location.href = url;
               
             }, 400);
+          } else if(!res.data.success){
+            alert('Ten dang nhap va mat khau khong hop le');
           }
         } catch (error) {
           let field = error.response.data.errors[0].field;

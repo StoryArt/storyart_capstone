@@ -9,12 +9,7 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [introContent, setIntroContent] = useState("");
-  const [dob, setDob] = useState("");
-  const [gender, setGender] = useState("");
-  const [registerResponseMessage, setRegisterResponseMessage] = useState({
-    success: false,
-    message: ""
-  });
+  
   const [errorMessage, setErrorMessage] = useState("");
 
 
@@ -26,19 +21,20 @@ const RegisterPage = () => {
       password: password,
       introContent: introContent,
       email: email,
-      dob: dob,
-      gender: gender
     };
     try {
       const res = await UserService.register(user);
 
       console.log(res.data);
-      setRegisterResponseMessage({
-        success: res.data.success,
-        message: res.data.message
-      });
-      if (registerResponseMessage.success == true) {
-        window.location.href = "/admin/users";
+      const { success } = res.data;
+    
+      if (success) {
+        alert('Dang ki tai khoan thanh cong');
+        window.setTimeout(() => {
+          window.location.href = "/login";
+        }, 400);
+      } else {
+        alert('Dang ki tai khoan khong thanh cong, vui long kiem tra lai thong tin');
       }
     } catch (error) {
       var err;

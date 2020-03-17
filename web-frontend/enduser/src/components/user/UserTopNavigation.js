@@ -24,6 +24,7 @@ const UserTopNavigation = () => {
     // }
 
     const logout = (e) => {
+        console.log('logout');
         e.preventDefault();
         UserService.logout();
     }
@@ -72,7 +73,7 @@ const UserTopNavigation = () => {
                                     className="border border-light rounded mr-1 nav-link Ripple-parent">{user.name}</Link>
                             </MDBNavItem>
                             <MDBNavItem>
-                                <Link onClick={logout} 
+                                <Link onClick={logout} to="/"
                                     className="border border-light rounded mr-1 nav-link Ripple-parent">Dang xuat</Link>
                             </MDBNavItem>
                          </>
