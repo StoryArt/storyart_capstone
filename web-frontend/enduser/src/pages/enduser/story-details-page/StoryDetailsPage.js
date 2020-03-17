@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 
 import { MDBModal, MDBDropdown, MDBDropdownItem, MDBDropdownMenu, MDBDropdownToggle,
@@ -15,9 +15,14 @@ import ValidationUtils from '../../../utils/validation';
 import NotFound from '../../../components/common/NotFound';
 import MySpinner from '../../../components/common/MySpinner';
 import TagList from '../../../components/common/TagList';
+import StringUtils from '../../../utils/string';
+
+import { UserContext } from '../../../context/user.context';
 
 const StoryDetailsPage = (props) => {
-    console.log(props.match.params.storyId);
+
+    const userContext = useContext(UserContext);
+    const { user } = userContext;
 
     const [story, setStory] = useState({});
     const [storyNotfound, setStoryNotfound] = useState(false);
@@ -310,7 +315,7 @@ const StoryDetailsPage = (props) => {
                         <strong style={{ fontSize: '1.2em', color: 'orange' }}>Diem trung binh: {story.avgRate}</strong>
                         <div className="my-3">
                             <strong>Gioi thieu</strong>
-                            <p>{story.intro}</p>
+                            <p>{ StringUtils.parseHtml(story.intro) }</p>
                         </div>
                         <strong>Tags:</strong> <TagList tags={story.tags} />
                          <div className="my-3">
@@ -327,7 +332,7 @@ const StoryDetailsPage = (props) => {
                                     value={sendCommentRequest.content}
                                     onChange={e => setSendCommentRequest({ ...sendCommentRequest, content: e.target.value })}></textarea>
                             </div>
-                            <button className="btn btn-primary float-right" type="submit">Gửi</button>
+                            <button className="btn btn-success float-right" type="submit">Gửi</button>
                         </form>
                     </div>
                 </div>
@@ -472,9 +477,9 @@ const StoryDetailsPage = (props) => {
                             </MDBModalFooter>
                         </MDBModal>
                         
-                         <div className="text-center">
-                             <button className="btn btn-secondary">Xem them</button>
-                         </div>
+                         {/* <div className="text-center">
+                             <button className="btn btn-success">Xem them</button>
+                         </div> */}
                     </div>
                 </div>
                </>

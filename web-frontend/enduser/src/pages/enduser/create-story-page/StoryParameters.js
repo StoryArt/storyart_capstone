@@ -14,7 +14,7 @@ const StoryParameters = (props) => {
         <div>
             {storyParameters.length > 0 && (
                 <div>
-                    <strong className="">Thong tin truyen (tham so)</strong>
+                    <strong className="">Thông tin truyện (tham sỐ)</strong>
                     <div className="card card-body mt-3">
                         {storyParameters.map((param, index) => {
                             const conditions = parameters.find(p => param.type === p.type).conditions;
@@ -25,7 +25,7 @@ const StoryParameters = (props) => {
                                             <TextField 
                                                 style={{ width: '100%' }}
                                                 variant="outlined"
-                                                label="Ten thong tin"
+                                                label="Tên thông tin"
                                                 value={param.name} 
                                                 onChange={(e) => onChangeParam('name', e.target.value, param)} 
                                                 />
@@ -33,7 +33,7 @@ const StoryParameters = (props) => {
                                         <div className="col-sm-3 px-1">
                                             {/* <label>Kieu thong tin</label> */}
                                             <FormControl variant="outlined" style={{ width: '100%' }}>
-                                                <InputLabel>Kieu thong tin</InputLabel>
+                                                <InputLabel>Kiểu thông tin</InputLabel>
                                                 <Select
                                                     defaultValue={parameters[0].type}
                                                     value={param.type}
@@ -41,7 +41,7 @@ const StoryParameters = (props) => {
                                                 >
                                                     {parameters.map(p => (
                                                         <MenuItem value={p.type} key={p.type}>
-                                                            {p.type == INFORMATION_TYPES.STRING ? 'DAY KI TU' : 'SO'}
+                                                            {p.type == INFORMATION_TYPES.STRING ? 'CHUỐI KÍ TỰ' : 'SỐ'}
                                                         </MenuItem>
                                                     ))}
                                                 </Select>
@@ -61,10 +61,10 @@ const StoryParameters = (props) => {
                                         <div className="col-sm-1 px-1">
                                             <MyDropdownMenu>
                                                 <MenuItem onClick={() => onAddParamConditions(param)}>
-                                                    Them dieu kien
+                                                    Thêm điều kiện
                                                 </MenuItem>
                                                 <MenuItem onClick={() => onRemoveParam(index)}>
-                                                    Xoa thong tin
+                                                    Xóa thông tin
                                                 </MenuItem>
                                             </MyDropdownMenu>
                                             
@@ -72,7 +72,7 @@ const StoryParameters = (props) => {
                                     </div>
 
                                     {/* parameter conditions */}
-                                    { param.conditions.length > 0 && <strong>Dieu kien</strong> }
+                                    { param.conditions.length > 0 && <strong>Điều kiện</strong> }
                                     {param.conditions.map((cond, index) => (
                                         <div className="row mb-2" key={cond.id}>
                                             <div className="col-sm-2 text-center px-1 pt-3">
@@ -114,7 +114,7 @@ const StoryParameters = (props) => {
                                         <div className="col-sm-1 px-1">
                                             <MyDropdownMenu>
                                                 <MenuItem onClick={() => onRemoveParamCondition(param, index)}>
-                                                    Xoa
+                                                    Xóa
                                                 </MenuItem>
                                             </MyDropdownMenu>
                                         </div>

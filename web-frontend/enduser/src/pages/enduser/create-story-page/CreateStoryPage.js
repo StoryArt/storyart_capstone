@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
-import { TextField, MenuItem, Tooltip } from '@material-ui/core';
+import { TextField, MenuItem, Tooltip, Fab } from '@material-ui/core';
+import { Add as AddIcon } from '@material-ui/icons';
 import MainLayout from '../../../layouts/UserLayout';
 
 import StoryParameters from './StoryParameters';
 import ScreensList from './ScreensList';
 import ScreensSelect from './ScreensSelect';
-
+import AllScreenSnapshots from './AllScreenSnapshots';
 import MyDropdownMenu from '../../../components/common/MyDropdownMenu';
 import MyAlert from '../../../components/common/MyAlert';
+import MyEditor from '../../../components/common/MyEditor';
+
 
 import { ACTION_TYPES, INFORMATION_TYPES, NUMBER_CONDITIONS, STRING_CONDITIONS, 
     NUMBER_OPERATIONS, STRING_OPERATIONS }  from '../../../common/constants';
+
+
 import StoryService from '../../../services/story.service';
 
 
@@ -81,8 +86,7 @@ const CreateStoryPage = () => {
         setScreens([...screens]);
     }
 
-    const handleRemoveScreen = (e, screen) => {
-        e.preventDefault();
+    const handleRemoveScreen = (screen) => {
         const newscreens = screens.filter(sec => sec.id !== screen.id);
         setScreens([...newscreens]);
     }
@@ -96,9 +100,7 @@ const CreateStoryPage = () => {
         setScreens([...screens]);
     }
 
-    const handleAddActions = (e, screen) => {
-        e.preventDefault();
-
+    const handleAddActions = (screen) => {
         const newaction = {
             id: Math.random().toString(),
             content: '',
@@ -122,8 +124,7 @@ const CreateStoryPage = () => {
         setStoryParameters([...storyParameters]);
     }
     
-    const addParameter = (e) => {
-        e.preventDefault();
+    const addParameter = () => {
         if(storyParameters.length > 0) return alert('Chi duoc them 1 thong tin');
         const newParam =  {
             id: Math.random().toString(),
@@ -178,7 +179,7 @@ const CreateStoryPage = () => {
             });
         }
         
-        story.published = isPublished;
+        story.isPublished = isPublished;
         story.screens = screens;
         story.informations = storyParameters;
         story.informationActions = informationActions;
@@ -195,10 +196,11 @@ const CreateStoryPage = () => {
                 if(story.isPublished) msg = 'Luu va xuat ban thanh cong';
                 setAlert({ content: msg, type:'success', open: true });
             } else {
-                setAlert({ content: 'Khong the luu truyen', type:'error', open: true });
+                
             }
         } catch (error) {
             console.log(error);
+            setAlert({ content: 'Khong the luu truyen', type:'error', open: true });
         }
     }
 
@@ -213,12 +215,12 @@ const CreateStoryPage = () => {
 
     return (
         <MainLayout>
-            <h3 className="text-center my-4">Tao truyen cho rieng ban</h3>
+            <h3 className="text-center my-4">Tạo truyện cho riêng bạn</h3>
             <div className="container" style={{ paddingBottom: '130px' }}>
-                <div className="row">
+                <div className="row mb-4">
                     <div className="col-sm-9 mx-auto">
                           {/* Story */}
-                          <div className="card screen-card mb-5">
+                          <div className="card screen-card mb-2">
                             <div className="card-header">
                                 <h4 className="mb-4"></h4>
                                     <div className="row">
@@ -226,13 +228,13 @@ const CreateStoryPage = () => {
                                             <TextField 
                                                 variant="outlined"
                                                 style={{ width: '100%' }}
-                                                label="Tieu de truyen..."
+                                                label="Tiêu đề truyện..."
                                                 value={story.title} 
                                                 onChange={(e) => changeStory('title', e.target.value)} />
                                         </div>
                                         <div className='col-sm-6'>
                                             <ScreensSelect
-                                                placeholder={'Chon man hinh dau tien'}
+                                                placeholder={'Chọn màn hình đầu tiên'}
                                                 screens={screens}
                                                 value={story.firstScreenId}
                                                 onChange={(e) => changeStory('firstScreenId', e.target.value)} 
@@ -253,14 +255,20 @@ const CreateStoryPage = () => {
                                    
                             </div>
                             <div className="card-body">
-                                <TextField 
+                                {/* <TextField 
                                     style={{ width: '100%' }}
                                     label="Noi dung gioi thieu"
                                     multiline
                                     variant="outlined"
                                     rows="3"
                                     value={story.content} 
-                                    onChange={(e) => changeStory('intro', e.target.value)} />
+                                    onChange={(e) => changeStory('intro', e.target.value)} /> */}
+
+                                <MyEditor
+                                    placeholder="Nội dung giới thiệu"
+                                    value={story.intro}
+                                    onChange={(value) => changeStory('intro', value)}
+                                />
                                 
                               <div className="text-right mt-2">
                                 <MyDropdownMenu >
@@ -269,45 +277,49 @@ const CreateStoryPage = () => {
                               </div>
                             </div>
                         </div>
+                        <div className="mb-5">
+                            <button 
+                                className="btn btn-default float-right" 
+                                onClick={() => viewStoryStructure()}>
+                                Xem cấu trúc truyện</button>
+
+                            <button 
+                                className="btn btn-warning float-right" 
+                                onClick={() => saveStory(false)}>
+                                Lưu truyện</button>
+
+                            <button 
+                                className="btn btn-danger float-right" 
+                                onClick={() => saveStory(true)}>Lưu và xuất bản</button>
+                        </div>
                     </div>
                 </div>
 
                 <div className="row">
-                    <div className="col-sm-3">
-                        <h3 style={{ fontSize: '1.2em' }}>Tat ca man hinh</h3>
-                        <hr style={{ border: '1px solid #ccc' }} />
-                        {screens.map((screen, index) => (
-                            <Tooltip 
-                                title={screen.title.length == 0 ? "Chua co tieu de" : screen.title} 
-                                key={screen.id}>
-                                <button 
-                                    style={{ width: '35px', height: '35px', padding: '0px', borderRadius: '5px' }}
-                                    onClick={() => setCurrentScreen(index)}
-                                    className={`btn ${currentScreen == index ? 'btn-success' : 'btn-secondary'}`} 
-                                    >{index + 1}</button>
+                    <div className="col-sm-3 px-1">
+                        <h3 style={{ fontSize: '1.2em' }}>
+                            <span className="mr-2">Tất cả màn hình ({screens.length})</span>
+                            <Tooltip title="Them man hinh" aria-label="add">
+                                <Fab 
+                                    color="primary" 
+                                    style={{ width: '35px', height: '35px' }} 
+                                    onClick={handleAddScreen}>
+                                    <AddIcon />
+                                </Fab>
                             </Tooltip>
-                        ))}
+                        </h3>
+                        <hr style={{ border: '1px solid #ccc' }} />
+                        <AllScreenSnapshots
+                            screens={screens}
+                            setCurrentScreen={setCurrentScreen}
+                            currentScreen={currentScreen}
+                            onRemoveScreen={handleRemoveScreen}
+                        />
                         <br/>
-                        <button 
-                            className="btn btn-primary btn-block my-3" 
-                            onClick={handleAddScreen}>Them man hinh</button>
-                        
-                        <button 
-                            className="btn btn-default btn-block mb-3" 
-                            onClick={() => viewStoryStructure()}>
-                            Xem cau truc truyen</button>
-
-                        <button 
-                            className="btn btn-warning btn-block mb-3" 
-                            onClick={() => saveStory(false)}>
-                            Luu truyen</button>
-
-                        <button 
-                            className="btn btn-danger btn-block" 
-                            onClick={() => saveStory(true)}>Luu va xuat ban</button>
+                     
                     </div>
                     <div className="col-sm-9">
-                        <h3 style={{ fontSize: '1.2em' }}>Chi tiet man hinh</h3>
+                                <h3 style={{ fontSize: '1.2em' }}>Chi tiết màn hình</h3>
                         <hr style={{ border: '1px solid #ccc' }} />
                         {/* Story screens */}
                         <ScreensList
@@ -322,16 +334,11 @@ const CreateStoryPage = () => {
                             onAddAction={handleAddActions} 
                             onRemoveAction={handleRemoveAction}
                         />
-
-                        {/* Add screen */}
-                      
-
                     </div>
                 </div>
-            
             </div>
         
-            <MyAlert/>
+            <MyAlert alert={alert}/>
         </MainLayout>
     );
 };

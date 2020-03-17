@@ -3,7 +3,6 @@ import AdminLayout from "../../layouts/AdminLayout";
 import { MDBDataTable } from "mdbreact";
 import { MDBBtn } from "mdbreact";
 import UserService from "../../services/user.service";
-import Axios from "axios";
 import { setAuthHeader } from "../../config/auth";
 import Pagination from "@material-ui/lab/Pagination";
 
@@ -17,6 +16,11 @@ const AdminManagementPage = props => {
     last: true
   });
   const [pageNo, setPageNo] = useState(1);
+
+  useEffect(() => {
+    // checkIfSystemAdmin();
+    LoadAdminsByPage();
+  }, []);
 
   useEffect(() => {
     // checkIfSystemAdmin();
@@ -40,6 +44,7 @@ const AdminManagementPage = props => {
       } catch (error) {}
     }
   };
+  
   function addAdmin() {
     props.history.push("/admin/add");
   }
@@ -61,7 +66,6 @@ const AdminManagementPage = props => {
 
     const res = await UserService.setStatusAdmin(url);
   }
- 
 
   async function LoadAdminsByPage(event) {
     setAuthHeader(localStorage.getItem("jwt-token"));
@@ -108,7 +112,7 @@ const AdminManagementPage = props => {
 
     setAdminGlobaldata(rowsData);
   }
- 
+
   const data = {
     columns: [
       {

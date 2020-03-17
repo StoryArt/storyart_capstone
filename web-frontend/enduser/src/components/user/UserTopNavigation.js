@@ -24,6 +24,7 @@ const UserTopNavigation = () => {
     // }
 
     const logout = (e) => {
+        console.log('logout');
         e.preventDefault();
         UserService.logout();
     }
@@ -43,11 +44,11 @@ const UserTopNavigation = () => {
                         <MDBNavItem>
                         <MDBDropdown align="right">
                             <MDBDropdownToggle nav caret>
-                                <span className="mr-2">Cau hinh</span>
+                                <span className="mr-2">Cấu hình</span>
                             </MDBDropdownToggle>
                             <MDBDropdownMenu>
-                            <MDBDropdownItem href="#!">Tai khoan</MDBDropdownItem>
-                            <MDBDropdownItem href="#!">Doi mat khau</MDBDropdownItem>
+                            <MDBDropdownItem href="#!">Tài khoản</MDBDropdownItem>
+                            <MDBDropdownItem href="#!">Đổi mật khẩu</MDBDropdownItem>
                             </MDBDropdownMenu>
                         </MDBDropdown>
                     </MDBNavItem>
@@ -55,11 +56,11 @@ const UserTopNavigation = () => {
                         <>
                             <MDBNavItem>
                             <Link to="/register" 
-                                className="border border-light rounded mr-1 nav-link Ripple-parent">Dang ki</Link>
+                                className="border border-light rounded mr-1 nav-link Ripple-parent">Đăng kí</Link>
                             </MDBNavItem>
                             <MDBNavItem>
                                 <Link to="/login" 
-                                    className="border border-light rounded mr-1 nav-link Ripple-parent">Dang nhap</Link>
+                                    className="border border-light rounded mr-1 nav-link Ripple-parent">Đăng nhập</Link>
                             </MDBNavItem>
                         </>
                     )}
@@ -72,8 +73,8 @@ const UserTopNavigation = () => {
                                     className="border border-light rounded mr-1 nav-link Ripple-parent">{user.name}</Link>
                             </MDBNavItem>
                             <MDBNavItem>
-                                <Link onClick={logout} 
-                                    className="border border-light rounded mr-1 nav-link Ripple-parent">Dang xuat</Link>
+                                <Link onClick={logout} to="/"
+                                    className="border border-light rounded mr-1 nav-link Ripple-parent">Đăng xuất</Link>
                             </MDBNavItem>
                          </>
                     )}

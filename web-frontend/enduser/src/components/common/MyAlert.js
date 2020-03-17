@@ -3,14 +3,16 @@ import { Alert } from '@material-ui/lab';
 import { Snackbar } from '@material-ui/core';
 
 
-const MyAlert = (props) => {
 
-    const { content, type, open } = props;
-    const [openAlert, setOpenAlert] = useState(false);
+const MyAlert = (props) => {
+    const { alert } = props;
+    const { content, type, open } = alert;
+    
+    const [openAlert, setOpenAlert] = useState(true);
 
     useEffect(() => {
-        setOpenAlert(open);
-    }, [open]);
+        setOpenAlert(alert.open);
+    }, [alert]);
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') return;
@@ -18,13 +20,16 @@ const MyAlert = (props) => {
     };
 
     return (
-        <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleClose}>
-            <Alert onClose={handleClose} severity={type}>
+        <Snackbar 
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            open={openAlert} autoHideDuration={6000} onClose={handleClose}>
+            <Alert elevation={6} variant="filled" onClose={handleClose} severity={type}>
                 {content}
             </Alert>
         </Snackbar>
     );
 };
+
 
 
 export default MyAlert;

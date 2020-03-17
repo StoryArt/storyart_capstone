@@ -10,15 +10,12 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [introContent, setIntroContent] = useState("");
-
-    const [errorMessage, setErrorMessage] = useState("");
+  
+  const [errorMessage, setErrorMessage] = useState("");
 
 
   async function handleSubmit(event) {
     
-
-    setAuthHeader(localStorage.getItem("jwt-token"));
-
     event.preventDefault();
     let user = {
       name: name,
@@ -26,8 +23,8 @@ const RegisterPage = () => {
       password: password,
       introContent: introContent,
       email: email,
-      
     };
+   
     try {
       const res = await UserService.register(user);
       if (res.data.success == true) {
@@ -35,8 +32,8 @@ const RegisterPage = () => {
           <MDBAlert color="success">{res.data.message}</MDBAlert>
         );
         window.setTimeout(() => {
-          window.location.href = "/admin/users";
-      }, 400);
+          window.location.href = "/login";
+        }, 400);
       }
     } catch (error) {
       var err;
