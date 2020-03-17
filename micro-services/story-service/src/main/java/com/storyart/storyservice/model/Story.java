@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
@@ -24,13 +25,13 @@ public class Story extends DateAudit {
 
     @NonNull
     @Column(length = 250)
-    @Size(min = 5, max = 250)
+    @Size(min = 5, max = 250, message = "Tiêu đề truyện phải có ít nhất 5 kí tự và không quá 250 kí tự")
     private String title;
 
     private int userId;
 
     @Column(length = 10000)
-    @Size(min = 10, max = 10000)
+    @Size(min = 10, max = 10000, message = "Nội dung giói thiệu truyện phải ít nhất 10 kí tự")
     private String intro;
 
     @Column(length = 100)
@@ -41,6 +42,7 @@ public class Story extends DateAudit {
     @Size(max = 1000)
     private String image;
 
+    @NotBlank(message = "Chưa có màn hình đầu tiên")
     private String firstScreenId;
 
     @Column(columnDefinition = "float default 0")

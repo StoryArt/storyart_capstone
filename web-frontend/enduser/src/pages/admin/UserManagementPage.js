@@ -5,16 +5,32 @@ import UserService from "../../services/user.service";
 import { MDBDataTable } from "mdbreact";
 import { useState, useEffect } from "react";
 import { MDBBtn } from "mdbreact";
-///hoi ve chuyen trang va validation 
+///hoi ve chuyen trang va validation
 
-import NotFoundPage from '../../pages/common/NotFoundPage';
+import NotFoundPage from "../../pages/common/NotFoundPage";
+import { setAuthHeader } from "../../config/auth";
+import Pagination from "@material-ui/lab/Pagination";
+
 const UserManagementPage = () => {
   const [convertedList, setConvertedList] = useState([]);
+  const [pageInfo, setPageInfo] = useState({
+    page: 1,
+    size: 10,
+    totalElement: 10,
+    totalPages: 1,
+    last: true
+  });
+  const [pageNo, setPageNo] = useState(1);
 
+  useEffect(() => {
+    getMyProfile();
+   LoadUsersByPage();
+  
+  }, []);
 
 
   function addUser() {
-    window.location = "/admin/users/add";
+    window.location.href = "/admin/users/add";
   }
 
   // ham nay nhan 2 tham so va 1 doi tuong goi la:
@@ -30,57 +46,61 @@ const UserManagementPage = () => {
     } else if (status == "false") {
       url += "?setActive=true";
       callElement.target.innerText = "Active";
-
     }
-
-    const headers = {
-      "Content-Type": "application/json",
-      "Authorization": localStorage.getItem("tokenKey")
-    };
 
     const res = await UserService.setStatusUser(url);
-    if(res.data.success){
-      
-    }
   }
 
   async function LoadUsersByPage(event) {
-    const url =
-      "http://localhost:8002/api/v1/admin/users/userOnly?page=" + 0 + "&size=10&s=";
+    setAuthHeader(localStorage.getItem("jwt-token"));
 
-    const res = await UserService.getUsersList();
-// setPageLenght(res.data.totalPages)
-console.log(res.data);
+    const res = await UserService.getUsersList(1, 10, "");
+    setPageInfo({
+      ...pageInfo,
+      page: Number(res.data.page),
+      size: Number(res.data.size),
+      totalElement: Number(res.data.totalElement),
+      totalPages: Number(res.data.totalPages),
+      last: Boolean(res.data.last)
+    });
+    // setPageLenght(res.data.totalPages)
     ConvertUserList(res.data);
-    // setUserList(res.data.content);
+
+   
+
   }
   const getMyProfile = async () => {
     try {
       const res = await UserService.getMyProfile();
-      if(res.data.role != "ROLE_ADMIN"){
-        return (<NotFoundPage></NotFoundPage>)
+      if (res.data.role != "ROLE_ADMIN") {
+        return <NotFoundPage></NotFoundPage>;
       }
-      
-     return res.data;
+
+      return res.data;
     } catch (error) {}
+  };
+  const changePage = async (event, value) => {
+    if (value !== pageNo) {
+      setPageNo(value);
+      try {
+        const res = await UserService.getUsersList(value, 10, "");
+        ConvertUserList(res.data);
+      } catch (error) {}
+    }
   };
 
   function ConvertUserList(data) {
     var userList = data.content;
     let rowsData = [];
-    let rowItem = {};
-/*"page": 0,
-    "size": 10,
-    "totalElement": 12,
-    "totalPages": 2,
-    "last": false*/
-    rowItem["totalPages"] = data.totalPages;
-    rowsData.push(rowItem);
+   
+
     for (var index = 0; index < userList.length; index++) {
       let rowItem = {};
       rowItem["username"] = userList[index].username;
       rowItem["username"] = (
-        <a href={`/user/profile/${userList[index].id}`}>{rowItem["username"]}</a>
+        <a href={`/user/profile/${userList[index].id}`}>
+          {rowItem["username"]}
+        </a>
       );
       const id = userList[index].id;
       rowItem["name"] = userList[index].username;
@@ -112,13 +132,7 @@ console.log(res.data);
     setConvertedList(rowsData);
   }
 
-  useEffect(() => {
-getMyProfile();
-
-    
-    LoadUsersByPage();
-  }, []);
-
+ 
   const data = {
     columns: [
       {
@@ -139,7 +153,6 @@ getMyProfile();
         sort: "asc",
         width: 200
       },
-    
 
       {
         label: "Joint At",
@@ -166,9 +179,14 @@ getMyProfile();
   return (
     <UserLayout>
       <h3> UserManagementPage </h3>
-      <input type="button" value="+ Account" onClick={addUser}  />
-      <MDBDataTable striped bordered small data={data}
-       pagesAmount={convertedList.totalPages}/>
+      <input type="button" value="+ Account" onClick={addUser} />
+      <MDBDataTable striped bordered small data={data}  entrieslabel={""} paging={false}displayEntries={false}/>
+      <Pagination
+        count={pageInfo.totalPages}
+        color="primary"
+        boundaryCount={2}
+        onChange={changePage}
+      />
     </UserLayout>
   );
 };

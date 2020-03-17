@@ -26,14 +26,14 @@ public class InfoCondition extends DateAudit {
     private String informationId;
 
     @Size(max = 255)
-    @NotBlank
+    @NotBlank(message = "Loại điều kiện thông tin không được để trống")
     private String type; // >, <, =, >=, <=
 
     @Size(max = 255)
-    @NotBlank
+    @NotBlank(message = "Giá trị của điều kiện thông tin không được để trống")
     private String value;
 
     @Size(max = 255)
-    @NotBlank
+    @NotBlank(message = "Màn hình chuyển tiếp của điều kiện không được để trống")
     private String nextScreenId;
 }

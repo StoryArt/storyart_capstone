@@ -42,4 +42,6 @@ public interface UserService {
     PagedResponse<UserInManagementResponse> findAdminbyUsernameOrEmail(int page, int size, String search);
 
     PagedResponse<UserInManagementResponse> findOnlyUserByUsernameOrEmail(int page, int size, String searchtxt);
+
+    void createDefaultSysAdmin();
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 
 import { MDBModal, MDBDropdown, MDBDropdownItem, MDBDropdownMenu, MDBDropdownToggle,
@@ -15,9 +15,14 @@ import ValidationUtils from '../../../utils/validation';
 import NotFound from '../../../components/common/NotFound';
 import MySpinner from '../../../components/common/MySpinner';
 import TagList from '../../../components/common/TagList';
+import StringUtils from '../../../utils/string';
+
+import { UserContext } from '../../../context/user.context';
 
 const StoryDetailsPage = (props) => {
-    console.log(props.match.params.storyId);
+
+    const userContext = useContext(UserContext);
+    const { user } = userContext;
 
     const [story, setStory] = useState({});
     const [storyNotfound, setStoryNotfound] = useState(false);
@@ -307,11 +312,14 @@ const StoryDetailsPage = (props) => {
                     </div>
                     <div className="col-sm-9">
                         <h3 className="font-weight-bold">{story.title} / <small>Nguyen Van A</small></h3>
-                        <strong style={{ fontSize: '1.2em' }}>{story.avgRate} stars</strong>
-                        <p>{story.intro}</p>
-                        <TagList tags={story.tags} />
-                         <div>
-                             <MDBRating iconRegular />
+                        <strong style={{ fontSize: '1.2em', color: 'orange' }}>Diem trung binh: {story.avgRate}</strong>
+                        <div className="my-3">
+                            <strong>Gioi thieu</strong>
+                            <p>{ StringUtils.parseHtml(story.intro) }</p>
+                        </div>
+                        <strong>Tags:</strong> <TagList tags={story.tags} />
+                         <div className="my-3">
+                             <strong>Danh gia truyen:</strong> <MDBRating iconRegular />
                          </div>
                          
                          {commentError.length > 0 && <small style={{ color: 'red' }}>(*){commentError}</small>}
@@ -324,7 +332,7 @@ const StoryDetailsPage = (props) => {
                                     value={sendCommentRequest.content}
                                     onChange={e => setSendCommentRequest({ ...sendCommentRequest, content: e.target.value })}></textarea>
                             </div>
-                            <button className="btn btn-primary float-right" type="submit">Gửi</button>
+                            <button className="btn btn-success float-right" type="submit">Gửi</button>
                         </form>
                     </div>
                 </div>
@@ -340,14 +348,14 @@ const StoryDetailsPage = (props) => {
                          </div>
                     </div>
                     <div className="col-sm-9">
-                         <tr>
-                            <th>
+                         <div className="row">
+                            <div className="col-sm-4">
                                 <h4 className="text-bold">
                                     Bình luận
                                 </h4>
-                            </th>
-                            <th>
-                                <MDBDropdown>
+                            </div>
+                           <div className="col-sm-8">
+                            <MDBDropdown className="float-right">
                                     <MDBDropdownToggle caret color="ins">
                                         Sắp xếp
                                 </MDBDropdownToggle>
@@ -356,8 +364,8 @@ const StoryDetailsPage = (props) => {
                                         <MDBDropdownItem onClick={e => getCommentsBySort('createdAt')}>Mới nhất</MDBDropdownItem>
                                     </MDBDropdownMenu>
                                 </MDBDropdown>
-                            </th>
-                        </tr>
+                           </div>
+                        </div>
                          {/* danh sach binh luan */}
                          {comments.map((comment, index) => (
                             <div className="row mb-3" key={comment.id}>
@@ -469,9 +477,9 @@ const StoryDetailsPage = (props) => {
                             </MDBModalFooter>
                         </MDBModal>
                         
-                         <div className="text-center">
-                             <button className="btn btn-secondary">Xem them</button>
-                         </div>
+                         {/* <div className="text-center">
+                             <button className="btn btn-success">Xem them</button>
+                         </div> */}
                     </div>
                 </div>
                </>

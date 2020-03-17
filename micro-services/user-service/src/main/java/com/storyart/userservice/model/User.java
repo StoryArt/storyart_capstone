@@ -28,7 +28,7 @@ public class User extends DateAudit {
     private String username;
 
     @NotBlank(message = "Tên không được để trống")
-    @Size(max = 40, min = 4, message = "Tên phải có từ 3 đến 40 ký tự")
+    @Size(max = 40, min = 3, message = "Tên phải có từ 3 đến 40 ký tự")
     @Column(length = 40)
     private String name;
 

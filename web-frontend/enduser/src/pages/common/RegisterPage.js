@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { MDBInput, MDBAlert } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
+import { setAuthHeader } from "../../config/auth";
 
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
@@ -9,16 +10,12 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [introContent, setIntroContent] = useState("");
-  const [dob, setDob] = useState("");
-  const [gender, setGender] = useState("");
-  const [registerResponseMessage, setRegisterResponseMessage] = useState({
-    success: false,
-    message: ""
-  });
+  
   const [errorMessage, setErrorMessage] = useState("");
 
 
   async function handleSubmit(event) {
+    
     event.preventDefault();
     let user = {
       name: name,
@@ -26,19 +23,17 @@ const RegisterPage = () => {
       password: password,
       introContent: introContent,
       email: email,
-      dob: dob,
-      gender: gender
     };
+   
     try {
       const res = await UserService.register(user);
-
-      console.log(res.data);
-      setRegisterResponseMessage({
-        success: res.data.success,
-        message: res.data.message
-      });
-      if (registerResponseMessage.success == true) {
-        window.location.href = "/admin/users";
+      if (res.data.success == true) {
+        setErrorMessage(
+          <MDBAlert color="success">{res.data.message}</MDBAlert>
+        );
+        window.setTimeout(() => {
+          window.location.href = "/login";
+        }, 400);
       }
     } catch (error) {
       var err;

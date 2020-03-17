@@ -1,11 +1,14 @@
 package com.storyart.userservice.service;
 
+import com.storyart.userservice.common.constants.RoleName;
 import com.storyart.userservice.exception.BadRequestException;
+import com.storyart.userservice.model.Role;
 import com.storyart.userservice.model.Story;
 import com.storyart.userservice.model.User;
 import com.storyart.userservice.payload.PagedResponse;
 import com.storyart.userservice.payload.UserInManagementResponse;
 import com.storyart.userservice.payload.UserProfileUpdateRequest;
+import com.storyart.userservice.repository.RoleRepository;
 import com.storyart.userservice.repository.UserRepository;
 import com.storyart.userservice.security.UserPrincipal;
 import com.storyart.userservice.util.AppContants;
@@ -37,16 +40,16 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
 
     @Autowired
+    RoleRepository roleRepository;
+
+    @Autowired
     PasswordEncoder passwordEncoder;
 
 
     @Override
     public void create(User us) {
-
         us.setPassword(passwordEncoder.encode(us.getPassword()));
-
         userRepository.save(us);
-
     }
 
     @Override
@@ -80,15 +83,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-
     //this used for search user of admin and sysadmin.
     // data responsed depend on T of PageResponse
     @Override
     public PagedResponse<User> getAllUser(UserPrincipal userPrincipal, int page, int size) {
         validatePageNumberAndSize(page, size);
-
-
-        //
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, "createdAt");
         //dưa paging vào repo để láy dữ liệu
         Page<User> users = userRepository.findAll(pageable);
@@ -109,8 +108,6 @@ public class UserServiceImpl implements UserService {
                     users.getTotalPages(), users.isLast());
 
         }
-
-
     }
 
     /**
@@ -127,13 +124,10 @@ public class UserServiceImpl implements UserService {
     public PagedResponse<UserInManagementResponse> findByUsernameOrEmail(int page, int size, String search) {
         validatePageNumberAndSize(page, size);
         Pageable pageable = PageRequest.of(page, size);
-        Page<User> userPage = userRepository.findByUsernameLike( search,pageable);
+        Page<User> userPage = userRepository.findByUsernameLike(search, pageable);
         List<User> usersList = userPage.toList();
 
-        List<UserInManagementResponse> users= convertUserlist(usersList);
-
-
-
+        List<UserInManagementResponse> users = convertUserlist(usersList);
 
         return new PagedResponse<UserInManagementResponse>(users, userPage.getNumber(), userPage.getSize(),
                 userPage.getTotalElements(),
@@ -161,39 +155,36 @@ public class UserServiceImpl implements UserService {
     @Autowired
     EntityManager entityManager;
 
-
-
     @Override
     public PagedResponse<UserInManagementResponse> findAdminbyUsernameOrEmail(int page, int size, String search) {
-
+        page = page - 1;
         validatePageNumberAndSize(page, size);
         Pageable pageable = PageRequest.of(page, size);
 
 
-
-        Page<User> userPage = userRepository.findAdminByUsernameOrEmail( search,pageable);
+        Page<User> userPage = userRepository.findAdminByUsernameOrEmail(search, pageable);
         List<User> usersList = userPage.toList();
 
-       List<UserInManagementResponse> users= convertUserlist(usersList);
+        List<UserInManagementResponse> users = convertUserlist(usersList);
 
 
-        return new PagedResponse<UserInManagementResponse>(users, userPage.getNumber(), userPage.getSize(),
+        return new PagedResponse<UserInManagementResponse>(users, userPage.getNumber() + 1, userPage.getSize(),
                 userPage.getTotalElements(),
                 userPage.getTotalPages(), userPage.isLast());
     }
 
 
-   public List<UserInManagementResponse> convertUserlist(List<User> users){
-       List<UserInManagementResponse> convertUserlist = new ArrayList<>();
-       for(User u: users){
+    public List<UserInManagementResponse> convertUserlist(List<User> users) {
+        List<UserInManagementResponse> convertUserlist = new ArrayList<>();
+        for (User u : users) {
             convertUserlist.add(new UserInManagementResponse(u));
         }
-       return convertUserlist;
+        return convertUserlist;
     }
 
     @Override
     public PagedResponse<UserInManagementResponse> findOnlyUserByUsernameOrEmail(int page, int size, String searchtxt) {
-
+page=page-1;
         validatePageNumberAndSize(page, size);
         Pageable pageable = PageRequest.of(page, size);
 
@@ -201,28 +192,40 @@ public class UserServiceImpl implements UserService {
 //        TypedQuery<User> querry=entityManager.createQuery("")
 
 
-        Page<User> userPage = userRepository.findOnlyUserByUsernameOrEmail( searchtxt,pageable);
+        Page<User> userPage = userRepository.findOnlyUserByUsernameOrEmail(searchtxt, pageable);
         List<User> usersList = userPage.toList();
 
-        List<UserInManagementResponse> users= convertUserlist(usersList);
+        List<UserInManagementResponse> users = convertUserlist(usersList);
 
 
-        return new PagedResponse<UserInManagementResponse>(users, userPage.getNumber(), userPage.getSize(),
+        return new PagedResponse<UserInManagementResponse>(users, 1+userPage.getNumber(), userPage.getSize(),
                 userPage.getTotalElements(),
                 userPage.getTotalPages(), userPage.isLast());
     }
 
+    @Override
+    public void createDefaultSysAdmin() {
+        Optional<User> found = userRepository.findByUsername("systemadmin");
+        if (found.isPresent()) return;
+        User user = new User();
+        user.setUsername("systemadmin");
+        user.setPassword("12345678");
+        user.setName("systemadmin");
+        user.setEmail("systemadmin@gmail.com");
+        Optional<Role> role = roleRepository.findRoleByName(RoleName.ROLE_SYSTEM_ADMIN);
+        user.setRoleId(role.get().getId());
+        create(user);
+    }
+
     private void validatePageNumberAndSize(int page, int size) {
         if (page < 0) {
-            throw new BadRequestException("Page number cannot be zero");
+            throw new BadRequestException("Trang không dưới 0");
         }
 
         if (size > AppContants.MAX_PAGE_SIZE) {
-            throw new BadRequestException("Page size cannot be greater than " + AppContants.MAX_PAGE_SIZE);
+            throw new BadRequestException("Số lượng trong  một trang không quá " + AppContants.MAX_PAGE_SIZE);
 
         }
-
-
     }
 
     @Override

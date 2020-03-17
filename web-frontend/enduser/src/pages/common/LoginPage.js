@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { MDBInput, MDBAlert } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
+import { saveTokenToLocal, setAuthHeader, getAuthUserInfo } from '../../config/auth';
+import { ROLE_NAMES } from "../../common/constants";
 
 
 
@@ -9,7 +11,6 @@ const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
     const [user, setUser] = useState({ username: '', password: '' });
-    const [loginResponseMessage, setLoginResponseMessage] = useState("");
 
     const changeUser = (prop, value) => setUser({ ...user, [prop]: value });
 
@@ -21,49 +22,38 @@ const LoginPage = () => {
           const res = await UserService.login(user);
     
           console.log(res.data);
-          setLoginResponseMessage(res.data);
-          if (res.data.accessToken !== null) {
-            localStorage.setItem("tokenKey",
-            res.data.tokenType +
-              " " +
-              res.data.accessToken);
-            window.location = "/home";
+          if (res.data.accessToken != null) {
+            const { tokenType, accessToken } = res.data;
+            const token = tokenType + " " + accessToken;
+            saveTokenToLocal(token);
+            setAuthHeader(token);
+
+            alert('Dang nhap thanh cong');
+            const userInfo = getAuthUserInfo();
+            let url = '/home';
+            if(userInfo.role === ROLE_NAMES.ROLE_ADMIN){
+              url = '/admin/users'
+            } else if(userInfo.role === ROLE_NAMES.ROLE_SYSTEM_ADMIN){
+              url = '/admin/admin';
+            }
+            //wait for 400 miliseconds to redirect
+            window.setTimeout(() => {
+                window.location.href = url;
+            }, 400);
+          } else if(!res.data.success){
+            alert('Ten dang nhap va mat khau khong hop le');
           }
         } catch (error) {
-          let field = error.response.data.errors[0].field;
-          var userfriendlyField = "Enter ";
-          switch (field) {
-            case "username":
-              userfriendlyField += "Tên đăng nhập ";
-              break;
-            case "email":
-              userfriendlyField += "Email ";
-              break;
-            case "dob":
-              userfriendlyField += "Ngày sinh ";
-              break;
-            case "gender":
-              userfriendlyField += "Giới tính ";
-              break;
-            case "password":
-              userfriendlyField += "Mật khẩu ";
-              break;
-    
-              case "name":
-                userfriendlyField += "Tên ";
-                break;
-            default:
-              break;
-        }
           setErrorMessage(
             <MDBAlert color="danger" >
-            {userfriendlyField + error.response.data.errors[0].defaultMessage}
-                    
+              {error.response.data.message}
             </MDBAlert>
           );
-
-          
         }
+      
+         
+          
+        
     }
 
     return (
@@ -74,6 +64,7 @@ const LoginPage = () => {
                     <div className="col-sm-6 mx-auto">
                         <div className="card">
                             <div className="card-body">
+                              {errorMessage}
                                 <form onSubmit={login}>
                                     <MDBInput 
                                         value={user.username}

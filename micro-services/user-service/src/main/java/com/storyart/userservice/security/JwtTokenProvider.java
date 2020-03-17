@@ -33,12 +33,15 @@ public class JwtTokenProvider implements Serializable {
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
         return Jwts.builder()
                 .setSubject(Integer.toString(userPrincipal.getId()))
+                .claim("id", userPrincipal.getId())
+                .claim("username", userPrincipal.getUsername())
+                .claim("name", userPrincipal.getName())
+                .claim("role", userPrincipal.getAuthorities().toArray()[0].toString())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
-
 
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
@@ -49,7 +52,6 @@ public class JwtTokenProvider implements Serializable {
                 .getBody();
         return Integer.parseInt(claims.getSubject());
     }
-
 
     /*when user pass login , attach a token generated (server gave it from his username and password) into header
     , sending that token to access any resouce he can access by his role */

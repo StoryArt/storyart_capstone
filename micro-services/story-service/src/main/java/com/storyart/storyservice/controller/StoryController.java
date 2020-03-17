@@ -41,6 +41,12 @@ public class StoryController {
         return new ResponseEntity(stories, HttpStatus.OK);
     }
 
+    @GetMapping("get_by_author/{userId}")
+    public ResponseEntity getStoriesByAuthor(@PathVariable int userId){
+        List<GetStoryDto> stories = storyService.getStoriesByUserId(userId);
+        return new ResponseEntity(stories, HttpStatus.OK);
+    }
+
     @GetMapping("{storyId}")
     public ResponseEntity getStoryDetails(@PathVariable int storyId){
         GetStoryDto story = storyService.getStoryDetails(storyId);

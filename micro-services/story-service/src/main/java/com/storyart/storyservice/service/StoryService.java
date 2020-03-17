@@ -2,6 +2,7 @@ package com.storyart.storyservice.service;
 
 import com.storyart.storyservice.common.constants.ACTION_TYPES;
 import com.storyart.storyservice.dto.GetStoryDto;
+import com.storyart.storyservice.dto.TagDto;
 import com.storyart.storyservice.dto.create_story.CreateStoryDto;
 import com.storyart.storyservice.dto.ResultDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryDto;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 public interface StoryService {
     HashMap<String, String> validateStoryinfo(CreateStoryDto story);
     GetStoryDto getStoryDetails(int id);
+    List<GetStoryDto> getStoriesByUserId(int userId);
     ResultDto getReadingStory(int storyId);
     ResultDto createStory(CreateStoryDto story);
     ResultDto updateStory(CreateStoryDto story);
@@ -63,6 +65,9 @@ class StoryServiceImpl implements StoryService{
     TagService tagService;
 
     @Autowired
+    StoryTagRepository storyTagRepository;
+
+    @Autowired
     ModelMapper modelMapper;
 
     @Override
@@ -83,6 +88,18 @@ class StoryServiceImpl implements StoryService{
         List<Tag> tags = tagRepository.findAllByStoryId(story.get().getId());
         dto.setTags(tagService.mapModelToDto(tags));
         return dto;
+    }
+
+    @Override
+    public List<GetStoryDto> getStoriesByUserId(int userId) {
+        List<Story> stories = storyRepository.findAllByUserId(userId);
+        return stories.stream().map(s -> {
+            GetStoryDto dto = modelMapper.map(s, GetStoryDto.class);
+            List<Tag> tags = tagRepository.findAllByStoryId(dto.getId());
+            List<TagDto> tagDtoList = tagService.mapModelToDto(tags);
+            dto.setTags(tagDtoList);
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -127,6 +144,7 @@ class StoryServiceImpl implements StoryService{
 
     @Override
     public ResultDto createStory(CreateStoryDto createStoryDto) {
+
         ResultDto result = new ResultDto();
         Story story = modelMapper.map(createStoryDto, Story.class);
 
@@ -140,6 +158,8 @@ class StoryServiceImpl implements StoryService{
 
         story.setFirstScreenId(screenIdsMap.get(createStoryDto.getFirstScreenId()));
         story.setActive(true);
+        story.setPublished(createStoryDto.isPublished());
+
         story = storyRepository.save(story);
         int storyId = story.getId();
 
@@ -240,6 +260,13 @@ class StoryServiceImpl implements StoryService{
         return page2;
     }
 
+    GetStoryDto mapModelToDto(Story story){
+        List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
+        GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
+        dto.setTags(tagService.mapModelToDto(tagList));
+        return dto;
+    }
+
     @Override
     public List<GetStoryDto> getTrendingStories(int quantity) {
         Pageable pageable =  PageRequest.of(0, quantity, Sort.by("avgRate").descending());
@@ -274,17 +301,25 @@ class StoryServiceImpl implements StoryService{
             story.setTitle(MyStringUtils.randomString(15, 5));
             story.setIntro(MyStringUtils.randomString(150, 120));
             story.setAvgRate(i%5);
-            story.setImage("https://mdbootstrap.com/img/Photos/Others/images/43.jpg");
+            story.setImage("http://lorempixel.com/400/200");
             story.setActive(true);
             story.setIsDeactiveByAdmin(false);
             story.setPublished(true);
-
+            story.setFirstScreenId("temp");
             stories.add(story);
+            Story saved = storyRepository.save(story);
+            List<Integer> tagList = getRandomTags(7);
+            tagList.stream().forEach(t -> {
+                StoryTag st = new StoryTag();
+                st.setStoryId(saved.getId());
+                st.setTagId(t);
+                storyTagRepository.save(st);
+            });
         }
         storyRepository.saveAll(stories);
     }
 
-    List<Tag> getRandomTags(int quantity){
+    List<Integer> getRandomTags(int quantity){
         List<Tag> tagsList = tagRepository.findAll();
         int length = tagsList.size();
         List<Tag> list = new ArrayList<>();
@@ -295,7 +330,7 @@ class StoryServiceImpl implements StoryService{
             indexes.add(index);
             list.add(tagsList.get(index));
         }
-        return list;
+        return list.stream().map(t -> t.getId()).collect(Collectors.toList());
     }
 
 

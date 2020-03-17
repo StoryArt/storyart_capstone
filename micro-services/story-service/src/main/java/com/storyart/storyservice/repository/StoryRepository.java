@@ -29,4 +29,7 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
 
     @Query(value = "SELECT * FROM story where id = :storyid", nativeQuery = true)
     Story findStoryById (@Param("storyid") Integer storyid);
+
+    @Query(value = "SELECT * FROM story s where s.user_id = ?1 order by s.created_at desc", nativeQuery = true)
+    List<Story> findAllByUserId(int userId);
 }

@@ -26,13 +26,12 @@ public class Information extends DateAudit {
 
     private int storyId;
 
-    @NotBlank
+    @NotBlank(message = "Tên thông tin không được đê trống")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "Giá trị thông tin không được trống")
     private String value;
 
-    @NotBlank
     private String unit;
 
     @Enumerated(EnumType.STRING)

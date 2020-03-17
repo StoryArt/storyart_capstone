@@ -35,21 +35,32 @@ public class JwtAuthenticationController {
 
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    AuthenticationManager authenticationManager;
+
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    JwtTokenProvider jwtTokenProvider;
+
     @Autowired
-    private JwtUserDetailsService userDetailsService;
+    JwtUserDetailsService userDetailsService;
 
     @Autowired
     RoleRepository roleRepository;
 
+    @Autowired
+    UserService userService;
 
+    @Autowired
+    JwtUserDetailsService jwtUserDetailsService;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    UserRepository userRepository;
     /**
      * above is demo
      * 10:57 PM 27/2/2020 add sign in an sign up api
      */
-
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -62,7 +73,7 @@ public class JwtAuthenticationController {
                     )
             );
         } catch (BadCredentialsException e) {
-            return ResponseEntity.ok().body(new ApiResponse(false, "Your username or password were incorrect."));
+            throw new BadRequestException("Sai tên đăng nhập hoặc mật khẩu!");
 
         }
 
@@ -72,18 +83,7 @@ public class JwtAuthenticationController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
-    @Autowired
-    UserService userService;
-    @Autowired
-    JwtUserDetailsService jwtUserDetailsService;
 
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-
-    @Autowired
-    UserRepository userRepository;
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
@@ -91,7 +91,7 @@ public class JwtAuthenticationController {
             throw new BadCredentialsException("Tên đăng nhập  này đã được đăng ký bởi ai đó!");
         }
         if (userService.findByEmail(signUpRequest.getEmail()) != null) {
-            throw new BadRequestException("Email này đã được đăng ký bơi người khác");
+            throw new BadRequestException("Email này đã được đăng ký bởi người khác");
 
         }
         User user = new User();

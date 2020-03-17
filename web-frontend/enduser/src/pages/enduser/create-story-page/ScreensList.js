@@ -5,6 +5,7 @@ import { MenuItem, TextField } from '@material-ui/core';
 import ScreensSelect from './ScreensSelect';
 import MyDropdownMenu from '../../../components/common/MyDropdownMenu';
 import ActionsList from './ActionsList';
+import MyEditor from '../../../components/common/MyEditor';
 
 const ScreensList = (props) => {
     
@@ -47,7 +48,7 @@ const ScreensList = (props) => {
                     </div>
 
                     <div className="card-body">
-                        <TextField 
+                        {/* <TextField 
                             name="content" 
                             label="Noi dung man hinh..." 
                             style={{ width: '100%' }}
@@ -55,7 +56,13 @@ const ScreensList = (props) => {
                             value={screen.content} 
                             variant="outlined" 
                             rows="3"
-                            onChange={(e) => onChangeScreen('content', e.target.value, screen)}/>
+                            onChange={(e) => onChangeScreen('content', e.target.value, screen)}/> */}
+
+                        <MyEditor 
+                            value={screen.content}
+                            placeholder="Noi dung man hinh..."
+                            onChange={(value) => onChangeScreen('content', value, screen)}
+                        />
 
                         {screen.actions.length > 0 && <strong className="mt-3 d-block">Hanh dong</strong>}
                         
