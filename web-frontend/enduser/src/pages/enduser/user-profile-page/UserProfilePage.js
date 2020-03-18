@@ -186,10 +186,7 @@ const UserProfilePage = () => {
                       </div>
                     </div>
                     <div className="col-sm-6">
-                      <i>
-                        Joint at:
-                        {DateTimeUtils.getDateTime(jointAt)}
-                      </i>
+                      
                       <div className="form-group">
                         <label htmlFor="intro_content">
                           <strong>Intro</strong>
@@ -202,6 +199,10 @@ const UserProfilePage = () => {
                           onChange={e => setIntro_content(e.target.value)}
                         />
                       </div>
+                      <i>
+                        Joint at:
+                        {DateTimeUtils.getDateTime(jointAt)}
+                      </i>
                     </div>{" "}
                   </div>
                 </form>{" "}
