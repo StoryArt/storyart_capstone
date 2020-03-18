@@ -19,9 +19,9 @@ public class CommentController {
     @Autowired
     CommentService commentService;
 
-    @PostMapping("/getAll")
+    @GetMapping("/getAll")
     public Page<ResponseListCommentDTO> getAllCommentByStoryId(
-            @RequestBody @Valid RequestLoadListCommentDTO requestLoadListCommentDTO,
+            @RequestParam(defaultValue = "0") Integer storyId,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "5") Integer pageSize,
             @RequestParam(defaultValue = "reactions") String sortBy){
@@ -30,7 +30,7 @@ public class CommentController {
         if(pageNo<0){
             pageNo = 0;
         }
-        return commentService.findAllByStoryId(requestLoadListCommentDTO, pageNo, pageSize, sortBy);
+        return commentService.findAllByStoryId(storyId, pageNo, pageSize, sortBy);
     }
     @PostMapping
     public ResponseListCommentDTO create(@RequestBody @Valid CreateCommentDTO createCommentDTO){
