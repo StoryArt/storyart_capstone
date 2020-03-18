@@ -8,9 +8,9 @@ class CommentService {
         return axios.post(url, comment);
     }
 
-    static async getComments(pageNo, sortBy, getCommentRequestBody) {
-        const url = base_url.concat('/getAll?pageSize=10&pageNo=').concat(pageNo).concat('&sortBy=').concat(sortBy);
-        return axios.post(url, getCommentRequestBody);
+    static async getComments(pageNo, sortBy, storyId) {
+        const url = base_url.concat('/getAll?pageSize=10&pageNo=').concat(pageNo).concat('&sortBy=').concat(sortBy).concat('&storyId=').concat(storyId);
+        return axios.get(url);
 
     }
 

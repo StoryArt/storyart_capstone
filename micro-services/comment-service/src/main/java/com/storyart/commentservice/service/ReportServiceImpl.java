@@ -4,6 +4,7 @@ import com.storyart.commentservice.dto.comment.ResponseListCommentDTO;
 import com.storyart.commentservice.dto.report.ReportCommentRequestDTO;
 import com.storyart.commentservice.dto.report.ReportCommentResponseDTO;
 import com.storyart.commentservice.model.Comment;
+import com.storyart.commentservice.model.Reaction;
 import com.storyart.commentservice.model.Report;
 import com.storyart.commentservice.model.User;
 import com.storyart.commentservice.repository.CommentRepository;
@@ -126,5 +127,33 @@ public class ReportServiceImpl implements ReportService {
         }
 
         return responsePage;
+    }
+
+    @Override
+    public Page<Report> getReportsByCommentId(int commentId, int pageNo, int pageSize) {
+
+        Optional<Comment> comment = commentRepository.findById(commentId);
+
+        if(!comment.isPresent()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Bình luận không tồn tại.");
+        }
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        Page<Report> responsePage = reportRepository.getReportsByCommentId(commentId, pageable);
+
+
+        return responsePage;
+    }
+
+    @Override
+    public void handleReport(List<Integer> reportIds) {
+        List<Report> reports = reportRepository.findAllById(reportIds);
+
+        for (Report report: reports) {
+            report.setHandled(true);
+        }
+
+        reportRepository.saveAll(reports);
     }
 }

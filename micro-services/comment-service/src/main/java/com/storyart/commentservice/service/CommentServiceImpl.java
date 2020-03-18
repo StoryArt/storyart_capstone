@@ -66,7 +66,7 @@ public class CommentServiceImpl implements CommentService {
         ModelMapper mm = new ModelMapper();
         ResponseListCommentDTO response = mm.map(comment, ResponseListCommentDTO.class);
         response.setUserId(user.get().getId());
-        response.setUsername(user.get().getUsername());
+        response.setUsername(user.get().getName());
         response.setLikes(new ArrayList<>());
         response.setDislikes(new ArrayList<>());
         
@@ -133,14 +133,14 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Page<ResponseListCommentDTO> findAllByStoryId(RequestLoadListCommentDTO request, int pageNo, int pageSize, String sortBy) {
+    public Page<ResponseListCommentDTO> findAllByStoryId(int storyId, int pageNo, int pageSize, String sortBy) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
         Page<Comment> commentPage;
         if (sortBy.equals("createdAt")) {
-            commentPage = commentRepository.findAllByStoryIdAndOrderBycreatedAt(request.getStoryId(), pageable);
+            commentPage = commentRepository.findAllByStoryIdAndOrderBycreatedAt(storyId, pageable);
         } else {
-            commentPage = commentRepository.findAllByStoryIdAndOrderByReactions(request.getStoryId(), pageable);
+            commentPage = commentRepository.findAllByStoryIdAndOrderByReactions(storyId, pageable);
         }
 //        commentPage.getContent().stream().map(comment -> {
 //
@@ -188,7 +188,7 @@ public class CommentServiceImpl implements CommentService {
             }
             for (User user:users) {
                 if(comment.getUserId() == user.getId()){
-                    comment.setUsername(user.getUsername());
+                    comment.setUsername(user.getName());
                     break;
                 }
             }
