@@ -26,7 +26,7 @@ const ScreensList = (props) => {
             {screen != null && (
                 <div className="card screen-card mb-5" key={screen.id}>
                     <div className="card-header">
-                        <h5 className="mb-4">Man hinh { currentScreen + 1 }</h5>
+                        <h5 className="mb-4">Màn hình { currentScreen + 1 }</h5>
                         <div className="row">
                             <div className="col-sm-6">
                                 <TextField
@@ -48,23 +48,13 @@ const ScreensList = (props) => {
                     </div>
 
                     <div className="card-body">
-                        {/* <TextField 
-                            name="content" 
-                            label="Noi dung man hinh..." 
-                            style={{ width: '100%' }}
-                            multiline
-                            value={screen.content} 
-                            variant="outlined" 
-                            rows="3"
-                            onChange={(e) => onChangeScreen('content', e.target.value, screen)}/> */}
-
                         <MyEditor 
                             value={screen.content}
-                            placeholder="Noi dung man hinh..."
+                            placeholder="Nội dung màn hình..."
                             onChange={(value) => onChangeScreen('content', value, screen)}
                         />
 
-                        {screen.actions.length > 0 && <strong className="mt-3 d-block">Hanh dong</strong>}
+                        {screen.actions.length > 0 && <strong className="mt-3 d-block">Hành động</strong>}
                         
                         <ActionsList
                             actions={screen.actions}
@@ -79,8 +69,8 @@ const ScreensList = (props) => {
                         <div className="text-right mt-2">
                             <MyDropdownMenu >
                                 {/* <MenuItem onClick={(e) => onAddNextScreen(e, screen)}>Them man hinh</MenuItem> */}
-                                <MenuItem onClick={(e) => onRemoveScreen(e, screen)}>Xoa man hinh</MenuItem>
-                                <MenuItem onClick={(e) => onAddAction(e, screen)}>Them hanh dong</MenuItem>
+                                <MenuItem onClick={() => onRemoveScreen(screen)}>Xóa màn hình</MenuItem>
+                                <MenuItem onClick={() => onAddAction(screen)}>Thêm hành động</MenuItem>
                             </MyDropdownMenu>
                         </div>
                     </div>

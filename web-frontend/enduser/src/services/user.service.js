@@ -5,17 +5,18 @@ import axios from "axios";
 import { clearTokenFromLocal, getAuthUserInfo, setAuthHeader } from '../config/auth';
 import { ROLE_NAMES } from "../common/constants";
 
-const baseUrl = 'http://localhost:8002/api/v1';
+const baseUrl = 'http://localhost:8001/api/user-service/api/v1';
+const signInUpUrl = 'http://localhost:8001/api/v1';
 
 
 class UserService {
   static async login(user) {
-    const url = baseUrl + "/auth/signin";
+    const url = signInUpUrl + "/auth/signin";
     return axios.post(url, user);
   }
 
   static async register(user) {
-    const url = baseUrl + "/auth/signup";
+    const url = signInUpUrl + "/auth/signup";
     return axios.post(url, user);
 
   }

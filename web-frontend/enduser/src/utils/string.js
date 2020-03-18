@@ -10,6 +10,12 @@ class StringUtils{
     static parseHtml(html){
         return ReactHtmlParser(html);
     }
+
+    static removeHtml(html) {
+        const tmp = document.createElement("div");
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || "";
+    }
 }
 
 export default StringUtils;

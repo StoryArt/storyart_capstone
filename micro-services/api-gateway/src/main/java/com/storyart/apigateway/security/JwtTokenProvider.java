@@ -1,4 +1,4 @@
-package com.storyart.userservice.security;
+package com.storyart.apigateway.security;
 
 
 import io.jsonwebtoken.*;
@@ -33,7 +33,6 @@ public class JwtTokenProvider implements Serializable {
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
         return Jwts.builder()
                 .setSubject(Integer.toString(userPrincipal.getId()))
-                .claim("id", userPrincipal.getId())
                 .claim("username", userPrincipal.getUsername())
                 .claim("name", userPrincipal.getName())
                 .claim("role", userPrincipal.getAuthorities().toArray()[0].toString())
@@ -53,6 +52,7 @@ public class JwtTokenProvider implements Serializable {
         return Integer.parseInt(claims.getSubject());
     }
 
+
     /*when user pass login , attach a token generated (server gave it from his username and password) into header
     , sending that token to access any resouce he can access by his role */
     public boolean validateToken(String authToken) {
@@ -60,15 +60,15 @@ public class JwtTokenProvider implements Serializable {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
             return true;
         } catch (SignatureException ex) {
-            logger.error("Sai cú pháp token!");
+            logger.error("Invalid JWT signature");
         } catch (MalformedJwtException ex) {
-            logger.error("Token không đúng");
+            logger.error("Invalid JWT token");
         } catch (ExpiredJwtException ex) {
-            logger.error("Token đã hết hạn");
+            logger.error("Expired JWT token");
         } catch (UnsupportedJwtException ex) {
-            logger.error("Không hỗ trợ jwt token");
+            logger.error("Unsupported JWT token");
         } catch (IllegalArgumentException ex) {
-            logger.error("Chuối token chứa claim không hợp lệ");
+            logger.error("JWT claims string is empty.");
         }
         return false;
     }

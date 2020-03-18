@@ -19,13 +19,13 @@ const UserSideNavigation = () => {
                 <NavLink exact={true} to="/" activeClassName="activeClass">
                     <MDBListGroupItem>
                         <MDBIcon icon="chart-pie" className="mr-3"/>
-                        Trang chu
+                        Trang chủ
                     </MDBListGroupItem>
                 </NavLink>
                 <NavLink to="/stories/search" activeClassName="activeClass">
                     <MDBListGroupItem>
                         <MDBIcon icon="user" className="mr-3"/>
-                        Tim kiem truyen
+                        Tìm kiếm truyện
                     </MDBListGroupItem>
                 </NavLink>
                 {(isUserAuth(user)) && (
@@ -33,19 +33,19 @@ const UserSideNavigation = () => {
                         <NavLink to="/user/history" activeClassName="activeClass">
                             <MDBListGroupItem>
                                 <MDBIcon icon="book" className="mr-3"/>
-                                Lich su
+                                Lịch sử
                             </MDBListGroupItem>
                         </NavLink>
                         <NavLink to="/user/edit-profile" activeClassName="activeClass">
                             <MDBListGroupItem>
                                 <MDBIcon icon="book" className="mr-3"/>
-                                Quan ly tai khoan
+                                Quản lý tài khoản
                             </MDBListGroupItem>
                         </NavLink>
                         <NavLink to="/stories/create" activeClassName="activeClass">
                             <MDBListGroupItem>
                                 <MDBIcon icon="book" className="mr-3"/>
-                                Tao truyen
+                                Tạo truyện
                             </MDBListGroupItem>
                         </NavLink>
                     </>
