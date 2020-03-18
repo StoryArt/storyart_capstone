@@ -89,6 +89,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         permitAll().
                 antMatchers("/api/v1/auth/**").
                 permitAll().
+                antMatchers(HttpMethod.GET,"/api/user-service/api/v1/user/**").permitAll().
 
                 antMatchers(HttpMethod.POST, "/api/v1/auth/signup").permitAll().
 // hien tai chi cho login va signup la khong can authentication
