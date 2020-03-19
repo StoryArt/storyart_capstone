@@ -76,7 +76,7 @@ const StoryDetailsPage = (props) => {
         type: ''
     });
 
-    const [isLastPage, setIsLastPage] = useState(false);
+    const [isLastPage, setIsLastPage] = useState(true);
 
     const updateComment = async () => {
         try {
@@ -470,6 +470,11 @@ const StoryDetailsPage = (props) => {
                                         <hr />
                                     </div>
                                 ))}
+                                {comments.length < 1 &&
+                                    <div className="text-center mt-4">
+                                        <small>Truyện chưa có bình luận, hãy để lại một bình luận nhé.</small>
+                                    </div>
+                                }
                                 <MDBModal isOpen={modalState.editModal} toggle={toggleModal('editModal')}>
                                     <MDBModalHeader toggle={toggleModal('editModal')}>Chỉnh sửa bình luận</MDBModalHeader>
                                     <MDBModalBody>
