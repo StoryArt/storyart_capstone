@@ -356,20 +356,20 @@ const StoryDetailsPage = (props) => {
                                 <div className="text-center">
                                     <Link
                                         className="btn btn-success btn-block mt-2"
-                                        to={`/stories/read/${story.id}`}>Doc truyen</Link>
+                                        to={`/stories/read/${story.id}`}>Dọc truyện</Link>
                                     {/* <Link className="btn btn-warning" to={`/stories/edit/${story.id}`}>Sua truyen</Link> */}
                                 </div>
                             </div>
                             <div className="col-sm-9">
                                 <h3 className="font-weight-bold">{story.title} / <small>Nguyen Van A</small></h3>
-                                <strong style={{ fontSize: '1.2em', color: 'orange' }}>Diem trung binh: {story.avgRate}</strong>
+                                <strong style={{ fontSize: '1.2em', color: 'orange' }}>Điểm trung bình: {story.avgRate}</strong>
                                 <div className="my-3">
-                                    <strong>Gioi thieu</strong>
+                                    <strong>Giới thiệu</strong>
                                     <p>{StringUtils.parseHtml(story.intro)}</p>
                                 </div>
                                 <strong>Tags:</strong> <TagList tags={story.tags} />
                                 <div className="my-3">
-                                    <strong>Danh gia truyen:</strong> <MDBRating iconRegular />
+                                    <strong>Đánh giá truyện:</strong> <MDBRating iconRegular />
                                 </div>
 
                                 {commentError.length > 0 && <small style={{ color: 'red' }}>(*){commentError}</small>}
@@ -388,13 +388,13 @@ const StoryDetailsPage = (props) => {
                         </div>
                         <div className="row">
                             <div className="col-sm-3">
-                                <h4 className="text-bold">Thong tin truyen</h4>
+                                <h4 className="text-bold">Thông tin truyện</h4>
                                 <hr />
                                 <div>
-                                    <strong>Tac gia: </strong>Nguyen Van A
+                                    <strong>Tác giả: </strong>Nguyen Van A
                          </div>
                                 <div>
-                                    <strong>Ngay tao: </strong>{new Date(story.createdAt).toLocaleDateString()}
+                                    <strong>Ngày tạo: </strong>{new Date(story.createdAt).toLocaleDateString()}
                                 </div>
                             </div>
                             <div className="col-sm-9">
@@ -464,8 +464,6 @@ const StoryDetailsPage = (props) => {
                                                     <i class="far fa-trash-alt" ></i>
                                                 </button>
                                             }
-
-
 
                                         </div>
                                         <hr />
@@ -557,7 +555,7 @@ const StoryDetailsPage = (props) => {
                     </>
              
             )}
-            {storyNotfound && <NotFound message="Khong tim thay cau truyen nay" />}
+            {storyNotfound && <NotFound message="Không tìm thấy câu truyện này" />}
            </div>
         </MainLayout>
 

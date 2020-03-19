@@ -38,7 +38,7 @@ const HomePage = () => {
     return (
         <MainLayout>
             <div className="container-fluid">
-                <h4 className="text-bold">Goi y cho ban</h4>
+                <h4 className="text-bold">Gợi ý cho bạn</h4>
                 <hr style={{ border: '1px solid #ccc' }} />
                 {!suggestedStoriesLoading && (
                      <div className="row">
@@ -52,7 +52,7 @@ const HomePage = () => {
                 {suggestedStoriesLoading && <MySpinner/>}
 
 
-                <h4 className="text-bold mt-5">Danh sach thinh hanh</h4>
+                <h4 className="text-bold mt-5">Danh sách thịnh hành</h4>
                 <hr style={{ border: '1px solid #ccc' }} />
                 {!trendStoriesLoading && (
                     <div className="row">

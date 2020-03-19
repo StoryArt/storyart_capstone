@@ -361,6 +361,7 @@ const CreateStoryPage = () => {
         
             <MyAlert alert={alert}/>
             <ScreenPreview 
+                animation={story.animation}
                 open={openScreenPreview}
                 onClose={closeScreenPreview}
                 screen={currentScreen}

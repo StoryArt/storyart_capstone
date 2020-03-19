@@ -52,10 +52,10 @@ const StoryCard = (props) => {
         </CardActionArea>
         <CardActions>
           <Button size="small" color="primary" onClick={readStory}>
-            Doc truyen
+            Dọc truyện
           </Button>
           <Button size="small" color="secondary" onClick={viewDetails}>
-            Chi tiet
+            Chi tiết
           </Button>
         </CardActions>
       </Card>

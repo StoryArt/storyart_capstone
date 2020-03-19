@@ -44,7 +44,7 @@ const styles = theme => ({
     // MUI typography elements use REMs, so you can scale the global
     // font size by setting the font-size on the <html> element.
     html: {
-      fontSize: 14,
+      fontSize: 16,
     }
   }
 });

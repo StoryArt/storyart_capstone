@@ -48,7 +48,7 @@ class UserService {
   }
 
   static async logout(){
-    const user = getAuthUserInfo();
+    let user = getAuthUserInfo();
     clearTokenFromLocal();
     setAuthHeader(null);
     if(user.role === ROLE_NAMES.ROLE_SYSTEM_ADMIN || user.role === ROLE_NAMES.ROLE_ADMIN){
@@ -56,6 +56,7 @@ class UserService {
     } else {
       window.location.href = "/home";
     }
+    user = null;
   }
 
   static async addAdmin(user) {

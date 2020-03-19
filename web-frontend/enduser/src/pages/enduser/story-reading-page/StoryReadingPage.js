@@ -159,7 +159,7 @@ const ReadStoryPage = (props) => {
                         ))}
                         <div className="col-lg-8 col-md-10 mx-auto">
                             <ScreenShow 
-                                animation={ANIMATIONS.FADE}
+                                animation={ANIMATIONS.GROW}
                                 showScreen={showScreen}
                                 screen={currentScreen}
                                 onSelectAction={handleSelectAction}
