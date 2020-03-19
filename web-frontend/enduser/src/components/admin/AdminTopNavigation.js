@@ -7,20 +7,12 @@ import UserService from "../../services/user.service";
 import { UserContext } from '../../context/user.context';
 
 const AdminTopNavigation = () => {
-   
 
-     const [collapse, setCollapse] = useState(false);
-     const userContext = useContext(UserContext);
-     const { user } = userContext;
+    const [collapse, setCollapse] = useState(false);
+    const userContext = useContext(UserContext);
+    const { user } = userContext;
     
-
     const onClick = () => setCollapse(!collapse)
-
-    // toggle = () => {
-    //     this.setState({
-    //         dropdownOpen: !this.state.dropdownOpen
-    //     });
-    // }
 
     const logout = (e) => {
         e.preventDefault();
@@ -39,17 +31,6 @@ const AdminTopNavigation = () => {
                 </MDBNavbarNav>
                 <MDBNavbarNav right>
                     
-                        {/* <MDBNavItem>
-                        <MDBDropdown align="right">
-                            <MDBDropdownToggle nav caret>
-                                <span className="mr-2">Dropdown</span>
-                            </MDBDropdownToggle>
-                            <MDBDropdownMenu>
-                            <MDBDropdownItem href="#!">Account info</MDBDropdownItem>
-                            <MDBDropdownItem href="#!">Change password</MDBDropdownItem>
-                            </MDBDropdownMenu>
-                        </MDBDropdown>
-                    </MDBNavItem> */}
                     <MDBNavItem>
                         <Link to="/admin"
                             className="border border-light rounded mr-1 nav-link Ripple-parent">{user.name}</Link>

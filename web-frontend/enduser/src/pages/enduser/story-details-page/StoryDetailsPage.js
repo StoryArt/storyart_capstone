@@ -8,7 +8,7 @@ import ReactionService from '../../../services/reaction.service';
 import ReportService from '../../../services/report.service';
 import moment from 'moment';
 
-import UserLayout from '../../../layouts/UserLayout';
+import MainLayout from '../../../layouts/main-layout/MainLayout';
 import StoryService from '../../../services/story.service';
 import ValidationUtils from '../../../utils/validation';
 
@@ -292,7 +292,7 @@ const StoryDetailsPage = (props) => {
     };
 
     return (
-        <UserLayout>
+        <MainLayout>
            <div className="container-fluid">
            {isLoadingStory && (<MySpinner/>)}
 
@@ -487,7 +487,7 @@ const StoryDetailsPage = (props) => {
             )}
             {storyNotfound && <NotFound message="Khong tim thay cau truyen nay" />}
            </div>
-        </UserLayout>
+        </MainLayout>
     );
 };
 

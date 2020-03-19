@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import AdminLayout from "../../layouts/AdminLayout";
+import MainLayout from "../../layouts/main-layout/MainLayout";
 import { MDBDataTable } from "mdbreact";
 import { MDBBtn } from "mdbreact";
 import UserService from "../../services/user.service";
@@ -155,7 +155,7 @@ const AdminManagementPage = props => {
   };
 
   return (
-    <AdminLayout>
+    <MainLayout>
       <h3> AdminManagementPage </h3>
       <input type="button" value="+ Account" onClick={addAdmin} />
       <MDBDataTable
@@ -173,7 +173,7 @@ const AdminManagementPage = props => {
         boundaryCount={2}
         onChange={changePage}
       />
-    </AdminLayout>
+    </MainLayout>
   );
 };
 

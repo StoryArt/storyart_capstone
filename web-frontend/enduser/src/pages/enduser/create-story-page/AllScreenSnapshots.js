@@ -3,9 +3,11 @@ import React from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { ListItem, ListItemText, ListItemSecondaryAction, IconButton, Tooltip } from '@material-ui/core';
+import { Pagination } from '@material-ui/lab';
 import { Delete as DeleteIcon } from '@material-ui/icons';
 import ValidationUtils from '../../../utils/validation';
 import StringUtils from '../../../utils/string';
+import {List} from 'react-virtualized';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -21,27 +23,33 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const AllScreenSnapshots = (props) => {
-    const { screens, setCurrentScreen, currentScreen, onRemoveScreen } = props;
+    const { screens, setCurrentScreen, currentScreen, onRemoveScreen, page } = props;
     const classes = useStyles();
 
     return (
         <div className={classes.root}>
+            
             {screens.map((screen, index) => (
                 <ListItem 
-                    selected={index === currentScreen} 
+                    selected={ValidationUtils.isEmpty(currentScreen) ? false : (screen.id === currentScreen.id)} 
                     button  
-                    key={screen.id} onClick={() => setCurrentScreen(index)}>
+                    key={screen.id} 
+                    // onClick={() => { console.log('click'); setCurrentScreen(screen.id) }}
+                    >
                     <div className="d-flex">
-                        <div className="">
+                        <div 
+                            style={{ minWidth: '200px' }}
+                            className="" 
+                            onClick={() => { setCurrentScreen(screen.id) }}>
                             <ListItemText 
                                 className={classes.text} s
-                                primary={`#${index + 1 } (${ValidationUtils.isEmpty(screen.title) ? 'Chưa có tiêu đề' : screen.title})`} />
-                            <small>{ StringUtils.truncate(StringUtils.removeHtml(screen.content), 50) }</small>
+                                primary={`#${ (page-1) * 10 + index + 1 } (${StringUtils.getObjTitle(screen)})`} />
+                            <small>{ StringUtils.truncate(StringUtils.removeHtml(screen.content), 60) }</small>
                         </div>
-                        <div className="ml-1">
-                            <ListItemSecondaryAction>
-                                <Tooltip title="Xoa man hinh">
-                                    <IconButton edge="end" aria-label="delete" onClick={() => onRemoveScreen(screen)}>
+                        <div className="">
+                            <ListItemSecondaryAction style={{ float: 'right' }}>
+                                <Tooltip title="Xóa màn hình" placement="top">
+                                    <IconButton edge="end" aria-label="delete" onClick={() => onRemoveScreen(screen.id)}>
                                         <DeleteIcon />
                                     </IconButton>
                                 </Tooltip>

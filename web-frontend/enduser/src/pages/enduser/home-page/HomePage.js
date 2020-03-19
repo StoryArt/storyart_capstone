@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MDBCol, MDBCard, MDBCardBody, MDBCardImage, MDBCardTitle, MDBCardText, MDBBtn, MDBInputGroup } from 'mdbreact';
-import UserLayout from '../../../layouts/UserLayout';
+import MainLayout from '../../../layouts/main-layout/MainLayout';
 import StoryCard from '../../../components/common/StoryCard';
 import MySpinner from '../../../components/common/MySpinner';
 import StoryService from '../../../services/story.service';
@@ -37,7 +36,7 @@ const HomePage = () => {
     }
 
     return (
-        <UserLayout>
+        <MainLayout>
             <div className="container-fluid">
                 <h4 className="text-bold">Goi y cho ban</h4>
                 <hr style={{ border: '1px solid #ccc' }} />
@@ -67,7 +66,7 @@ const HomePage = () => {
                 {trendStoriesLoading && <MySpinner/>}
 
            </div>
-        </UserLayout>
+        </MainLayout>
     );
 };
 

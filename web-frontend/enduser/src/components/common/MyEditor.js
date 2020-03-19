@@ -42,14 +42,14 @@ const modules = {
       
         ['clean', 'link', 'image', 'video'],
     ],
-  }
+}
 
-  const formats = [
-    'header',
-    'bold', 'italic', 'underline', 'strike', 'blockquote',
-    'list', 'bullet', 'indent',
-    'link', 'image', 'color'
-  ]
+const formats = [
+  'header',
+  'bold', 'italic', 'underline', 'strike', 'blockquote',
+  'list', 'bullet', 'indent',
+  'link', 'image', 'color'
+]
 
 const MyEditor = (props) => {
     const { value, onChange, placeholder } = props;
@@ -80,10 +80,12 @@ const MyEditor = (props) => {
 
         <ReactQuill 
             value={value}
-            modules={modules}
-            // formats={formats}
             placeholder={placeholder}
             onChange={onChange} 
+            
+            modules={modules}
+            // formats={formats}
+            
             theme="snow" />
     );
 };

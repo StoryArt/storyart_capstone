@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import UserLayout from '../../../layouts/UserLayout';
+import MainLayout from  '../../../layouts/main-layout/MainLayout';
 import {
     MDBNavItem, MDBNavLink, MDBTabContent, MDBTabPane, MDBNav, MDBModal,
     MDBModalHeader, MDBModalBody, MDBModalFooter, MDBBtn, MDBInput,
@@ -181,7 +181,7 @@ const UserHistoryPage = () => {
     }
 
     return (
-        <UserLayout>
+        <MainLayout>
             <div className="container-fluid">
                 <MDBNav className="nav-tabs" className="mb-4">
                     <MDBNavItem>
@@ -346,7 +346,7 @@ const UserHistoryPage = () => {
                 </MDBTabContent>
 
             </div>
-        </UserLayout>
+        </MainLayout>
     );
 };
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-// import './assets/bootstrap/bootstrap.min.css';
+import { withStyles } from "@material-ui/core/styles";
 import './App.css';
 
 import GlobalContext from './context';
@@ -29,16 +29,26 @@ import ReportManagementPage from './pages/admin/ReportManagementPage';
 import AdminManagementPage from './pages/admin/AdminManagementPage';
 import NotFoundPage from './pages/common/NotFoundPage';
 
-
 import AddAdmin from './pages/common/AddAdmin';
 
 import PrivateRoute from './pages/common/auth/PrivateRoute';
-
 
 import { getTokenFromLocal, setAuthHeader, interceptResponse } from './config/auth';
 import ValidationUtils from './utils/validation';
 import { ROLE_NAMES } from './common/constants';
 import UserService from './services/user.service';
+
+
+const styles = theme => ({
+  "@global": {
+    // MUI typography elements use REMs, so you can scale the global
+    // font size by setting the font-size on the <html> element.
+    html: {
+      fontSize: 14,
+    }
+  }
+});
+
 
 function App() {
 
@@ -117,4 +127,4 @@ function App() {
   );
 }
 
-export default App;
+export default withStyles(styles)(App);

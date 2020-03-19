@@ -1,5 +1,5 @@
 import ReactHtmlParser, { processNodes, convertNodeToElement, htmlparser2 } from 'react-html-parser';
-
+import ValidationUtils from './validation';
 
 class StringUtils{
     static truncate(str, length){
@@ -12,9 +12,16 @@ class StringUtils{
     }
 
     static removeHtml(html) {
-        const tmp = document.createElement("div");
-        tmp.innerHTML = html;
-        return tmp.textContent || tmp.innerText || "";
+        // const tmp = document.createElement("div");
+        // tmp.innerHTML = html;
+        // return tmp.textContent || tmp.innerText || "";
+        if(ValidationUtils.isEmpty(html)) return '';
+        return html.replace(/<[^>]*>?/gm, '');
+    }
+
+    static getObjTitle(obj){
+        if(ValidationUtils.isEmpty(obj) || ValidationUtils.isEmpty(obj.title)) return 'Chưa có tiêu đề';
+        return obj.title;
     }
 }
 

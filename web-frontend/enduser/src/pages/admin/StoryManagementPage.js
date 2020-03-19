@@ -1,12 +1,12 @@
 import React from 'react';
-import AdminLayout from '../../layouts/AdminLayout';
+import MainLayout from '../../layouts/main-layout/MainLayout';
 
 const StoryManagementPage =  () => {
   return (
-    <AdminLayout>
+    <MainLayout>
       <h3>StoryManagementPage</h3>
      
-    </AdminLayout>
+    </MainLayout>
   )
 }
 

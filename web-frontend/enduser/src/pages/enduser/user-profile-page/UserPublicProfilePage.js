@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import UserLayout from "../../../layouts/UserLayout";
+import MainLayout from  '../../../layouts/main-layout/MainLayout';
 import { MDBInput, MDBBtn } from "mdbreact";
 import UserService from "../../../services/user.service";
 const UserPublicProfilePage = props => {
@@ -36,7 +36,7 @@ const UserPublicProfilePage = props => {
 
 
   return (
-    <UserLayout>
+    <MainLayout>
       <div className="container-fluid">
         <div className="row mb-5">
           <div className="col-12">
@@ -150,7 +150,7 @@ const UserPublicProfilePage = props => {
           ))}{" "}
         </div>{" "}
       </div>{" "}
-    </UserLayout>
+    </MainLayout>
   );
 };
 

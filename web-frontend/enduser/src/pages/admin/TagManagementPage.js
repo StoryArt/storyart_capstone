@@ -1,5 +1,5 @@
 import React from "react";
-import AdminLayout from "../../layouts/AdminLayout";
+import MainLayout from "../../layouts/main-layout/MainLayout";
 import TagService from "../../services/tag.service";
 import axios from "axios";
 import DateTimeUtils from '../../utils/datetime';
@@ -204,7 +204,7 @@ class TagManagementPage extends React.Component {
     }
 
     return (
-      <AdminLayout>
+      <MainLayout>
         <MDBContainer>
           <MDBCard>
             <MDBRow type="flex" justify="start">
@@ -323,7 +323,7 @@ class TagManagementPage extends React.Component {
             </div>
           </MDBCard>
         </MDBContainer>
-      </AdminLayout>
+      </MainLayout>
     );
   }
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import UserLayout from "../../layouts/UserLayout";
+import MainLayout from "../../layouts/main-layout/MainLayout";
 
 import UserService from "../../services/user.service";
 import { MDBDataTable } from "mdbreact";
@@ -177,7 +177,7 @@ const UserManagementPage = () => {
   };
 
   return (
-    <UserLayout>
+    <MainLayout>
       <h3> UserManagementPage </h3>
       <input type="button" value="+ Account" onClick={addUser} />
       <MDBDataTable striped bordered small data={data}  entrieslabel={""} paging={false}displayEntries={false}/>
@@ -187,7 +187,7 @@ const UserManagementPage = () => {
         boundaryCount={2}
         onChange={changePage}
       />
-    </UserLayout>
+    </MainLayout>
   );
 };
 

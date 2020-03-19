@@ -5,7 +5,7 @@ import { MDBBtn, MDBInputGroup, MDBModal, MDBModalHeader, MDBModalBody, MDBCard,
 import { Select, MenuItem, Input, ListItemText, Checkbox, Chip, 
     FormControl, InputLabel, Button } from '@material-ui/core';
 import { Pagination } from '@material-ui/lab';
-import UserLayout from '../../../layouts/UserLayout';
+import MainLayout from '../../../layouts/main-layout/MainLayout';
 import StoryService from '../../../services/story.service';
 import TagService from '../../../services/tag.service';
 
@@ -114,7 +114,7 @@ const SearchStoriesPage = () => {
     const selectedTags = tags.filter(tag => filters.tags.indexOf(tag.id) > -1);
 
     return (
-        <UserLayout>
+        <MainLayout>
             <div className="container-fluid">
                 <div className="row mb-4">
                     <div className="col-12">
@@ -199,7 +199,7 @@ const SearchStoriesPage = () => {
                 )}
                 
            </div>
-        </UserLayout>
+        </MainLayout>
     );
 };
 

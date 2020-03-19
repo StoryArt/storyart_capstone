@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import AdminLayout from '../../layouts/AdminLayout';
+import MainLayout from '../../layouts/main-layout/MainLayout';
 import { MDBNav, MDBTabContent, MDBNavItem, MDBNavLink, MDBTabPane, MDBCardBody, MDBDataTable, MDBCard, MDBBtn, MDBTable, MDBTableHead, MDBTableBody, MDBModal, MDBModalHeader, MDBModalBody, MDBModalFooter } from 'mdbreact';
 import Pagination from '@material-ui/lab/Pagination';
 import ReportService from '../../services/report.service';
@@ -114,7 +114,7 @@ const ReportManagementPage = () => {
 
 
   return (
-    <AdminLayout>
+    <MainLayout>
       <div className="container-fluid">
         <MDBNav className="nav-tabs" className="mb-4">
           <MDBNavItem>
@@ -180,7 +180,7 @@ const ReportManagementPage = () => {
         </MDBModal>
       </div>
 
-    </AdminLayout>
+    </MainLayout>
   )
 }
 

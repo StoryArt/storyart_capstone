@@ -26,6 +26,7 @@ public class PreFilter  extends ZuulFilter {
         return true;
     }
     Logger log = LoggerFactory.getLogger(PreFilter.class);
+
     @Override
     public Object run() throws ZuulException {
         RequestContext ctx = RequestContext.getCurrentContext();
