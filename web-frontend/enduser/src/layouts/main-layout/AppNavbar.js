@@ -14,6 +14,7 @@ MenuBook as MenuBookIcon, History as HistoryIcon, AddBox as AddBoxIcon } from '@
 import UserService from '../../services/user.service';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 
+const drawerWidth = 240;
 
 const useStyles = makeStyles(theme => ({
   root: {
