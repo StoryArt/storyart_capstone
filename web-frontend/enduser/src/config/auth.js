@@ -47,7 +47,10 @@ export const interceptResponse = (handleUnauthorizedAction) => {
         const responseURL = error.request.responseURL;
         // if(responseURL.indexOf('/api/auth/login') > -1 || responseURL.indexOf('/api/auth/change-password') > -1) return Promise.reject(error);
      
-        if(error.response.status === 401 || error.response.status === 403) return handleUnauthorizedAction();
+        if(!ValidationUtils.isEmpty(error.response)){
+            if(error.response.status === 401|| error.response.status===403)
+            return handleUnauthorizedAction();
+        }
         return Promise.reject(error);
     });
 }

@@ -187,8 +187,9 @@ public class ReactionServiceImpl implements ReactionService {
             for (Comment comment: comments) {
                 if (response.getCommentId() == comment.getId()){
                     for (User user: users) {
+                        
                         if (comment.getUserId() == user.getId()){
-                            response.setCommentOwnerName(user.getUsername());
+                            response.setCommentOwnerName(user.getName());
                             response.setCommentOwnerId(user.getId());
                             break;
                         }

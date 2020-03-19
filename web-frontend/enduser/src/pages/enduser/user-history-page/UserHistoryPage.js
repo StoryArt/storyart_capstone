@@ -7,9 +7,11 @@ import {
 import CommentService from '../../../services/comment.service';
 import ReactionService from '../../../services/reaction.service';
 import moment from 'moment';
+import { getAuthUserInfo } from '../../../config/auth';
 
 
 const UserHistoryPage = () => {
+    const userInfo = getAuthUserInfo();
 
     const [activeItem, setActiveItem] = useState('1');
 
@@ -25,57 +27,67 @@ const UserHistoryPage = () => {
         commentId: 0,
     });
     const deleteComment = async () => {
-        try {
-            const res = await CommentService.deleteComment(deleteRequest);
-            setModalState({ ...modalState, deleteModal: false });
-            if (commentIndex !== -1) {
-                var array = [...comments];
-                setComments(array.filter(item => item.id !== deleteRequest.commentId));
-                //array.splice(commentIndex, 1);
-                //setComments(array);
+        if (userInfo !== null) {
+            try {
+                var deleteComment = { ...deleteRequest };
+                deleteComment.userId = userInfo.id;
+                const res = await CommentService.deleteComment(deleteComment);
+                setModalState({ ...modalState, deleteModal: false });
+                if (commentIndex !== -1) {
+                    var array = [...comments];
+                    setComments(array.filter(item => item.id !== deleteRequest.commentId));
+                }
+            } catch (error) {
+                console.log(error.response.request._response);
             }
-        } catch (error) {
-            console.log(error.response.request._response);
         }
+
     }
     const deleteReaction = async () => {
-        try {
-            const res = await ReactionService.deleteReaction(deleteRequest);
-            setModalState({ ...modalState, deleteReactionModal: false });
-            if (reactionIndex !== -1) {
-                var array = [...reactions];
-                setReactions(array.filter(item => item.commentId !== deleteRequest.commentId));
+        if (userInfo !== null) {
+            try {
+                var deleteReact = { ...deleteRequest };
+                deleteReact.userId = userInfo.id;
+                const res = await ReactionService.deleteReaction(deleteReact);
+                setModalState({ ...modalState, deleteReactionModal: false });
+                if (reactionIndex !== -1) {
+                    var array = [...reactions];
+                    setReactions(array.filter(item => item.commentId !== deleteRequest.commentId));
+                }
+            } catch (error) {
+                console.log(error.response.request._response);
             }
-        } catch (error) {
-            console.log(error.response.request._response);
         }
+
     }
     const [modalError, setModalError] = useState('');
     const updateComment = async () => {
-        try {
-            const res = await CommentService.updateComment(updateCommentRequest);
-            setModalState({ ...modalState, editModal: false });
-            var array = [...comments];
-            setComments(array.map(item => item.id === updateCommentRequest.commentId ? { ...item, content: updateCommentRequest.content } : item));
-            setModalError('');
-        } catch (error) {
-            setModalError(error.response.data.message);
-            console.log(error);
+        if (userInfo !== null) {
+            try {
+                var updateComment = { ...updateCommentRequest };
+                updateComment.userId = userInfo.id;
+                const res = await CommentService.updateComment(updateComment);
+                setModalState({ ...modalState, editModal: false });
+                var array = [...comments];
+                setComments(array.map(item => item.id === updateCommentRequest.commentId ? { ...item, content: updateCommentRequest.content } : item));
+                setModalError('');
+            } catch (error) {
+                setModalError(error.response.data.message);
+                console.log(error);
+            }
         }
+
     }
 
 
     const [updateCommentRequest, setUpdateCommentRequest] = useState({
         content: '',
-        userId: 1,
+        userId: 0,
         commentId: 0
     });
     const [comments, setComments] = useState([]);
     const [reactions, setReactions] = useState([]);
-    const forceUpdateComments = useCallback(() => setComments({}), []);
 
-
-    const [userId, setUserId] = useState(1);
     const [commentPageNo, setCommentPageNo] = useState(1);
 
     const toggle = tab => e => {
@@ -99,45 +111,57 @@ const UserHistoryPage = () => {
 
     //TODO
     //const [isShowMore, setShowMore] = useState(false);
+    const [isLastCommentPage, setIsLastCommentPage] = useState(true);
     const getCommentHistory = async () => {
-        try {
-            var array = [...comments];
-            if (array.length > 1) {
-                setCommentPageNo(commentPageNo + 1);
-                const res = await CommentService.getCommentHistory(userId, commentPageNo + 1);
+        if (userInfo !== null) {
+            try {
+                var array = [...comments];
+                if (array.length > 1) {
+                    setCommentPageNo(commentPageNo + 1);
+                    const res = await CommentService.getCommentHistory(userInfo.id, commentPageNo + 1);
 
-                res.data.content.forEach(element => {
-                    setComments(comments => [...comments, element]);
-                });
+                    res.data.content.forEach(element => {
+                        setComments(comments => [...comments, element]);
+                    });
+                    setIsLastCommentPage(res.data.last);
+                }
+                else {
+                    setCommentPageNo(1);
+                    const res = await CommentService.getCommentHistory(userInfo.id, 1);
+                    setComments(res.data.content);
+                    setIsLastCommentPage(res.data.last);
+                }
+            } catch (error) {
             }
-            else {
-                setCommentPageNo(1);
-                const res = await CommentService.getCommentHistory(userId, 1);
-                setComments(res.data.content);
-            }
-        } catch (error) {
         }
+
     }
     const [reactionPageNo, setReactionPageNo] = useState(1);
+    const [isLastReactionPage, setIsLastReactionPage] = useState(true);
     const getReactionHistory = async () => {
-        try {
-            var array = [...reactions];
-            if (array.length > 1) {
-                setReactionPageNo(reactionPageNo + 1);
-                const res = await ReactionService.getReactionHistory(userId, reactionPageNo + 1);
+        if (userInfo !== null) {
+            try {
+                var array = [...reactions];
+                if (array.length > 1) {
+                    setReactionPageNo(reactionPageNo + 1);
+                    const res = await ReactionService.getReactionHistory(userInfo.id, reactionPageNo + 1);
 
-                res.data.content.forEach(element => {
-                    setReactions(reactions => [...reactions, element]);
-                });
-            }
-            else {
-                setReactionPageNo(1);
-                const res = await ReactionService.getReactionHistory(userId, 1);
-                setReactions(res.data.content);
-            }
+                    res.data.content.forEach(element => {
+                        setReactions(reactions => [...reactions, element]);
+                    });
+                    setIsLastReactionPage(res.data.last);
+                }
+                else {
+                    setReactionPageNo(1);
+                    const res = await ReactionService.getReactionHistory(userInfo.id, 1);
+                    setReactions(res.data.content);
+                    setIsLastReactionPage(res.data.last);
+                }
 
-        } catch (error) {
+            } catch (error) {
+            }
         }
+
     }
     const toggleModal = (modal, commentIdSpec, index) => e => {
 
@@ -186,12 +210,12 @@ const UserHistoryPage = () => {
                 <MDBNav className="nav-tabs" className="mb-4">
                     <MDBNavItem>
                         <MDBNavLink to="#" active={activeItem === "1"} onClick={toggle("1")} role="tab" >
-                            Doc Truyen
+                            Đọc truyện
                         </MDBNavLink>
                     </MDBNavItem>
                     <MDBNavItem>
                         <MDBNavLink to="#" active={activeItem === "2"} onClick={toggle("2")} role="tab" >
-                            Binh luan
+                            Bình luận
                         </MDBNavLink>
                     </MDBNavItem>
                     <MDBNavItem>
@@ -242,14 +266,14 @@ const UserHistoryPage = () => {
                         ))}
                         {comments.length < 1 &&
                             <div className="text-center">
-                                <small>Không có lịch sử react</small>
+                                <small>Không có lịch sử bình luận.</small>
                             </div>
                         }
                         <br>
 
                         </br>
 
-                        {comments.length > 0 &&
+                        {!isLastCommentPage > 0 &&
                             <div className="text-center">
                                 <button className="btn btn-secondary" onClick={getCommentHistory}>Xem thêm</button>
                             </div>
@@ -307,14 +331,14 @@ const UserHistoryPage = () => {
                         ))}
                         {reactions.length < 1 &&
                             <div className="text-center">
-                                <small>Không có lịch sử react</small>
+                                <small>Không có lịch sử react.</small>
                             </div>
                         }
                         <br>
                         </br>
 
 
-                        {reactions.length > 0 &&
+                        {!isLastReactionPage > 0 &&
                             <div className="text-center">
                                 <button className="btn btn-secondary" onClick={getReactionHistory}>Xem thêm</button>
                             </div>

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import MainLayout from '../../layouts/main-layout/MainLayout';
-import { MDBNav, MDBTabContent, MDBNavItem, MDBNavLink, MDBTabPane, MDBCardBody, MDBDataTable, MDBCard, MDBBtn, MDBTable, MDBTableHead, MDBTableBody, MDBModal, MDBModalHeader, MDBModalBody, MDBModalFooter } from 'mdbreact';
+import { MDBNav, MDBTabContent, MDBNavItem, MDBNavLink, MDBTabPane, MDBCardBody, 
+  MDBDataTable, MDBCard, MDBBtn, MDBTable, MDBTableHead, MDBTableBody, MDBModal, 
+  MDBModalHeader, MDBModalBody, MDBModalFooter, MDBDropdown, MDBDropdownItem, 
+  MDBDropdownToggle, MDBDropdownMenu } from 'mdbreact';
 import Pagination from '@material-ui/lab/Pagination';
 import ReportService from '../../services/report.service';
 
@@ -20,14 +23,10 @@ const ReportManagementPage = () => {
 
     }
   }
-  const [convertedData, setConvertedData] = useState([]);
+
   function convertData(data) {
     var reportList = data.content;
     var rowsList = [];
-    var rowItem = {};
-    //rowItem["totalPages"] = data.totalPages;
-    //rowsList.push(rowItem);
-    //setTotalPages(data.totalPages);
     reportList.forEach(element => {
       var row = {};
       row["commentOwner"] = element["commentOwner"];
@@ -45,10 +44,58 @@ const ReportManagementPage = () => {
     setDataTable({ ...dataTable, rows: rowsList });
   }
 
-
+  const [reportContent, setReportContent] = useState({});
   const handleReport = (report) => {
     setHandleModal(true);
+    setReportContent(report);
+    getReportsByCommentId(1, report.commentId);
+    setCommentId(report.commentId);
   };
+
+  const [commentId, setCommentId] = useState(0);
+  const [handlePageNo, setHandlePageNo] = useState(1);
+  const [handleTotalPages, sethandleTotalPages] = useState(0);
+  const [reportIds, setReportIds] = useState([]);
+
+  const getReportsByCommentId = async (pageNumber, commentId) => {
+    try {
+      const res = await ReportService.getReportsForEachComment(pageNumber, commentId);
+      if (handleTotalPages === 0) {
+        sethandleTotalPages(res.data.totalPages);
+      }
+      convertHandleData(res.data);
+      //get reportIds
+      var listReportId = [];
+      res.data.content.forEach(element => {
+        listReportId.push(element.id);
+      });
+      setReportIds(listReportId);
+
+    } catch (error) {
+
+    }
+  }
+
+  function convertHandleData(data) {
+    var reportList = data.content;
+    var rowsList = [];
+    reportList.forEach(element => {
+      var row = {};
+      row["userId"] = element["userId"];
+      row["content"] = element["content"];
+
+      rowsList.push(row);
+    });
+
+    setHandleTable({ ...handleTable, rows: rowsList });
+  }
+
+  const changeHandlePage = (event, value) => {
+    if (value !== handlePageNo) {
+      setHandlePageNo(value);
+      getReportsByCommentId(value, commentId);
+    }
+  }
 
   const changePage = async (event, value) => {
     if (value !== pageNo) {
@@ -62,6 +109,8 @@ const ReportManagementPage = () => {
     }
   };
 
+
+
   const [activeItem, setActiveItem] = useState('1');
   const toggle = tab => e => {
     if (activeItem !== tab) {
@@ -72,8 +121,6 @@ const ReportManagementPage = () => {
     }
 
   };
-
-
 
   const [dataTable, setDataTable] = useState({
     columns: [
@@ -112,6 +159,46 @@ const ReportManagementPage = () => {
     rows: []
   });
 
+  const [handleTable, setHandleTable] = useState({
+    columns: [
+      {
+        label: "Tên người báo cáo",
+        field: "userId",
+        width: "30%",
+        sort: "disabled"
+      },
+      {
+        label: "Nội dung báo cáo",
+        field: "content",
+        width: "70%",
+        sort: "disabled"
+      }
+
+    ],
+    rows: []
+  });
+
+  const [handleOption, setHandleOption] = useState('Không có vi phạm');
+
+  const handleReportAction = async () => {
+    try {
+      if (handleOption === "Không có vi phạm") {
+        const res = await ReportService.handleReport(reportIds);
+        var updateRows = [...dataTable.rows];
+
+        setDataTable({ ...dataTable, rows: updateRows.map(item => item.commentId === commentId ? { ...item, handled: true } : item) });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    setHandleModal(!handleModal);
+
+
+
+  }
+
+
+
 
   return (
     <MainLayout>
@@ -133,9 +220,8 @@ const ReportManagementPage = () => {
             {dataTable.rows.length > 0 &&
               <MDBCard>
                 <MDBCardBody>
-                  <Pagination align="right" count={totalPages} color="primary" boundaryCount={2} onChange={changePage} />
-                  <br>
-                  </br>
+                  <Pagination className="float-right" count={totalPages} color="primary" boundaryCount={2} onChange={changePage} />
+
                   <MDBTable striped hover bordered>
                     <MDBTableHead columns={dataTable.columns} />
                     <MDBTableBody rows={dataTable.rows} />
@@ -157,9 +243,33 @@ const ReportManagementPage = () => {
         </MDBTabContent>
 
 
-        <MDBModal isOpen={handleModal} toggle={e => setHandleModal(!handleModal)}>
-          <MDBModalHeader toggle={e => setHandleModal(!handleModal)}>Chỉnh sửa bình luận</MDBModalHeader>
+        <MDBModal isOpen={handleModal} size='lg' toggle={e => setHandleModal(!handleModal)}>
+          <MDBModalHeader toggle={e => setHandleModal(!handleModal)}>Xử lý báo cáo</MDBModalHeader>
           <MDBModalBody>
+            <p>Tên người dùng: <strong>{reportContent.commentOwner}</strong></p>
+            <p>Nội dung bình luận: "<strong>{reportContent.commentContent}</strong>"</p>
+            <p>Số lượng báo cáo: <strong>{reportContent.numberOfReports}</strong></p>
+
+            <p>Cách xử lý: </p>
+            <MDBDropdown>
+              <MDBDropdownToggle caret color="ins">
+                {handleOption}
+              </MDBDropdownToggle>
+              <MDBDropdownMenu basic >
+                <MDBDropdownItem onClick={e => setHandleOption('Không có vi phạm')}>Không có vi phạm</MDBDropdownItem>
+                <MDBDropdownItem onClick={e => setHandleOption('Ẩn bình luận')}>Ẩn bình luận</MDBDropdownItem>
+                <MDBDropdownItem onClick={e => setHandleOption('Vô hiệu hóa tài khoản')}>Vô hiệu hóa tài khoản</MDBDropdownItem>
+              </MDBDropdownMenu>
+            </MDBDropdown>
+
+
+
+
+            <Pagination className="float-right" count={handleTotalPages} color="primary" boundaryCount={2} onChange={changeHandlePage} />
+            <MDBTable striped hover bordered small>
+              <MDBTableHead columns={handleTable.columns} />
+              <MDBTableBody rows={handleTable.rows} />
+            </MDBTable>
             {/* {modalError.length > 0 && <small style={{ color: 'red' }}>(*){modalError}</small>}
             <form className='mx-3 grey-text'>
               <MDBInput
@@ -175,7 +285,7 @@ const ReportManagementPage = () => {
             <MDBBtn color='success' onClick={e => setHandleModal(!handleModal)}>
               Hủy
                                         </MDBBtn>
-            <MDBBtn color='warning' >Chỉnh sửa</MDBBtn>
+            <MDBBtn color='warning' onClick={handleReportAction} >Xử lý</MDBBtn>
           </MDBModalFooter>
         </MDBModal>
       </div>

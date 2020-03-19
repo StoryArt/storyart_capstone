@@ -4,9 +4,13 @@
 import axios from "axios";
 import { clearTokenFromLocal, getAuthUserInfo, setAuthHeader } from '../config/auth';
 import { ROLE_NAMES } from "../common/constants";
+//url qua gateway
+// const baseUrl = 'http://localhost:8001/api/user-service/api/v1';
+// const signInUpUrl = 'http://localhost:8001/api/v1';
 
-const baseUrl = 'http://localhost:8001/api/user-service/api/v1';
-const signInUpUrl = 'http://localhost:8001/api/v1';
+//url khong qua gateway
+const baseUrl='http://localhost:8002/api/v1';
+const signInUpUrl = 'http://localhost:8002/api/v1';
 
 
 class UserService {
