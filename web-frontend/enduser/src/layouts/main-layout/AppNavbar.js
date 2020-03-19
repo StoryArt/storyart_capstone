@@ -93,7 +93,7 @@ const AppNavbar = (props) => {
     }
 
     const handleLogout = () => {
-      setDialogContent('Bạn có chắc chắn muốn đăng xuất khổi ứng dụng không?');
+      setDialogContent('Bạn có chắc chắn muốn đăng xuất khỏi ứng dụng không?');
       setOpenDialog(true);
     }
 
