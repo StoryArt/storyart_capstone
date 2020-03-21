@@ -89,3 +89,22 @@ export const getActions = () => {
         ACTION_TYPES.UPDATE_INFORMATION
     ]
 }
+
+export const ORDER_BYS = {
+    AVG_RATE: 'avg_rate',
+    READ: 'read',
+    COMEMENT: 'comment',
+    SCREEN: 'screen',
+    RATING: 'rating',
+}
+
+export const getOrderBys = () => {
+    const { AVG_RATE, READ, COMEMENT, SCREEN, RATING } = ORDER_BYS;
+    return [
+        { value: AVG_RATE, title: 'Đánh giá trung bình' },
+        { value: READ, title: 'Số lượt đọc' },
+        { value: COMEMENT, title: 'Số lượt bình luận' },
+        { value: SCREEN, title: 'Số màn hình' },
+        { value: RATING, title: 'Số lượt đánh giá' },
+    ]
+}

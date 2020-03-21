@@ -50,13 +50,16 @@ public class Story extends DateAudit {
     private float avgRate;
 
     @Column(columnDefinition="tinyint(1) default 0")
-    private boolean isActive;
+    private boolean active;
 
     @Column(columnDefinition="tinyint(1) default 0")
-    private boolean isPublished;
+    private boolean published;
 
     @Column(columnDefinition="tinyint(1) default 0")
-    private Boolean isDeactiveByAdmin;
+    private Boolean deactiveByAdmin;
+
+    @Column(columnDefinition = "int default 0")
+    private int numOfRead;
 
     private Date createdAt;
 

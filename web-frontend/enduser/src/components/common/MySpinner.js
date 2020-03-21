@@ -4,7 +4,11 @@ import { CircularProgress } from '@material-ui/core';
 const MySpinner = () => {
     return (
         <div className="text-center">
-            <CircularProgress color="secondary" />
+            <CircularProgress 
+                variant="determinate"
+                size={24}
+                thickness={4}
+                color="secondary" />
         </div>
     );
 };

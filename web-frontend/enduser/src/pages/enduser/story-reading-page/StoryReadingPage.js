@@ -14,6 +14,7 @@ import { ACTION_TYPES, INFORMATION_TYPES, STRING_OPERATIONS,
 import MySpinner from '../../../components/common/MySpinner';
 import NotFound from '../../../components/common/NotFound';
 import ScreenShow from '../../../components/common/ScreenShow';
+import SocialShare from '../../../components/common/SocialShare';
 
 const ReadStoryPage = (props) => {
 
@@ -183,6 +184,7 @@ const ReadStoryPage = (props) => {
                     </div>
                 )}
             </div>
+            {/* <SocialShare shareUrl={window.location.href} /> */}
             </Fullscreen>
            
            { isLoading && <MySpinner/> }

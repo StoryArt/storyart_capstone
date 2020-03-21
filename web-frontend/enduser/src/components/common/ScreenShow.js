@@ -26,6 +26,7 @@ const ScreenShow = (props) => {
         case ANIMATIONS.ZOOM: 
             animationEle = <Zoom></Zoom>
             break;
+        default: animationEle = <Fade></Fade>
     }
 
     return (

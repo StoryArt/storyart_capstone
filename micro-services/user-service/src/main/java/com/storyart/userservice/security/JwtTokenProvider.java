@@ -16,14 +16,12 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider implements Serializable {
 
-
     @Value("${jwt.secret}")
     private String jwtSecret;
 
 
     @Value("${jwt.expirationInMs}")
     private int jwtExpirationInMs;
-
 
     public String generateToken(Authentication authentication) {
         UserPrincipal userPrincipal = (UserPrincipal)

@@ -3,11 +3,11 @@ import MainLayout from "../../layouts/main-layout/MainLayout";
 import { MDBDataTable } from "mdbreact";
 import { MDBBtn } from "mdbreact";
 import UserService from "../../services/user.service";
-import { setAuthHeader } from "../../config/auth";
+import { setAuthHeader, getTokenFromLocal } from "../../config/auth";
 import Pagination from "@material-ui/lab/Pagination";
 
 const AdminManagementPage = props => {
-  const [adminGlobaldata, setAdminGlobaldata] = useState("");
+  const [adminGlobaldata, setAdminGlobaldata] = useState([]);
   const [pageInfo, setPageInfo] = useState({
     page: 1,
     size: 10,
@@ -68,7 +68,7 @@ const AdminManagementPage = props => {
   }
 
   async function LoadAdminsByPage(event) {
-    setAuthHeader(localStorage.getItem("jwt-token"));
+    setAuthHeader(getTokenFromLocal());
     const res = await UserService.getAdminsList(1, 10, "");
     addDataToAdminGlobal(res.data);
   }
@@ -156,8 +156,8 @@ const AdminManagementPage = props => {
 
   return (
     <MainLayout>
-      <h3> AdminManagementPage </h3>
-      <input type="button" value="+ Account" onClick={addAdmin} />
+      <h3 className="text-center"> Quản lý tài khoản admin </h3>
+      <input className="btn btn-success" type="button" value="+ Tài khoản" onClick={addAdmin} />
       <MDBDataTable
         striped
         bordered

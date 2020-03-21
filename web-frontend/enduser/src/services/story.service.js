@@ -41,6 +41,15 @@ class StoryService{
         return axios.get(url);
     }
 
+    static async updateStoryByAdmin(storyId, enable){
+        const url = baseUrl + '/update_by_admin/' + storyId + '/' + enable;
+        return axios.put(url);
+    }
+
+    static getStoriesForAdmin({ page, itemsPerPage, asc, orderBy, keyword }){
+        const url = baseUrl + `/get_for_admin?page=${page}&itemsPerPage=${itemsPerPage}&asc=${asc}&orderBy=${orderBy}&keyword=${keyword}`;
+        return axios.get(url);
+    }
 }
 
 export default StoryService;

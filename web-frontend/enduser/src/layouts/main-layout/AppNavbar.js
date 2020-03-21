@@ -22,12 +22,15 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
   },
   appBar: {
+    backgroundColor: '#d6c494',
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
   },
   appBarShift: {
+    backgroundColor: '#d6c494',
+    // backgroundColor: '#b09c63',
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: drawerWidth,
     transition: theme.transitions.create(['margin', 'width'], {

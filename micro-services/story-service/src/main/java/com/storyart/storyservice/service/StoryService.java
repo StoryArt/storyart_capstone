@@ -20,7 +20,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.Converter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -36,6 +35,10 @@ public interface StoryService {
                               boolean isPublished, int page, int itemsPerPage);
     List<GetStoryDto> getTrendingStories(int quantity);
     void createTempStories();
+    List<GetStoryDto> getAll();
+
+    Page<GetStoryDto> getStoriesForAdmin(String keyword, String orderBy, boolean asc, int page, int itemsPerPage);
+    ResultDto updateByAdmin(int storyId, boolean disable);
 }
 
 @Service
@@ -60,6 +63,12 @@ class StoryServiceImpl implements StoryService{
 
     @Autowired
     TagRepository tagRepository;
+
+    @Autowired
+    CommentRepository commentRepository;
+
+    @Autowired
+    RatingRepository ratingRepository;
 
     @Autowired
     TagService tagService;
@@ -301,9 +310,11 @@ class StoryServiceImpl implements StoryService{
             story.setTitle(MyStringUtils.randomString(15, 5));
             story.setIntro(MyStringUtils.randomString(150, 120));
             story.setAvgRate(i%5);
+            int reads = new Random().nextInt(100) + 10;
+            story.setNumOfRead(reads);
             story.setImage("http://lorempixel.com/400/200");
             story.setActive(true);
-            story.setIsDeactiveByAdmin(false);
+            story.setDeactiveByAdmin(false);
             story.setPublished(true);
             story.setFirstScreenId("temp");
             stories.add(story);
@@ -316,7 +327,100 @@ class StoryServiceImpl implements StoryService{
                 storyTagRepository.save(st);
             });
         }
-        storyRepository.saveAll(stories);
+        List<Story> savedStories = storyRepository.saveAll(stories);
+
+        savedStories.stream().forEach(story -> {
+            int quantity = new Random().nextInt(20) + 4;
+            for(int i = 1; i <= quantity; i++){
+                Comment comment = new Comment();
+                comment.setStoryId(story.getId());
+                comment.setContent("It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using");
+                Rating rating = new Rating();
+                rating.setStoryId(story.getId());
+                double stars = new Random().nextInt(5);
+                rating.setStars(stars);
+                commentRepository.save(comment);
+                ratingRepository.save(rating);
+            }
+        });
+    }
+
+    @Override
+    public List<GetStoryDto> getAll() {
+        List<Story> stories = storyRepository.findAll();
+        return stories.stream().map(story -> mapModelToDto(story)).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<GetStoryDto> getStoriesForAdmin(String keyword, String orderBy, boolean asc, int page, int itemsPerPage) {
+
+        Pageable pageable =  PageRequest.of(page - 1, itemsPerPage);
+        Page<Story> page1 = null;
+        if(orderBy.equals("avg_rate")){
+            if(asc){
+                page1 = storyRepository.findForAdminOrderByAvgRateASC(keyword, pageable);
+            } else {
+                page1 = storyRepository.findForAdminOrderByAvgRateDESC(keyword, pageable);
+            }
+        } else if(orderBy.equals("comment")){
+            if(asc){
+                page1 = storyRepository.findForAdminOrderByNumOfCommentASC(keyword, pageable);
+            } else {
+                page1 = storyRepository.findForAdminOrderByNumOfCommentDESC(keyword, pageable);
+            }
+        } else if(orderBy.equals("rating")){
+            if(asc){
+                page1 = storyRepository.findForAdminOrderByNumOfRatingASC(keyword, pageable);
+            } else {
+                page1 = storyRepository.findForAdminOrderByNumOfRatingDESC(keyword, pageable);
+            }
+        } else if(orderBy.equals("screen")){
+            if(asc){
+                page1 = storyRepository.findForAdminOrderByNumOfScreenASC(keyword, pageable);
+            } else {
+                page1 = storyRepository.findForAdminOrderByNumOfScreenDESC(keyword, pageable);
+            }
+        } else if(orderBy.equals("read")){
+            if(asc){
+                page1 = storyRepository.findForAdminOrderByNumOfReadASC(keyword, pageable);
+            } else {
+                page1 = storyRepository.findForAdminOrderByNumOfReadDESC(keyword, pageable);
+            }
+        }
+        if(page1 == null) return null;
+
+        Page<GetStoryDto> page2 = page1.map(new Function<Story, GetStoryDto>() {
+            @Override
+            public GetStoryDto apply(Story story) {
+                List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
+                GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
+                dto.setTags(tagService.mapModelToDto(tagList));
+                dto.setNumOfComment(commentRepository.countCommentByStoryId(story.getId()));
+                dto.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
+                return dto;
+            }
+        });
+        return page2;
+    }
+
+    @Override
+    public ResultDto updateByAdmin(int storyId, boolean disable) {
+        ResultDto result = new ResultDto();
+        Story story = storyRepository.findById(storyId).orElse(null);
+        if(story == null) {
+            result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
+            result.setSuccess(false);
+        } else {
+            if(!story.getDeactiveByAdmin() && disable){
+                story.setDeactiveByAdmin(true);
+            } else if(story.getDeactiveByAdmin() && !disable) {
+                story.setDeactiveByAdmin(false);
+            }
+            storyRepository.save(story);
+            result.setSuccess(true);
+            result.setData(story);
+        }
+        return result;
     }
 
     List<Integer> getRandomTags(int quantity){

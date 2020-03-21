@@ -187,17 +187,10 @@ public class UserServiceImpl implements UserService {
 page=page-1;
         validatePageNumberAndSize(page, size);
         Pageable pageable = PageRequest.of(page, size);
-
-
 //        TypedQuery<User> querry=entityManager.createQuery("")
-
-
         Page<User> userPage = userRepository.findOnlyUserByUsernameOrEmail(searchtxt, pageable);
         List<User> usersList = userPage.toList();
-
         List<UserInManagementResponse> users = convertUserlist(usersList);
-
-
         return new PagedResponse<UserInManagementResponse>(users, 1+userPage.getNumber(), userPage.getSize(),
                 userPage.getTotalElements(),
                 userPage.getTotalPages(), userPage.isLast());

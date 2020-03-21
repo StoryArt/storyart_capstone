@@ -30,6 +30,7 @@ const LoginPage = () => {
 
             alert('Dang nhap thanh cong');
             const userInfo = getAuthUserInfo();
+            
             let url = '/home';
             if(userInfo.role === ROLE_NAMES.ROLE_ADMIN){
               url = '/admin/users'
@@ -41,19 +42,19 @@ const LoginPage = () => {
                 window.location.href = url;
             }, 400);
           } else if(!res.data.success){
-            alert('Ten dang nhap va mat khau khong hop le');
+            alert('Dang nhap khong thanh cong');
           }
         } catch (error) {
-          setErrorMessage(
-            <MDBAlert color="danger" >
-              {error.response.data.message}
-            </MDBAlert>
-          );
+          if(error.response){
+            setErrorMessage(
+              <MDBAlert color="danger" >
+                {error.response.data.message}
+              </MDBAlert>
+            );
+          } else {
+            alert('Dang nha khong thanh cong');
+          }
         }
-      
-         
-          
-        
     }
 
     return (

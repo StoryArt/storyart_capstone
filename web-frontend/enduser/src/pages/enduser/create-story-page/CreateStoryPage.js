@@ -45,7 +45,8 @@ const CreateStoryPage = () => {
     const [screens, setScreens] = useState([]);
     const [storyParameters, setStoryParameters] = useState([]);
     const [currentScreen, setCurrentScreen] = useState(null);
-    const [alert, setAlert] = useState({ open: false, content: '', type: 'success' });
+    const [alert, setAlert] = useState({ content: '', type: 'success' });
+    const [openAlert, setOpenAlert] = useState(false);
     const [openScreenPreview, setOpenScreenPreview] = useState(false);
     const [screenSnapshotsPage, setScreenSnapshotsPage] = useState({ page: 1 });
     
@@ -116,15 +117,19 @@ const CreateStoryPage = () => {
     }
     
     const addParameter = () => {
-        if(storyParameters.length > 0) return alert('Chi duoc them 1 thong tin');
-        const newParam =  {
-            id: Math.random().toString(),
-            type: INFORMATION_TYPES.NUMBER, //string, number, date,
-            name: '',
-            value: 100,
-            conditions: []
-        };
-        setStoryParameters([newParam])
+        if(storyParameters.length > 0) {
+            setAlert({ ...alert, content: 'Chỉ thêm được 1 thông tin!', type: 'error' });
+            setOpenAlert(true);
+        } else {
+            const newParam =  {
+                id: Math.random().toString(),
+                type: INFORMATION_TYPES.NUMBER, //string, number, date,
+                name: '',
+                value: 100,
+                conditions: []
+            };
+            setStoryParameters([newParam])
+        }
     }
 
     const removeParam = (index) => {
@@ -186,15 +191,17 @@ const CreateStoryPage = () => {
             const { success } = res.data;
 
             if(success) {
-                let msg = 'Luu thanh cong';
-                if(story.isPublished) msg = 'Luu va xuat ban thanh cong';
-                setAlert({ content: msg, type:'success', open: true });
+                let msg = 'Lưu thành công';
+                if(story.isPublished) msg = 'Lưu và xuất bản thành công';
+                setAlert({ content: msg, type:'success' });
+                setOpenAlert(true);
             } else {
                 
             }
         } catch (error) {
             console.log(error);
-            setAlert({ content: 'Khong the luu truyen', type:'error', open: true });
+            setAlert({ content: 'Không thể lưu truyện', type:'error' });
+            setOpenAlert(true);
         }
     }
 
@@ -359,7 +366,13 @@ const CreateStoryPage = () => {
                 </div>
             </div>
         
-            <MyAlert alert={alert}/>
+            <MyAlert 
+                open={openAlert}
+                setOpen={setOpenAlert}
+                type={alert.type}
+                content={alert.content}
+            />
+
             <ScreenPreview 
                 animation={story.animation}
                 open={openScreenPreview}
