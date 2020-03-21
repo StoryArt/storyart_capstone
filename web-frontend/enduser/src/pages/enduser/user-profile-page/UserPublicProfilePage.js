@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
-import MainLayout from  '../../../layouts/main-layout/MainLayout';
-import { MDBInput, MDBBtn } from "mdbreact";
+import MainLayout from "../../../layouts/main-layout/MainLayout";
+import { MDBInput, MDBBtn, MDBRow, MDBCol, MDBContainer } from "mdbreact";
 import UserService from "../../../services/user.service";
+import DateTimeUtils from "../../../utils/datetime";
+
 const UserPublicProfilePage = props => {
   const [profile, setProfile] = useState([]);
   const [name, setName] = useState("");
-  const [us, setUs] = useState("");
-
+  const [jointAt, setJointAt] = useState("");
   const [email, setEmail] = useState("");
+  const [avatar, setAvatar] = useState("");
   const [intro_content, setIntro_content] = useState("");
   const [is_active, setIsActive] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-
-  const GetProById = async (userId) => {
+  const GetProById = async userId => {
     try {
       const res = await UserService.getProById(userId);
       setProfile(res.data);
@@ -21,6 +22,8 @@ const UserPublicProfilePage = props => {
       setIntro_content(res.data.intro_content);
       setIsActive(res.data.active);
       setEmail(res.data.email);
+      setAvatar(res.data.avatar);
+      setJointAt(res.data.jointAt);
     } catch (error) {
       console.log(error);
     }
@@ -32,27 +35,56 @@ const UserPublicProfilePage = props => {
   }, []);
 
   const statusButton = [];
-  statusButton.push(<MDBBtn style={{padding:0}} color={profile.active?"success": "danger"}>{profile.active?"Active":"Deactivated"}</MDBBtn>);
-
+  statusButton.push(
+    <MDBBtn
+      style={{ padding: 0 }}
+      color={profile.active ? "success" : "danger"}
+    >
+      {profile.active ? "Active" : "Deactivated"}
+    </MDBBtn>
+  );
 
   return (
     <MainLayout>
+      
       <div className="container-fluid">
         <div className="row mb-5">
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-              <div className="row">
-                  <div  style={{paddingRight:0}} className="col-sm-2">
-                    <h2 style={{ marginRight:0}}> 
+                <div className="row">
+                  <div style={{ paddingRight: 0 }} className="col-sm-2">
+                    <h2 style={{ marginRight: 0 }}>
                       <strong>Account</strong>
                     </h2>
                   </div>
-                  <div style={{padding:0}} className="col-sm-3">{statusButton}</div>
+                  <div style={{ padding: 0 }} className="col-sm-3">
+                    {statusButton}
+                  </div>
                 </div>
               </div>{" "}
               <div className="card-body">
                 {errorMessage}
+
+                <div className="row">
+                    {/* //avatar */}
+                    <div className="form-group col-sm-6 field avatar">
+                      <div className="avatar-container">
+                        <label htmlFor="avatar1">
+                          <strong>Avatar</strong>
+                        </label>
+                        <div className="avatar-80">
+                          <img
+                            id="avatar1"
+                            name="avatar1"
+                            src={avatar}
+                            width="80"
+                          />
+                        </div>
+                      </div>
+                      </div>
+                  </div>
+               
                 <form>
                   <div className="row">
                     <div className="col-sm-6">
@@ -60,7 +92,8 @@ const UserPublicProfilePage = props => {
                         <label htmlFor="name">
                           <strong>Name</strong>
                         </label>
-                        <input disabled
+                        <input
+                          disabled
                           type="text"
                           id="name"
                           value={name}
@@ -69,12 +102,13 @@ const UserPublicProfilePage = props => {
                           onChange={e => setName(e.target.value)}
                         />
                       </div>
-                     
+
                       <div className="form-group">
                         <label htmlFor="email">
                           <strong>Email</strong>
                         </label>
-                        <input disabled
+                        <input
+                          disabled
                           type="text"
                           id="email"
                           value={email}
@@ -82,21 +116,24 @@ const UserPublicProfilePage = props => {
                           className="form-control"
                           onChange={e => setEmail(e.target.value)}
                         />
+                        {" "}
+                        
                       </div>
-
-                     
+                      Joint at:
+                      {DateTimeUtils.getDateTime(jointAt)}
                     </div>
                     <div className="col-sm-6">
                       <div className="form-group">
                         <label htmlFor="intro_content">
                           <strong>Intro</strong>
                         </label>
-                        <textarea disabled
+                        <textarea
+                          disabled
                           type="textarea"
                           id="intro_content"
                           value={intro_content == null ? "" : intro_content}
                           outline
-                          className="form-control"
+                          className="form-control text-area"
                           onChange={e => setIntro_content(e.target.value)}
                         />
                       </div>

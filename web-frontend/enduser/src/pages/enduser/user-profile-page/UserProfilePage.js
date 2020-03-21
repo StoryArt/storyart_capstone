@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from "react";
-import MainLayout from  '../../../layouts/main-layout/MainLayout';
+import MainLayout from "../../../layouts/main-layout/MainLayout";
 import {
   MDBInput,
   MDBAlert,
@@ -12,8 +11,8 @@ import {
 import { setAuthHeader } from "../../../config/auth";
 
 import UserService from "../../../services/user.service";
-import { UserContext } from '../../../context/user.context';
-import { getAuthUserInfo } from '../../../config/auth';
+import { UserContext } from "../../../context/user.context";
+import { getAuthUserInfo } from "../../../config/auth";
 
 import SplitDate from "../../../utils/splitDate";
 import DateTimeUtils from "../../../utils/datetime";
@@ -29,13 +28,14 @@ const UserProfilePage = () => {
   const [jointAt, setJointAt] = useState("");
   const [is_active, setIsActive] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
+  const [avatar, setAvatar] = useState(null);
+  const [upfile, setUploadFile] = useState(null);
   const [stories, setStories] = useState([]);
+  const [saveAvatarBt, setSaveAvatarBt] = useState("disabled");
   // const userContext = useContext(UserContext);
   // const { user } = userContext;
   // console.log(user);
   const user = getAuthUserInfo();
-
 
   useEffect(() => {
     getProfile();
@@ -78,6 +78,7 @@ const UserProfilePage = () => {
 
       setProfile(res.data);
       setEmail(res.data.email);
+      setAvatar(res.data.avatar);
       setId(res.data.id);
       setName(res.data.name);
       setUs(res.data.username);
@@ -86,8 +87,46 @@ const UserProfilePage = () => {
 
       setJointAt(date.toString());
       setIsActive(res.data.is_active);
+      setAvatar(res.data.avatar);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const onChangeAvatar = async file => {
+    setUploadFile(file);
+
+    var reader = new FileReader();
+
+    reader.onload = function(e) {
+      setAvatar(e.target.result);
+    };
+
+    reader.readAsDataURL(file);
+    setSaveAvatarBt("");
+  };
+
+  const handleUploadAvatar = async event => {
+    event.preventDefault();
+    try {
+      const res = await UserService.uploadAvatar(upfile);
+      console.log(res);
+
+      if (res.data.status == 200) {
+        let linkImgur = res.data.data.link;
+        try {
+          const r2 = await UserService.saveToDatabase(id, linkImgur);
+          setErrorMessage(<MDBAlert color="success">Lưu thành công!</MDBAlert>);
+        } catch (error) {
+          setErrorMessage(
+            <MDBAlert color="danger">Lưu thất bại. Thử lại!</MDBAlert>
+          );
+        }
+      }
+    } catch (error) {
+      setErrorMessage(
+        <MDBAlert color="danger">Upload thất bại. Thử lại!</MDBAlert>
+      );
     }
   };
 
@@ -100,12 +139,18 @@ const UserProfilePage = () => {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const statusButton = [];
 
-  statusButton.push(<MDBBtn style={{padding:0}} color={profile.active?"success": "danger"}>{profile.active?"Active":"Deactivated"}</MDBBtn>);
-
+  statusButton.push(
+    <MDBBtn
+      style={{ padding: 0 }}
+      color={profile.active ? "success" : "danger"}
+    >
+      {profile.active ? "Active" : "Deactivated"}
+    </MDBBtn>
+  );
 
   return (
     <MainLayout>
@@ -114,24 +159,76 @@ const UserProfilePage = () => {
           <div className="col-12">
             <div className="card">
               <div className="card-header ">
-              <div className="row">
-                  <div  style={{paddingRight:0}} className="col-sm-2">
-                    <h2 style={{ marginRight:0}}> 
+                <div className="row">
+                  <div style={{ paddingRight: 0 }} className="col-sm-2">
+                    <h2 style={{ marginRight: 0 }}>
                       <strong>Account</strong>
                     </h2>
                   </div>
-                  <div style={{padding:0}} className="col-sm-3">{statusButton}</div>
-                
-              </div>{" "}
+                  <div style={{ padding: 0 }} className="col-sm-3">
+                    {statusButton}
+                  </div>
+                </div>{" "}
               </div>{" "}
               <div className="card-body">
                 {errorMessage}
-                <form onSubmit={handleUpdateProfile}>
+                <form
+                  onSubmit={handleUploadAvatar}
+                  enctype="multipart/form-data"
+                >
+                  <div className="row">
+                    {/* //avatar */}
+                    <div className="form-group col-sm-6 field avatar">
+                      <div className="avatar-container">
+                        <label htmlFor="avatar1">
+                          <strong>Avatar</strong>
+                        </label>
+                        <div className="avatar-80">
+                          <img
+                            id="avatar1"
+                            name="avatar1"
+                            src={avatar}
+                            width="80"
+                          />
+                        </div>
+                      </div>
+                      <div className="control">
+                        <input
+                          type="file"
+                          name="image"
+                          accept=".jpg, .gif, .png"
+                          onChange={e => onChangeAvatar(e.target.files[0])}
+                        />
+                        <p className="tips">JPG, GIF or PNG, Max size: 10MB</p>
+                        <div className="form-group">
+                          <button
+                            disabled={saveAvatarBt}
+                            className="btn float-left"
+                            style={{
+                              clear: "both",
+                              fontSize: "1.1em",
+                              margin: 0,
+                              color: "#fff",
+                              backgroundColor: "#007bff"
+                            }}
+                          >
+                            Lưu avatar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+                <form
+                  onSubmit={handleUpdateProfile}
+                  // enctype="multipart/form-data"
+                >
                   <div className="row">
                     <div className="col-sm-6">
+                      {/* //name */}
                       <div className="form-group">
                         <label htmlFor="name">
-                          <strong>Name</strong>
+                          <strong>Tên của bạn</strong>
                         </label>
                         <input
                           type="text"
@@ -142,6 +239,7 @@ const UserProfilePage = () => {
                           onChange={e => setName(e.target.value)}
                         />
                       </div>
+                      {/* //username */}
                       <div className="form-group">
                         <label htmlFor="username">
                           <strong>Username</strong>
@@ -155,6 +253,7 @@ const UserProfilePage = () => {
                           onChange={e => setUs(e.target.value)}
                         />
                       </div>
+                      {/* //email */}
                       <div className="form-group">
                         <label htmlFor="email">
                           <strong>Email</strong>
@@ -168,7 +267,7 @@ const UserProfilePage = () => {
                           onChange={e => setEmail(e.target.value)}
                         />
                       </div>
-
+                      {/* save button */}
                       <div className="form-group">
                         {" "}
                         <button
@@ -181,28 +280,27 @@ const UserProfilePage = () => {
                             backgroundColor: "#007bff"
                           }}
                         >
-                          Save changes
+                          Lưu thay đổi
                         </button>
                       </div>
                     </div>
+                    {/* intro */}
                     <div className="col-sm-6">
-                      
                       <div className="form-group">
                         <label htmlFor="intro_content">
-                          <strong>Intro</strong>
+                          <strong>Giới thiệu cho mọi người về bạn</strong>
                         </label>
                         <textarea
+                          
                           id="intro_content"
                           value={intro_content == null ? "" : intro_content}
                           outline
-                          className="form-control"
+                          className="form-control text-area"
                           onChange={e => setIntro_content(e.target.value)}
                         />
                       </div>
-                      <i>
-                        Joint at:
-                        {DateTimeUtils.getDateTime(jointAt)}
-                      </i>
+                      Joint at:
+                      {DateTimeUtils.getDateTime(jointAt)}
                     </div>{" "}
                   </div>
                 </form>{" "}
