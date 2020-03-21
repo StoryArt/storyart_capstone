@@ -17,6 +17,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 import java.util.Collection;
 
 /**
@@ -48,6 +49,7 @@ public class UserController {
             userProfileResponse.setEmail(user.getEmail());
             userProfileResponse.setActive(user.isActive());
             userProfileResponse.setJointAt(user.getCreatedAt());
+            userProfileResponse.setAvatar(user.getAvatar());
         }
         return userProfileResponse;
 
@@ -91,17 +93,17 @@ public class UserController {
     //todo : what is @Valid
 
     // todo danh luong xu ly cho ham nay
-    @PutMapping(value = "/{uid}")
+    @PutMapping(value = "/{uid}", consumes = {"multipart/form-data"})
     public UserProfileResponse
     update(@PathVariable("uid") Integer uid,
-           @RequestBody @Valid UserProfileUpdateRequest user, @CurrentUser UserPrincipal userPrincipal) {
+           @RequestBody UserProfileUpdateRequest user, @CurrentUser UserPrincipal userPrincipal) {
 
         if (userPrincipal.getId() != uid) {
             throw new UnauthorizedException("Bạn không thể chỉnh sửa nội dung này!");
         }
         //nếu tìm được user khác user hiện tại, có email trùng thì báo lõi trùng email
-       User user1= userService.findByEmail(user.getEmail());
-        if (user1!= null) {
+        User user1 = userService.findByEmail(user.getEmail());
+        if (user1 != null) {
 
             if (user1.getId() != userPrincipal.getId()) {
                 throw new BadRequestException("Email đã được đăng ký bởi ai đó!");
@@ -127,15 +129,15 @@ public class UserController {
     @DeleteMapping(value = "/{uid}")
     public ResponseEntity<?>
     setStatusYourAccount(@PathVariable Integer uid, @CurrentUser UserPrincipal currentUser,
-                                      @Param(value = "setActive") boolean setActive) {
+                         @Param(value = "setActive") boolean setActive) {
         //this user must being active and param: setActive=false
         if (currentUser.getId() != uid) {
             throw new UnauthorizedException("Bạn không thể chỉnh sửa nội dung này!");
         }
         // trong th tu khoa tai khoan khi tai khoan đa khoa boi admin!
-      if(  userService.findById(currentUser.getId()).isDeactiveByAdmin()){
-          return new ResponseEntity<>(new ApiResponse(false, "Tài khoản đã khóa bởi quản trị viên!"), HttpStatus.FORBIDDEN);
-      }
+        if (userService.findById(currentUser.getId()).isDeactiveByAdmin()) {
+            return new ResponseEntity<>(new ApiResponse(false, "Tài khoản đã khóa bởi quản trị viên!"), HttpStatus.FORBIDDEN);
+        }
 
         if (!setActive) {
             userService.deActive(uid, false);
@@ -150,6 +152,19 @@ public class UserController {
             }
         }
 
+    }
+
+
+    @PostMapping(value = "/{uid}/avatar/save")
+    public ResponseEntity<?> saveAvatarLink(@PathVariable("uid") Integer uid, @CurrentUser UserPrincipal userPrincipal, @RequestBody AvatarUpdateRequest avatarUpdateRequest) {
+        if (userPrincipal.getId() != uid) {
+            throw new UnauthorizedException("Bạn không thể chỉnh sửa nội dung này!");
+
+
+        }
+
+        userService.updateAvatar(uid, avatarUpdateRequest.getLink());
+        return new ResponseEntity<>(new ApiResponse(true, "Lưu thành công!"), HttpStatus.OK);
     }
 
 

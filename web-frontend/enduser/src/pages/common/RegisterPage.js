@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { MDBInput, MDBAlert } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
-import { setAuthHeader } from "../../config/auth";
+
 
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
+  const [avatar, setAvatar] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [introContent, setIntroContent] = useState("");
@@ -17,15 +18,21 @@ const RegisterPage = () => {
   async function handleSubmit(event) {
     
     event.preventDefault();
+    let randomImage="https://avatars.dicebear.com/v2/avataaars/"+username+".svg"+"?options[mood][]=happy&options[mouth][]=smile&options[accessories][]=sunglasses"
+   
     let user = {
       name: name,
       username: username,
       password: password,
       introContent: introContent,
       email: email,
+      avatar: randomImage
     };
    
     try {
+
+
+      
       const res = await UserService.register(user);
       if (res.data.success == true) {
         setErrorMessage(

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -26,6 +27,9 @@ public class UserProfileUpdateRequest {
     String email;
     @Size(max = 300, message = "Thông tin giới thiệu có độ dài tối đa là 300 ký tự!")
     String intro_content;
+
+
+    String avatar;
 
 
 

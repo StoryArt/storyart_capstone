@@ -101,6 +101,7 @@ public class JwtAuthenticationController {
         user.setName(signUpRequest.getName());
         user.setEmail(signUpRequest.getEmail());
         user.setIntroContent(signUpRequest.getIntro_content());
+        user.setAvatar(signUpRequest.getAvatar());
 
 //        Role userRole
         Role userRole = roleRepository.findRoleByName(RoleName.ROLE_USER)

@@ -162,7 +162,7 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(page, size);
 
 
-        Page<User> userPage = userRepository.findAdminByUsernameOrEmail(search, pageable);
+        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(search,RoleName.ROLE_ADMIN, pageable);
         List<User> usersList = userPage.toList();
 
         List<UserInManagementResponse> users = convertUserlist(usersList);
@@ -187,8 +187,7 @@ public class UserServiceImpl implements UserService {
 page=page-1;
         validatePageNumberAndSize(page, size);
         Pageable pageable = PageRequest.of(page, size);
-//        TypedQuery<User> querry=entityManager.createQuery("")
-        Page<User> userPage = userRepository.findOnlyUserByUsernameOrEmail(searchtxt, pageable);
+        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(searchtxt,RoleName.ROLE_USER, pageable);
         List<User> usersList = userPage.toList();
         List<UserInManagementResponse> users = convertUserlist(usersList);
         return new PagedResponse<UserInManagementResponse>(users, 1+userPage.getNumber(), userPage.getSize(),
@@ -208,6 +207,14 @@ page=page-1;
         Optional<Role> role = roleRepository.findRoleByName(RoleName.ROLE_SYSTEM_ADMIN);
         user.setRoleId(role.get().getId());
         create(user);
+    }
+
+    @Override
+    public void updateAvatar(Integer uid,String link) {
+        User user= findById(uid);
+        user.setAvatar(link);
+        userRepository.save(user);
+
     }
 
     private void validatePageNumberAndSize(int page, int size) {
@@ -230,6 +237,7 @@ page=page-1;
         byId.setName(us.getName());
         byId.setEmail(us.getEmail());
         byId.setIntroContent(us.getIntro_content());
+        byId.setAvatar(us.getAvatar());
 
 
         userRepository.save(byId);
