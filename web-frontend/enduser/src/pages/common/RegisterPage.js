@@ -3,8 +3,7 @@ import { MDBInput, MDBAlert } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
 
-import Avatars from '@dicebear/avatars';
-import sprites from '@dicebear/avatars-avataaars-sprites';
+
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
