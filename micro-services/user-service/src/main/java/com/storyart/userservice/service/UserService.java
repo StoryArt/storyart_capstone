@@ -44,4 +44,7 @@ public interface UserService {
     PagedResponse<UserInManagementResponse> findOnlyUserByUsernameOrEmail(int page, int size, String searchtxt);
 
     void createDefaultSysAdmin();
+
+
+    void updateAvatar(Integer uid,String link);
 }

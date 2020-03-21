@@ -43,5 +43,7 @@ public class SignUpRequest {
     String intro_content;
 
 
+    String avatar;
+
 
 }

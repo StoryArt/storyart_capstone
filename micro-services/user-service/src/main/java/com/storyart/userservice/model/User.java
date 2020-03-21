@@ -37,7 +37,7 @@ public class User extends DateAudit {
     @Size(max = 100, min = 8, message = "Mật khẩu phải có từ 8 đến 100 ký tự")
     private String password;
 
-    @Size(max = 1000, message = "̣")
+    @Size(max = 1000, message = "")
     private String avatar;
 
     private int roleId;
@@ -56,6 +56,9 @@ public class User extends DateAudit {
     private Date updatedAt;
 
     boolean isDeactiveByAdmin;
+
+
+
 
     @PrePersist
     protected void onCreate() {

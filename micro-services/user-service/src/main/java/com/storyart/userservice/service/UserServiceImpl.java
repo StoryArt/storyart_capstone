@@ -162,7 +162,7 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(page, size);
 
 
-        Page<User> userPage = userRepository.findAdminByUsernameOrEmail(search, pageable);
+        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(search,RoleName.ROLE_ADMIN, pageable);
         List<User> usersList = userPage.toList();
 
         List<UserInManagementResponse> users = convertUserlist(usersList);
@@ -192,7 +192,7 @@ page=page-1;
 //        TypedQuery<User> querry=entityManager.createQuery("")
 
 
-        Page<User> userPage = userRepository.findOnlyUserByUsernameOrEmail(searchtxt, pageable);
+        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(searchtxt,RoleName.ROLE_USER, pageable);
         List<User> usersList = userPage.toList();
 
         List<UserInManagementResponse> users = convertUserlist(usersList);
@@ -217,6 +217,14 @@ page=page-1;
         create(user);
     }
 
+    @Override
+    public void updateAvatar(Integer uid,String link) {
+        User user= findById(uid);
+        user.setAvatar(link);
+        userRepository.save(user);
+
+    }
+
     private void validatePageNumberAndSize(int page, int size) {
         if (page < 0) {
             throw new BadRequestException("Trang không dưới 0");
@@ -237,6 +245,7 @@ page=page-1;
         byId.setName(us.getName());
         byId.setEmail(us.getEmail());
         byId.setIntroContent(us.getIntro_content());
+        byId.setAvatar(us.getAvatar());
 
 
         userRepository.save(byId);
