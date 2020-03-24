@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
 
@@ -311,9 +312,8 @@ public class CommentServiceImpl implements CommentService {
         List<Comment> comments = commentRepository.findAllByStoryIdInAndActiveAndDisableByAdminAndCreatedAtBetweenOrderByCreatedAtDesc(storyIds,true, false, startDate, endDate);
         response.setTotal(comments.size());
         List<NumberOfCommentByDate> numberOfCommentByDates = new ArrayList<>();
-        Date tmpDate = new Date();
-        //Calendar cal = Calendar.getInstance();
-        int totalDay = calendarEnd.get(Calendar.DAY_OF_MONTH) - calendarStart.get(Calendar.DAY_OF_MONTH);
+
+        int totalDay = (int) ChronoUnit.DAYS.between(calendarStart.toInstant(), calendarEnd.toInstant());
 
         for(int i = 0; i<= totalDay; i++){
             Date dateTemp = calendarStart.getTime();
