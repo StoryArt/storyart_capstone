@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -28,4 +29,9 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
     @Query("select c from Comment c where c.id in (:commentIds)")
     List<Comment> findAllByCommentIds(List<Integer> commentIds);
+
+    @Query("select count(c) from Comment c where c.storyId in (:storyIds)")
+    Integer findTotalCommentByStoryIds(List<Integer> storyIds);
+
+    List<Comment> findAllByStoryIdInAndActiveAndDisableByAdminAndCreatedAtBetweenOrderByCreatedAtDesc(List<Integer> storyIds,boolean isActive,boolean isDisableByAdmin, Date startDate, Date endDate);
 }

@@ -66,4 +66,11 @@ public class CommentController {
         }
         return commentService.getCommentHistory(userId, pageNo, pageSize);
     }
+
+    @GetMapping("/getCommentStatistic")
+    public StatisticResponse getCommentStatistic(@RequestParam(defaultValue = "0") @Valid Integer userId,
+                                                 @RequestParam(defaultValue = "0") @Valid String start,
+                                                 @RequestParam(defaultValue = "0") @Valid String end){
+        return commentService.getStatistic(userId, start, end);
+    }
 }

@@ -7,5 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface StoryRepository extends JpaRepository<Story, Integer> {
-
+    @Query("select s.id from Story s where s.userId = ?1")
+    List<Integer> getAllStoryIdByUserId(int userId);
 }

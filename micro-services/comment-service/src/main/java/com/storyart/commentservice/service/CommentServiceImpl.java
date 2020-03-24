@@ -19,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
 
@@ -272,6 +274,97 @@ public class CommentServiceImpl implements CommentService {
 
 
         return responsePage;
+    }
+
+    @Override
+    public StatisticResponse getStatistic(int userId, String start, String end) {
+        Date startDate, endDate;
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        Calendar calendarEnd = Calendar.getInstance();
+        Calendar calendarStart= Calendar.getInstance();
+
+        try {
+            //
+            startDate = formatter.parse(start);
+            calendarStart.setTime(startDate);
+            //
+            endDate = formatter.parse(end);
+            calendarEnd.setTime(endDate);
+            calendarEnd.set(Calendar.HOUR, 23);
+            calendarEnd.set(Calendar.MINUTE, 59);
+            calendarEnd.set(Calendar.SECOND, 59);
+            endDate = calendarEnd.getTime();
+        } catch (ParseException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sai định dạng ngày.");
+        }
+
+        List<Integer> storyIds = storyRepository.getAllStoryIdByUserId(userId);
+
+        //int totalComment = commentRepository.findTotalCommentByStoryIds(storyIds);
+
+        StatisticResponse response = new StatisticResponse();
+
+
+
+        List<Comment> comments = commentRepository.findAllByStoryIdInAndActiveAndDisableByAdminAndCreatedAtBetweenOrderByCreatedAtDesc(storyIds,true, false, startDate, endDate);
+        response.setTotal(comments.size());
+        List<NumberOfCommentByDate> numberOfCommentByDates = new ArrayList<>();
+        Date tmpDate = new Date();
+        //Calendar cal = Calendar.getInstance();
+        int totalDay = calendarEnd.get(Calendar.DAY_OF_MONTH) - calendarStart.get(Calendar.DAY_OF_MONTH);
+
+        for(int i = 0; i<= totalDay; i++){
+            Date dateTemp = calendarStart.getTime();
+            NumberOfCommentByDate numberOfCommentByDate = new NumberOfCommentByDate();
+            numberOfCommentByDate.setDate(dateTemp);
+            numberOfCommentByDate.setNumberOfComment(0);
+            for (Comment comment: comments) {
+                Date date = new Date(comment.getCreatedAt().getTime());
+                String dateString = formatter.format(date);
+                try {
+                    date = formatter.parse(dateString);
+                } catch (ParseException e) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Có lỗi xảy ra khi tính toán.");
+                }
+                if(date.compareTo(dateTemp) ==0){
+                    numberOfCommentByDate.setNumberOfComment(numberOfCommentByDate.getNumberOfComment()+1);
+                }
+            }
+            int dayOfMonth = calendarStart.get(Calendar.DAY_OF_MONTH);
+            calendarStart.set(Calendar.DAY_OF_MONTH, dayOfMonth+1);
+            numberOfCommentByDates.add(numberOfCommentByDate);
+        }
+
+        //for (Comment comment:comments) {
+//
+        //    Date date = new Date(comment.getCreatedAt().getTime());
+        //    String dateString = formatter.format(date);
+        //    try {
+        //        date = formatter.parse(dateString);
+        //    } catch (ParseException e) {
+        //        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Có lỗi xảy ra khi tính toán.");
+        //    }
+        //    if(date.compareTo(tmpDate) !=0){
+        //        tmpDate = date;
+        //        NumberOfCommentByDate numberOfCommentByDate = new NumberOfCommentByDate();
+        //        numberOfCommentByDate.setDate(date);
+        //        numberOfCommentByDate.setNumberOfComment(1);
+        //        numberOfCommentByDates.add(numberOfCommentByDate);
+        //    }
+        //    else {
+        //        for (NumberOfCommentByDate numberCommentByDate: numberOfCommentByDates) {
+        //            if(numberCommentByDate.getDate().compareTo(date) == 0){
+        //                numberCommentByDate.setNumberOfComment(numberCommentByDate.getNumberOfComment()+1);
+        //            }
+        //        }
+        //    }
+        //}
+//
+        response.setNumberOfCommentByDates(numberOfCommentByDates);
+
+        return response;
     }
 
 
