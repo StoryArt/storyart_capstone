@@ -44,7 +44,7 @@ public class Rating extends DateAudit {
 
     private Date createdAt;
 
-    private Date updatedAt;
+    private Date updatedAt = new Date();
 
     @PrePersist
     protected void onCreate() {

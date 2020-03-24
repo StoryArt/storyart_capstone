@@ -1,16 +1,16 @@
 package com.storyart.storyservice.model;
 
 import com.storyart.storyservice.common.DateAudit;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -31,7 +31,7 @@ public class User extends DateAudit {
     private String username;
 
     @NotBlank(message = "Tên không được để trống")
-    @Size(max = 40, min = 4, message = "Tên phải có từ 3 đến 40 ký tự")
+    @Size(max = 40, min = 3, message = "Tên phải có từ 3 đến 40 ký tự")
     @Column(length = 40)
     private String name;
 
@@ -40,7 +40,7 @@ public class User extends DateAudit {
     @Size(max = 100, min = 8, message = "Mật khẩu phải có từ 8 đến 100 ký tự")
     private String password;
 
-    @Size(max = 1000, message = "̣")
+    @Size(max = 1000, message = "")
     private String avatar;
 
     private int roleId;
@@ -57,6 +57,8 @@ public class User extends DateAudit {
     private Date createdAt;
 
     private Date updatedAt;
+
+    boolean isDeactiveByAdmin;
 
     @PrePersist
     protected void onCreate() {

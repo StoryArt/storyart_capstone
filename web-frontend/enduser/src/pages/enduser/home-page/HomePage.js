@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MDBCol, MDBCard, MDBCardBody, MDBCardImage, MDBCardTitle, MDBCardText, MDBBtn, MDBInputGroup } from 'mdbreact';
-import UserLayout from '../../../layouts/UserLayout';
+import MainLayout from '../../../layouts/main-layout/MainLayout';
 import StoryCard from '../../../components/common/StoryCard';
 import MySpinner from '../../../components/common/MySpinner';
 import StoryService from '../../../services/story.service';
@@ -108,8 +107,9 @@ const HomePage = () => {
     }
 
     return (
-        <UserLayout>
+        <MainLayout>
             <div className="container-fluid">
+<<<<<<< HEAD
                 <h4 className="text-bold">Gợi ý cho bạn theo Đánh giá</h4>
                 <hr style={{ border: '1px solid #ccc' }} />
                 {!suggestedStoriesByRatingLoading && (
@@ -127,6 +127,9 @@ const HomePage = () => {
                 {suggestedStoriesByRatingLoading && <MySpinner/>}
 
                 <h4 className="text-bold">Gợi ý cho bạn theo Lịch Sử</h4>
+=======
+                <h4 className="text-bold">Gợi ý cho bạn</h4>
+>>>>>>> 8cda2314fa393dc565ba97d5a524415d82d33900
                 <hr style={{ border: '1px solid #ccc' }} />
                 {!suggestedStoriesByHistoryLoading && (
                      <div className="row">
@@ -143,13 +146,17 @@ const HomePage = () => {
                 {suggestedStoriesByHistoryLoading && <MySpinner/>}
 
 
+<<<<<<< HEAD
                 <h4 className="text-bold mt-5">Truyện đang thịnh hành</h4>
+=======
+                <h4 className="text-bold mt-5">Danh sách thịnh hành</h4>
+>>>>>>> 8cda2314fa393dc565ba97d5a524415d82d33900
                 <hr style={{ border: '1px solid #ccc' }} />
                 {!trendStoriesLoading && (
                     <div className="row">
                         {trendStories.map(story => (
-                            <div className="col-sm-3 px-2">
-                            <StoryCard story={story} />
+                            <div className="col-sm-3 px-2" key={story.id}>
+                                <StoryCard story={story} />
                             </div>
                         ))}
                     </div>
@@ -157,7 +164,7 @@ const HomePage = () => {
                 {trendStoriesLoading && <MySpinner/>}
 
            </div>
-        </UserLayout>
+        </MainLayout>
     );
 };
 

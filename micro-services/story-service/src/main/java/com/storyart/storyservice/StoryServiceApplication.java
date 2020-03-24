@@ -20,5 +20,6 @@ public class StoryServiceApplication {
 		return args -> {
 	//		storyService.createTempStories();
 		};
+
 	}
 }

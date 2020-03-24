@@ -12,9 +12,6 @@ const TagList = (props) => {
     return (
         <>
             {tags.map((tag, index) => (
-                // <div 
-                //     key={tag.id} 
-                //     className={`badge badge-secondary  mr-2`}>{tag.title}</div>
                 <span key={tag.id}>{tag.title}{index != (tags.length - 1) ? ', ' : ''} </span>
             ))}
         </>

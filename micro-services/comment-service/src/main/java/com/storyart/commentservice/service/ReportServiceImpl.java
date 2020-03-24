@@ -4,6 +4,7 @@ import com.storyart.commentservice.dto.comment.ResponseListCommentDTO;
 import com.storyart.commentservice.dto.report.ReportCommentRequestDTO;
 import com.storyart.commentservice.dto.report.ReportCommentResponseDTO;
 import com.storyart.commentservice.model.Comment;
+import com.storyart.commentservice.model.Reaction;
 import com.storyart.commentservice.model.Report;
 import com.storyart.commentservice.model.User;
 import com.storyart.commentservice.repository.CommentRepository;
@@ -61,8 +62,8 @@ public class ReportServiceImpl implements ReportService {
         }
 
         Report report = new Report();
-        report.setComment(cmt.get());
-        report.setUser(u.get()); //user nay la nguoi di report dung ko, dung r, user bi, report nam trong cmt
+        report.setCommentId(reportCommentRequestDTO.getCommentId());
+        report.setUserId(reportCommentRequestDTO.getUserId()); //user nay la nguoi di report dung ko, dung r, user bi, report nam trong cmt
         //chinh xac =)))
         //lua` nhau a` :v
         //tuong ko biet cai nay chu =)) :))
@@ -95,18 +96,64 @@ public class ReportServiceImpl implements ReportService {
         List<Integer> commentIds = new ArrayList<>();
 
         for (Report report : reportList) {
-            commentIds.add(report.getComment().getId());
+            commentIds.add(report.getCommentId());
         }
+
+        List<Comment> comments = commentRepository.findAllById(commentIds);
+
+        List<Integer> userIds = new ArrayList<>();
+        for (Comment comment: comments) {
+            userIds.add(comment.getUserId());
+        }
+        List<User> users = userRepository.findAllById(userIds);
 
         List<Integer> numberOfReports = reportRepository.getNumberOfReports(commentIds);
         List<ReportCommentResponseDTO> responseList = responsePage.getContent();
         int index = 0;
         for (ReportCommentResponseDTO response: responseList) {
             response.setNumberOfReports(numberOfReports.get(index));
-            response.setCommentOwner(reportList.get(index).getComment().getUser().getUsername());
+            for (Comment comment: comments){
+                if(response.getCommentId() == comment.getId()){
+                    response.setCommentContent(comment.getContent());
+                    for (User user: users) {
+                        if(user.getId() == comment.getUserId()){
+                            response.setCommentOwner(user.getUsername());
+                        }
+                    }
+                }
+            }
+            //response.setCommentOwner(reportList.get(index).getComment().getUser().getUsername());
             index++;
         }
 
         return responsePage;
+    }
+
+    @Override
+    public Page<Report> getReportsByCommentId(int commentId, int pageNo, int pageSize) {
+
+        Optional<Comment> comment = commentRepository.findById(commentId);
+
+        if(!comment.isPresent()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Bình luận không tồn tại.");
+        }
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        Page<Report> responsePage = reportRepository.getReportsByCommentId(commentId, pageable);
+
+
+        return responsePage;
+    }
+
+    @Override
+    public void handleReport(List<Integer> reportIds) {
+        List<Report> reports = reportRepository.findAllById(reportIds);
+
+        for (Report report: reports) {
+            report.setHandled(true);
+        }
+
+        reportRepository.saveAll(reports);
     }
 }

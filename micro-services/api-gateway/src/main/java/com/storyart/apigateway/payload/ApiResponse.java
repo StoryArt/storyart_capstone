@@ -1,4 +1,4 @@
-package com.storyart.userservice.payload;
+package com.storyart.apigateway.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserIdentityAvailability {
-    private Boolean avaiable;
+public class ApiResponse {
+private Boolean success;
+private String message;
+
 }

@@ -12,7 +12,6 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReactionHistoryResponseDTO {
-    private int reactionId;
     private int userId;
     private int commentId;
     private int commentOwnerId;
@@ -20,6 +19,6 @@ public class ReactionHistoryResponseDTO {
     private String storyName;
     private String type;
     private boolean isActive;
-    private Timestamp createAt;
-    private Timestamp updateAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 }

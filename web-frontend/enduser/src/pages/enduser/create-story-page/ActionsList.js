@@ -24,7 +24,7 @@ const ActionsList = (props) => {
                         </div>
                         <div className="col-sm-6 mb-2"> 
                             <FormControl style={{ width: '100%' }} variant="outlined">
-                                <InputLabel>Loai hanh dong</InputLabel>
+                                <InputLabel>Loại hành động</InputLabel>
                                 <Select
                                     defaultValue={actionsList[0]}
                                     value={action.type}
@@ -43,7 +43,7 @@ const ActionsList = (props) => {
                                 <div className="col-sm-4">
                                     {(
                                         <FormControl style={{ width: '100%' }} variant="outlined">
-                                            <InputLabel>Anh huong</InputLabel>
+                                            <InputLabel>Ảnh hưởng</InputLabel>
                                             <Select
                                                 defaultValue={currentParam.operations[0]}
                                                 value={action.operation}
@@ -103,7 +103,7 @@ const ActionsList = (props) => {
                     <div className="col-1">
                         <MyDropdownMenu>
                             <MenuItem onClick={() => onRemoveAction(screen, index)}>
-                                Xoa
+                                Xóa
                             </MenuItem>
                         </MyDropdownMenu>
                     </div>

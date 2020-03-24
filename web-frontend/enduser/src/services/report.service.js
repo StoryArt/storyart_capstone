@@ -6,6 +6,24 @@ class ReportService {
         const url = base_url.concat('/reportComment');
         return axios.post(url, reportRequest);
     }
+
+    static async getCommentReports(pageNo) {
+        const url = base_url.concat('/getCommentReports?pageSize=5&pageNo=').concat(pageNo);
+        return axios.get(url);
+
+    }
+
+    static async getReportsForEachComment(pageNo, commentId) {
+        const url = base_url.concat('/getReportsByCommentId?pageSize=3&pageNo=').concat(pageNo).concat('&commentId=').concat(commentId);
+        return axios.get(url);
+
+    }
+
+    static async handleReport(reportIds) {
+        const url = base_url.concat('/handleReport');
+        return axios.post(url, reportIds);
+    }
+
 }
 
 export default ReportService;

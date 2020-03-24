@@ -14,6 +14,6 @@ import java.util.HashMap;
 @AllArgsConstructor
 public class ResultDto<T> implements Serializable {
     private boolean success;
-    private HashMap<String, String> errors;
+    private HashMap<String, String> errors = new HashMap<>();
     private T data;
 }

@@ -6,9 +6,11 @@ import com.storyart.commentservice.dto.reaction.ReactionCommentDTO;
 import com.storyart.commentservice.dto.reaction.ReactionHistoryResponseDTO;
 import com.storyart.commentservice.model.Comment;
 import com.storyart.commentservice.model.Reaction;
+import com.storyart.commentservice.model.Story;
 import com.storyart.commentservice.model.User;
 import com.storyart.commentservice.repository.CommentRepository;
 import com.storyart.commentservice.repository.ReactionRepository;
+import com.storyart.commentservice.repository.StoryRepository;
 import com.storyart.commentservice.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -33,6 +36,9 @@ public class ReactionServiceImpl implements ReactionService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    StoryRepository storyRepository;
 
     @Override
     public void react(ReactionCommentDTO reactionDTO) {
@@ -51,8 +57,9 @@ public class ReactionServiceImpl implements ReactionService {
         if(react.isPresent()){
             Reaction reaction = react.get();
             if(reaction.getType().equals(reactionDTO.getType())){
-               reaction.setActive(false);
-               reactionRepository.save(reaction);
+               //reaction.setActive(false);
+               //reactionRepository.save(reaction);
+                removeReaction(reactionDTO);
             }
             else {
                 reaction.setType(reactionDTO.getType());
@@ -60,65 +67,61 @@ public class ReactionServiceImpl implements ReactionService {
             }
         } else {
             Reaction newReaction = new Reaction();
-            newReaction.setComment(comment.get());
-            newReaction.setUser(user.get());
+            newReaction.setCommentId(reactionDTO.getCommentId());
+            newReaction.setUserId(reactionDTO.getUserId());
             newReaction.setType(reactionDTO.getType());
             newReaction.setActive(true);
             reactionRepository.save(newReaction);
         }
     }
 
-    @Override
-    public void like(ReactionCommentDTO reactionDTO) {
-        Optional<Reaction> reaction = reactionRepository.findReactionByCommentIdAndUserId(reactionDTO.getCommentId(), reactionDTO.getUserId());
-        Optional<Comment> comment = commentRepository.findById(reactionDTO.getCommentId());
-        if(!comment.isPresent()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Bình luận không tồn tại.");
-        }
-        if(reaction.isPresent()){
-            Reaction updateReaction = reaction.get();
-
-            updateReaction.setType("like");
-            reactionRepository.save(updateReaction);
-        }
-        else {
-            Reaction newReaction = new Reaction();
-            newReaction.setComment(comment.get());
-//            newReaction.setUserId(reactionDTO.getUserId());
-            newReaction.setUser(null);
-            newReaction.setType("like");
-            reactionRepository.save(newReaction);
-        }
-    }
-///ham like, dislike giong het nhau, anh gop vo dc ko //chac chan dc
-//    em for sure la dc auke
-    //
-    @Override
-    public void dislike(ReactionCommentDTO reactionDTO) {
-        Optional<Reaction> reaction = reactionRepository.findReactionByCommentIdAndUserId(reactionDTO.getCommentId(), reactionDTO.getUserId());
-        Optional<Comment> comment = commentRepository.findById(reactionDTO.getCommentId());
-
-        if(!comment.isPresent()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Bình luận không tồn tại.");
-        }
-
-        if(reaction.isPresent()){
-            Reaction updateReaction = reaction.get();
-            updateReaction.setType("dislike");
+    //@Override
+    //public void like(ReactionCommentDTO reactionDTO) {
+    //    Optional<Reaction> reaction = reactionRepository.findReactionByCommentIdAndUserId(reactionDTO.getCommentId(), reactionDTO.getUserId());
+    //    Optional<Comment> comment = commentRepository.findById(reactionDTO.getCommentId());
+    //    if(!comment.isPresent()){
+    //        throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Bình luận không tồn tại.");
+    //    }
+    //    if(reaction.isPresent()){
+    //        Reaction updateReaction = reaction.get();
 //
-            reactionRepository.save(updateReaction);
-        }
-        else {
-            Reaction newReaction = new Reaction();
-            newReaction.setComment(comment.get());
-//            newReaction.setUserId(reactionDTO.getUserId());
-            newReaction.setUser(null);
-            newReaction.setType("dislike");
+    //        updateReaction.setType("like");
+    //        reactionRepository.save(updateReaction);
+    //    }
+    //    else {
+    //        Reaction newReaction = new Reaction();
+    //        newReaction.setCommentId(reactionDTO.getCommentId());
+    //        newReaction.setUserId(reactionDTO.getUserId());
+    //        newReaction.setType("like");
+    //        reactionRepository.save(newReaction);
+    //    }
+    //}
+    //@Override
+    //public void dislike(ReactionCommentDTO reactionDTO) {
+    //    Optional<Reaction> reaction = reactionRepository.findReactionByCommentIdAndUserId(reactionDTO.getCommentId(), reactionDTO.getUserId());
+    //    Optional<Comment> comment = commentRepository.findById(reactionDTO.getCommentId());
 //
-            reactionRepository.save(newReaction);
-        }
-
-    }
+    //    if(!comment.isPresent()){
+    //        throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Bình luận không tồn tại.");
+    //    }
+//
+    //    if(reaction.isPresent()){
+    //        Reaction updateReaction = reaction.get();
+    //        updateReaction.setType("dislike");
+////
+    //        reactionRepository.save(updateReaction);
+    //    }
+    //    else {
+    //        Reaction newReaction = new Reaction();
+    //        newReaction.setComment(comment.get());
+//  //          newReaction.setUserId(reactionDTO.getUserId());
+    //        newReaction.setUser(null);
+    //        newReaction.setType("dislike");
+////
+    //        reactionRepository.save(newReaction);
+    //    }
+//
+    //}
 
     @Override
     public void removeReaction(ReactionCommentDTO reactionDTO) {
@@ -133,8 +136,9 @@ public class ReactionServiceImpl implements ReactionService {
         Optional<Reaction> react = reactionRepository.findReactionByCommentIdAndUserId(reactionDTO.getCommentId(), reactionDTO.getUserId());
         Reaction reaction = react.get();
         if(react.isPresent()){
-            reaction.setActive(false);
-            reactionRepository.save(reaction);
+            //reaction.setActive(false);
+            //reactionRepository.save(reaction);
+            reactionRepository.delete(reaction);
         }
 
 
@@ -153,14 +157,54 @@ public class ReactionServiceImpl implements ReactionService {
             }
         });
 
+        List<Reaction> reactions = reactionPage.getContent();
+        List<Integer> commentIds = new ArrayList<>();
+        for (Reaction reaction: reactions) {
+            commentIds.add(reaction.getCommentId());
+        }
+
+        List<Comment> comments = commentRepository.findAllByCommentIds(commentIds);
+
+        List<Integer> userIds = new ArrayList<>();
+        List<Integer> storyIds = new ArrayList<>();
+
+        for (Comment comment: comments) {
+            userIds.add(comment.getUserId());
+            storyIds.add(comment.getStoryId());
+        }
+
+        List<User> users = userRepository.findAllById(userIds);
+        List<Story> stories = storyRepository.findAllById(storyIds);
+
         List<ReactionHistoryResponseDTO> responseList = responsePage.getContent();
-        int index = 0;
+        //int index = 0;
         for (ReactionHistoryResponseDTO response : responseList) {
-            response.setStoryName(reactionPage.getContent().get(index).getComment().getStory().getTitle());
-            response.setCommentId(reactionPage.getContent().get(index).getComment().getId());
-            response.setCommentOwnerId(reactionPage.getContent().get(index).getComment().getId());
-            response.setCommentOwnerName(reactionPage.getContent().get(index).getComment().getUser().getUsername());
-            index++;
+            //response.setStoryName(reactionPage.getContent().get(index).getComment().getStory().getTitle());
+            //response.setCommentId(reactionPage.getContent().get(index).getComment().getId());
+            //response.setCommentOwnerId(reactionPage.getContent().get(index).getComment().getId());
+            //response.setCommentOwnerName(reactionPage.getContent().get(index).getComment().getUser().getUsername());
+
+            for (Comment comment: comments) {
+                if (response.getCommentId() == comment.getId()){
+                    for (User user: users) {
+                        
+                        if (comment.getUserId() == user.getId()){
+                            response.setCommentOwnerName(user.getName());
+                            response.setCommentOwnerId(user.getId());
+                            break;
+                        }
+                    }
+                    for (Story story: stories) {
+                        if (comment.getStoryId() == story.getId()){
+                            response.setStoryName(story.getTitle());
+                            break;
+                        }
+                    }
+
+                }
+
+            }
+            //index++;
         }
 
         return responsePage;

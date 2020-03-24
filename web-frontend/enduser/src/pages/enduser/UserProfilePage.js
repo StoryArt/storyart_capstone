@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import UserLayout from "../../layouts/UserLayout";
+import MainLayout from "../../layouts/main-layout/MainLayout";
 import {
   MDBInput,
   MDBAlert,
@@ -109,7 +109,7 @@ const UserProfilePage = () => {
   }
 
   return (
-    <UserLayout>
+    <MainLayout>
       <div className="container-fluid">
         <div className="row mb-5">
           <div className="col-12">
@@ -245,7 +245,7 @@ const UserProfilePage = () => {
           ))}{" "}
         </div>{" "}
       </div>{" "}
-    </UserLayout>
+    </MainLayout>
   );
 };
 

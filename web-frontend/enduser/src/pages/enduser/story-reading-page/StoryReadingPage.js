@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Spring, Transition, animated } from 'react-spring/renderprops';
-import { Button } from '@material-ui/core';
-import MainLayout from '../../../layouts/UserLayout';
+import Fullscreen from "react-full-screen";
+import { Zoom, Fade, Collapse, Slide, Grow, IconButton, Tooltip } from '@material-ui/core';
+
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import MainLayout from '../../../layouts/main-layout/MainLayout';
 import StoryService from '../../../services/story.service';
 import ValidationUtils from '../../../utils/validation';
+import StringUtils from '../../../utils/string';
 import { ACTION_TYPES, INFORMATION_TYPES, STRING_OPERATIONS,
-     NUMBER_OPERATIONS, STRING_CONDITIONS, NUMBER_CONDITIONS } from '../../../common/constants';
+     NUMBER_OPERATIONS, STRING_CONDITIONS, NUMBER_CONDITIONS, ANIMATIONS } from '../../../common/constants';
 
 import MySpinner from '../../../components/common/MySpinner';
 import NotFound from '../../../components/common/NotFound';
+import ScreenShow from '../../../components/common/ScreenShow';
+import SocialShare from '../../../components/common/SocialShare';
 
 const ReadStoryPage = (props) => {
 
@@ -18,8 +24,10 @@ const ReadStoryPage = (props) => {
     const [informationActions, setInformationActions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [notfound, setNotfound] = useState(false);
+    const [isFullScreen, setFullScreen] = useState(false);
 
     const [currentScreen, setCurrentScreen] = useState({ });
+    const [showScreen, setShowScreen] = useState(false);
     const [selectedScreens, setSelectedScreens] = useState([]);
     const [selectedActions, setSelectedActions] = useState([]);
     const [userInformation, setUserInformation] = useState([]);
@@ -30,8 +38,13 @@ const ReadStoryPage = (props) => {
     }, []);
 
     const changeCurrentScreen = (screenId) => {
+        setShowScreen(false);
         const screen = screens.find(scr => scr.id === screenId);
-        setCurrentScreen(screen);
+        setTimeout(() => {
+            setCurrentScreen(screen)
+            setShowScreen(true)
+        }, 1000);
+        
     }
   
     const getReadingStory = async (storyId) => {
@@ -99,23 +112,20 @@ const ReadStoryPage = (props) => {
                     }
                 }
             }
-            console.log(newValue);
             
             foundInformation.value = newValue;
             
             setInformations([...informations]);
 
             if(!canReadMore) return;
+
             changeCurrentScreen(action.nextScreenId);
-          
             
         } else if(action.type === ACTION_TYPES.REDIRECT){
             window.open(action.value, '_blank');
         } else if (action.type === ACTION_TYPES.NEXT_SCREEN){
             changeCurrentScreen(action.value);
         } 
-
-
     }
 
     const startReading = () => {
@@ -123,76 +133,59 @@ const ReadStoryPage = (props) => {
     }
 
     return (        
-        <MainLayout background={'#151A1E'}>
-            {notfound && (<NotFound message={'Khong tim thay truyen nay'} />)}
-
-            {(!isLoading && !notfound && !ValidationUtils.isEmpty(story)) && (
-                 <div>
-                    {/* <h3 className="text-center">{ story.title }</h3> */}
+        <MainLayout>
+            {notfound && (<NotFound message={'Không tìm tháy truyện này'} />)}
+            
+            <Fullscreen
+                enabled={isFullScreen}
+                onChange={isFull => setFullScreen(isFull)}
+            >
+            
+            <div id="fullscreen" style={{ position: 'relative' }}>
+            <Tooltip title="Toàn màn hình">
+                <IconButton 
+                    style={{ position: 'absolute', top: 0, right: 0 }}
+                    aria-label="delete" onClick={() => setFullScreen(!isFullScreen)}>
+                    <FullscreenIcon />
+                </IconButton>
+            </Tooltip>
+              
+                {(!isLoading && !notfound && !ValidationUtils.isEmpty(story)) && (
                     <div className="container">
                         {informations.map(information => (
-                            <div key={information.id}>{ information.name }: { information.value }</div>
+                            <div  
+                                className="text-bold"
+                                style={{ fontSize: '1.2em' }} 
+                                key={information.id}>{ information.name }: { information.value }</div>
                         ))}
                         <div className="col-lg-8 col-md-10 mx-auto">
-                            {!ValidationUtils.isEmpty(currentScreen) && (
-                                  <div className="screen-card">
-                                    <div className="screen-card-header">
-                                        <h5 className="text-center">{ currentScreen.title }</h5>
-                                    </div>
-                                    <Transition  
-                                        from={{ opacity: 0 }}
-                                        to={{ opacity: 1 }}
-                                        native
-                                        items={!ValidationUtils.isEmpty(currentScreen)}
-                                        >
-                                            {show => show && (props => (
-                                                <animated.div style={props}>
-                                                    <div className="screen-card-body" style={props}>
-                                                        <p className="text-center">{ currentScreen.content }</p><br/>
-                                                        <div className="row">
-                                                            {currentScreen.actions.map(action => (
-                                                                <div className="col-6" key={action.id}>
-                                                                    <p 
-                                                                        onClick={() => handleSelectAction(action)}
-                                                                        className="action-content text-center">
-                                                                            
-                                                                        {action.type === ACTION_TYPES.REDIRECT && (
-                                                                            <a href={action.value} target="_blank">
-                                                                                {action.content}
-                                                                            </a>
-                                                                        )}
-                                                                        {action.type !== ACTION_TYPES.REDIRECT && (
-                                                                            <>{ action.content }</>
-                                                                        )}
-                                                                    </p>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                        
-                                                </animated.div>
-                                                
-                                            ))}
-                                    </Transition>
-                                    
-                                </div>
-                            )}
+                            <ScreenShow 
+                                animation={ANIMATIONS.GROW}
+                                showScreen={showScreen}
+                                screen={currentScreen}
+                                onSelectAction={handleSelectAction}
+                            />
 
                             {ValidationUtils.isEmpty(currentScreen) && (
                                 <div className="text-center">
-                                    <h3 className="screen-card-header"> {story.title}</h3>
-                                    <p className="text-center screen-card-body">
+                                    <h3 className="screen-card-header text-bold"> {story.title}</h3>
+                                    <p 
+                                        style={{ fontSize: '1.5em' }}
+                                        className="text-justify screen-card-body">
                                         {story.intro}
                                     </p>
                                     <button
                                         onClick={startReading} 
-                                        className="btn btn-primary btn-block">Bat dau cuoc phieu luu</button>
+                                        style={{ background: '#fffbe8' }}
+                                        className="btn float-right mt-3">Bắt đầu đọc truyện</button>
                                 </div>
                             ) }
                         </div>
                     </div>
-                 </div>
-            ) }
+                )}
+            </div>
+            {/* <SocialShare shareUrl={window.location.href} /> */}
+            </Fullscreen>
            
            { isLoading && <MySpinner/> }
         

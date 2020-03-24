@@ -11,7 +11,7 @@ public interface CommentService {
     ResponseListCommentDTO create(CreateCommentDTO cmt);
     Comment update(UpdateCommentDTO cmt);
     Comment delete(DeleteCommentDTO cmt);
-    Page<ResponseListCommentDTO> findAllByStoryId(RequestLoadListCommentDTO request, int pageNo, int pageSize, String sortBy);
+    Page<ResponseListCommentDTO> findAllByStoryId(int storyId, int pageNo, int pageSize, String sortBy);
     Comment findById(Integer id);
     void disableAndEnableComment(int commentId);
     Page<CommentHistoryResponseDTO> getCommentHistory(int userId, int pageNo, int pageSize);

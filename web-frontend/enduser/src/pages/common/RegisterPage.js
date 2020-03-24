@@ -3,42 +3,44 @@ import { MDBInput, MDBAlert } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
 
+
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
+  const [avatar, setAvatar] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [introContent, setIntroContent] = useState("");
-  const [dob, setDob] = useState("");
-  const [gender, setGender] = useState("");
-  const [registerResponseMessage, setRegisterResponseMessage] = useState({
-    success: false,
-    message: ""
-  });
+  
   const [errorMessage, setErrorMessage] = useState("");
 
 
   async function handleSubmit(event) {
+    
     event.preventDefault();
+    let randomImage="https://avatars.dicebear.com/v2/avataaars/"+username+".svg"+"?options[mood][]=happy&options[mouth][]=smile&options[accessories][]=sunglasses"
+   
     let user = {
       name: name,
       username: username,
       password: password,
       introContent: introContent,
       email: email,
-      dob: dob,
-      gender: gender
+      avatar: randomImage
     };
+   
     try {
-      const res = await UserService.register(user);
 
-      console.log(res.data);
-      setRegisterResponseMessage({
-        success: res.data.success,
-        message: res.data.message
-      });
-      if (registerResponseMessage.success == true) {
-        window.location.href = "/admin/users";
+
+      
+      const res = await UserService.register(user);
+      if (res.data.success == true) {
+        setErrorMessage(
+          <MDBAlert color="success">{res.data.message}</MDBAlert>
+        );
+        window.setTimeout(() => {
+          window.location.href = "/login";
+        }, 400);
       }
     } catch (error) {
       var err;

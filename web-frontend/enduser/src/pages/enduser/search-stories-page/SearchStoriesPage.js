@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
-import { MDBBtn, MDBInputGroup, MDBModal, MDBModalHeader, MDBModalBody, MDBCard,
-        MDBCardBody, MDBBreadcrumb, MDBBreadcrumbItem, MDBFormInline, MDBIcon } from 'mdbreact';
-import { Select, MenuItem, Input, ListItemText, Checkbox, Chip, 
-    FormControl, InputLabel, Button } from '@material-ui/core';
+import { MDBBtn, MDBCard, MDBCardBody, MDBFormInline, MDBIcon } from 'mdbreact';
+import { Select, MenuItem, Input, ListItemText, Checkbox, Chip, FormControl, InputLabel } from '@material-ui/core';
 import { Pagination } from '@material-ui/lab';
-import UserLayout from '../../../layouts/UserLayout';
+import MainLayout from '../../../layouts/main-layout/MainLayout';
 import StoryService from '../../../services/story.service';
 import TagService from '../../../services/tag.service';
 
@@ -114,7 +112,7 @@ const SearchStoriesPage = () => {
     const selectedTags = tags.filter(tag => filters.tags.indexOf(tag.id) > -1);
 
     return (
-        <UserLayout>
+        <MainLayout>
             <div className="container-fluid">
                 <div className="row mb-4">
                     <div className="col-12">
@@ -122,7 +120,7 @@ const SearchStoriesPage = () => {
                             <MDBCardBody id="breadcrumb" className="d-flex align-items-center justify-content-between">
                                <div className="col-6">
                                     <FormControl style={{ width: '100%' }}>
-                                    <InputLabel>Chon tag yeu thich</InputLabel>
+                                    <InputLabel>Chọn tag yêu thích</InputLabel>
                                     <Select
                                         multiple
                                         value={filters.tags}
@@ -154,10 +152,10 @@ const SearchStoriesPage = () => {
                                         <input 
                                             className="form-control form-control-sm" type="search" 
                                             onChange={(e) => changeFilters('keyword', e.target.value)}
-                                            placeholder="Tim kiem truyen" aria-label="Search"/>
+                                            placeholder="Tìm kiếm truyện" aria-label="Search"/>
                                         <MDBBtn 
                                             size="sm" 
-                                            color="primary" 
+                                            color="success" 
                                             className="my-0" 
                                             type="submit">
                                                 <MDBIcon icon="search" />
@@ -170,14 +168,14 @@ const SearchStoriesPage = () => {
                 </div>
                 <div className="row">
                     <div className="col-sm-3">
-                        <h3 className="text-bold">Tat ca truyen</h3>
+                        <h3 className="text-bold">Tất cả truyện</h3>
                     </div>
                     <div className="col-sm-9">
                         <Pagination 
                             style={{float: 'right'}}
                             count={totalPages} 
                             page={filters.page}
-                            color="primary" 
+                            color="success" 
                             onChange={changePage} />
                          <div className="clearfix"></div>
                     </div>
@@ -199,7 +197,7 @@ const SearchStoriesPage = () => {
                 )}
                 
            </div>
-        </UserLayout>
+        </MainLayout>
     );
 };
 

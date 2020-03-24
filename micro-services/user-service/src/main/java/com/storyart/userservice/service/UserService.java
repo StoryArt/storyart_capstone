@@ -19,7 +19,7 @@ public interface UserService {
 
     void delete(Integer id);
 
-    void deActive(Integer id);
+    void deActive(Integer id, boolean deadmin);
 
 
     List<User> findAll();
@@ -42,4 +42,9 @@ public interface UserService {
     PagedResponse<UserInManagementResponse> findAdminbyUsernameOrEmail(int page, int size, String search);
 
     PagedResponse<UserInManagementResponse> findOnlyUserByUsernameOrEmail(int page, int size, String searchtxt);
+
+    void createDefaultSysAdmin();
+
+
+    void updateAvatar(Integer uid,String link);
 }

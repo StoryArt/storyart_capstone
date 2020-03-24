@@ -21,4 +21,8 @@ public interface RatingRepository extends JpaRepository<Rating, Integer> {
     @Query(value = "SELECT * FROM rating where user_id = :userid", nativeQuery = true)
     List<Rating> findRatingByUserId(@Param("userid") Integer userid);
 
+//    @Query(value = "SELECT count(*) FROM rating r where r.story_id = ?1", nativeQuery = true)
+//    int countRateByStoryId (int storyId);
+
+    int countRatingByStoryId(int storyId);
 }

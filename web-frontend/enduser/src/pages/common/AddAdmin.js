@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { MDBInput, MDBAlert } from "mdbreact";
 import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
+import { setAuthHeader } from "../../config/auth";
+
 
 const AddAdmin = () => {
   const [username, setUsername] = useState("");
@@ -9,12 +11,7 @@ const AddAdmin = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [intro_content, setIntro_content] = useState("");
-  const [dob, setDob] = useState("");
-  const [gender, setGender] = useState("");
-  const [addAdminResponseMessage, setAddAdminResponseMessage] = useState({
-    success: false,
-    message: ""
-  });
+ 
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -25,20 +22,24 @@ const AddAdmin = () => {
       password: password,
       intro_content: intro_content,
       email: email,
-      dob: dob,
-      gender: gender,
       name: name
     };
     try {
+    setAuthHeader(localStorage.getItem("jwt-token"));
+
       const res = await UserService.addAdmin(user);
 
       console.log(res.data);
-      setAddAdminResponseMessage({
-        success: res.data.success,
-        message: res.data.message
-      });
-      if (addAdminResponseMessage.success == true) {
-        window.location.href = "/admin/admin";
+      
+      if (res.data.success == true) {
+        window.setTimeout(function() {
+          // Move to a new location or you can do something else
+          setErrorMessage(
+            <MDBAlert color="success">{res.data.message}</MDBAlert>
+          );
+
+          window.location.href = "/admin/admin";
+        }, 2000);
       }
     } catch (error) {
       console.log(JSON.stringify(error));
@@ -49,6 +50,7 @@ const AddAdmin = () => {
       } else if (typeof error.response.data.message == "string") {
         err = error.response.data.message;
       }
+
       setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
     }
   }
@@ -94,32 +96,6 @@ const AddAdmin = () => {
                         label="Mat khau"
                         onChange={e => setPassword(e.target.value)}
                       />
-                    </div>
-                    <div className="col-sm-6">
-                      <MDBInput
-                        value={dob}
-                        label="Ngay sinh"
-                        type="date"
-                        onChange={e => setDob(e.target.value)}
-                      />
-                    </div>
-                    <div className="col-sm-6">
-                      <label>Gioi tinh</label>
-                      <br />
-                      <input
-                        defaultChecked
-                        type="radio"
-                        checked={gender === "male"}
-                        onClick={e => setGender("male")}
-                      />{" "}
-                      Nam
-                      <input
-                        type="radio"
-                        className="ml-3"
-                        checked={gender === "female"}
-                        onClick={e => setGender("female")}
-                      />{" "}
-                      Nu
                     </div>
                     <div className="col-12">
                       <MDBInput

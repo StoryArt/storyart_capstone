@@ -1,6 +1,7 @@
 package com.storyart.storyservice.dto;
 
 import com.storyart.storyservice.model.Tag;
+import com.storyart.storyservice.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,15 @@ public class GetStoryDto {
     private float avgRate;
     private Date createdAt;
     private Date updatedAt;
+    private boolean deactiveByAdmin;
+    private boolean active;
+    private boolean published;
     private int authorId;
+    private int numOfComment;
+    private int numOfScreen;
+    private int numOfRate;
+    private int numOfRead;
 
+    User user;
     List<TagDto> tags;
 }

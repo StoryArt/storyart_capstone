@@ -32,3 +32,79 @@ export const NUMBER_OPERATIONS = {
 export const STRING_OPERATIONS = {
     REPLACE: 'REPLACE'
 }
+
+export const ROLE_NAMES = {
+    ROLE_USER: 'ROLE_USER',
+    ROLE_ADMIN: 'ROLE_ADMIN',
+    ROLE_SYSTEM_ADMIN: 'ROLE_SYSTEM_ADMIN',
+}
+
+export const ANIMATIONS = {
+    FADE: 'FADE',
+    GROW: 'GROW',
+    SLIDE: 'SLIDE',
+    ZOOM: 'ZOOM',
+    COLLAPSE: 'COLLAPSE',
+}
+
+export const getAnimations = () => {
+    return [
+        ANIMATIONS.FADE, ANIMATIONS.GROW, ANIMATIONS.SLIDE, ANIMATIONS.COLLAPSE, ANIMATIONS.ZOOM
+    ]
+}
+
+export const getParameters = () => {
+    return [{
+        type: INFORMATION_TYPES.NUMBER,
+        conditions: [
+            NUMBER_CONDITIONS.EQUAL,
+            NUMBER_CONDITIONS.GREATER,
+            NUMBER_CONDITIONS.GREATER_OR_EQUAL,
+            NUMBER_CONDITIONS.LESS,
+            NUMBER_CONDITIONS.LESS_OR_EQUAL,
+        ],
+        operations: [
+            NUMBER_OPERATIONS.PLUS,
+            NUMBER_OPERATIONS.MINUS,
+            NUMBER_OPERATIONS.MULTIPLY,
+            NUMBER_OPERATIONS.DIVIDE,
+            NUMBER_OPERATIONS.REPLACE,
+        ]
+    },
+    {
+        type: INFORMATION_TYPES.STRING,
+        conditions: [
+            STRING_CONDITIONS.EQUAL
+        ],
+        operations: [
+            STRING_OPERATIONS.REPLACE
+        ]
+    }];
+}
+
+export const getActions = () => {
+    return [
+        ACTION_TYPES.NEXT_SCREEN, 
+        ACTION_TYPES.REDIRECT,
+        ACTION_TYPES.UPDATE_INFORMATION
+    ]
+}
+
+export const ORDER_BYS = {
+    AVG_RATE: 'avg_rate',
+    READ: 'read',
+    COMEMENT: 'comment',
+    SCREEN: 'screen',
+    RATING: 'rating',
+}
+
+export const getOrderBys = () => {
+    const { AVG_RATE, READ, COMEMENT, SCREEN, RATING } = ORDER_BYS;
+    return [
+        { value: AVG_RATE, title: 'Đánh giá trung bình' },
+        { value: READ, title: 'Số lượt đọc' },
+        { value: COMEMENT, title: 'Số lượt bình luận' },
+        { value: SCREEN, title: 'Số màn hình' },
+        { value: RATING, title: 'Số lượt đánh giá' },
+    ]
+}

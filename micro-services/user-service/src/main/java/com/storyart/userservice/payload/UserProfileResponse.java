@@ -26,9 +26,11 @@ public class UserProfileResponse {
     private String email;
     private Date jointAt;
     private Integer storyCount;
+    private boolean isActive;
 
     private String intro_content;
     private RoleName role;
+    private String  avatar;
 //todo: bo username
     //todo: slug
     //todo: them role
@@ -41,8 +43,9 @@ public class UserProfileResponse {
         this.setEmail(user.getEmail());
         this.setJointAt(user.getCreatedAt());
         this.setIntro_content(user.getIntroContent());
+        this.setActive(user.isActive());
               this.role = BeanUtil.getBean(RoleService.class).findRoleById(user.getRoleId()).getName();
-
+this.setAvatar(user.getAvatar());
     }
 
 

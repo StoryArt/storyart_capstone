@@ -73,6 +73,7 @@ const AdminCardSection2 = () => {
           </MDBCard>
         </MDBCol>
       </MDBRow>
+  
   )
 }
 

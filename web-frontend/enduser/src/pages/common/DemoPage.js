@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import UserLayout from '../../layouts/UserLayout';
+import MainLayout from '../../layouts/main-layout/MainLayout';
 import PostService from '../../services/post.service';
 
 
@@ -23,7 +23,7 @@ const DemoPage = () => {
     }, []);
 
     return (
-        <UserLayout>
+        <MainLayout>
             <div className="container">
                 <div className="row">
                     <div className="col-sm-8 mx-auto">
@@ -50,7 +50,7 @@ const DemoPage = () => {
                     </div>
                 </div>
             </div>
-        </UserLayout>
+        </MainLayout>
     );
 };
 

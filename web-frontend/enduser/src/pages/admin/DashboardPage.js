@@ -9,11 +9,11 @@ import ChartSection2 from './sections/ChartSection2';
 import MapSection from './sections/MapSection';
 import ModalSection from './sections/ModalSection';
 
-import AdminLayout from '../../layouts/AdminLayout';
+import MainLayout from '../../layouts/main-layout/MainLayout';
 
 const DashboardPage =  () => {
   return (
-    <AdminLayout>
+    <MainLayout>
       {/* <BreadcrumSection /> */}
       {/* <AdminCardSection1 />
       <ChartSection1 />
@@ -24,7 +24,7 @@ const DashboardPage =  () => {
           <ModalSection />
       </MDBRow>
       <AdminCardSection2 /> */}
-    </AdminLayout>
+    </MainLayout>
   )
 }
 
