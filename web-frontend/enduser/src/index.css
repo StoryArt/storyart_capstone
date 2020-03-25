@@ -1,7 +1,7 @@
 
 :root {
   --main-navbar-color: #f0e8c5;
-  --main-bg-color: #f0f0c5;
+  --main-bg-color: #F7F7F7;
   /* --main-bg-color: #fff; */
 }
 body{
@@ -269,6 +269,7 @@ main {
   color: orange;
   cursor: pointer;
   transition: all 0.3s;
+  margin-bottom: 30px;
 }
 
 .screen-card-body .action-content:hover{
@@ -298,7 +299,7 @@ h5{
   background-color: var(--main-bg-color);
 }
 
-.fullscreen-enabled {
+.fullscreen-enabled, .screen-show {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -309,9 +310,8 @@ h5{
 
 .avatar-80 {
   display: block;
-    width: 80px;
-    height: 80px;
-
+  width: 80px;
+  height: 80px;
 }
 
 .avatar{

@@ -28,10 +28,11 @@ public class Story extends DateAudit {
     @Size(min = 5, max = 250, message = "Tiêu đề truyện phải có ít nhất 5 kí tự và không quá 250 kí tự")
     private String title;
 
+
     private int userId;
 
-    @Column(length = 10000)
-    @Size(min = 10, max = 10000, message = "Nội dung giói thiệu truyện phải ít nhất 10 kí tự")
+    @Column(columnDefinition="TEXT")
+    @Size(min = 10, message = "Nội dung giói thiệu truyện phải ít nhất 10 kí tự")
     private String intro;
 
     @Column(length = 100)
@@ -47,7 +48,7 @@ public class Story extends DateAudit {
 
     @Column(columnDefinition = "float default 0")
     @Range(min = 0, max = 5)
-    private float avgRate;
+    private double avgRate;
 
     @Column(columnDefinition="tinyint(1) default 0")
     private boolean active;
@@ -56,7 +57,7 @@ public class Story extends DateAudit {
     private boolean published;
 
     @Column(columnDefinition="tinyint(1) default 0")
-    private Boolean deactiveByAdmin;
+    private boolean deactiveByAdmin;
 
     @Column(columnDefinition = "int default 0")
     private int numOfRead;

@@ -1,8 +1,10 @@
 package com.storyart.storyservice.service;
 
+import com.storyart.storyservice.dto.ResultDto;
 import com.storyart.storyservice.dto.story_suggestion.RatedStoryDTO;
 import com.storyart.storyservice.dto.story_suggestion.RatingDTO;
 import com.storyart.storyservice.model.Rating;
+import com.storyart.storyservice.model.RatingId;
 import com.storyart.storyservice.model.Story;
 import com.storyart.storyservice.repository.RatingRepository;
 import com.storyart.storyservice.repository.StoryRepository;
@@ -12,9 +14,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public interface RatingService {
     List<Story> getSuggestion(Integer id);
+    ResultDto rateStory(double stars, int  userId, int storyId);
 }
 
 
@@ -216,6 +220,29 @@ class RatingServiceIml implements RatingService {
         return NewListStory;
     }
 
+    @Override
+    public ResultDto rateStory(double stars, int userId, int storyId) {
+        ResultDto result = new ResultDto();
+        result.setSuccess(false);
+        RatingId ratingId = new RatingId();
+        ratingId.setStoryId(storyId);
+        ratingId.setUserId(userId);
+        Optional<Rating> rating = ratingRepository.findById(ratingId);
+        Rating r = rating.orElseGet(null);
+        if(r != null){
+          r.setStars(stars);
+        } else {
+            Rating rate = new Rating();
+            RatingId id = new RatingId();
+            id.setUserId(userId);
+            id.setStoryId(storyId);
+            rate.setStars(stars);
+
+
+        }
+        return null;
+    }
+
     public Double cosineSimilarity(List<Double> currUser, List<Double> SelectedUser) {
 
         double AB = 0.0;
@@ -231,4 +258,6 @@ class RatingServiceIml implements RatingService {
         cosineSimilarity = AB / (Math.sqrt(A) * Math.sqrt(B));
         return cosineSimilarity;
     }
+
+
 }

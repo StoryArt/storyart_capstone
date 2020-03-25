@@ -1,5 +1,6 @@
 package com.storyart.storyservice.service;
 
+import com.github.javafaker.Faker;
 import com.storyart.storyservice.common.constants.ACTION_TYPES;
 import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.TagDto;
@@ -8,6 +9,7 @@ import com.storyart.storyservice.dto.ResultDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryInformationDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryScreenDto;
+import com.storyart.storyservice.dto.read_story.ReadStoryTagDto;
 import com.storyart.storyservice.model.*;
 import com.storyart.storyservice.repository.*;
 import com.storyart.storyservice.utils.MyStringUtils;
@@ -38,7 +40,12 @@ public interface StoryService {
     List<GetStoryDto> getAll();
 
     Page<GetStoryDto> getStoriesForAdmin(String keyword, String orderBy, boolean asc, int page, int itemsPerPage);
+    Page<GetStoryDto> getStoriesForUser(int userId, String keyword, String orderBy, boolean asc, int page, int itemsPerPage);
     ResultDto updateByAdmin(int storyId, boolean disable);
+
+    ResultDto deleteStory(int storyId);
+    ResultDto changePublishedStatus(int storyId,  boolean turnOnPublished);
+
 }
 
 @Service
@@ -100,6 +107,57 @@ class StoryServiceImpl implements StoryService{
     }
 
     @Override
+    public ResultDto changePublishedStatus(int storyId, boolean turnOnPublished) {
+        ResultDto result = new ResultDto();
+        Optional<Story> story = storyRepository.findById(storyId);
+        result.setSuccess(false);
+        if(!story.isPresent()) {
+            result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
+        } else {
+            Story s = story.get();
+            if(s.isDeactiveByAdmin()){
+                result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa bởi admin");
+            } else if(!s.isActive()){
+                result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
+            } else if(turnOnPublished && !s.isPublished()){
+                s.setPublished(true);
+                result.setSuccess(true);
+                result.setData(s);
+                storyRepository.save(s);
+            } else if(!turnOnPublished && s.isPublished()){
+                s.setPublished(false);
+                result.setSuccess(true);
+                result.setData(s);
+                storyRepository.save(s);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public ResultDto deleteStory(int storyId) {
+        ResultDto result = new ResultDto();
+        Optional<Story> story = storyRepository.findById(storyId);
+        result.setSuccess(false);
+        if(!story.isPresent()){
+            result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
+        } else {
+            Story s = story.get();
+            if(!s.isActive()) {
+                result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
+            } else if(s.isDeactiveByAdmin()){
+                result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa bới admin");
+            } else {
+                s.setActive(false);
+                storyRepository.save(s);
+                result.setData(s);
+                result.setSuccess(true);
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<GetStoryDto> getStoriesByUserId(int userId) {
         List<Story> stories = storyRepository.findAllByUserId(userId);
         return stories.stream().map(s -> {
@@ -114,12 +172,16 @@ class StoryServiceImpl implements StoryService{
     @Override
     public ResultDto getReadingStory(int storyId) {
         ResultDto result = new ResultDto();
-        result.setSuccess(true);
-        Optional<Story> story = storyRepository.findById(storyId);
-        if(!story.isPresent()){
-            result.setData(null);
+        result.setSuccess(false);
+        result.setData(null);
+
+        Story story = storyRepository.findById(storyId).orElse(null);
+        if(story == null){
+            result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
+        } else if(!story.isActive() || story.isDeactiveByAdmin()) {
+            result.getErrors().put("DELETED", "Truyện này đã bị xóa");
         } else {
-            ReadStoryDto readStoryDto = modelMapper.map(story.get(), ReadStoryDto.class);
+            ReadStoryDto readStoryDto = modelMapper.map(story, ReadStoryDto.class);
             List<Screen> screens = screenRepository.findByStoryId(storyId);
 
             List<ReadStoryScreenDto> screenDtoList = screens.stream().map(screen -> {
@@ -142,11 +204,17 @@ class StoryServiceImpl implements StoryService{
 
             List<InformationAction> informationActions = informationActionRepository.findAllByInformationIdIn(informationIds);
 
+            List<Tag> tagList = tagRepository.findAllByStoryId(storyId);
+            System.out.println("tags: " + tagList.size());
+            List<ReadStoryTagDto> readStoryTagDtoList = tagList.stream().map(t -> modelMapper.map(t, ReadStoryTagDto.class)).collect(Collectors.toList());
+
             readStoryDto.setInformationActions(informationActions);
             readStoryDto.setScreens(screenDtoList);
             readStoryDto.setInformations(informationDtos);
+            readStoryDto.setTags(readStoryTagDtoList);
 
             result.setData(readStoryDto);
+            result.setSuccess(true);
         }
         return result;
     }
@@ -168,9 +236,19 @@ class StoryServiceImpl implements StoryService{
         story.setFirstScreenId(screenIdsMap.get(createStoryDto.getFirstScreenId()));
         story.setActive(true);
         story.setPublished(createStoryDto.isPublished());
+        story.setDeactiveByAdmin(false);
+        story.setUpdatedAt(new Date());
 
         story = storyRepository.save(story);
         int storyId = story.getId();
+
+        //insert story tags
+        createStoryDto.getTags().stream().forEach(tagId -> {
+            StoryTag st = new StoryTag();
+            st.setTagId(tagId);
+            st.setStoryId(storyId);
+            storyTagRepository.save(st);
+        });
 
         //save all screens
         createStoryDto.getScreens().stream().forEach(screen -> {
@@ -180,8 +258,6 @@ class StoryServiceImpl implements StoryService{
             savedScreen.setId(screenIdsMap.get(screen.getId()));
             savedScreen.setNextScreenId(screenIdsMap.get(screen.getNextScreenId()));
             screenRepository.save(savedScreen);
-
-            screenIdsMap.put(screen.getId(), savedScreen.getId());
 
             screen.getActions().stream().forEach(action -> {
                 Action savedAction = modelMapper.map(action, Action.class);
@@ -237,11 +313,114 @@ class StoryServiceImpl implements StoryService{
     @Override
     public ResultDto updateStory(CreateStoryDto storyDto) {
         ResultDto resultDto = new ResultDto();
-        HashMap<String, String> errors = validateStoryinfo(storyDto);
-        resultDto.setErrors(errors);
+        Story foundStory = storyRepository.findById(storyDto.getId()).orElse(null);
+
+        if(foundStory == null){
+            resultDto.getErrors().put("NOT_FOUND", "Truyện này không có trong hệ thống!");
+        } else if(!foundStory.isActive() || foundStory.isDeactiveByAdmin()){
+            resultDto.getErrors().put("DELETED", "Truyện đã bị xóa!");
+        } else {
+            Story story = modelMapper.map(storyDto, Story.class);
+            HashMap<String, String> screenIdsMap = new HashMap<>();
+            HashMap<String, String> actionIdsMap = new HashMap<>();
+            HashMap<String, String> informationIdsMap = new HashMap<>();
+
+            //delete all old screens
+            List<Screen> screenList = screenRepository.findByStoryId(story.getId());
+            screenRepository.deleteAll(screenList);
+//            screenRepository.deleteAllByStoryId(story.getId());
+
+            storyDto.getScreens().stream().forEach(screen -> {
+                screenIdsMap.put(screen.getId(), MyStringUtils.generateUniqueId());
+            });
+
+            story.setFirstScreenId(screenIdsMap.get(storyDto.getFirstScreenId()));
+            story.setCreatedAt(foundStory.getCreatedAt());
+            story.setActive(true);
+            story.setDeactiveByAdmin(foundStory.isDeactiveByAdmin());
+            storyRepository.save(story);
+            int storyId = story.getId();
+
+            //delete all story tags;
+            List<StoryTag> storyTags = storyTagRepository.findAllByStoryId(storyId);
+            storyTagRepository.deleteAll(storyTags);
+
+            //insert story tags
+            storyDto.getTags().stream().forEach(tagId -> {
+                StoryTag st = new StoryTag();
+                st.setTagId(tagId);
+                st.setStoryId(storyId);
+                storyTagRepository.save(st);
+            });
+
+            //insert new screens
+            storyDto.getScreens().stream().forEach(screen -> {
+                Screen savedScreen = modelMapper.map(screen, Screen.class);
+
+                savedScreen.setStoryId(storyId);
+                savedScreen.setId(screenIdsMap.get(screen.getId()));
+                savedScreen.setNextScreenId(screenIdsMap.get(screen.getNextScreenId()));
+                screenRepository.save(savedScreen);
+
+                //delete all actions
 
 
+                screen.getActions().stream().forEach(action -> {
+                    Action savedAction = modelMapper.map(action, Action.class);
 
+                    savedAction.setId(MyStringUtils.generateUniqueId());
+                    savedAction.setScreenId(savedScreen.getId());
+                    if(action.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())){
+                        savedAction.setValue(screenIdsMap.get(action.getValue()));
+                    }
+                    savedAction.setNextScreenId(screenIdsMap.get(action.getNextScreenId()));
+
+                    actionRepository.save(savedAction);
+                    actionIdsMap.put(action.getId(), savedAction.getId());
+                });
+            });
+
+            //delete all informations
+            List<Information> informations = informationRepository.findAllByStoryId(storyId);
+            List<String> informationIds = informations.stream().map((i -> i.getId())).collect(Collectors.toList());
+            informationRepository.deleteAll(informations);
+
+            //delete all information actions
+            List<InformationAction> informationActionList = informationActionRepository.findAllByInformationIdIn(informationIds);
+            informationActionRepository.deleteAll(informationActionList);
+
+            //insert new informations
+            storyDto.getInformations().stream().forEach(information -> {
+                Information savedInformation = modelMapper.map(information, Information.class);
+                savedInformation.setStoryId(storyId);
+                savedInformation.setId(MyStringUtils.generateUniqueId());
+                informationRepository.save(savedInformation);
+
+                informationIdsMap.put(information.getId(), savedInformation.getId());
+
+                information.getConditions().stream().forEach(condition -> {
+                    InfoCondition savedInfoCondition = modelMapper.map(condition, InfoCondition.class);
+
+                    savedInfoCondition.setInformationId(savedInformation.getId());
+                    savedInfoCondition.setId(MyStringUtils.generateUniqueId());
+                    savedInfoCondition.setNextScreenId(screenIdsMap.get(condition.getNextScreenId()));
+
+                    infoConditionRepository.save(savedInfoCondition);
+                });
+            });
+
+            //save information action
+
+            storyDto.getInformationActions().stream().forEach(informationAction -> {
+                InformationAction savedInformationAction = modelMapper.map(informationAction, InformationAction.class);
+                savedInformationAction.setActionId(actionIdsMap.get(informationAction.getActionId()));
+                savedInformationAction.setInformationId(informationIdsMap.get(informationAction.getInformationId()));
+
+                informationActionRepository.save(savedInformationAction);
+            });
+            resultDto.setSuccess(true);
+            resultDto.setData(story);
+        }
         return resultDto;
     }
 
@@ -290,12 +469,12 @@ class StoryServiceImpl implements StoryService{
 
     @Override
     public void createTempStories() {
+        Faker faker = new Faker(new Locale("vi"));
 
-        String[] tags = new String[]{"kinh di", "bi kich", "hai kich", "thieu nhi", "nguoi lon",
-                "the gioi", "dong vat", "thuc vat", "kham pha", "thien nhien", "con nguoi", "than thoai",
-                "co tich", "quang cao", "marketing", "thuong hieu", "kinh doanh", "tro choi", "bi an",
-                "gioi tinh", "giao duc", "chinh tri", "lich su", "nhan van", "nhan loai", "vu tru"};
-
+        String[] tags = new String[]{"kinh dị", "bi kịch", "hài kịch", "thiếu nhi", "người lớn",
+                "thế giới", "động vật", "thực vật", "khám phá", "thiên nhiên", "con nguời", "thần thoại",
+                "cổ tích", "quảng cáo", "marketing", "thương hiệu", "kinh doanh", "trò choi", "bí ẩn",
+                "giới tính", "giáo dục", "chính trị", "lịch sử", "nhân văn", "nhân loại", "vũ trụ"};
 
         List<Tag> savedTags = Arrays.asList(tags).stream().map(tag -> {
             Tag tag1 = new Tag();
@@ -304,19 +483,21 @@ class StoryServiceImpl implements StoryService{
         }).collect(Collectors.toList());
         tagRepository.saveAll(savedTags);
 
+
         List<Story> stories = new ArrayList<>();
         for(int i = 0; i < 100; i++){
             Story story = new Story();
-            story.setTitle(MyStringUtils.randomString(15, 5));
-            story.setIntro(MyStringUtils.randomString(150, 120));
-            story.setAvgRate(i%5);
+            story.setTitle(faker.book().title());
+            story.setIntro(faker.lorem().paragraph(8));
+            story.setAvgRate(faker.number().randomDouble(2, 0, 5));
             int reads = new Random().nextInt(100) + 10;
-            story.setNumOfRead(reads);
+            story.setNumOfRead(faker.number().numberBetween(10, 1000));
             story.setImage("http://lorempixel.com/400/200");
             story.setActive(true);
+            story.setUserId(1);
             story.setDeactiveByAdmin(false);
             story.setPublished(true);
-            story.setFirstScreenId("temp");
+            story.setFirstScreenId(MyStringUtils.generateUniqueId());
             stories.add(story);
             Story saved = storyRepository.save(story);
             List<Integer> tagList = getRandomTags(7);
@@ -330,14 +511,14 @@ class StoryServiceImpl implements StoryService{
         List<Story> savedStories = storyRepository.saveAll(stories);
 
         savedStories.stream().forEach(story -> {
-            int quantity = new Random().nextInt(20) + 4;
+            int quantity = faker.number().numberBetween(12, 100);
             for(int i = 1; i <= quantity; i++){
                 Comment comment = new Comment();
                 comment.setStoryId(story.getId());
-                comment.setContent("It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using");
+                comment.setContent(faker.lorem().sentence(10, 100));
                 Rating rating = new Rating();
                 rating.setStoryId(story.getId());
-                double stars = new Random().nextInt(5);
+                double stars = faker.number().numberBetween(1, 5);
                 rating.setStars(stars);
                 commentRepository.save(comment);
                 ratingRepository.save(rating);
@@ -356,48 +537,81 @@ class StoryServiceImpl implements StoryService{
 
         Pageable pageable =  PageRequest.of(page - 1, itemsPerPage);
         Page<Story> page1 = null;
-        if(orderBy.equals("avg_rate")){
-            if(asc){
-                page1 = storyRepository.findForAdminOrderByAvgRateASC(keyword, pageable);
-            } else {
-                page1 = storyRepository.findForAdminOrderByAvgRateDESC(keyword, pageable);
-            }
-        } else if(orderBy.equals("comment")){
-            if(asc){
-                page1 = storyRepository.findForAdminOrderByNumOfCommentASC(keyword, pageable);
-            } else {
-                page1 = storyRepository.findForAdminOrderByNumOfCommentDESC(keyword, pageable);
-            }
-        } else if(orderBy.equals("rating")){
-            if(asc){
-                page1 = storyRepository.findForAdminOrderByNumOfRatingASC(keyword, pageable);
-            } else {
-                page1 = storyRepository.findForAdminOrderByNumOfRatingDESC(keyword, pageable);
-            }
-        } else if(orderBy.equals("screen")){
-            if(asc){
-                page1 = storyRepository.findForAdminOrderByNumOfScreenASC(keyword, pageable);
-            } else {
-                page1 = storyRepository.findForAdminOrderByNumOfScreenDESC(keyword, pageable);
-            }
-        } else if(orderBy.equals("read")){
-            if(asc){
-                page1 = storyRepository.findForAdminOrderByNumOfReadASC(keyword, pageable);
-            } else {
-                page1 = storyRepository.findForAdminOrderByNumOfReadDESC(keyword, pageable);
-            }
+        switch (orderBy){
+            case "avg_rate":
+                if(asc) page1 = storyRepository.findForAdminOrderByAvgRateASC(keyword, pageable);
+                else page1 = storyRepository.findForAdminOrderByAvgRateDESC(keyword, pageable);
+                break;
+            case "comment":
+                if(asc) page1 = storyRepository.findForAdminOrderByNumOfCommentASC(keyword, pageable);
+                else page1 = storyRepository.findForAdminOrderByNumOfCommentDESC(keyword, pageable);
+                break;
+            case "rating":
+                if(asc) page1 = storyRepository.findForAdminOrderByNumOfRatingASC(keyword, pageable);
+                else page1 = storyRepository.findForAdminOrderByNumOfRatingDESC(keyword, pageable);
+                break;
+            case "screen":
+                if(asc) page1 = storyRepository.findForAdminOrderByNumOfScreenASC(keyword, pageable);
+                else page1 = storyRepository.findForAdminOrderByNumOfScreenDESC(keyword, pageable);
+                break;
+            case "read":
+                if(asc) page1 = storyRepository.findForAdminOrderByNumOfReadASC(keyword, pageable);
+                else page1 = storyRepository.findForAdminOrderByNumOfReadDESC(keyword, pageable);
+                break;
         }
+
         if(page1 == null) return null;
 
         Page<GetStoryDto> page2 = page1.map(new Function<Story, GetStoryDto>() {
             @Override
             public GetStoryDto apply(Story story) {
-                List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
-                GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
-                dto.setTags(tagService.mapModelToDto(tagList));
-                dto.setNumOfComment(commentRepository.countCommentByStoryId(story.getId()));
-                dto.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
-                return dto;
+                return mapStoryModelToGetStoryDto(story);
+            }
+        });
+        return page2;
+    }
+    public GetStoryDto mapStoryModelToGetStoryDto(Story story){
+        List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
+        GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
+        dto.setTags(tagService.mapModelToDto(tagList));
+        dto.setNumOfComment(commentRepository.countCommentByStoryId(story.getId()));
+        dto.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
+        return dto;
+    }
+
+    @Override
+    public Page<GetStoryDto> getStoriesForUser(int userId, String keyword, String orderBy, boolean asc, int page, int itemsPerPage) {
+        Pageable pageable =  PageRequest.of(page - 1, itemsPerPage);
+        Page<Story> page1 = null;
+        switch (orderBy){
+            case "avg_rate":
+                if(asc) page1 = storyRepository.findForUserOrderByAvgRateASC(userId, keyword, pageable);
+                else page1 = storyRepository.findForUserOrderByAvgRateDESC(userId, keyword, pageable);
+                break;
+            case "read":
+                if(asc) page1 = storyRepository.findForUserOrderByNumOfReadASC(userId, keyword, pageable);
+                else page1 = storyRepository.findForUserOrderByNumOfReadDESC(userId, keyword, pageable);
+                break;
+            case "comment":
+                if(asc) page1 = storyRepository.findForUserOrderByNumOfCommentASC(userId, keyword, pageable);
+                else page1 = storyRepository.findForUserOrderByNumOfCommentDESC(userId, keyword, pageable);
+                break;
+            case "rating":
+                if(asc) page1 = storyRepository.findForUserOrderByNumOfRatingASC(userId, keyword, pageable);
+                else page1 = storyRepository.findForUserOrderByNumOfRatingDESC(userId, keyword, pageable);
+                break;
+            case "screen":
+                if(asc) page1 = storyRepository.findForUserOrderByNumOfScreenASC(userId, keyword,  pageable);
+                else page1 = storyRepository.findForUserOrderByNumOfScreenDESC(userId, keyword, pageable);
+                break;
+        }
+
+        if(page1 == null) return null;
+
+        Page<GetStoryDto> page2 = page1.map(new Function<Story, GetStoryDto>() {
+            @Override
+            public GetStoryDto apply(Story story) {
+                return mapStoryModelToGetStoryDto(story);
             }
         });
         return page2;
@@ -411,9 +625,9 @@ class StoryServiceImpl implements StoryService{
             result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
             result.setSuccess(false);
         } else {
-            if(!story.getDeactiveByAdmin() && disable){
+            if(!story.isDeactiveByAdmin() && disable){
                 story.setDeactiveByAdmin(true);
-            } else if(story.getDeactiveByAdmin() && !disable) {
+            } else if(story.isDeactiveByAdmin() && !disable) {
                 story.setDeactiveByAdmin(false);
             }
             storyRepository.save(story);

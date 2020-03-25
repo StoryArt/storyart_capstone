@@ -1,6 +1,7 @@
 import React from 'react';
 import { TextField, Select, FormControl, InputLabel, MenuItem } from '@material-ui/core';
 import ScreensSelect from './ScreensSelect';
+import ActionsSelect from './ActionsSelect';
 import MyDropdownMenu from '../../../components/common/MyDropdownMenu';
 import { ACTION_TYPES } from '../../../common/constants';
 
@@ -15,6 +16,7 @@ const ActionsList = (props) => {
                         <div className="row">
                         <div className="col-sm-6 mb-2">
                             <TextField 
+                                size="small"
                                 style={{ width: '100%' }}
                                 label="Noi dung..."
                                 variant="outlined"
@@ -23,26 +25,18 @@ const ActionsList = (props) => {
                             />
                         </div>
                         <div className="col-sm-6 mb-2"> 
-                            <FormControl style={{ width: '100%' }} variant="outlined">
-                                <InputLabel>Loại hành động</InputLabel>
-                                <Select
-                                    defaultValue={actionsList[0]}
-                                    value={action.type}
-                                    onChange={(e) => onChangeActions('type', e.target.value, screen, index)}
-                                >
-                                    {actionsList.map(action => (
-                                        <MenuItem 
-                                            key={action} 
-                                            value={action}>{ action }</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            
+                            <ActionsSelect
+                                 value={action.type}
+                                 onChange={(e) => onChangeActions('type', e.target.value, screen, index)}
+                                 actionsList={actionsList}
+                            />
                         </div>
                         {(action.type === ACTION_TYPES.UPDATE_INFORMATION && currentParam != null) && (
                             <>
                                 <div className="col-sm-4">
                                     {(
-                                        <FormControl style={{ width: '100%' }} variant="outlined">
+                                        <FormControl size="small" style={{ width: '100%' }} variant="outlined">
                                             <InputLabel>Ảnh hưởng</InputLabel>
                                             <Select
                                                 defaultValue={currentParam.operations[0]}
@@ -58,6 +52,7 @@ const ActionsList = (props) => {
                                 </div>
                                 <div className="col-sm-4">
                                     <TextField 
+                                        size="small"
                                         style={{ width: '100%' }}
                                         variant="outlined"
                                         label="Gia tri tac dong..."
@@ -89,6 +84,7 @@ const ActionsList = (props) => {
                             {action.type === ACTION_TYPES.REDIRECT && (
                                <div className="col-sm-6">
                                     <TextField 
+                                        size="small"
                                         style={{ width: '100%' }}
                                         variant="outlined"
                                         label="Duong dan..."

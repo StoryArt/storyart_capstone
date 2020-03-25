@@ -98,6 +98,12 @@ export const ORDER_BYS = {
     RATING: 'rating',
 }
 
+export const SCREEN_COLORS = {
+    FIRST_SCREEN: '#009688',
+    ENDING_SCREEN: '#8e24aa',
+    NORMAL_SCREEN: '#e53935'
+}
+
 export const getOrderBys = () => {
     const { AVG_RATE, READ, COMEMENT, SCREEN, RATING } = ORDER_BYS;
     return [
@@ -108,3 +114,4 @@ export const getOrderBys = () => {
         { value: RATING, title: 'Số lượt đánh giá' },
     ]
 }
+
