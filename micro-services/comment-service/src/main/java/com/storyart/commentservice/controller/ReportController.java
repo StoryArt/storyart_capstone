@@ -30,13 +30,14 @@ public class ReportController {
 
     @GetMapping("/getCommentReports")
     public Page<ReportCommentResponseDTO> getCommentReports(
+            @RequestParam(defaultValue = "false") boolean isHandled,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
         pageNo = pageNo - 1;
         if (pageNo < 0) {
             pageNo = 0;
         }
-        return reportService.getListReportComment(pageNo, pageSize);
+        return reportService.getListReportComment(isHandled,pageNo, pageSize);
     }
 
     @GetMapping("/getReportsByCommentId")

@@ -1,22 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import MainLayout from '../../layouts/main-layout/MainLayout';
-import { MDBNav, MDBTabContent, MDBNavItem, MDBNavLink, MDBTabPane, MDBCardBody, 
-  MDBDataTable, MDBCard, MDBBtn, MDBTable, MDBTableHead, MDBTableBody, MDBModal, 
-  MDBModalHeader, MDBModalBody, MDBModalFooter, MDBDropdown, MDBDropdownItem, 
-  MDBDropdownToggle, MDBDropdownMenu } from 'mdbreact';
+import {
+  MDBNav, MDBTabContent, MDBNavItem, MDBNavLink, MDBTabPane, MDBCardBody,
+  MDBDataTable, MDBCard, MDBBtn, MDBTable, MDBTableHead, MDBTableBody, MDBModal,
+  MDBModalHeader, MDBModalBody, MDBModalFooter, MDBDropdown, MDBDropdownItem,
+  MDBDropdownToggle, MDBDropdownMenu
+} from 'mdbreact';
 import Pagination from '@material-ui/lab/Pagination';
 import ReportService from '../../services/report.service';
+import { getAuthUserInfo } from '../../config/auth';
 
 const ReportManagementPage = () => {
+  const userInfo = getAuthUserInfo();
   useEffect(() => {
     getCommentReportsData();
   }, []);
   const [handleModal, setHandleModal] = useState(false);
   const [pageNo, setPageNo] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+
+  const [isHandledDropdown, setIsHandledDropdown] = useState(false);
   const getCommentReportsData = async () => {
     try {
-      const res = await ReportService.getCommentReports(pageNo);
+      const res = await ReportService.getCommentReports(pageNo, isHandledDropdown);
       setTotalPages(res.data.totalPages);
       convertData(res.data);
     } catch (error) {
@@ -185,8 +191,8 @@ const ReportManagementPage = () => {
       if (handleOption === "Không có vi phạm") {
         const res = await ReportService.handleReport(reportIds);
         var updateRows = [...dataTable.rows];
-
-        setDataTable({ ...dataTable, rows: updateRows.map(item => item.commentId === commentId ? { ...item, handled: true } : item) });
+        setDataTable({ ...dataTable, rows: updateRows.filter(item => item.commentId !== commentId) });
+        //setDataTable({ ...dataTable, rows: updateRows.map(item => item.commentId === commentId ? { ...item, handled: true } : item) });
       }
     } catch (error) {
       console.log(error);
@@ -240,57 +246,50 @@ const ReportManagementPage = () => {
           <MDBTabPane tabId="2" role="tabpanel">
             <p>Nothing to show</p>
           </MDBTabPane>
+
         </MDBTabContent>
 
 
-        <MDBModal isOpen={handleModal} size='lg' toggle={e => setHandleModal(!handleModal)}>
-          <MDBModalHeader toggle={e => setHandleModal(!handleModal)}>Xử lý báo cáo</MDBModalHeader>
-          <MDBModalBody>
-            <p>Tên người dùng: <strong>{reportContent.commentOwner}</strong></p>
-            <p>Nội dung bình luận: "<strong>{reportContent.commentContent}</strong>"</p>
-            <p>Số lượng báo cáo: <strong>{reportContent.numberOfReports}</strong></p>
-
-            <p>Cách xử lý: </p>
-            <MDBDropdown>
-              <MDBDropdownToggle caret color="ins">
-                {handleOption}
-              </MDBDropdownToggle>
-              <MDBDropdownMenu basic >
-                <MDBDropdownItem onClick={e => setHandleOption('Không có vi phạm')}>Không có vi phạm</MDBDropdownItem>
-                <MDBDropdownItem onClick={e => setHandleOption('Ẩn bình luận')}>Ẩn bình luận</MDBDropdownItem>
-                <MDBDropdownItem onClick={e => setHandleOption('Vô hiệu hóa tài khoản')}>Vô hiệu hóa tài khoản</MDBDropdownItem>
-              </MDBDropdownMenu>
-            </MDBDropdown>
 
 
-
-
-            <Pagination className="float-right" count={handleTotalPages} color="primary" boundaryCount={2} onChange={changeHandlePage} />
-            <MDBTable striped hover bordered small>
-              <MDBTableHead columns={handleTable.columns} />
-              <MDBTableBody rows={handleTable.rows} />
-            </MDBTable>
-            {/* {modalError.length > 0 && <small style={{ color: 'red' }}>(*){modalError}</small>}
-            <form className='mx-3 grey-text'>
-              <MDBInput
-                type='textarea'
-                rows='2'
-                label='Nội dung bình luận'
-                value={updateCommentRequest.content}
-                onChange={e => setUpdateCommentRequest({ ...updateCommentRequest, content: e.target.value })}
-              />
-            </form> */}
-          </MDBModalBody>
-          <MDBModalFooter>
-            <MDBBtn color='success' onClick={e => setHandleModal(!handleModal)}>
-              Hủy
-                                        </MDBBtn>
-            <MDBBtn color='warning' onClick={handleReportAction} >Xử lý</MDBBtn>
-          </MDBModalFooter>
-        </MDBModal>
       </div>
+      <MDBModal className="float" isOpen={handleModal} size='sm' toggle={e => setHandleModal(!handleModal)}>
+        <MDBModalHeader toggle={e => setHandleModal(!handleModal)}>Xử lý báo cáo</MDBModalHeader>
+        <MDBModalBody>
+          <p>Tên người dùng: <strong>{reportContent.commentOwner}</strong></p>
+          <p>Nội dung bình luận: "<strong>{reportContent.commentContent}</strong>"</p>
+          <p>Số lượng báo cáo: <strong>{reportContent.numberOfReports}</strong></p>
 
+          <p>Cách xử lý: </p>
+          <MDBDropdown>
+            <MDBDropdownToggle caret color="ins">
+              {handleOption}
+            </MDBDropdownToggle>
+            <MDBDropdownMenu basic >
+              <MDBDropdownItem onClick={e => setHandleOption('Không có vi phạm')}>Không có vi phạm</MDBDropdownItem>
+              <MDBDropdownItem onClick={e => setHandleOption('Ẩn bình luận')}>Ẩn bình luận</MDBDropdownItem>
+              <MDBDropdownItem onClick={e => setHandleOption('Vô hiệu hóa tài khoản')}>Vô hiệu hóa tài khoản</MDBDropdownItem>
+            </MDBDropdownMenu>
+          </MDBDropdown>
+
+
+
+
+          <Pagination className="float-right" count={handleTotalPages} color="primary" boundaryCount={2} onChange={changeHandlePage} />
+          <MDBTable striped hover bordered small>
+            <MDBTableHead columns={handleTable.columns} />
+            <MDBTableBody rows={handleTable.rows} />
+          </MDBTable>
+        </MDBModalBody>
+        <MDBModalFooter>
+          <MDBBtn color='success' onClick={e => setHandleModal(!handleModal)}>
+            Hủy
+                                        </MDBBtn>
+          <MDBBtn color='warning' onClick={handleReportAction} >Xử lý</MDBBtn>
+        </MDBModalFooter>
+      </MDBModal>
     </MainLayout>
+
   )
 }
 

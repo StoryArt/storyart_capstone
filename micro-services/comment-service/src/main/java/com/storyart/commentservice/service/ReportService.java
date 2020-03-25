@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ReportService {
     void reportComment(ReportCommentRequestDTO reportCommentRequestDTO);
-    Page<ReportCommentResponseDTO> getListReportComment(int pageNo, int pageSize);
+    Page<ReportCommentResponseDTO> getListReportComment(boolean isHandled,int pageNo, int pageSize);
     Page<Report> getReportsByCommentId(int commentId, int pageNo, int pageSize);
     void handleReport(List<Integer> reportIds);
     //minh co can lam tinh nang huy repỏt ko, chắc là k

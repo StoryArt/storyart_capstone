@@ -278,7 +278,15 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public StatisticResponse getStatistic(int userId, String start, String end) {
+    public StatisticResponse getStatistic(int storyId,int userId, String start, String end) {
+        List<Integer> storyIds = new ArrayList<>();
+        if(storyId == 0){
+            storyIds = storyRepository.getAllStoryIdByUserId(userId);
+        }
+        else {
+            storyIds.add(storyId);
+        }
+
         Date startDate, endDate;
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -300,10 +308,6 @@ public class CommentServiceImpl implements CommentService {
         } catch (ParseException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sai định dạng ngày.");
         }
-
-        List<Integer> storyIds = storyRepository.getAllStoryIdByUserId(userId);
-
-        //int totalComment = commentRepository.findTotalCommentByStoryIds(storyIds);
 
         StatisticResponse response = new StatisticResponse();
 
@@ -336,32 +340,6 @@ public class CommentServiceImpl implements CommentService {
             calendarStart.set(Calendar.DAY_OF_MONTH, dayOfMonth+1);
             numberOfCommentByDates.add(numberOfCommentByDate);
         }
-
-        //for (Comment comment:comments) {
-//
-        //    Date date = new Date(comment.getCreatedAt().getTime());
-        //    String dateString = formatter.format(date);
-        //    try {
-        //        date = formatter.parse(dateString);
-        //    } catch (ParseException e) {
-        //        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Có lỗi xảy ra khi tính toán.");
-        //    }
-        //    if(date.compareTo(tmpDate) !=0){
-        //        tmpDate = date;
-        //        NumberOfCommentByDate numberOfCommentByDate = new NumberOfCommentByDate();
-        //        numberOfCommentByDate.setDate(date);
-        //        numberOfCommentByDate.setNumberOfComment(1);
-        //        numberOfCommentByDates.add(numberOfCommentByDate);
-        //    }
-        //    else {
-        //        for (NumberOfCommentByDate numberCommentByDate: numberOfCommentByDates) {
-        //            if(numberCommentByDate.getDate().compareTo(date) == 0){
-        //                numberCommentByDate.setNumberOfComment(numberCommentByDate.getNumberOfComment()+1);
-        //            }
-        //        }
-        //    }
-        //}
-//
         response.setNumberOfCommentByDates(numberOfCommentByDates);
 
         return response;
