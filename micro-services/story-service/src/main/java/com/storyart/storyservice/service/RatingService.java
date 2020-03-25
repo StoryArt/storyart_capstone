@@ -1,10 +1,7 @@
 package com.storyart.storyservice.service;
 
-<<<<<<< HEAD
 import com.storyart.storyservice.dto.GetStoryDto;
-=======
 import com.storyart.storyservice.dto.ResultDto;
->>>>>>> e21281a3e66532db0e5b306182dcd9c8a8e46a23
 import com.storyart.storyservice.dto.story_suggestion.RatedStoryDTO;
 import com.storyart.storyservice.dto.story_suggestion.RatingDTO;
 import com.storyart.storyservice.dto.story_suggestion.StoryCommentDTO;
@@ -23,20 +20,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-<<<<<<< HEAD
 import java.util.function.Function;
+import java.util.Optional;
 
 public interface RatingService {
     List<Integer>  getSuggestion(Integer id, boolean flag);
     List<Integer> getSuggestByCommentAndReaction();
-
-=======
-import java.util.Optional;
-
-public interface RatingService {
-    List<Story> getSuggestion(Integer id);
     ResultDto rateStory(double stars, int  userId, int storyId);
->>>>>>> e21281a3e66532db0e5b306182dcd9c8a8e46a23
 }
 
 
@@ -294,7 +284,6 @@ class RatingServiceIml implements RatingService {
         return cosineSimilarity;
     }
 
-<<<<<<< HEAD
     @Override
     public List<Integer> getSuggestByCommentAndReaction() {
 
@@ -346,7 +335,4 @@ class RatingServiceIml implements RatingService {
 
         return listSuggestion;
     }
-=======
-
->>>>>>> e21281a3e66532db0e5b306182dcd9c8a8e46a23
 }

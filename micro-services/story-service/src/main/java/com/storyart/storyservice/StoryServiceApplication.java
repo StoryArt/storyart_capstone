@@ -18,11 +18,8 @@ public class StoryServiceApplication {
 	@Bean
 	public CommandLineRunner createTestStories(StoryService storyService){
 		return args -> {
-<<<<<<< HEAD
 			//storyService.createTempStories();
-=======
-//			storyService.createTempStories();
->>>>>>> e21281a3e66532db0e5b306182dcd9c8a8e46a23
+
 		};
 	}
 }
