@@ -3,13 +3,11 @@ package com.storyart.storyservice.service;
 import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.story_suggestion.RatedStoryDTO;
 import com.storyart.storyservice.dto.story_suggestion.RatingDTO;
+import com.storyart.storyservice.dto.story_suggestion.StoryCommentDTO;
 import com.storyart.storyservice.model.Rating;
 import com.storyart.storyservice.model.Story;
 import com.storyart.storyservice.model.Tag;
-import com.storyart.storyservice.repository.RatingRepository;
-import com.storyart.storyservice.repository.StoryRepository;
-import com.storyart.storyservice.repository.TagRepository;
-import com.storyart.storyservice.repository.UserRepository;
+import com.storyart.storyservice.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,7 +21,9 @@ import java.util.List;
 import java.util.function.Function;
 
 public interface RatingService {
-    Page<GetStoryDto> getSuggestion(Integer id, int PageNo, int pageSize);
+    List<Integer>  getSuggestion(Integer id, boolean flag);
+    List<Integer> getSuggestByCommentAndReaction();
+
 }
 
 
@@ -45,19 +45,26 @@ class RatingServiceIml implements RatingService {
     @Autowired
     TagService tagService;
 
+    @Autowired
+    CommentRepository commentRepository;
+
     @Override
-    public Page<GetStoryDto> getSuggestion(Integer id, int pageNo, int pageSize) {
+    public List<Integer>  getSuggestion(Integer id, boolean flagcheck) {
 
         // Step 1
-        // find All User Rating
-        List<Integer> listStory = storyRepository.findAllStory();
+        // find All User Rating\
+        List<Integer> listStory = new ArrayList<>();
+        if(flagcheck){
+            listStory = storyRepository.findStoryThisWeek();
+        }else{
+            listStory = storyRepository.findStoryExceptThisWeek();
+        }
+
 
         List<RatedStoryDTO> ListAssumRatedStory = new ArrayList<>();
 
         for (Integer story : listStory) {
             List<RatingDTO> listRatingUser = new ArrayList<>();
-            List<Rating> getallRate = ratingRepository.findAll();
-            //bat ki cai data nao lay tu` rating deu ra null, nhung van co size ok
             List<Rating> ratingUser = ratingRepository.findRatingByStoryIdEXceptId(story, id);
 
             if(ratingUser.size() >0 ){
@@ -230,23 +237,9 @@ class RatingServiceIml implements RatingService {
 
         // Step 9
         // get All suggest Story
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<Story> storyPage = storyRepository.findAllByStoryIds(listSuggestStory, pageable);
 
 
-        ModelMapper mm = new ModelMapper();
-        Page<GetStoryDto> responsePage = storyPage.map(new Function<Story, GetStoryDto>() {
-            @Override
-            public GetStoryDto apply(Story story) {
-                List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
-                GetStoryDto dto = mm.map(story, GetStoryDto.class);
-                dto.setTags(tagService.mapModelToDto(tagList));
-                return dto;
-
-
-            }
-        });
-        return responsePage;
+        return listSuggestStory;
     }
 
     public Double cosineSimilarity(List<Double> currUser, List<Double> SelectedUser) {
@@ -263,5 +256,57 @@ class RatingServiceIml implements RatingService {
 
         cosineSimilarity = AB / (Math.sqrt(A) * Math.sqrt(B));
         return cosineSimilarity;
+    }
+
+    @Override
+    public List<Integer> getSuggestByCommentAndReaction() {
+
+        List<StoryCommentDTO> list = new ArrayList<>();
+        List<Integer> listStory = storyRepository.findAllStory();
+        for (Integer integer: listStory){
+            int comment = commentRepository.countCommentByStoryId(integer);
+            int like = commentRepository.countLikeCommentByStoryId(integer);
+            int dislike = commentRepository.countDisLikeCommentByStoryId(integer);
+
+            double point = ((comment * 0.4) + (like * 0.3) + (dislike * 0.3))/(comment + like + dislike);
+            StoryCommentDTO dto = new StoryCommentDTO();
+            dto.setStoryId(integer);
+            dto.setPoint(point);
+            list.add(dto);
+        }
+
+
+        List<Integer> listSuggestion = new ArrayList<>();
+        int topid = 0;
+        int secondtopid = 0;
+        int thirdtopid = 0;
+        int fourtopid = 0;
+        double top = 0.0;
+        double second = 0.0;
+        double third = 0.0;
+        double four = 0.0;
+        for (StoryCommentDTO dto : list){
+            if(dto.getPoint() >= top){
+                fourtopid = thirdtopid;
+                thirdtopid = secondtopid;
+                secondtopid = topid;
+                        topid = dto.getStoryId();
+            }else if(dto.getPoint() >= second){
+                fourtopid = thirdtopid;
+                thirdtopid = secondtopid;
+                secondtopid = dto.getStoryId();
+            }else if(dto.getPoint() >= third){
+                fourtopid = thirdtopid;
+                thirdtopid = dto.getStoryId();
+            } else if(dto.getPoint() >= four){
+                four = dto.getStoryId();
+            }
+        }
+        listSuggestion.add(topid);
+        listSuggestion.add(secondtopid);
+        listSuggestion.add(thirdtopid);
+        listSuggestion.add(fourtopid);
+
+        return listSuggestion;
     }
 }

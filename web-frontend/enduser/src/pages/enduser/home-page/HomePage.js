@@ -12,18 +12,14 @@ const HomePage = () => {
     const [trendStories, setTrendStories] = useState([]);
     const [trendStoriesLoading, setTrendStoriesLoading] = useState(false);
 
-    const [suggestedStoriesByRating, setsuggestedStoriesByRating] = useState([]);
-    const [suggestedStoriesByRatingLoading, setsuggestedStoriesByRatingLoading] = useState(false);
-
-    const [suggestedStoriesByHistory, setsuggestedStoriesByHistory] = useState([]);
-    const [suggestedStoriesByHistoryLoading, setsuggestedStoriesByHistoryLoading] = useState(false);
+    const [suggestedStories, setsuggestedStories] = useState([]);
+    const [suggestedStoriesLoading, setsuggestedStoriesLoading] = useState(false);
 
     const [pageNoRating, setPageNoRating] = useState(1);
     const [pageNoHistory, setPageNoHistory] = useState(1);
     useEffect(() => {
         getTrendStories();
-        getsuggestedStoriesByRating();
-        getsuggestedStoriesByHistory();
+        getsuggestedStories();
     }, []);
     // useEffect(() => {
         
@@ -44,113 +40,61 @@ const HomePage = () => {
         setTrendStoriesLoading(false);
     }
 
-    const getsuggestedStoriesByRating = async () => {
-        setsuggestedStoriesByRatingLoading(true);
+    const getsuggestedStories = async () => {
+        setsuggestedStoriesLoading(true);
         try {
             
-            var array = [...suggestedStoriesByRating]
+            var array = [...suggestedStories]
             //check xem array hien tai co data chua, co' thi load next page
             if (array.length > 1) {
                 
                 setPageNoRating(pageNoRating + 1);
                 const pageNumber = pageNoRating + 1;
-                const res = await StoryService.getSuggestStoryByRating(pageNumber);
+                const res = await StoryService.getSuggestion(pageNumber);
                 console.log(res);
                 res.data.content.forEach(element => {
-                    setsuggestedStoriesByRating(story => [...story, element]);
+                    setsuggestedStories(story => [...story, element]);
                 });
             }else{
-                const res = await StoryService.getSuggestStoryByRating(1);
+                const res = await StoryService.getSuggestion(1);
                 console.log(res);
-                setsuggestedStoriesByRating(res.data.content);
+                setsuggestedStories(res.data.content);
             }
-            console.log(suggestedStoriesByRating);
+            console.log(suggestedStories);
 
 
         } catch (error) {
             console.log(error);
           
         }
-        setsuggestedStoriesByRatingLoading(false);
-        
-    }
-
-    const getsuggestedStoriesByHistory = async () => {
-        setsuggestedStoriesByHistoryLoading(true);
-        try {
-            
-            var array = [...suggestedStoriesByHistory]
-            //check xem array hien tai co data chua, co' thi load next page
-            if (array.length > 1) {
-                
-                setPageNoHistory(pageNoHistory + 1);
-                const pageNumber = pageNoHistory + 1;
-                const res = await StoryService.getSuggestStoryByHistory(pageNumber);
-                console.log(res);
-                res.data.content.forEach(element => {
-                    setsuggestedStoriesByHistory(story => [...story, element]);
-                });
-            }else{
-                const res = await StoryService.getSuggestStoryByHistory(1);
-                console.log(res);
-                setsuggestedStoriesByHistory(res.data.content);
-            }
-            console.log(suggestedStoriesByHistory);
-
-
-        } catch (error) {
-            console.log(error);
-          
-        }
-        setsuggestedStoriesByHistoryLoading(false);
+        setsuggestedStoriesLoading(false);
         
     }
 
     return (
         <MainLayout>
             <div className="container-fluid">
-<<<<<<< HEAD
-                <h4 className="text-bold">Gợi ý cho bạn theo Đánh giá</h4>
-                <hr style={{ border: '1px solid #ccc' }} />
-                {!suggestedStoriesByRatingLoading && (
-                     <div className="row">
-                        {suggestedStoriesByRating.map(story => (
-                            <div className="col-sm-3 px-2">
-                                <StoryCard story={story} />
-                            </div>
-                        ))}
-                    </div>
-                )}
-                 <Button size="small" color="secondary" onClick={e => getsuggestedStoriesByRating()}>
-          Thêm Truyện
-          </Button>
-                {suggestedStoriesByRatingLoading && <MySpinner/>}
 
-                <h4 className="text-bold">Gợi ý cho bạn theo Lịch Sử</h4>
-=======
+
                 <h4 className="text-bold">Gợi ý cho bạn</h4>
->>>>>>> 8cda2314fa393dc565ba97d5a524415d82d33900
                 <hr style={{ border: '1px solid #ccc' }} />
-                {!suggestedStoriesByHistoryLoading && (
+                {!suggestedStoriesLoading && (
                      <div className="row">
-                        {suggestedStoriesByHistory.map(story => (
+                        {suggestedStories.map(story => (
                             <div className="col-sm-3 px-2">
                                 <StoryCard story={story} />
                             </div>
                         ))}
                     </div>
                 )}
-                 <Button size="small" color="secondary" onClick={e => getsuggestedStoriesByHistory()}>
+                 <Button size="small" color="secondary" onClick={e => getsuggestedStories()}>
           Thêm Truyện
           </Button>
-                {suggestedStoriesByHistoryLoading && <MySpinner/>}
+                {suggestedStoriesLoading && <MySpinner/>}
 
 
-<<<<<<< HEAD
-                <h4 className="text-bold mt-5">Truyện đang thịnh hành</h4>
-=======
+
                 <h4 className="text-bold mt-5">Danh sách thịnh hành</h4>
->>>>>>> 8cda2314fa393dc565ba97d5a524415d82d33900
                 <hr style={{ border: '1px solid #ccc' }} />
                 {!trendStoriesLoading && (
                     <div className="row">

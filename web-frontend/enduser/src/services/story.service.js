@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_ENDPOINT_PREFIX } from '../config/api';
+import {getAuthUserInfo} from '../config/auth'
 
 const baseUrl = API_ENDPOINT_PREFIX + '/stories';
 
@@ -41,20 +42,20 @@ class StoryService{
         return axios.get(url);
     }
 
-<<<<<<< HEAD
-    static async getSuggestStoryByRating(pageNo){
+
+    static async getSuggestion(pageNo){
         let pagesize = 4;
-        const url = "http://localhost:8003/rating/suggestRated1?pageNo=".concat(pageNo).concat('&pageSize=').concat(pagesize);
-        return axios.get(url);
+        const userinfo = getAuthUserInfo();
+
+        if(userinfo === null){
+            const url1 = "http://localhost:8003/suggestion/suggeststory".concat('?pageNo=').concat(pageNo).concat('&pageSize=').concat(pagesize);
+            return axios.get(url1);
+        }else{
+            const url = "http://localhost:8003/suggestion/suggest".concat(userinfo.id).concat('?pageNo=').concat(pageNo).concat('&pageSize=').concat(pagesize);
+            return axios.get(url);
+        }
     }
 
-    static async getSuggestStoryByHistory(pageNo){
-        let pagesize = 4;
-        const url = "http://localhost:8003/history/suggestRated1?pageNo=".concat(pageNo).concat('&pageSize=').concat(pagesize);
-        return axios.get(url);
-    }
-
-=======
     static async updateStoryByAdmin(storyId, enable){
         const url = baseUrl + '/update_by_admin/' + storyId + '/' + enable;
         return axios.put(url);
@@ -64,7 +65,6 @@ class StoryService{
         const url = baseUrl + `/get_for_admin?page=${page}&itemsPerPage=${itemsPerPage}&asc=${asc}&orderBy=${orderBy}&keyword=${keyword}`;
         return axios.get(url);
     }
->>>>>>> 8cda2314fa393dc565ba97d5a524415d82d33900
 }
 
 export default StoryService;

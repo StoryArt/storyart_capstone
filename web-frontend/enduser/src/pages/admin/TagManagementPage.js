@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import MainLayout from "../../layouts/main-layout/MainLayout";
 import TagService from "../../services/tag.service";
 import axios from "axios";
@@ -147,6 +147,9 @@ class TagManagementPage extends React.Component {
 
   render() {
     const { data } = this.state;
+    
+  const [openAlert, setOpenAlert] = useState(false);
+  const [alert, setAlert] = useState({ content: '', type: 'success' });
 
     //
     data.map((dat, index) => {

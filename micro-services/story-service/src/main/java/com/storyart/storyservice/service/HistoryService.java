@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public interface HistoryService {
-    Page<GetStoryDto> jaccardCalculate(Integer id, int pageNo, int pageSize);
+    List<Integer> jaccardCalculate(Integer id);
 }
 
 @Service
@@ -41,7 +41,7 @@ class HistoryServiceIml implements HistoryService {
     TagRepository tagRepository;
 
     @Override
-    public  Page<GetStoryDto> jaccardCalculate(Integer id, int PageNo, int pageSize) {
+    public   List<Integer> jaccardCalculate(Integer id) {
         List<ReadingHistory> CurrentUserHistory = historyRepository.findHistoryById(id);
         HistoryDTO currentUserH = new HistoryDTO();
         currentUserH.setUserid(id);
@@ -85,22 +85,8 @@ class HistoryServiceIml implements HistoryService {
         List<Integer> MostFitHistory = historyRepository.findListHistory(MostFitId);
         List<Story> listStory = new ArrayList<>();
         MostFitHistory.removeAll(currentUserH.getListStory());
-        Pageable pageable = PageRequest.of(PageNo, pageSize);
-        Page<Story> storyPage = storyRepository.findAllByStoryIds(MostFitHistory, pageable);
 
-        ModelMapper mm = new ModelMapper();
-        Page<GetStoryDto> responsePage = storyPage.map(new Function<Story, GetStoryDto>() {
-            @Override
-            public GetStoryDto apply(Story story) {
-                List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
-                GetStoryDto dto = mm.map(story, GetStoryDto.class);
-                dto.setTags(tagService.mapModelToDto(tagList));
-                return dto;
-
-
-            }
-        });
-        return responsePage;
+        return MostFitHistory;
     }
 
 
