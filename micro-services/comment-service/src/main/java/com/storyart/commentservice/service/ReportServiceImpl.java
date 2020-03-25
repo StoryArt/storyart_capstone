@@ -79,9 +79,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Page<ReportCommentResponseDTO> getListReportComment(int pageNo, int pageSize) {
+    public Page<ReportCommentResponseDTO> getListReportComment(boolean isHandled, int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<Report> reportPage = reportRepository.findReportComment(pageable);
+        Page<Report> reportPage = reportRepository.findReportComment(isHandled,pageable);
 
         Page<ReportCommentResponseDTO> responsePage = reportPage.map(new Function<Report, ReportCommentResponseDTO>() {
             @Override

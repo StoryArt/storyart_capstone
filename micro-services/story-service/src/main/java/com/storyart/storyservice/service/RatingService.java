@@ -1,10 +1,15 @@
 package com.storyart.storyservice.service;
 
+<<<<<<< HEAD
 import com.storyart.storyservice.dto.GetStoryDto;
+=======
+import com.storyart.storyservice.dto.ResultDto;
+>>>>>>> e21281a3e66532db0e5b306182dcd9c8a8e46a23
 import com.storyart.storyservice.dto.story_suggestion.RatedStoryDTO;
 import com.storyart.storyservice.dto.story_suggestion.RatingDTO;
 import com.storyart.storyservice.dto.story_suggestion.StoryCommentDTO;
 import com.storyart.storyservice.model.Rating;
+import com.storyart.storyservice.model.RatingId;
 import com.storyart.storyservice.model.Story;
 import com.storyart.storyservice.model.Tag;
 import com.storyart.storyservice.repository.*;
@@ -18,12 +23,20 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+<<<<<<< HEAD
 import java.util.function.Function;
 
 public interface RatingService {
     List<Integer>  getSuggestion(Integer id, boolean flag);
     List<Integer> getSuggestByCommentAndReaction();
 
+=======
+import java.util.Optional;
+
+public interface RatingService {
+    List<Story> getSuggestion(Integer id);
+    ResultDto rateStory(double stars, int  userId, int storyId);
+>>>>>>> e21281a3e66532db0e5b306182dcd9c8a8e46a23
 }
 
 
@@ -242,6 +255,29 @@ class RatingServiceIml implements RatingService {
         return listSuggestStory;
     }
 
+    @Override
+    public ResultDto rateStory(double stars, int userId, int storyId) {
+        ResultDto result = new ResultDto();
+        result.setSuccess(false);
+        RatingId ratingId = new RatingId();
+        ratingId.setStoryId(storyId);
+        ratingId.setUserId(userId);
+        Optional<Rating> rating = ratingRepository.findById(ratingId);
+        Rating r = rating.orElseGet(null);
+        if(r != null){
+          r.setStars(stars);
+        } else {
+            Rating rate = new Rating();
+            RatingId id = new RatingId();
+            id.setUserId(userId);
+            id.setStoryId(storyId);
+            rate.setStars(stars);
+
+
+        }
+        return null;
+    }
+
     public Double cosineSimilarity(List<Double> currUser, List<Double> SelectedUser) {
 
         double AB = 0.0;
@@ -258,6 +294,7 @@ class RatingServiceIml implements RatingService {
         return cosineSimilarity;
     }
 
+<<<<<<< HEAD
     @Override
     public List<Integer> getSuggestByCommentAndReaction() {
 
@@ -309,4 +346,7 @@ class RatingServiceIml implements RatingService {
 
         return listSuggestion;
     }
+=======
+
+>>>>>>> e21281a3e66532db0e5b306182dcd9c8a8e46a23
 }

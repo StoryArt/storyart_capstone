@@ -14,8 +14,8 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
     @Query("select r from Report r where r.userId = ?1 and r.commentId = ?2")
     Optional<Report> findReportByUserIdAndCommentId(int userId, int commentId);
 
-    @Query("select r from Report r where r.storyId = 0 group by r.commentId order by count(r.commentId) desc ")
-    Page<Report> findReportComment(Pageable pageable);
+    @Query("select r from Report r where r.storyId = 0 and r.isHandled=?1 group by r.commentId order by count(r.commentId) desc ")
+    Page<Report> findReportComment(boolean isHandled,Pageable pageable);
 
     @Query("select count(r.commentId) from Report r where r.commentId in (:commentIds) group by r.commentId order by count(r.commentId) desc")
     List<Integer> getNumberOfReports(List<Integer> commentIds);

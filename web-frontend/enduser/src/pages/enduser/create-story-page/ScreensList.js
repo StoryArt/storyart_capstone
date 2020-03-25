@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { MenuItem, TextField, Tooltip, Fab } from '@material-ui/core';
 import { Visibility as VisibilityIcon } from '@material-ui/icons';
@@ -30,8 +30,10 @@ const ScreensList = (props) => {
                 <div className="card screen-card mb-5">
                     <div className="card-header">
                         <h5 className="mb-4">
-                            <span className="mr-3">Màn hình { index }</span>
-                            <Tooltip style={{ float: 'right' }} title="Xem trình diễn màn hình" aria-label="add" placement="top">
+                            <span className="mr-3">#{ index }</span>
+                            <Tooltip style={{ float: 'right' }} 
+                                title="Xem trình diễn màn hình" 
+                                placement="top">
                                 <Fab 
                                     color="primary" 
                                     style={{ width: '35px', height: '35px' }} 
@@ -43,6 +45,7 @@ const ScreensList = (props) => {
                         <div className="row">
                             <div className="col-sm-6">
                                 <TextField
+                                    size="small"
                                     variant="outlined" 
                                     label="Tiêu đề"
                                     style={{ width: '100%' }}
@@ -62,9 +65,11 @@ const ScreensList = (props) => {
 
                     <div className="card-body">
                         <MyEditor 
+                            onChange={(value) =>  {
+                                onChangeScreen('content', value, currentScreen);
+                            }}
                             value={currentScreen.content}
                             placeholder="Nội dung màn hình..."
-                            onChange={(value) => onChangeScreen('content', value, currentScreen)}
                         />
 
                         {currentScreen.actions.length > 0 && <strong className="mt-3 d-block">Hành động</strong>}

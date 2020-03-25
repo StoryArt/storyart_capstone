@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ActionRepository extends JpaRepository<Action, String> {
     List<Action> findAllByScreenId(String screenId);
+    void deleteAllByScreenId(String screenId);
 }

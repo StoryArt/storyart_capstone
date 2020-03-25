@@ -11,16 +11,13 @@ import java.util.List;
 
 public interface UserService {
 
-
     void create(User us);
-
 
     void update(Integer uid, UserProfileUpdateRequest us);
 
     void delete(Integer id);
 
     void deActive(Integer id, boolean deadmin);
-
 
     List<User> findAll();
 
@@ -29,7 +26,6 @@ public interface UserService {
     User findByUsername(String username);
 
     void active(Integer uid);
-
 
     User findByEmail(String email);
 
@@ -44,7 +40,7 @@ public interface UserService {
     PagedResponse<UserInManagementResponse> findOnlyUserByUsernameOrEmail(int page, int size, String searchtxt);
 
     void createDefaultSysAdmin();
+    void createTestUser();
 
-
-    void updateAvatar(Integer uid,String link);
+    void updateAvatar(Integer uid, String link);
 }

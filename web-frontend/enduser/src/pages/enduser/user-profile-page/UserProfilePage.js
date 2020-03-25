@@ -1,24 +1,37 @@
 import React, { useState, useEffect } from "react";
 import MainLayout from "../../../layouts/main-layout/MainLayout";
 import {
-  MDBInput,
   MDBAlert,
   MDBBtn,
-  MDBModalFooter,
-  MDBModalHeader,
-  MDBModalBody
 } from "mdbreact";
 import { setAuthHeader } from "../../../config/auth";
 
 import UserService from "../../../services/user.service";
 import { UserContext } from "../../../context/user.context";
 import { getAuthUserInfo } from "../../../config/auth";
+import { getOrderBys } from '../../../common/constants';
 
-import SplitDate from "../../../utils/splitDate";
 import DateTimeUtils from "../../../utils/datetime";
 import StoryService from "../../../services/story.service";
+import { FormControl, TextField, InputLabel, Select, MenuItem, TableContainer, 
+  Table, TableHead, TableRow, TableCell, TableBody, Divider, InputAdornment, Paper } from "@material-ui/core";
+import { Search as SearchIcon } from '@material-ui/icons';
+import { Pagination } from '@material-ui/lab';
+import TagList from '../../../components/common/TagList';
+import StringUtils from "../../../utils/string";
+import ValidationUtils from "../../../utils/validation";
+import MyDropdownMenu from '../../../components/common/MyDropdownMenu';
+import MySpinner from '../../../components/common/MySpinner';
+import NotFound from '../../../components/common/NotFound';
+import MyAlert from '../../../components/common/MyAlert';
+import ConfirmDialog from '../../../components/common/ConfirmDialog';
 
-const UserProfilePage = () => {
+
+const orderBys = getOrderBys();
+
+let searchTimeout;
+
+const UserProfilePage = (props) => {
   const [profile, setProfile] = useState([]);
   const [id, setId] = useState("");
   const [name, setName] = useState("");
@@ -30,17 +43,31 @@ const UserProfilePage = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [avatar, setAvatar] = useState(null);
   const [upfile, setUploadFile] = useState(null);
-  const [stories, setStories] = useState([]);
+  
   const [saveAvatarBt, setSaveAvatarBt] = useState("disabled");
-  // const userContext = useContext(UserContext);
-  // const { user } = userContext;
-  // console.log(user);
+
+  const [stories, setStories] = useState([]);
+  const [story, setStory] = useState(null);
+  const [isLoadingstories, setIsLoadingStories] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+  const [filters, setFilters] = useState({
+    keyword: '',
+    orderBy: 'avg_rate',
+    asc: false,
+    page: 1,
+    itemsPerPage: 10,
+  });
+
+  const [openAlert, setOpenAlert] = useState(false);
+  const [alert, setAlert] = useState({ content: '', type: 'success', open: false });
+  const [dialog, setDialog] = useState({ content: '', open: false });
   const user = getAuthUserInfo();
 
   useEffect(() => {
     getProfile();
     getStoriesByAuthor();
   }, []);
+
 
   async function handleUpdateProfile(event) {
     event.preventDefault();
@@ -131,15 +158,101 @@ const UserProfilePage = () => {
   };
 
   const getStoriesByAuthor = async () => {
-    console.log(user);
+    setIsLoadingStories(true);
     try {
-      const res = await StoryService.getStoriesByAuthor(user.id);
+      const res = await StoryService.getStoriesByAuthor(1, filters);
       console.log(res);
-      setStories(res.data);
+      const { content, totalPages } = res.data;
+      setStories(content);
+      setTotalPages(totalPages)
     } catch (error) {
       console.log(error);
     }
+    setIsLoadingStories(false);
   };
+
+  const changeFilters = (prop, value) => {
+    filters[prop] = value;
+    setFilters({ ...filters });
+    if(prop === 'keyword'){
+        clearTimeout(searchTimeout);
+        searchTimeout = window.setTimeout(() => {
+            setFilters({ ...filters, page: 1 });
+            getStoriesByAuthor();
+        }, 300);
+    } else {
+      getStoriesByAuthor();
+    }
+}
+
+  const changePage = (e, value) => {
+    changeFilters('page', value);
+  }
+
+  const editStory = (story) => props.history.push('/stories/edit/' + story.id);
+
+  const readStory = (story) => window.open('/stories/read/' + story.id, '_blank');
+
+  const deleteStory = async () => {
+    setDialog({ ...dialog, open: false })
+    try {
+      const res = await StoryService.deleteStory(story.id);
+      console.log(res);
+      const { success, errors } = res.data;
+      if(success){
+        setAlert({ type: 'success', content: 'Xóa thành công', open: true });
+        getStoriesByAuthor();
+      } else {
+        setAlert({ type: 'error', content: Object.values(errors)[0], open: true });
+      }
+      
+      closeAlert();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
+
+  const handleDeleteStory = (story) => {
+    setStory(story);
+    setDialog({ open: true, content: 'Bạn có chắc muốn xóa ' + story.title + '?' });
+  }
+
+  const changePublishedStatus = async (story) => {
+    const turnOnPublished = !story.published;
+    try {
+      const res = await StoryService.changePublishedStatus(story.id, turnOnPublished);
+      const { success, errors } = res.data;
+      console.log(res);
+      if(success){
+        setAlert({ 
+          type: 'success', 
+          content: 'Đổi trạng thái xuất bản thành công',
+          open: true
+       });
+        const index = stories.findIndex(s => s.id === story.id);
+        stories[index].published = !story.published;
+        setStories([...stories]);
+      } else {
+        setAlert({ 
+          type: 'error', 
+          content: Object.values(errors)[0],
+          open: true
+        });
+      }
+      closeAlert();
+      
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const cancel = () => {
+    setStory(null);
+    setDialog({ ...dialog, open: false });
+  }
+
 
   const statusButton = [];
 
@@ -154,7 +267,7 @@ const UserProfilePage = () => {
 
   return (
     <MainLayout>
-      <div className="container-fluid">
+      <div className="container-fluid" style={{ paddingBottom: '100px' }}>
         <div className="row mb-5">
           <div className="col-12">
             <div className="card">
@@ -168,8 +281,8 @@ const UserProfilePage = () => {
                   <div style={{ padding: 0 }} className="col-sm-3">
                     {statusButton}
                   </div>
-                </div>{" "}
-              </div>{" "}
+                </div> 
+              </div> 
               <div className="card-body">
                 {errorMessage}
                 <form
@@ -269,7 +382,7 @@ const UserProfilePage = () => {
                       </div>
                       {/* save button */}
                       <div className="form-group">
-                        {" "}
+                         
                         <button
                           className="btn float-left"
                           style={{
@@ -301,56 +414,176 @@ const UserProfilePage = () => {
                       </div>
                       Joint at:
                       {DateTimeUtils.getDateTime(jointAt)}
-                    </div>{" "}
+                    </div> 
                   </div>
-                </form>{" "}
-              </div>{" "}
-            </div>{" "}
-          </div>{" "}
+                </form> 
+              </div> 
+            </div> 
+          </div> 
         </div>
-        <h3 className="text-bold"> Truyen cua ban </h3>{" "}
-        <hr style={{ border: "1px solid #ccc" }} />{" "}
-        <div className="row">
-          {" "}
-          {stories.map(story => (
-            <div className="col-8" key={story.id}>
-              <div className="card mb-3">
-                <div className="row no-gutters">
-                  <div className="col-md-4">
-                    <img
-                      src="https://mdbootstrap.com/img/Photos/Others/images/43.jpg"
-                      className="card-img"
-                    />
-                  </div>{" "}
-                  <div className="col-md-8">
-                    <div className="card-body">
-                      <h5 className="card-title"> Truyen ma nua dem </h5>{" "}
-                      <p className="card-text">
-                        {" "}
-                        This is a story inro content...{" "}
-                      </p>{" "}
-                      <div>
-                        <button className="btn btn-warning float-right">
-                          {" "}
-                          Edit{" "}
-                        </button>{" "}
-                        <button className="btn btn-success float-right mr-0">
-                          {" "}
-                          Publish{" "}
-                        </button>{" "}
-                        <button className="btn btn-danger float-right mr-0">
-                          {" "}
-                          Deactivate{" "}
-                        </button>
-                      </div>{" "}
-                    </div>{" "}
-                  </div>{" "}
-                </div>{" "}
-              </div>{" "}
+        <h3 className="text-bold"> Truyện của bạn </h3> 
+        <hr style={{ border: "1px solid #ccc" }} /> 
+
+        <div className="row my-3">
+            <div className="col-sm-3">
+              <FormControl>
+                <TextField
+                  // variant="outlined"
+                  style={{ width: '100%' }}
+                  label="Tìm truyện..."
+                  value={filters.keyword} 
+                  onChange={(e) => changeFilters('keyword', e.target.value)} 
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+              </FormControl>
             </div>
-          ))}{" "}
-        </div>{" "}
-      </div>{" "}
+            <div className="col-sm-3">
+              <FormControl style={{ width: '100%' }}>
+                  <InputLabel>Sắp theo</InputLabel>
+                  <Select
+                      value={filters.orderBy}
+                      onChange={(e) => changeFilters('orderBy', e.target.value)}
+                  >
+                      {orderBys.map((orderBy) => (
+                          <MenuItem key={orderBy.value} value={orderBy.value}>
+                              {orderBy.title}
+                          </MenuItem>
+                      ))}
+                  </Select>
+              </FormControl>
+            </div>
+            <div className="col-sm-3">
+              <FormControl >
+                  <InputLabel>Thứ tự</InputLabel>
+                  <Select
+                      value={filters.asc}
+                      onChange={(e) => changeFilters('asc', e.target.value)}
+                  >
+                        <MenuItem value={true}>
+                            Tăng dần
+                        </MenuItem>
+                        <MenuItem value={false}>
+                            Giảm dần
+                        </MenuItem>
+                  </Select>
+              </FormControl>
+            </div>
+          </div>
+        {/* {isLoadingstories && <MySpinner/>} */}
+
+        <>
+          <div className="row my-3">
+            <div className="col-12">
+              <Pagination 
+                  style={{float: 'right'}}
+                  count={totalPages} 
+                  page={filters.page}
+                  onChange={changePage} />
+            </div>
+          </div>
+
+          <div className="row mb-5">
+            <div className="col-12">
+            <TableContainer component={Paper}>
+                <Table aria-label="caption table">
+                  <caption>Tất cả truyện</caption>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>#</TableCell>
+                      <TableCell align="center">Tiêu đề</TableCell>
+                      <TableCell align="center">Ảnh</TableCell>
+                      {/* <TableCell align="center">Giới thiệu</TableCell> */}
+                      <TableCell align="center">Số màn hình</TableCell>
+                      <TableCell align="center">Số lượt đọc</TableCell>
+                      <TableCell align="center">Số lượt bình luận</TableCell>
+                      <TableCell align="center">Số lượt đánh giá</TableCell>
+                      <TableCell align="center">Đánh giá trung bình</TableCell>
+                      <TableCell align="center">Trạng thái</TableCell>
+                      <TableCell align="center">Nhãn</TableCell>
+                      <TableCell align="center"></TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    { stories.map((story, index) => (
+                      <TableRow key={story.id}>
+                        <TableCell align="center">{ index + 1}</TableCell>
+                        <TableCell align="center">{ story.title }</TableCell>
+                        <TableCell align="center">
+                          <img style={{ width: '80px' }}  src={story.image}/>
+                        </TableCell>
+                        <TableCell align="center">{story.numOfScreen}</TableCell>
+                        <TableCell align="center">{story.numOfRead}</TableCell>
+                        <TableCell align="center">{story.numOfComment}</TableCell>
+                        <TableCell align="center">{story.numOfRate}</TableCell>
+                        <TableCell align="center">{story.avgRate}</TableCell>
+                        <TableCell align="center">{story.published ? <span className="text-success">Đã xuất bản</span> : <span className="text-danger">Chưa xuát bản</span>}</TableCell>
+                        <TableCell align="center">
+                          <div style={{ maxWidth: '150px' }}>
+                            <small>
+                              <TagList tags={story.tags} />
+                            </small>
+                          </div>
+                        </TableCell>
+                        <TableCell align="center">
+                          <MyDropdownMenu>
+                            <MenuItem onClick={() => readStory(story)}>
+                              Đọc truyên
+                            </MenuItem>
+                            <MenuItem onClick={() => editStory(story)}>
+                              Cập nhật
+                            </MenuItem>
+                            <MenuItem onClick={() => changePublishedStatus(story)}>
+                              {story.published ? 'Hủy xuất bản truyện' : 'Xuất bản truyện'}
+                            </MenuItem>
+                            <Divider/>
+                            <MenuItem onClick={() => handleDeleteStory(story)}>
+                              Xóa truyện
+                            </MenuItem>
+                          </MyDropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </div>
+        </div>
+                      
+          <div className="row my-3">
+            <div className="col-12">
+              <Pagination 
+                  style={{float: 'right'}}
+                  count={totalPages} 
+                  page={filters.page}
+                  onChange={changePage} />
+            </div>
+          </div>
+        </>
+      
+
+        {(!isLoadingstories && stories.length == 0) && <NotFound message="Không tìm thấy truyện nào..." />}
+        
+      </div> 
+      <ConfirmDialog
+          openDialog={dialog.open}
+          cancel={cancel}
+          ok={deleteStory}
+          setOpenDialog={() => setDialog({ ...dialog, open: true })}
+          content={dialog.content}
+      />
+
+      <MyAlert 
+          open={alert.open}
+          setOpen={() => setAlert({ ...alert, open: true })}
+          type={alert.type}
+          content={alert.content}
+      />
     </MainLayout>
   );
 };

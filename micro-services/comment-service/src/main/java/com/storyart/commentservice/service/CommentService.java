@@ -15,5 +15,5 @@ public interface CommentService {
     Comment findById(Integer id);
     void disableAndEnableComment(int commentId);
     Page<CommentHistoryResponseDTO> getCommentHistory(int userId, int pageNo, int pageSize);
-    StatisticResponse getStatistic(int userId, String startDate, String endDate);
+    StatisticResponse getStatistic(int storyId, int userId, String startDate, String endDate);
 }

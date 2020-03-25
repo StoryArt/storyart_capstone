@@ -3,11 +3,9 @@ import React from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { ListItem, ListItemText, ListItemSecondaryAction, IconButton, Tooltip } from '@material-ui/core';
-import { Pagination } from '@material-ui/lab';
 import { Delete as DeleteIcon } from '@material-ui/icons';
 import ValidationUtils from '../../../utils/validation';
 import StringUtils from '../../../utils/string';
-import {List} from 'react-virtualized';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -22,7 +20,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const AllScreenSnapshots = (props) => {
+const ScreenSnapshots = (props) => {
     const { screens, setCurrentScreen, currentScreen, onRemoveScreen, page } = props;
     const classes = useStyles();
 
@@ -42,7 +40,7 @@ const AllScreenSnapshots = (props) => {
                             className="" 
                             onClick={() => { setCurrentScreen(screen.id) }}>
                             <ListItemText 
-                                className={classes.text} s
+                                className={classes.text}
                                 primary={`#${ (page-1) * 10 + index + 1 } (${StringUtils.getObjTitle(screen)})`} />
                             <small>{ StringUtils.truncate(StringUtils.removeHtml(screen.content), 60) }</small>
                         </div>
@@ -64,4 +62,4 @@ const AllScreenSnapshots = (props) => {
 };
 
 
-export default AllScreenSnapshots;
+export default ScreenSnapshots;

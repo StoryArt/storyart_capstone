@@ -26,7 +26,7 @@ const ReadStoryPage = (props) => {
     const [notfound, setNotfound] = useState(false);
     const [isFullScreen, setFullScreen] = useState(false);
 
-    const [currentScreen, setCurrentScreen] = useState({ });
+    const [currentScreen, setCurrentScreen] = useState({});
     const [showScreen, setShowScreen] = useState(false);
     const [selectedScreens, setSelectedScreens] = useState([]);
     const [selectedActions, setSelectedActions] = useState([]);
@@ -172,7 +172,7 @@ const ReadStoryPage = (props) => {
                                     <p 
                                         style={{ fontSize: '1.5em' }}
                                         className="text-justify screen-card-body">
-                                        {story.intro}
+                                        {StringUtils.parseHtml(story.intro)}
                                     </p>
                                     <button
                                         onClick={startReading} 

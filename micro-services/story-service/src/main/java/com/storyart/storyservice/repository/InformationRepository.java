@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface InformationRepository extends JpaRepository<Information, String> {
     List<Information> findAllByStoryId(int storyId);
+    void deleteAllByStoryIdEquals(int storyId);
 }

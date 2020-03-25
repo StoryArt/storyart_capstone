@@ -23,6 +23,7 @@ const StoryParameters = (props) => {
                                     <div className="row mb-4" key={param.id}>
                                         <div className="col-sm-4 px-1">
                                             <TextField 
+                                                size="small"
                                                 style={{ width: '100%' }}
                                                 variant="outlined"
                                                 label="Tên thông tin"
@@ -32,7 +33,7 @@ const StoryParameters = (props) => {
                                         </div>
                                         <div className="col-sm-3 px-1">
                                             {/* <label>Kieu thong tin</label> */}
-                                            <FormControl variant="outlined" style={{ width: '100%' }}>
+                                            <FormControl size="small" variant="outlined" style={{ width: '100%' }}>
                                                 <InputLabel>Kiểu thông tin</InputLabel>
                                                 <Select
                                                     defaultValue={parameters[0].type}
@@ -50,6 +51,7 @@ const StoryParameters = (props) => {
                                         </div>
                                         <div className="col-sm-4 px-1">
                                             <TextField 
+                                                size="small"
                                                 style={{ width: '100%' }}
                                                 variant="outlined"
                                                 label=""
@@ -79,7 +81,7 @@ const StoryParameters = (props) => {
                                                 <strong>{param.name}</strong> 
                                             </div>
                                             <div className="col-sm-2 px-1">
-                                            <FormControl  style={{ width: '100%' }}>
+                                            <FormControl size="small" style={{ width: '100%' }}>
                                                 <Select
                                                     defaultValue={conditions[0]}
                                                     variant="outlined"
@@ -95,6 +97,7 @@ const StoryParameters = (props) => {
                                             </div>
                                             <div className="col-sm-3 px-1">
                                                 <TextField  
+                                                    size="small"
                                                     style={{ width: '100%' }}
                                                     variant="outlined"
                                                     value={cond.value}

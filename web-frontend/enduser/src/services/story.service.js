@@ -20,8 +20,8 @@ class StoryService{
         return axios.get(url);
     }
 
-    static async getStoriesByAuthor(userId){
-        const url = baseUrl + '/get_by_author/' + userId;
+    static async getStoriesByAuthor(userId, { orderBy, asc, keyword, page, itemsPerPage }){
+        const url = baseUrl + '/get_by_author' + `?userId=${userId}&orderBy=${orderBy}&asc=${asc}&keyword=${keyword}&page=${page}&itemsPerPage=${itemsPerPage}`;
         return axios.get(url);
     }
 
@@ -58,6 +58,16 @@ class StoryService{
 
     static async updateStoryByAdmin(storyId, enable){
         const url = baseUrl + '/update_by_admin/' + storyId + '/' + enable;
+        return axios.put(url);
+    }
+
+    static async deleteStory(storyId){
+        const url = baseUrl + '/' + storyId ;
+        return axios.delete(url);
+    }
+
+    static async changePublishedStatus(storyId, turnOnPublished){
+        const url = baseUrl + '/change_published?storyId=' + storyId + '&turnOnPublished=' + turnOnPublished ;
         return axios.put(url);
     }
 
