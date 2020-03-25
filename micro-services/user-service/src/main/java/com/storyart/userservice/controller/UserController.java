@@ -93,7 +93,7 @@ public class UserController {
     //todo : what is @Valid
 
     // todo danh luong xu ly cho ham nay
-    @PutMapping(value = "/{uid}", consumes = {"multipart/form-data"})
+    @PutMapping(value = "/{uid}")
     public UserProfileResponse
     update(@PathVariable("uid") Integer uid,
            @RequestBody UserProfileUpdateRequest user, @CurrentUser UserPrincipal userPrincipal) {

@@ -29,7 +29,6 @@ public class UserProfileUpdateRequest {
     String intro_content;
 
 
-    String avatar;
 
 
 

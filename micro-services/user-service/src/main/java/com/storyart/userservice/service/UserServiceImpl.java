@@ -242,7 +242,6 @@ page=page-1;
         byId.setName(us.getName());
         byId.setEmail(us.getEmail());
         byId.setIntroContent(us.getIntro_content());
-        byId.setAvatar(us.getAvatar());
 
 
         userRepository.save(byId);
