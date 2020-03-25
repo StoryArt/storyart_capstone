@@ -41,7 +41,7 @@ const modules = {
         [{ 'align': [] }],
       
         ['clean', 'link', 'image', 'video'],
-    ],
+    ]
 }
 
 const formats = [
@@ -52,7 +52,8 @@ const formats = [
 ]
 
 const MyEditor = (props) => {
-    const { value, onChange, placeholder } = props;
+    const { onChange, placeholder, value } = props;
+
     return (
         // <MuiThemeProvider theme={defaultTheme}>
         //     <MUIRichTextEditor 
@@ -82,10 +83,7 @@ const MyEditor = (props) => {
             value={value}
             placeholder={placeholder}
             onChange={onChange} 
-            
             modules={modules}
-            // formats={formats}
-            
             theme="snow" />
     );
 };

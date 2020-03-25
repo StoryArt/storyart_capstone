@@ -66,29 +66,29 @@ const StoryManagementPage =  (props) => {
 const changePage = (e, value) => {
   console.log(value);
   changeFilters('page', value);
-  
 }
 
-const getStories = async () => {
-    let data = [];
-    setIsLoadingStories(true);
-    try {
-        const res = await StoryService.getStoriesForAdmin({ ...filters });
-        console.log(res);
-        
-        data = res.data.content;
-        setTotalPages(res.data.totalPages);
-    } catch (error) {
-        console.log(error);
-    }
-    setIsLoadingStories(false);
-    return data;
-}
+  const getStories = async () => {
+      let data = [];
+      setIsLoadingStories(true);
+      try {
+          const res = await StoryService.getStoriesForAdmin({ ...filters });
+          console.log(res);
+          
+          data = res.data.content;
+          setTotalPages(res.data.totalPages);
+      } catch (error) {
+          console.log(error);
+      }
+      setIsLoadingStories(false);
+      return data;
+  }
 
   const searchStories = async () => {
       const stories = await getStories();
       setStories(stories);
   }
+
   const readStory = (story) => {
     window.open('/stories/read/' + story.id);
   }
@@ -206,7 +206,7 @@ const getStories = async () => {
                   onChange={changePage} />
             </div>
           </div>
-          {isLoadingStories && <MySpinner/>}
+          {/* {isLoadingStories && <MySpinner/>} */}
           
           <TableContainer component={Paper}>
               <Table className={classes.table} aria-label="caption table">

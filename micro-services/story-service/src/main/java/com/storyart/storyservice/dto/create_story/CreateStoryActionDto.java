@@ -5,15 +5,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateStoryActionDto{
+    @NotBlank(message = "Chưa có id cho hành động")
     private String id;
+
+    @NotBlank(message = "Chưa có nội dung cho hành động")
+    @Size(max = 10, message = "Nội dung màn hình có tối đa 100 kí tự")
     private String content;
+
+    @Pattern(regexp = "UPDATE_INFORMATION|NEXT_SCREEN|REDIRECT", message = "Kiểu hành động chỉ 1 trong UPDATE_INFORMATION|NEXT_SCREEN|REDIRECT")
     private String type;
-//    private String operation;
+
     private String value;
     private String nextScreenId;
 }

@@ -2,6 +2,7 @@ package com.storyart.storyservice.repository;
 
 
 import com.storyart.storyservice.model.Rating;
+import com.storyart.storyservice.model.RatingId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface RatingRepository extends JpaRepository<Rating, Integer> {
+public interface RatingRepository extends JpaRepository<Rating, RatingId> {
 
     @Query(value = "SELECT * FROM rating where rating.story_id = :storyid and not user_id = :userid", nativeQuery = true)
     List<Rating> findRatingByStoryIdEXceptId(@Param("storyid") Integer storyid, @Param("userid") Integer userid);
@@ -25,4 +26,5 @@ public interface RatingRepository extends JpaRepository<Rating, Integer> {
 //    int countRateByStoryId (int storyId);
 
     int countRatingByStoryId(int storyId);
+
 }

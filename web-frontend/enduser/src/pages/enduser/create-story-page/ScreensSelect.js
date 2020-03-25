@@ -6,15 +6,16 @@ const ScreensSelect = (props) => {
     const { screens, onChange, value, placeholder } = props;
 
     return (
-        <FormControl variant="outlined" style={{ width: '100%' }}>
+        <FormControl size="small" variant="outlined" style={{ width: '100%' }}>
             <InputLabel>{placeholder}</InputLabel>
             <Select
+                size="small"
                 value={value}
                 onChange={onChange}
             >
                 {screens.map((screen, index) => (
                     <MenuItem key={screen.id} value={screen.id}>
-                        Màn hình {index + 1} ({ screen.title.length > 0 ? screen.title : 'Chưa có tiêu đề' })
+                        #{index + 1} ({ screen.title.length > 0 ? screen.title : 'Chưa có tiêu đề' })
                     </MenuItem>
                 ))}
         </Select>

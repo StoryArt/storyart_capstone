@@ -24,7 +24,6 @@ public class InformationAction {
     @NotNull
     private String informationId;
 
-    @NotBlank
     private String value;
 
     @NotBlank

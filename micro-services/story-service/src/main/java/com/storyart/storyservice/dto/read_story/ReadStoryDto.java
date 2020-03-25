@@ -15,16 +15,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReadStoryDto {
+    private int id;
     private String title;
-    private int authorId;
+    private int userId;
     private double avgRate;
     private String intro;
     private String animation;
-    private boolean isPublished;
-    private boolean isActive;
+    private boolean published;
+    private boolean active;
     private String firstScreenId;
 
     private List<ReadStoryScreenDto> screens;
+    private List<ReadStoryTagDto> tags;
     private List<ReadStoryInformationDto> informations;
     private List<InformationAction> informationActions;
 }

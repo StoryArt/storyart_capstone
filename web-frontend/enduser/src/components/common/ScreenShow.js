@@ -38,14 +38,17 @@ const ScreenShow = (props) => {
                 }, (
                     <div className="screen-card">
                         <div className="screen-card-header">
-                            <h5 className="text-center">{ screen.title }</h5>
+                            <h5 className="text-center">{ StringUtils.getObjTitle(screen) }</h5>
                         </div>
                         <div className="screen-card-body" style={props}>
-                            <p className="text-center">{ StringUtils.parseHtml(screen.content) }</p><br/>
+                            <div className="text-center">
+                               { StringUtils.parseHtml(screen.content) }
+                            </div>
+                            <br/>
                             <div className="row">
                                 {screen.actions.map(action => (
                                     <div className="col-6" key={action.id}>
-                                        <p 
+                                        <div 
                                             style={{ fontSize: '1.2em' }}
                                             onClick={() => onSelectAction(action)}
                                             className="action-content text-center">
@@ -58,7 +61,7 @@ const ScreenShow = (props) => {
                                             {action.type !== ACTION_TYPES.REDIRECT && (
                                                 <>{ StringUtils.parseHtml(action.content)  }</>
                                             )}
-                                        </p>
+                                        </div>
                                     </div>
                                 ))}
                             </div>

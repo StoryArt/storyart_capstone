@@ -16,15 +16,6 @@ import java.util.Date;
 import javax.persistence.*;
 
 
-@Setter
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-class RatingId implements Serializable {
-    private int userId;
-    private int storyId;
-}
-
 @Entity
 @Table(name = "rating")
 @Setter

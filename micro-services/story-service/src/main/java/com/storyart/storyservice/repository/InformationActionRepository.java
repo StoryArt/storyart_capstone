@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface InformationActionRepository extends JpaRepository<InformationAction, Integer> {
     List<InformationAction> findAllByInformationIdIn(List<String> informationIds);
+    void deleteAllByInformationIdIn(List<String> informationId);
 }

@@ -82,11 +82,17 @@ function App() {
             <Route exact path="/stories/search" component={SearchStoriesPage}/>
             <Route exact path="/stories/details/:storyId" component={StoryDetailsPage}/>
             <Route exact path="/stories/read/:storyId" component={StoryReadingPage}/>
-            <Route exact path="/user/profile/:userId" component={UserPublicProfilePage}/>
+            {/* <Route exact path="/user/profile/:userId" component={UserPublicProfilePage}/> */}
 
             <PrivateRoute 
               exact 
               path="/stories/create" 
+              roleName={ROLE_NAMES.ROLE_USER} 
+              component={CreateStoryPage}/>
+
+            <PrivateRoute 
+              exact 
+              path="/stories/edit/:storyId" 
               roleName={ROLE_NAMES.ROLE_USER} 
               component={CreateStoryPage}/>
             

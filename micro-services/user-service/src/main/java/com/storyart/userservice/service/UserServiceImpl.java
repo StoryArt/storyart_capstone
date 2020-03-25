@@ -210,6 +210,11 @@ page=page-1;
     }
 
     @Override
+    public void createTestUser() {
+
+    }
+
+    @Override
     public void updateAvatar(Integer uid,String link) {
         User user= findById(uid);
         user.setAvatar(link);
