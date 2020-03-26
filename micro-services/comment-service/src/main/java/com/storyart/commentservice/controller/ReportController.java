@@ -1,9 +1,6 @@
 package com.storyart.commentservice.controller;
 
-import com.storyart.commentservice.dto.report.HandleReportRequestDTO;
-import com.storyart.commentservice.dto.report.ReportByCommentIdResponse;
-import com.storyart.commentservice.dto.report.ReportCommentRequestDTO;
-import com.storyart.commentservice.dto.report.ReportCommentResponseDTO;
+import com.storyart.commentservice.dto.report.*;
 import com.storyart.commentservice.model.Reaction;
 import com.storyart.commentservice.model.Report;
 import com.storyart.commentservice.service.ReportService;
@@ -26,6 +23,13 @@ public class ReportController {
     @PostMapping("/reportComment")
     public ResponseEntity<Boolean> reportComment(@RequestBody @Valid ReportCommentRequestDTO reportCommentRequestDTO) {
         reportService.reportComment(reportCommentRequestDTO);
+
+        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    }
+
+    @PostMapping("/reportStory")
+    public ResponseEntity<Boolean> reportStory(@RequestBody @Valid ReportStoryRequest request) {
+        reportService.reportStory(request);
 
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }

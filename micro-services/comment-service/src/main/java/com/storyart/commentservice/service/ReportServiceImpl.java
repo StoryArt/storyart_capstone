@@ -1,10 +1,7 @@
 package com.storyart.commentservice.service;
 
 import com.storyart.commentservice.dto.comment.ResponseListCommentDTO;
-import com.storyart.commentservice.dto.report.HandleReportRequestDTO;
-import com.storyart.commentservice.dto.report.ReportByCommentIdResponse;
-import com.storyart.commentservice.dto.report.ReportCommentRequestDTO;
-import com.storyart.commentservice.dto.report.ReportCommentResponseDTO;
+import com.storyart.commentservice.dto.report.*;
 import com.storyart.commentservice.model.*;
 import com.storyart.commentservice.repository.CommentRepository;
 import com.storyart.commentservice.repository.ReportRepository;
@@ -37,8 +34,8 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public void reportComment(ReportCommentRequestDTO reportCommentRequestDTO) {
-        if (reportCommentRequestDTO.getContent().length() < 1) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vui lòng không để trống nội dung report.");
+        if (reportCommentRequestDTO.getContent().trim().length() < 1) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vui lòng không để trống nội dung báo cáo.");
         }
         Optional<Report> rp = reportRepository.findReportByUserIdAndCommentId(reportCommentRequestDTO.getUserId(), reportCommentRequestDTO.getCommentId());
         //List<Report> reports = reportRepository.findAll();//lay het report trong db ra luon ha anh :v de a sua, nay` luc a chua biet query
@@ -76,6 +73,31 @@ public class ReportServiceImpl implements ReportService {
         //để mình biết cái report nào admin đã xử lí rồi, tránh load hết.
         //a ok anh, v la co them 1 bien isDisableByAdmin trong comment dung ko , đúng, 1 cái ishandled trong report
         //ok, gud gud
+
+        reportRepository.save(report);
+    }
+
+    @Override
+    public void reportStory(ReportStoryRequest request) {
+        Optional<Story> story = storyRepository.findById(request.getStoryId());
+        if(!story.isPresent()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Truyện không tồn tại.");
+        }
+
+        Optional<User> user = userRepository.findById(request.getUserId());
+        if (!user.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tài khoản không tồn tại.");
+        }
+
+        if(request.getContent().trim().length()<1){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vui lòng nhập nội dung báo cáo.");
+        }
+
+        Report report = new Report();
+        report.setUserId(request.getUserId());
+        report.setStoryId(request.getStoryId());
+        report.setContent(request.getContent());
+        report.setHandled(false);
 
         reportRepository.save(report);
     }

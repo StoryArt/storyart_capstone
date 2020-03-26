@@ -53,7 +53,7 @@ public class CommentServiceImpl implements CommentService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, errStoryNotFound);
         }
 
-        if (cmt.getContent().length() < 1) {
+        if (cmt.getContent().trim().length() < 1) {
             throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, errCommentEmpty);
         }
         //TODO: Remove comment if you want to validate
@@ -94,7 +94,7 @@ public class CommentServiceImpl implements CommentService {
 //            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errUserNotFound);
 //        }
 
-        if (updateComment.content.length() < 1) {
+        if (updateComment.content.trim().length() < 1) {
             throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, errCommentEmpty);
         }
 

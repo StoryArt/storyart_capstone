@@ -7,6 +7,11 @@ class ReportService {
         return axios.post(url, reportRequest);
     }
 
+    static async reportStory(reportRequest) {
+        const url = base_url.concat('/reportStory');
+        return axios.post(url, reportRequest);
+    }
+
     static async getCommentReports(pageNo, isHandled) {
         const url = base_url.concat('/getCommentReports?pageSize=5&pageNo=').concat(pageNo).concat('&isHandled=').concat(isHandled);
         return axios.get(url);
