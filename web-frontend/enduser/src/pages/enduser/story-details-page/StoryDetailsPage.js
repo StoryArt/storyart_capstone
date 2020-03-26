@@ -20,6 +20,7 @@ import TagList from '../../../components/common/TagList';
 import StringUtils from '../../../utils/string';
 
 import { getAuthUserInfo } from '../../../config/auth';
+import zIndex from '@material-ui/core/styles/zIndex';
 
 //import { UserContext } from '../../../context/user.context';
 
@@ -550,13 +551,13 @@ const StoryDetailsPage = (props) => {
                              <button className="btn btn-success">Xem them</button>
                          </div> */}
 
-                    </div>
-                </div>
+                            </div>
+                        </div>
                     </>
-             
-            )}
-            {storyNotfound && <NotFound message="Không tìm thấy câu truyện này" />}
-           </div>
+
+                )}
+                {storyNotfound && <NotFound message="Không tìm thấy câu truyện này" />}
+            </div>
         </MainLayout>
 
     );

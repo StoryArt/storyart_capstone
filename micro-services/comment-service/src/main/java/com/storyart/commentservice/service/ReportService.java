@@ -1,5 +1,7 @@
 package com.storyart.commentservice.service;
 
+import com.storyart.commentservice.dto.report.HandleReportRequestDTO;
+import com.storyart.commentservice.dto.report.ReportByCommentIdResponse;
 import com.storyart.commentservice.dto.report.ReportCommentRequestDTO;
 import com.storyart.commentservice.dto.report.ReportCommentResponseDTO;
 import com.storyart.commentservice.model.Report;
@@ -10,8 +12,9 @@ import java.util.List;
 public interface ReportService {
     void reportComment(ReportCommentRequestDTO reportCommentRequestDTO);
     Page<ReportCommentResponseDTO> getListReportComment(boolean isHandled,int pageNo, int pageSize);
-    Page<Report> getReportsByCommentId(int commentId, int pageNo, int pageSize);
-    void handleReport(List<Integer> reportIds);
+    Page<ReportByCommentIdResponse> getReportsByCommentId(int commentId, boolean isHandled, int pageNo, int pageSize);
+    //void handleReport(List<Integer> reportIds);
+    void handleReport(HandleReportRequestDTO request);
     //minh co can lam tinh nang huy repỏt ko, chắc là k
     //k thay thằng nào làm vụ này :v
 

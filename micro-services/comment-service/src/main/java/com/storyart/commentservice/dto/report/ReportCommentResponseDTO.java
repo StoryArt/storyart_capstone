@@ -25,8 +25,13 @@ public class ReportCommentResponseDTO {
     private int numberOfReports;
 
     private int commentId;
+    private boolean commentIsDisableByAdmin;
+
+    private int commentOwnerId;
     private String commentContent;
     private String commentOwner;
+    private String commentOwnerEmail;
+    private boolean userIsDisableByAdmin;
 
     private boolean isHandled;
     private Timestamp createdAt;

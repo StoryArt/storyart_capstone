@@ -340,3 +340,6 @@ p.tips{color:#999;font-size: 12px
   overflow-y: auto;
                    resize         : none
 }
+.modal{
+  z-index: 3000;
+}

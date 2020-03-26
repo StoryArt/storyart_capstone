@@ -1,5 +1,7 @@
 package com.storyart.commentservice.controller;
 
+import com.storyart.commentservice.dto.report.HandleReportRequestDTO;
+import com.storyart.commentservice.dto.report.ReportByCommentIdResponse;
 import com.storyart.commentservice.dto.report.ReportCommentRequestDTO;
 import com.storyart.commentservice.dto.report.ReportCommentResponseDTO;
 import com.storyart.commentservice.model.Reaction;
@@ -41,7 +43,8 @@ public class ReportController {
     }
 
     @GetMapping("/getReportsByCommentId")
-    public Page<Report> getRoportsByReactionId(
+    public Page<ReportByCommentIdResponse> getRoportsByCommentId(
+            @RequestParam(defaultValue = "false") boolean isHandled,
             @RequestParam(defaultValue = "0") Integer commentId,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "5") Integer pageSize) {
@@ -49,13 +52,13 @@ public class ReportController {
         if (pageNo < 0) {
             pageNo = 0;
         }
-        return reportService.getReportsByCommentId(commentId, pageNo, pageSize);
+        return reportService.getReportsByCommentId(commentId,isHandled, pageNo, pageSize);
     }
 
     @PostMapping("/handleReport")
     public ResponseEntity<Boolean> handleReport(
-            @RequestBody @Valid List<Integer> reportIds){
-        reportService.handleReport(reportIds);
+            @RequestBody @Valid HandleReportRequestDTO request){
+        reportService.handleReport(request);
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
 }

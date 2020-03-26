@@ -13,15 +13,15 @@ class ReportService {
 
     }
 
-    static async getReportsForEachComment(pageNo, commentId) {
-        const url = base_url.concat('/getReportsByCommentId?pageSize=3&pageNo=').concat(pageNo).concat('&commentId=').concat(commentId);
+    static async getReportsForEachComment(pageNo, commentId, isHandled) {
+        const url = base_url.concat('/getReportsByCommentId?pageSize=3&pageNo=').concat(pageNo).concat('&commentId=').concat(commentId).concat('&isHandled=').concat(isHandled);
         return axios.get(url);
 
     }
 
-    static async handleReport(reportIds) {
+    static async handleReport(handleRequest) {
         const url = base_url.concat('/handleReport');
-        return axios.post(url, reportIds);
+        return axios.post(url, handleRequest);
     }
 
 }
