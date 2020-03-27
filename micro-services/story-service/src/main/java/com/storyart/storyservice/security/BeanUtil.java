@@ -1,4 +1,4 @@
-package com.storyart.apigateway.service;
+package com.storyart.storyservice.security;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

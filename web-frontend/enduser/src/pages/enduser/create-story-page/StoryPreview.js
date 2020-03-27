@@ -56,8 +56,9 @@ const StoryPreview = (props) => {
 
     const edges = [];
     screens.forEach((s, i) => {
-        s.first = s.id === story.firstScreenId;
+        s.first = false;
         s.ending = false;
+        
         const haveNextScreenAction = s.actions.some(a => a.type === ACTION_TYPES.NEXT_SCREEN || a.type === ACTION_TYPES.UPDATE_INFORMATION)
         if(haveNextScreenAction){
             s.actions.forEach((a, i) => {
@@ -78,8 +79,10 @@ const StoryPreview = (props) => {
                 from: s.id,
                 to: s.nextScreenId
             })
+        } else if(s.id === story.firstScreenId) {
+            s.first = true;
         } else {
-            s.ending = true;
+          s.ending = true;
         }
     })
 

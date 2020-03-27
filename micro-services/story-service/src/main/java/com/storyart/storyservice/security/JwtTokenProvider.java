@@ -1,4 +1,4 @@
-package com.storyart.apigateway.security;
+package com.storyart.storyservice.security;
 
 
 import io.jsonwebtoken.*;

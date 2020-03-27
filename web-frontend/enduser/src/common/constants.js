@@ -100,8 +100,8 @@ export const ORDER_BYS = {
 
 export const SCREEN_COLORS = {
     FIRST_SCREEN: '#009688',
-    ENDING_SCREEN: '#8e24aa',
-    NORMAL_SCREEN: '#e53935'
+    ENDING_SCREEN: '#f44336',
+    NORMAL_SCREEN: '#e1bee7'
 }
 
 export const getOrderBys = () => {

@@ -1,8 +1,9 @@
-package com.storyart.apigateway.config;
+package com.storyart.storyservice.config;
 
-import com.storyart.apigateway.security.JwtAuthenticationEntryPoint;
-import com.storyart.apigateway.security.JwtAuthenticationFilter;
+import com.storyart.storyservice.security.JwtAuthenticationEntryPoint;
+import com.storyart.storyservice.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,11 +19,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
 
     @Autowired
@@ -30,6 +36,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     JwtAuthenticationFilter jwtAuthenticationFilter;
+
 
     @Autowired
     UserDetailsService userDetailsService;
@@ -42,7 +49,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             throws Exception {
         authenticationManagerBuilder.userDetailsService(userDetailsService)
                 .passwordEncoder(passwordEncoder());
+    }
 
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+        return source;
     }
 
 
@@ -52,11 +65,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-
     }
 
     @Override
@@ -74,34 +85,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 sessionManagement().
                 sessionCreationPolicy(SessionCreationPolicy.STATELESS).
                 and().
-                //dont authenticate this paticulat request
-                        authorizeRequests().
-                antMatchers("/",
-                        "/favicon.ico",
-                        "/**/*.png",
-                        "/**/*.gif",
-                        "/**/*.svg",
-                        "/**/*.jpg",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js").
-//todo add more permit api in here
-        permitAll().
-                antMatchers("/api/v1/auth/**").
-                permitAll().
-                antMatchers(HttpMethod.GET,"/api/user-service/api/v1/user/**").permitAll().
+                authorizeRequests()
 
-                antMatchers(HttpMethod.POST, "/api/v1/auth/signup").permitAll().
-// hien tai chi cho login va signup la khong can authentication
-                // all other reqs need to be authenticated
-                        anyRequest().
-                authenticated();
-        // using stateless session , session wont be used to store user state
-        ;
-
-// Add filter to validate the tokens with every request
+                .antMatchers( "/stories/public/**").permitAll()
+                .antMatchers("/tags/public/**").permitAll()
+                .anyRequest()
+                .authenticated();
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    }
 
+    private final long MAX_AGE_SECS = 3600;
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("HEAD",
+                        "OPTIONS",
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "PATCH",
+                        "DELETE")
+                .maxAge(MAX_AGE_SECS);
     }
 
 

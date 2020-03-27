@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
 public interface TagService {
     List<TagDto> getTags();
     List<TagDto> mapModelToDto(List<Tag> tags);
-
-
     Tag create(AddTagDTO tag);
 
     Tag update(AddTagDTO tag);

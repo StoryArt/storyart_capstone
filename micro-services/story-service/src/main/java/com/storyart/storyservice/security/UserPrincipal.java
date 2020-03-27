@@ -1,11 +1,11 @@
-package com.storyart.apigateway.security;
+package com.storyart.storyservice.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.storyart.apigateway.common.constants.RoleName;
-import com.storyart.apigateway.model.Role;
-import com.storyart.apigateway.repository.RoleRepository;
-import com.storyart.apigateway.service.BeanUtil;
-import com.storyart.apigateway.service.RoleService;
+import com.storyart.storyservice.common.constants.RoleName;
+import com.storyart.storyservice.model.Role;
+import com.storyart.storyservice.model.User;
+import com.storyart.storyservice.repository.RoleRepository;
+import com.storyart.storyservice.service.RoleService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,7 +35,7 @@ public class UserPrincipal implements UserDetails {
     private RoleName roleName;
 
 
-    public static UserPrincipal create(com.storyart.apigateway.model.User user) {
+    public static UserPrincipal create(User user) {
 
         Set<Role> roles= new HashSet<>();
 
@@ -47,7 +47,7 @@ public class UserPrincipal implements UserDetails {
         return new UserPrincipal(user.getId(), user.getUsername(),
                 user.getPassword(),user.getName(),
                 BeanUtil.getBean(RoleRepository.class)
-                        .findRoleById(user.getRoleId()).get().getName(),
+                        .findById(user.getRoleId()).get().getName(),
                 grantedAuthorityList);
     }
 

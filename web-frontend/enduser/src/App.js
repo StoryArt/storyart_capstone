@@ -53,9 +53,9 @@ const styles = theme => ({
 function App() {
 
   // redirect to login page when response status is 401 or 403
-  interceptResponse(() => {
-    UserService.logout();
-  });
+  // interceptResponse(() => {
+  //   UserService.logout();
+  // });
 
   //get token from local storage when access the website
   useEffect(() => {

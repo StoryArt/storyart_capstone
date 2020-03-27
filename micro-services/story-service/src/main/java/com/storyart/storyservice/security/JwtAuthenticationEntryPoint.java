@@ -1,4 +1,4 @@
-package com.storyart.apigateway.security;
+package com.storyart.storyservice.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

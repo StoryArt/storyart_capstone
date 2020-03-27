@@ -1,4 +1,4 @@
-package com.storyart.apigateway.security;
+package com.storyart.storyservice.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+//@CrossOrigin(origins = "*")
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUserDetailsService userDetailsService;
@@ -40,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String jwt = getJwtTokenFromRequest(request);
-
+            System.out.println("tokenL " + jwt);
             if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
 
                 //decode token and take userid from it
@@ -54,7 +56,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
             }
         } catch (Exception e) {
             logger.error("Could not set user authentication in security context", e);

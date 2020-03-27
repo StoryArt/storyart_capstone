@@ -9,7 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-//@EnableFeignClients
+@EnableFeignClients
 public class StoryServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(StoryServiceApplication.class, args);

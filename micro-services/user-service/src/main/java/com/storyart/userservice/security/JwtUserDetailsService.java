@@ -29,10 +29,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         } else {
             throw new UsernameNotFoundException("Username not found with username:" + username);
         }
-
-
     }
-
 
     @Transactional
     public UserDetails loadUserById(Integer id) {

@@ -5,7 +5,7 @@ const storyEndpointAPIUrl = API_ENDPOINT_PREFIX + '/tags';
 
 class TagService {
     static async getTags(){
-        const url = storyEndpointAPIUrl + '/all';
+        const url = storyEndpointAPIUrl + '/public/all';
         return axios.get(url);
     }
 

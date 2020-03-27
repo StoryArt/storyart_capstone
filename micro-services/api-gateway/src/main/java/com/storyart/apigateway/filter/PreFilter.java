@@ -1,4 +1,4 @@
-package com.storyart.apigateway.security;
+package com.storyart.apigateway.filter;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;

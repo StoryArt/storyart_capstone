@@ -167,11 +167,10 @@ const ReadStoryPage = (props) => {
                             />
 
                             {ValidationUtils.isEmpty(currentScreen) && (
-                                <div className="text-center">
-                                    <h3 className="screen-card-header text-bold"> {story.title}</h3>
+                                <div className="">
+                                    <h3 className="screen-card-header text-bold text-center"> {story.title}</h3>
                                     <p 
-                                        style={{ fontSize: '1.5em' }}
-                                        className="text-justify screen-card-body">
+                                        className="">
                                         {StringUtils.parseHtml(story.intro)}
                                     </p>
                                     <button
