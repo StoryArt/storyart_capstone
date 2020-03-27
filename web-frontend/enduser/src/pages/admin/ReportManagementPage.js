@@ -1,24 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import MainLayout from '../../layouts/main-layout/MainLayout';
-import { MDBNav, MDBTabContent, MDBNavItem, MDBNavLink, MDBTabPane, MDBCardBody, 
-  MDBDataTable, MDBCard, MDBBtn, MDBTable, MDBTableHead, MDBTableBody, MDBModal, 
-  MDBModalHeader, MDBModalBody, MDBModalFooter, MDBDropdown, MDBDropdownItem, 
-  MDBDropdownToggle, MDBDropdownMenu } from 'mdbreact';
+import {
+  MDBNav, MDBTabContent, MDBNavItem, MDBNavLink, MDBTabPane, MDBCardBody,
+  MDBDataTable, MDBCard, MDBBtn, MDBTable, MDBTableHead, MDBTableBody, MDBModal,
+  MDBModalHeader, MDBModalBody, MDBModalFooter, MDBDropdown, MDBDropdownItem,
+  MDBDropdownToggle, MDBDropdownMenu, MDBInput
+} from 'mdbreact';
 import Pagination from '@material-ui/lab/Pagination';
 import ReportService from '../../services/report.service';
+import { getAuthUserInfo } from '../../config/auth';
+import { Block, BlockOutlined } from '@material-ui/icons';
 
 const ReportManagementPage = () => {
+  const userInfo = getAuthUserInfo();
   useEffect(() => {
-    getCommentReportsData();
+    getCommentReportsData(false);
   }, []);
   const [handleModal, setHandleModal] = useState(false);
   const [pageNo, setPageNo] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const getCommentReportsData = async () => {
+
+  const [handledDropdown, setHandledDropdown] = useState('Chưa xử lý');
+  const getCommentReportsData = async (isHandled) => {
     try {
-      const res = await ReportService.getCommentReports(pageNo);
-      setTotalPages(res.data.totalPages);
-      convertData(res.data);
+      if (isHandled !== handled) {
+        setPageNo(1);
+        const res = await ReportService.getCommentReports(1, isHandled);
+        setTotalPages(res.data.totalPages);
+        convertData(res.data);
+      }
+      else {
+        const res = await ReportService.getCommentReports(pageNo, isHandled);
+        setTotalPages(res.data.totalPages);
+        convertData(res.data);
+      }
+
+
     } catch (error) {
 
     }
@@ -27,17 +44,27 @@ const ReportManagementPage = () => {
   function convertData(data) {
     var reportList = data.content;
     var rowsList = [];
+
     reportList.forEach(element => {
       var row = {};
       row["commentOwner"] = element["commentOwner"];
+      row["commentId"] = element["commentId"];
       row["commentContent"] = element["commentContent"];
       row["numberOfReports"] = element["numberOfReports"];
-      row["handled"] = (element.handled ?
-        (<p>Đã xử lý</p>) : (<p>Chưa xử lý</p>));
-      row["handle"] = (<MDBBtn color="success" onClick={e => handleReport(element)}>
-        Xử lý
-      </MDBBtn>);
 
+      row["commentOwnerEmail"] = element["commentOwnerEmail"];
+      row["handle"] = (element.handled ?
+        (
+          <MDBBtn color="primary" onClick={e => handleReport(element)}>
+            Xem lại
+          </MDBBtn>
+        )
+        :
+        (<MDBBtn color="success" onClick={e => handleReport(element)}>
+          Xử lý
+        </MDBBtn>)
+
+      );
       rowsList.push(row);
     });
     //setConvertedData(rowsList);
@@ -46,9 +73,10 @@ const ReportManagementPage = () => {
 
   const [reportContent, setReportContent] = useState({});
   const handleReport = (report) => {
+    setHandleOption("Không có vi phạm");
     setHandleModal(true);
     setReportContent(report);
-    getReportsByCommentId(1, report.commentId);
+    getReportsByCommentId(1, report.commentId, report.handled);
     setCommentId(report.commentId);
   };
 
@@ -57,12 +85,10 @@ const ReportManagementPage = () => {
   const [handleTotalPages, sethandleTotalPages] = useState(0);
   const [reportIds, setReportIds] = useState([]);
 
-  const getReportsByCommentId = async (pageNumber, commentId) => {
+  const getReportsByCommentId = async (pageNumber, commentId, handled) => {
     try {
-      const res = await ReportService.getReportsForEachComment(pageNumber, commentId);
-      if (handleTotalPages === 0) {
-        sethandleTotalPages(res.data.totalPages);
-      }
+      const res = await ReportService.getReportsForEachComment(pageNumber, commentId, handled);
+      sethandleTotalPages(res.data.totalPages);
       convertHandleData(res.data);
       //get reportIds
       var listReportId = [];
@@ -70,7 +96,7 @@ const ReportManagementPage = () => {
         listReportId.push(element.id);
       });
       setReportIds(listReportId);
-
+      setHandlePageNo(pageNumber);
     } catch (error) {
 
     }
@@ -81,7 +107,7 @@ const ReportManagementPage = () => {
     var rowsList = [];
     reportList.forEach(element => {
       var row = {};
-      row["userId"] = element["userId"];
+      row["username"] = element["username"];
       row["content"] = element["content"];
 
       rowsList.push(row);
@@ -90,10 +116,10 @@ const ReportManagementPage = () => {
     setHandleTable({ ...handleTable, rows: rowsList });
   }
 
+
   const changeHandlePage = (event, value) => {
     if (value !== handlePageNo) {
-      setHandlePageNo(value);
-      getReportsByCommentId(value, commentId);
+      getReportsByCommentId(value, commentId, reportContent.handled);
     }
   }
 
@@ -101,7 +127,7 @@ const ReportManagementPage = () => {
     if (value !== pageNo) {
       setPageNo(value);
       try {
-        const res = await ReportService.getCommentReports(value);
+        const res = await ReportService.getCommentReports(value, handled);
         convertData(res.data);
       } catch (error) {
 
@@ -116,18 +142,21 @@ const ReportManagementPage = () => {
     if (activeItem !== tab) {
       setActiveItem(tab);
     }
-    if (tab === '1') {
-      getCommentReportsData();
-    }
 
   };
 
   const [dataTable, setDataTable] = useState({
     columns: [
       {
-        label: "Tên người dùng",
+        label: "Tên tài khoản",
         field: "commentOwner",
         width: "25%",
+        sort: "asc"
+      },
+      {
+        label: "Mã bình luận",
+        field: "commentId",
+        width: "50%",
         sort: "asc"
       },
       {
@@ -143,8 +172,8 @@ const ReportManagementPage = () => {
         sort: "asc"
       },
       {
-        label: "Trạng thái",
-        field: "handled",
+        label: "Email",
+        field: "commentOwnerEmail",
         width: "10%",
         sort: "asc"
       },
@@ -182,18 +211,84 @@ const ReportManagementPage = () => {
 
   const handleReportAction = async () => {
     try {
+      var handleRequest = {
+        type: '',
+        id: 0,
+        action: '',
+        reportIds: reportIds
+      };
       if (handleOption === "Không có vi phạm") {
-        const res = await ReportService.handleReport(reportIds);
-        var updateRows = [...dataTable.rows];
-
-        setDataTable({ ...dataTable, rows: updateRows.map(item => item.commentId === commentId ? { ...item, handled: true } : item) });
+        handleRequest.type = "none";
       }
+      if (handleOption === "Ẩn bình luận") {
+        handleRequest.type = "comment";
+        handleRequest.action = "deactivate";
+        handleRequest.id = commentId;
+      }
+      if (handleOption === "Vô hiệu hóa tài khoản") {
+        handleOption = "user";
+        handleRequest.action = "deactivate";
+        handleRequest.id = reportContent.commentOwnerId;
+      }
+      const res = await ReportService.handleReport(handleRequest);
+      var updateRows = [...dataTable.rows];
+      setDataTable({ ...dataTable, rows: updateRows.filter(item => item.commentId !== commentId) });
     } catch (error) {
       console.log(error);
     }
     setHandleModal(!handleModal);
 
 
+
+
+  }
+  const [handled, setHandled] = useState(false);
+  const getCommentReportsByIsHandled = (isHandled) => {
+    if (isHandled) {
+      setHandledDropdown('Đã xử lý');
+    }
+    else {
+      setHandledDropdown('Chưa xử lý');
+    }
+    setHandled(isHandled);
+    getCommentReportsData(isHandled);
+  }
+
+  const changeStatusWhenReview = async (type, status) => {
+    var handleRequest = {
+      type: '',
+      id: 0,
+      action: '',
+      reportIds: []
+    };
+    if (type === "comment") {
+      setReportContent({ ...reportContent, commentIsDisableByAdmin: !status });
+      handleRequest.type = "comment";
+      handleRequest.id = commentId;
+      if (status) {
+        handleRequest.action = "activate";
+      }
+      else {
+        handleRequest.action = "deactivate";
+      }
+
+
+    }
+    if (type === "user") {
+      setReportContent({ ...reportContent, userIsDisableByAdmin: !status });
+      handleRequest.type = "user";
+      handleRequest.id = reportContent.commentOwnerId;
+      if (status) {
+        handleRequest.action = "activate";
+      }
+      else {
+        handleRequest.action = "deactivate";
+      }
+    }
+    try {
+      const res = await ReportService.handleReport(handleRequest);
+    } catch (error) {
+    }
 
   }
 
@@ -203,6 +298,7 @@ const ReportManagementPage = () => {
   return (
     <MainLayout>
       <div className="container-fluid">
+
         <MDBNav className="nav-tabs" className="mb-4">
           <MDBNavItem>
             <MDBNavLink to="#" active={activeItem === "1"} onClick={toggle("1")} role="tab" >
@@ -217,50 +313,100 @@ const ReportManagementPage = () => {
         </MDBNav>
         <MDBTabContent activeItem={activeItem} >
           <MDBTabPane tabId="1" role="tabpanel">
-            {dataTable.rows.length > 0 &&
-              <MDBCard>
-                <MDBCardBody>
-                  <Pagination className="float-right" count={totalPages} color="primary" boundaryCount={2} onChange={changePage} />
 
-                  <MDBTable striped hover bordered>
-                    <MDBTableHead columns={dataTable.columns} />
-                    <MDBTableBody rows={dataTable.rows} />
-                  </MDBTable>
 
-                </MDBCardBody>
-              </MDBCard>
-            }
-            {dataTable.rows.length < 1 &&
-              <div className="text-center">
-                <p>Không có báo cáo</p>
-              </div>
-            }
+            <MDBCard>
+              <MDBCardBody>
+
+                {/* <div class="row"> */}
+                <MDBDropdown>
+                  <MDBDropdownToggle caret color="ins">
+                    {handledDropdown}
+                  </MDBDropdownToggle>
+                  <MDBDropdownMenu basic >
+                    <MDBDropdownItem onClick={e => getCommentReportsByIsHandled(false)}>Chưa xử lý</MDBDropdownItem>
+                    <MDBDropdownItem onClick={e => getCommentReportsByIsHandled(true)}>Đã xử lý</MDBDropdownItem>
+                  </MDBDropdownMenu>
+                </MDBDropdown>
+                {/* <MDBInput label="Nhập nội dung tìm kiếm (mã bình luận, tên tài khoản,...)"></MDBInput> */}
+                {/* 
+                  </MDBInput>
+                  <button className="float-right">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div> */}
+
+                {dataTable.rows.length > 0 &&
+                  <div>
+                    <Pagination page={pageNo} className="float-right" count={totalPages} color="primary" boundaryCount={2} onChange={changePage} />
+
+                    <MDBTable striped hover bordered>
+                      <MDBTableHead columns={dataTable.columns} />
+                      <MDBTableBody rows={dataTable.rows} />
+                    </MDBTable>
+                  </div>
+
+                }
+                {dataTable.rows.length < 1 &&
+                  <div className="text-center">
+                    <p>Không có báo cáo</p>
+                  </div>
+                }
+
+              </MDBCardBody>
+            </MDBCard>
+
+
 
           </MDBTabPane>
           <MDBTabPane tabId="2" role="tabpanel">
             <p>Nothing to show</p>
           </MDBTabPane>
+
         </MDBTabContent>
 
 
-        <MDBModal isOpen={handleModal} size='lg' toggle={e => setHandleModal(!handleModal)}>
+
+        <MDBModal isOpen={handleModal} size='md' toggle={e => setHandleModal(!handleModal)}>
           <MDBModalHeader toggle={e => setHandleModal(!handleModal)}>Xử lý báo cáo</MDBModalHeader>
           <MDBModalBody>
             <p>Tên người dùng: <strong>{reportContent.commentOwner}</strong></p>
             <p>Nội dung bình luận: "<strong>{reportContent.commentContent}</strong>"</p>
             <p>Số lượng báo cáo: <strong>{reportContent.numberOfReports}</strong></p>
+            <p>Email: <strong>{reportContent.commentOwnerEmail}</strong></p>
+            {reportContent.handled &&
+              <div>
+                <div style={{ display: "flex" }}>
 
-            <p>Cách xử lý: </p>
-            <MDBDropdown>
-              <MDBDropdownToggle caret color="ins">
-                {handleOption}
-              </MDBDropdownToggle>
-              <MDBDropdownMenu basic >
-                <MDBDropdownItem onClick={e => setHandleOption('Không có vi phạm')}>Không có vi phạm</MDBDropdownItem>
-                <MDBDropdownItem onClick={e => setHandleOption('Ẩn bình luận')}>Ẩn bình luận</MDBDropdownItem>
-                <MDBDropdownItem onClick={e => setHandleOption('Vô hiệu hóa tài khoản')}>Vô hiệu hóa tài khoản</MDBDropdownItem>
-              </MDBDropdownMenu>
-            </MDBDropdown>
+                  <p>Trạng thái bình luận:
+                    <strong onClick={e => changeStatusWhenReview('comment', reportContent.commentIsDisableByAdmin)} style={reportContent.commentIsDisableByAdmin ? ({ color: 'red', cursor: 'pointer' }) : ({ color: 'green', cursor: 'pointer' })}> {reportContent.commentIsDisableByAdmin ? "Đã ẩn" : "Bình thường"} </strong>
+                  </p>
+                </div>
+
+                <div style={{ display: "flex" }}>
+                  <p>Trạng thái người dùng:
+                  <strong onClick={e => changeStatusWhenReview('user', reportContent.userIsDisableByAdmin)} style={reportContent.userIsDisableByAdmin ? ({ color: 'red', cursor: 'pointer' }) : ({ color: 'green', cursor: 'pointer' })}> {reportContent.userIsDisableByAdmin ? "Đã vô hiệu hóa" : "Bình thường"} </strong>
+                  </p>
+                </div>
+
+              </div>
+            }
+            {!reportContent.handled &&
+              <div>
+                <p>Cách xử lý: </p>
+                <MDBDropdown>
+                  <MDBDropdownToggle caret color="ins">
+                    {handleOption}
+                  </MDBDropdownToggle>
+                  <MDBDropdownMenu basic >
+                    <MDBDropdownItem onClick={e => setHandleOption('Không có vi phạm')}>Không có vi phạm</MDBDropdownItem>
+                    <MDBDropdownItem onClick={e => setHandleOption('Ẩn bình luận')}>Ẩn bình luận</MDBDropdownItem>
+                    <MDBDropdownItem onClick={e => setHandleOption('Vô hiệu hóa tài khoản')}>Vô hiệu hóa tài khoản</MDBDropdownItem>
+                  </MDBDropdownMenu>
+                </MDBDropdown>
+              </div>
+            }
+
 
 
 
@@ -270,27 +416,21 @@ const ReportManagementPage = () => {
               <MDBTableHead columns={handleTable.columns} />
               <MDBTableBody rows={handleTable.rows} />
             </MDBTable>
-            {/* {modalError.length > 0 && <small style={{ color: 'red' }}>(*){modalError}</small>}
-            <form className='mx-3 grey-text'>
-              <MDBInput
-                type='textarea'
-                rows='2'
-                label='Nội dung bình luận'
-                value={updateCommentRequest.content}
-                onChange={e => setUpdateCommentRequest({ ...updateCommentRequest, content: e.target.value })}
-              />
-            </form> */}
           </MDBModalBody>
-          <MDBModalFooter>
-            <MDBBtn color='success' onClick={e => setHandleModal(!handleModal)}>
-              Hủy
-                                        </MDBBtn>
-            <MDBBtn color='warning' onClick={handleReportAction} >Xử lý</MDBBtn>
-          </MDBModalFooter>
+          {!reportContent.handled &&
+            <MDBModalFooter>
+              <MDBBtn color='success' onClick={e => setHandleModal(!handleModal)}>
+                Hủy
+                                      </MDBBtn>
+              <MDBBtn color='warning' onClick={handleReportAction} >Xử lý</MDBBtn>
+            </MDBModalFooter>
+          }
+
         </MDBModal>
       </div>
 
     </MainLayout>
+
   )
 }
 

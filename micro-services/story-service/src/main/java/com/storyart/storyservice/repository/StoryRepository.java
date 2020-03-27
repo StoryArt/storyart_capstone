@@ -103,6 +103,16 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
     @Query(value = "SELECT * FROM story where id = :storyid", nativeQuery = true)
     Story findStoryById (@Param("storyid") Integer storyid);
 
+    @Query(value = "select id from storyart_db.story  where YEARWEEK(story.created_at) = YEARWEEK(NOW())", nativeQuery = true)
+    List<Integer> findStoryThisWeek();
+
+    @Query(value = "select id from storyart_db.story  where not YEARWEEK(story.created_at) = YEARWEEK(NOW())", nativeQuery = true)
+    List<Integer> findStoryExceptThisWeek();
+
+    @Query(value = "SELECT * FROM storyart_db.story order by  story.created_at DESC", nativeQuery = true)
+    Page<Story> findStoryOrderByCreateAt(Pageable page);
+    @Query("select s from Story s where s.id in (:storyIds)")
+    Page<Story> findAllByStoryIds(@Param("storyIds") List<Integer> storyIds, Pageable pageable); //mo dum cai file luc nay
     @Query(value = "SELECT * FROM story s where s.user_id = ?1 order by s.created_at desc", nativeQuery = true)
     List<Story> findAllByUserId(int userId);
 }

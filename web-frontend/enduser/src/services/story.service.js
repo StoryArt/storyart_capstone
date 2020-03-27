@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_ENDPOINT_PREFIX } from '../config/api';
+import {getAuthUserInfo} from '../config/auth'
 
 // const baseUrl = API_ENDPOINT_PREFIX + '/stories';
 const baseUrl = 'http://localhost:8000/api/story-service/stories';
@@ -40,6 +41,20 @@ class StoryService{
     static async getStoryDetails(storyId){
         const url = baseUrl + '/public/' + storyId;
         return axios.get(url);
+    }
+
+
+    static async getSuggestion(pageNo){
+        let pagesize = 4;
+        const userinfo = getAuthUserInfo();
+
+        if(userinfo === null){
+            const url1 = "http://localhost:8003/suggestion/suggeststory".concat('?pageNo=').concat(pageNo).concat('&pageSize=').concat(pagesize);
+            return axios.get(url1);
+        }else{
+            const url = "http://localhost:8003/suggestion/suggest".concat(userinfo.id).concat('?pageNo=').concat(pageNo).concat('&pageSize=').concat(pagesize);
+            return axios.get(url);
+        }
     }
 
     static async updateStoryByAdmin(storyId, enable){

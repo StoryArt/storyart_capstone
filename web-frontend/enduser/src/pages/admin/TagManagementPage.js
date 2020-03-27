@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import MainLayout from "../../layouts/main-layout/MainLayout";
 import TagService from "../../services/tag.service";
 import axios from "axios";
@@ -60,10 +60,11 @@ class TagManagementPage extends React.Component {
     this.setState({ visible3: false });
   };
   loadData = () => {
-    const url = "http://localhost:8003/tags/getAll";
-    axios.get(url).then(res => {
+   TagService.getAllTag().then(res => {
       this.setState({ data: res.data.content });
       this.setState({ loading: true });
+    }).catch(error => {
+      console.log(error);
     });
   };
 
@@ -74,9 +75,7 @@ class TagManagementPage extends React.Component {
   handleSubmit = e => {
     let tag = { title: this.state.title };
     
-    const url = "http://localhost:8003/tags";
-    axios.post(url, tag)
-    .then(res => {
+    TagService.addTag(tag).then(res => {
       this.setState({ visible: false });
       this.setState({ status: "", currId: "", title: "" });
       this.loadData();
@@ -106,16 +105,12 @@ class TagManagementPage extends React.Component {
       active: status,
       isUpdate: isUpdate
     };
-    const config = {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
-    const url = "http://localhost:8003/tags";
-    axios.put(url, tag, config).then(res => {
+     TagService.updateTag(tag).then(res => {
       this.setState({ visible3: false });
       this.setState({ status: "", currId: "", title: "" });
       this.loadData();
+    }).catch(error => {
+      console.log(error);
     });
   };
 
@@ -152,6 +147,9 @@ class TagManagementPage extends React.Component {
 
   render() {
     const { data } = this.state;
+    
+  const [openAlert, setOpenAlert] = useState(false);
+  const [alert, setAlert] = useState({ content: '', type: 'success' });
 
     //
     data.map((dat, index) => {

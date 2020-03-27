@@ -20,6 +20,7 @@ import TagList from '../../../components/common/TagList';
 import StringUtils from '../../../utils/string';
 
 import { getAuthUserInfo } from '../../../config/auth';
+import zIndex from '@material-ui/core/styles/zIndex';
 
 //import { UserContext } from '../../../context/user.context';
 
@@ -36,7 +37,8 @@ const StoryDetailsPage = (props) => {
         deleteModal: false,
         editModal: false,
         reportModal: false,
-        isLoggedInModal: false
+        isLoggedInModal: false,
+        reportStoryModal: false
     });
     const [commentIndex, setCommentIndex] = useState(-1);
 
@@ -68,6 +70,11 @@ const StoryDetailsPage = (props) => {
         userName: '',
         comment: '',
     });
+    const [reportStoryModalInfo, setReportStoryModalInfo] = useState({
+        userName: '',
+        storyName: '',
+    });
+
     const [pageNo, setPageNo] = useState(1);
     const [userId, setUserId] = useState(0);
     const [reactRequest, setReactReqeust] = useState({
@@ -116,7 +123,7 @@ const StoryDetailsPage = (props) => {
             }
         }
         if (modal === 'reportModal') {
-            if (userId === 0) {
+            if (userInfo === null) {
                 setModalState({ ...modalState, isLoggedInModal: true });
             }
             else {
@@ -132,6 +139,21 @@ const StoryDetailsPage = (props) => {
             }
 
 
+        }
+        if (modal === 'reportStoryModal') {
+            if (userInfo === null) {
+                setModalState({ ...modalState, isLoggedInModal: true });
+            }
+            else {
+                //setReportStoryModalInfo({ userName: "update later", storyName: story.title });
+                if (modalState.reportStoryModal === true) {
+                    setModalState({ ...modalState, reportStoryModal: false });
+                    setModalError('');
+                }
+                else {
+                    setModalState({ ...modalState, reportStoryModal: true });
+                }
+            }
         }
         if (modal === 'isLoggedInModal') {
             if (modalState.isLoggedInModal === true) {
@@ -320,12 +342,25 @@ const StoryDetailsPage = (props) => {
         }
         setIsLoadingStory(false);
     }
-
-    //const { user } = getAuthUserInfo();
+    const [reportStoryContent, setReportStoryContent] = useState('');
+    const reportStory = async () => {
+        try {
+            const { storyId } = props.match.params;
+            var request = {
+                userId: userInfo.id,
+                storyId: storyId,
+                content: reportStoryContent
+            }
+            const res = await ReportService.reportStory(request);
+            setModalState({ ...modalState, reportStoryModal: false });
+            setModalError('');
+        } catch (error) {
+            setModalError(error.response.data.message)
+        }
+    }
 
     useEffect(() => {
         getComments();
-        //const user = getAuthUserInfo();
         if (userInfo !== null) {
             setUserId(userInfo.id);
         }
@@ -358,6 +393,9 @@ const StoryDetailsPage = (props) => {
                                         className="btn btn-success btn-block mt-2"
                                         to={`/stories/read/${story.id}`}>Dọc truyện</Link>
                                     {/* <Link className="btn btn-warning" to={`/stories/edit/${story.id}`}>Sua truyen</Link> */}
+                                </div>
+                                <div className="text-center btn btn-danger btn-block mt-1" onClick={toggleModal('reportStoryModal')}>
+                                    Báo cáo
                                 </div>
                             </div>
                             <div className="col-sm-9">
@@ -448,7 +486,7 @@ const StoryDetailsPage = (props) => {
                                                 </i>
                                                 <span className="dislikes-count"> {comment.dislikes.length}</span>
                                             </span>
-                                            {userId !== comment.userId &&
+                                            {(userId !== comment.userId && userInfo !== null) &&
                                                 <button type="button" class="btn btn-danger" onClick={toggleModal('reportModal', comment.id, index, comment.username, comment.content)}>
                                                     <i class="far fa-flag" ></i>
                                                 </button>
@@ -530,6 +568,29 @@ const StoryDetailsPage = (props) => {
                                     </MDBModalFooter>
                                 </MDBModal>
 
+                                <MDBModal isOpen={modalState.reportStoryModal} toggle={toggleModal('reportStoryModal')}>
+                                    <MDBModalHeader toggle={toggleModal('reportStoryModal')}>Báo cáo truyện</MDBModalHeader>
+                                    <MDBModalBody>
+                                        <p>Truyện: <strong>{story.title}</strong></p>
+                                        <p>Tác giả: <strong>update later</strong></p>
+                                        {modalError.length > 0 && <small style={{ color: 'red' }}>(*){modalError}</small>}
+                                        <form className='mx-3 grey-text'>
+                                            <MDBInput
+                                                type='textarea'
+                                                rows='2'
+                                                label='Nội dung báo cáo'
+                                                onChange={e => setReportStoryContent(e.target.value)}
+                                            />
+                                        </form>
+                                    </MDBModalBody>
+                                    <MDBModalFooter>
+                                        <MDBBtn color='success' onClick={toggleModal('reportStoryModal')}>
+                                            Hủy
+                                        </MDBBtn>
+                                        <MDBBtn color='danger' onClick={reportStory}>Gửi</MDBBtn>
+                                    </MDBModalFooter>
+                                </MDBModal>
+
                                 <MDBModal isOpen={modalState.isLoggedInModal} toggle={toggleModal('isLoggedInModal')}>
                                     <MDBModalHeader toggle={toggleModal('isLoggedInModal')}>Bạn chưa đăng nhập!</MDBModalHeader>
                                     <MDBModalBody>
@@ -550,13 +611,13 @@ const StoryDetailsPage = (props) => {
                              <button className="btn btn-success">Xem them</button>
                          </div> */}
 
-                    </div>
-                </div>
+                            </div>
+                        </div>
                     </>
-             
-            )}
-            {storyNotfound && <NotFound message="Không tìm thấy câu truyện này" />}
-           </div>
+
+                )}
+                {storyNotfound && <NotFound message="Không tìm thấy câu truyện này" />}
+            </div>
         </MainLayout>
 
     );

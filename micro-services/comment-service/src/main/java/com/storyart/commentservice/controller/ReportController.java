@@ -1,7 +1,6 @@
 package com.storyart.commentservice.controller;
 
-import com.storyart.commentservice.dto.report.ReportCommentRequestDTO;
-import com.storyart.commentservice.dto.report.ReportCommentResponseDTO;
+import com.storyart.commentservice.dto.report.*;
 import com.storyart.commentservice.model.Reaction;
 import com.storyart.commentservice.model.Report;
 import com.storyart.commentservice.service.ReportService;
@@ -28,19 +27,28 @@ public class ReportController {
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
 
+    @PostMapping("/reportStory")
+    public ResponseEntity<Boolean> reportStory(@RequestBody @Valid ReportStoryRequest request) {
+        reportService.reportStory(request);
+
+        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    }
+
     @GetMapping("/getCommentReports")
     public Page<ReportCommentResponseDTO> getCommentReports(
+            @RequestParam(defaultValue = "false") boolean isHandled,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
         pageNo = pageNo - 1;
         if (pageNo < 0) {
             pageNo = 0;
         }
-        return reportService.getListReportComment(pageNo, pageSize);
+        return reportService.getListReportComment(isHandled,pageNo, pageSize);
     }
 
     @GetMapping("/getReportsByCommentId")
-    public Page<Report> getRoportsByReactionId(
+    public Page<ReportByCommentIdResponse> getRoportsByCommentId(
+            @RequestParam(defaultValue = "false") boolean isHandled,
             @RequestParam(defaultValue = "0") Integer commentId,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "5") Integer pageSize) {
@@ -48,13 +56,13 @@ public class ReportController {
         if (pageNo < 0) {
             pageNo = 0;
         }
-        return reportService.getReportsByCommentId(commentId, pageNo, pageSize);
+        return reportService.getReportsByCommentId(commentId,isHandled, pageNo, pageSize);
     }
 
     @PostMapping("/handleReport")
     public ResponseEntity<Boolean> handleReport(
-            @RequestBody @Valid List<Integer> reportIds){
-        reportService.handleReport(reportIds);
+            @RequestBody @Valid HandleReportRequestDTO request){
+        reportService.handleReport(request);
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
 }

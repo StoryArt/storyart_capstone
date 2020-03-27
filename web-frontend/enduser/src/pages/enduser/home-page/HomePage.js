@@ -4,19 +4,28 @@ import MainLayout from '../../../layouts/main-layout/MainLayout';
 import StoryCard from '../../../components/common/StoryCard';
 import MySpinner from '../../../components/common/MySpinner';
 import StoryService from '../../../services/story.service';
+import {  Button } from '@material-ui/core';
 
 
 const HomePage = () => {
 
     const [trendStories, setTrendStories] = useState([]);
     const [trendStoriesLoading, setTrendStoriesLoading] = useState(false);
-    const [suggestedStories, setSuggestedStories] = useState([]);
-    const [suggestedStoriesLoading, setSuggestedStoriesLoading] = useState(false);
 
+    const [suggestedStories, setsuggestedStories] = useState([]);
+    const [suggestedStoriesLoading, setsuggestedStoriesLoading] = useState(false);
+
+    const [pageNoRating, setPageNoRating] = useState(1);
+    const [pageNoHistory, setPageNoHistory] = useState(1);
     useEffect(() => {
-        getSuggestedStories();
         getTrendStories();
+        getsuggestedStories();
     }, []);
+    // useEffect(() => {
+        
+    // }, []);
+//s no k nhay vao ham khi debug nhi :v 
+// bo tay ><
 
     const getTrendStories = async () => {
         setTrendStoriesLoading(true);
@@ -31,13 +40,42 @@ const HomePage = () => {
         setTrendStoriesLoading(false);
     }
 
-    const getSuggestedStories = async () => {
+    const getsuggestedStories = async () => {
+        setsuggestedStoriesLoading(true);
+        try {
+            
+            var array = [...suggestedStories]
+            //check xem array hien tai co data chua, co' thi load next page
+            if (array.length > 1) {
+                
+                setPageNoRating(pageNoRating + 1);
+                const pageNumber = pageNoRating + 1;
+                const res = await StoryService.getSuggestion(pageNumber);
+                console.log(res);
+                res.data.content.forEach(element => {
+                    setsuggestedStories(story => [...story, element]);
+                });
+            }else{
+                const res = await StoryService.getSuggestion(1);
+                console.log(res);
+                setsuggestedStories(res.data.content);
+            }
+            console.log(suggestedStories);
 
+
+        } catch (error) {
+            console.log(error);
+          
+        }
+        setsuggestedStoriesLoading(false);
+        
     }
 
     return (
         <MainLayout>
             <div className="container-fluid">
+
+
                 <h4 className="text-bold">Gợi ý cho bạn</h4>
                 <hr style={{ border: '1px solid #ccc' }} />
                 {!suggestedStoriesLoading && (
@@ -49,7 +87,11 @@ const HomePage = () => {
                         ))}
                     </div>
                 )}
+                 <Button size="small" color="secondary" onClick={e => getsuggestedStories()}>
+          Thêm Truyện
+          </Button>
                 {suggestedStoriesLoading && <MySpinner/>}
+
 
 
                 <h4 className="text-bold mt-5">Danh sách thịnh hành</h4>

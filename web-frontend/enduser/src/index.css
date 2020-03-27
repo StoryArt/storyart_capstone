@@ -353,3 +353,7 @@ canvas{
   margin-top: 10px;
   display: inline-block
 }
+
+.modal{
+  z-index: 3000;
+}

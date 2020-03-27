@@ -68,9 +68,11 @@ public class CommentController {
     }
 
     @GetMapping("/getCommentStatistic")
-    public StatisticResponse getCommentStatistic(@RequestParam(defaultValue = "0") @Valid Integer userId,
-                                                 @RequestParam(defaultValue = "0") @Valid String start,
-                                                 @RequestParam(defaultValue = "0") @Valid String end){
-        return commentService.getStatistic(userId, start, end);
+    public StatisticResponse getCommentStatistic(
+            @RequestParam(defaultValue = "0") Integer storyId,
+            @RequestParam(defaultValue = "0") Integer userId,
+            @RequestParam(defaultValue = "0") String start,
+            @RequestParam(defaultValue = "0") String end){
+        return commentService.getStatistic(storyId, userId, start, end);
     }
 }

@@ -1,19 +1,28 @@
 package com.storyart.storyservice.service;
 
+import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.story_suggestion.HistoryDTO;
 import com.storyart.storyservice.model.ReadingHistory;
 import com.storyart.storyservice.model.Story;
+import com.storyart.storyservice.model.Tag;
 import com.storyart.storyservice.repository.HistoryRepository;
 import com.storyart.storyservice.repository.StoryRepository;
+import com.storyart.storyservice.repository.TagRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public interface HistoryService {
-    List<Story> jaccardCalculate(Integer id);
+    List<Integer> jaccardCalculate(Integer id);
 }
 
 @Service
@@ -25,8 +34,14 @@ class HistoryServiceIml implements HistoryService {
     @Autowired
     StoryRepository storyRepository;
 
+    @Autowired
+    TagService tagService;
+
+    @Autowired
+    TagRepository tagRepository;
+
     @Override
-    public List<Story> jaccardCalculate(Integer id) {
+    public   List<Integer> jaccardCalculate(Integer id) {
         List<ReadingHistory> CurrentUserHistory = historyRepository.findHistoryById(id);
         HistoryDTO currentUserH = new HistoryDTO();
         currentUserH.setUserid(id);
@@ -37,7 +52,6 @@ class HistoryServiceIml implements HistoryService {
         currentUserH.setListStory(listCurr);
 
         List<HistoryDTO> listHistory = new ArrayList<>();
-
 
         List<Integer> check = historyRepository.findUserIdHistoryExceptId(id);
         // get list history except current
@@ -72,17 +86,7 @@ class HistoryServiceIml implements HistoryService {
         List<Story> listStory = new ArrayList<>();
         MostFitHistory.removeAll(currentUserH.getListStory());
 
-
-        // get list story
-        for (Integer i : MostFitHistory) {
-            Optional<Story> story = storyRepository.findById(i);
-            if (story.isPresent()) {
-                listStory.add(story.get());
-            }
-        }
-
-
-        return listStory;
+        return MostFitHistory;
     }
 
 
