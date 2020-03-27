@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-//@CrossOrigin(origins = "*")
+@CrossOrigin
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUserDetailsService userDetailsService;
