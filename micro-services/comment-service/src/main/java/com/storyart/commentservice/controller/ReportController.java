@@ -46,6 +46,18 @@ public class ReportController {
         return reportService.getListReportComment(isHandled,pageNo, pageSize);
     }
 
+    @GetMapping("/getStoryReports")
+    public Page<StoryReportResponse> getStoryReports(
+            @RequestParam(defaultValue = "false") boolean isHandled,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        pageNo = pageNo - 1;
+        if (pageNo < 0) {
+            pageNo = 0;
+        }
+        return reportService.getListReportStory(isHandled,pageNo, pageSize);
+    }
+
     @GetMapping("/getReportsByCommentId")
     public Page<ReportByCommentIdResponse> getRoportsByCommentId(
             @RequestParam(defaultValue = "false") boolean isHandled,
@@ -57,6 +69,19 @@ public class ReportController {
             pageNo = 0;
         }
         return reportService.getReportsByCommentId(commentId,isHandled, pageNo, pageSize);
+    }
+
+    @GetMapping("/getReportsByStoryId")
+    public Page<ReportByStoryIdResponse> getRoportsByStoryId(
+            @RequestParam(defaultValue = "false") boolean isHandled,
+            @RequestParam(defaultValue = "0") Integer storyId,
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "5") Integer pageSize) {
+        pageNo = pageNo - 1;
+        if (pageNo < 0) {
+            pageNo = 0;
+        }
+        return reportService.getReportsByStoryId(storyId,isHandled, pageNo, pageSize);
     }
 
     @PostMapping("/handleReport")

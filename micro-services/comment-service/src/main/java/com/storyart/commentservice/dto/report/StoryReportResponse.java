@@ -9,19 +9,25 @@ import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.List;
+
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class ReportByCommentIdResponse {
-    private Integer id;
+@NoArgsConstructor
+public class StoryReportResponse {
+    private List<Integer> reportIds;
+    private int numberOfReports;
 
     private int userId;
-    private String username;
+    private String authorName;
+    private String authorEmail;
+    private boolean userIsDisableByAdmin;
 
     private int storyId;
-    private int commentId;
-    private String content;
+    private String storyName;
+    private boolean storyIsDisableByAdmin;
+
     private boolean isHandled;
 }

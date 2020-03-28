@@ -29,6 +29,18 @@ class ReportService {
         return axios.post(url, handleRequest);
     }
 
+    static async getStoryReports(pageNo, isHandled) {
+        const url = base_url.concat('/getStoryReports?pageSize=5&pageNo=').concat(pageNo).concat('&isHandled=').concat(isHandled);
+        return axios.get(url);
+    }
+
+    static async getReportsForEachStory(pageNo, storyId, isHandled) {
+        const url = base_url.concat('/getReportsByStoryId?pageSize=3&pageNo=').concat(pageNo).concat('&storyId=').concat(storyId).concat('&isHandled=').concat(isHandled);
+        return axios.get(url);
+
+    }
+
+
 }
 
 export default ReportService;

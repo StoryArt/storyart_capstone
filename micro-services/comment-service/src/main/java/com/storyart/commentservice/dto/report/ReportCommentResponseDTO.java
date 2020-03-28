@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReportCommentResponseDTO {
-    private int id;
+    private List<Integer> reportIds;
 
     private int numberOfReports;
 
@@ -34,6 +34,4 @@ public class ReportCommentResponseDTO {
     private boolean userIsDisableByAdmin;
 
     private boolean isHandled;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
 }

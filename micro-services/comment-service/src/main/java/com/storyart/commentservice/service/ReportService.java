@@ -11,6 +11,9 @@ public interface ReportService {
     void reportStory(ReportStoryRequest request);
     Page<ReportCommentResponseDTO> getListReportComment(boolean isHandled,int pageNo, int pageSize);
     Page<ReportByCommentIdResponse> getReportsByCommentId(int commentId, boolean isHandled, int pageNo, int pageSize);
+
+    Page<StoryReportResponse> getListReportStory(boolean isHandled,int pageNo, int pageSize);
+    Page<ReportByStoryIdResponse> getReportsByStoryId(int storyId, boolean isHandled, int pageNo, int pageSize);
     //void handleReport(List<Integer> reportIds);
     void handleReport(HandleReportRequestDTO request);
     //minh co can lam tinh nang huy repỏt ko, chắc là k
