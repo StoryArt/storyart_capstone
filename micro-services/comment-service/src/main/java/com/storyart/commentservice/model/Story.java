@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
@@ -24,13 +25,14 @@ public class Story extends DateAudit {
 
     @NonNull
     @Column(length = 250)
-    @Size(min = 5, max = 250)
+    @Size(min = 5, max = 250, message = "Tiêu đề truyện phải có ít nhất 5 kí tự và không quá 250 kí tự")
     private String title;
+
 
     private int userId;
 
-    @Column(length = 10000)
-    @Size(min = 10, max = 10000)
+    @Column(columnDefinition="TEXT")
+    @Size(min = 10, message = "Nội dung giói thiệu truyện phải ít nhất 10 kí tự")
     private String intro;
 
     @Column(length = 100)
@@ -41,20 +43,24 @@ public class Story extends DateAudit {
     @Size(max = 1000)
     private String image;
 
+    @NotBlank(message = "Chưa có màn hình đầu tiên")
     private String firstScreenId;
 
     @Column(columnDefinition = "float default 0")
     @Range(min = 0, max = 5)
-    private float avgRate;
+    private double avgRate;
 
     @Column(columnDefinition="tinyint(1) default 0")
-    private boolean isActive;
+    private boolean active;
 
     @Column(columnDefinition="tinyint(1) default 0")
-    private boolean isPublished;
+    private boolean published;
 
     @Column(columnDefinition="tinyint(1) default 0")
-    private Boolean isDeactiveByAdmin;
+    private boolean deactiveByAdmin;
+
+    @Column(columnDefinition = "int default 0")
+    private int numOfRead;
 
     private Date createdAt;
 

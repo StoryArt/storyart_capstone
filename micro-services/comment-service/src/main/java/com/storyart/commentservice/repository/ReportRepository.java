@@ -15,12 +15,23 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
     Optional<Report> findReportByUserIdAndCommentId(int userId, int commentId);
 
     @Query("select r from Report r where r.storyId = 0 and r.isHandled=?1 group by r.commentId order by count(r.commentId) desc ")
-    Page<Report> findReportComment(boolean isHandled,Pageable pageable);
+    Page<Report> findReportComment(boolean isHandled, Pageable pageable);
 
-    @Query("select count(r.commentId) from Report r where r.commentId in (:commentIds) and r.isHandled=(:isHandled) group by r.commentId order by count(r.commentId) desc")
-    List<Integer> getNumberOfReports(List<Integer> commentIds,boolean isHandled);
+    //@Query("select count(r.commentId) from Report r where r.commentId in (:commentIds) and r.isHandled=(:isHandled) group by r.commentId order by count(r.commentId) desc")
+    //List<Integer> getNumberOfReports(List<Integer> commentIds,boolean isHandled);
 
     @Query("select r from Report r where r.commentId = ?1 and r.isHandled=?2")
-    Page<Report> getReportsByCommentId(int commentId,boolean isHandled, Pageable pageable);
+    Page<Report> getReportsByCommentId(int commentId, boolean isHandled, Pageable pageable);
 
+    @Query("select r from Report r where  r.commentId in (:commentIds) and r.isHandled=(:isHandled)")
+    List<Report> findFullInformationReport(List<Integer> commentIds, boolean isHandled);
+
+    @Query("select r from Report r where r.commentId = 0 and r.isHandled=?1 group by r.storyId order by count(r.storyId) desc ")
+    Page<Report> findReportStory(boolean isHandled, Pageable pageable);
+
+    @Query("select r from Report r where r.storyId = ?1 and r.isHandled=?2")
+    Page<Report> getReportsByStoryId(int storyId, boolean isHandled, Pageable pageable);
+
+    @Query("select r from Report r where  r.storyId in (:storyIds) and r.isHandled=(:isHandled)")
+    List<Report> findFullInformationReportStory(List<Integer> storyIds, boolean isHandled);
 }
