@@ -41,7 +41,7 @@ const StoryCard = (props) => {
               </span>
             </Typography>
            
-            <div className="mb-3">{ StringUtils.truncate(story.intro, 60) }</div>
+            <div className="mb-3">{ StringUtils.truncate(StringUtils.removeHtml(story.intro), 60) }</div>
 
             <Typography variant="body2" color="textSecondary" component="p" style={{ fontSize: '0.8em' }}>
               <TagList tags={story.tags} />

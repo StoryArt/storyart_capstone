@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +37,7 @@ public class UserController {
 
 
     @GetMapping("/{uid}")
-    public UserProfileResponse
-    get(@PathVariable("uid") Integer uid) {
+    public UserProfileResponse get(@PathVariable("uid") Integer uid) {
         User user = userService.findById(uid);
         UserProfileResponse userProfileResponse = new UserProfileResponse();
 
@@ -53,6 +53,12 @@ public class UserController {
         }
         return userProfileResponse;
 
+    }
+
+    @GetMapping("current")
+    @Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_SYSTEM_ADMIN"})
+    public ResponseEntity getCurrentUser(@CurrentUser UserPrincipal userPrincipal){
+        return new ResponseEntity(userPrincipal, HttpStatus.OK);
     }
 
 

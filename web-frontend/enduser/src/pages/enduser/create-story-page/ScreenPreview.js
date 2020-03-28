@@ -17,6 +17,9 @@ const styles = theme => ({
   screenShow: {
    
   },
+  fullHeight: {
+    height: '100%'
+  },
   closeButton: {
     position: 'absolute',
     right: theme.spacing(1),
@@ -84,7 +87,6 @@ const ScreenPreview = (props) => {
                     </DialogTitle>
                     <DialogContent 
                       style={{ minHeight: '200px' }}
-                      className={classes.screenShow}
                       dividers>
                         <div className="container" style={{ height: '100%' }}>
                           <div className="row" style={{ height: '100%' }}>

@@ -24,7 +24,7 @@ const ActionsList = (props) => {
                                 onChange={(e) => onChangeActions('content', e.target.value, screen, index)}
                             />
                         </div>
-                        <div className="col-sm-6 mb-2"> 
+                        <div className="col-sm-6 mb-4"> 
                             
                             <ActionsSelect
                                  value={action.type}

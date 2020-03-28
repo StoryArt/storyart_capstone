@@ -31,8 +31,8 @@ public interface StoryService {
     GetStoryDto getStoryDetails(int id);
     List<GetStoryDto> getStoriesByUserId(int userId);
     ResultDto getReadingStory(int storyId);
-    ResultDto createStory(CreateStoryDto story);
-    ResultDto updateStory(CreateStoryDto story);
+    ResultDto createStory(CreateStoryDto story, int userId);
+    ResultDto updateStory(CreateStoryDto story, int userId);
     Page<GetStoryDto> searchStories(Set<Integer> tags, String keyword, boolean isActive,
                               boolean isPublished, int page, int itemsPerPage);
     List<GetStoryDto> getTrendingStories(int quantity);
@@ -45,9 +45,10 @@ public interface StoryService {
     Page<GetStoryDto> getStoriesForUser(int userId, String keyword, String orderBy, boolean asc, int page, int itemsPerPage);
     ResultDto updateByAdmin(int storyId, boolean disable);
 
-    ResultDto deleteStory(int storyId);
-    ResultDto changePublishedStatus(int storyId,  boolean turnOnPublished);
-
+    ResultDto deleteStory(int storyId, int userId);
+    ResultDto changePublishedStatus(int storyId, int userId, boolean turnOnPublished);
+    ResultDto increaseStoryRead(int storyId);
+    ResultDto saveReadHistory(int storyId, int userId);
 }
 
 @Service
@@ -109,7 +110,7 @@ class StoryServiceImpl implements StoryService{
     }
 
     @Override
-    public ResultDto changePublishedStatus(int storyId, boolean turnOnPublished) {
+    public ResultDto changePublishedStatus(int storyId, int userId, boolean turnOnPublished) {
         ResultDto result = new ResultDto();
         Optional<Story> story = storyRepository.findById(storyId);
         result.setSuccess(false);
@@ -117,10 +118,13 @@ class StoryServiceImpl implements StoryService{
             result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
         } else {
             Story s = story.get();
+
             if(s.isDeactiveByAdmin()){
                 result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa bởi admin");
             } else if(!s.isActive()){
                 result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
+            } else if(userId != s.getUserId()){
+                result.getErrors().put("NOT_OWN", "Truyện này không thuộc về bạn");
             } else if(turnOnPublished && !s.isPublished()){
                 s.setPublished(true);
                 result.setSuccess(true);
@@ -131,13 +135,45 @@ class StoryServiceImpl implements StoryService{
                 result.setSuccess(true);
                 result.setData(s);
                 storyRepository.save(s);
+            } else {
+                result.setSuccess(true);
             }
         }
         return result;
     }
 
     @Override
-    public ResultDto deleteStory(int storyId) {
+    public ResultDto increaseStoryRead(int storyId) {
+        ResultDto result = new ResultDto();
+        result.setSuccess(true);
+        Story story = storyRepository.findById(storyId).orElse(null);
+        if(story != null){
+            story.setNumOfRead(story.getNumOfRead() + 1);
+            storyRepository.save(story);
+        } else {
+            result.setSuccess(false);
+            result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
+        }
+        return result;
+    }
+
+    @Override
+    public ResultDto saveReadHistory(int storyId, int userId) {
+        ResultDto result = new ResultDto();
+        result.setSuccess(false);
+        Story story = storyRepository.findById(storyId).orElse(null);
+        if(story == null){
+            result.getErrors().put("NOT_FOUND", "Truyện này không tồn tại");
+        } else if(!story.isActive() ||  story.isDeactiveByAdmin()){
+            result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
+        } else {
+
+        }
+        return result;
+    }
+
+    @Override
+    public ResultDto deleteStory(int storyId, int userId) {
         ResultDto result = new ResultDto();
         Optional<Story> story = storyRepository.findById(storyId);
         result.setSuccess(false);
@@ -149,6 +185,8 @@ class StoryServiceImpl implements StoryService{
                 result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
             } else if(s.isDeactiveByAdmin()){
                 result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa bới admin");
+            } else if(userId != s.getUserId()){
+                result.getErrors().put("NOT_OWN", "Truyện này không thuộc về bạn");
             } else {
                 s.setActive(false);
                 storyRepository.save(s);
@@ -222,7 +260,7 @@ class StoryServiceImpl implements StoryService{
     }
 
     @Override
-    public ResultDto createStory(CreateStoryDto createStoryDto) {
+    public ResultDto createStory(CreateStoryDto createStoryDto, int userId) {
 
         ResultDto result = new ResultDto();
         Story story = modelMapper.map(createStoryDto, Story.class);
@@ -240,6 +278,7 @@ class StoryServiceImpl implements StoryService{
         story.setPublished(createStoryDto.isPublished());
         story.setDeactiveByAdmin(false);
         story.setUpdatedAt(new Date());
+        story.setUserId(userId);
 
         story = storyRepository.save(story);
         int storyId = story.getId();
@@ -313,7 +352,7 @@ class StoryServiceImpl implements StoryService{
     }
 
     @Override
-    public ResultDto updateStory(CreateStoryDto storyDto) {
+    public ResultDto updateStory(CreateStoryDto storyDto, int userId) {
         ResultDto resultDto = new ResultDto();
         Story foundStory = storyRepository.findById(storyDto.getId()).orElse(null);
 
@@ -321,6 +360,8 @@ class StoryServiceImpl implements StoryService{
             resultDto.getErrors().put("NOT_FOUND", "Truyện này không có trong hệ thống!");
         } else if(!foundStory.isActive() || foundStory.isDeactiveByAdmin()){
             resultDto.getErrors().put("DELETED", "Truyện đã bị xóa!");
+        }else if(userId != foundStory.getUserId()){
+            resultDto.getErrors().put("NOT_OWN", "Truyện này không thuộc về bạn");
         } else {
             Story story = modelMapper.map(storyDto, Story.class);
             HashMap<String, String> screenIdsMap = new HashMap<>();
@@ -579,6 +620,7 @@ class StoryServiceImpl implements StoryService{
         });
         return page2;
     }
+
     public GetStoryDto mapStoryModelToGetStoryDto(Story story){
         List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
         GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);

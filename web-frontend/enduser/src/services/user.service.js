@@ -13,6 +13,7 @@ import { ROLE_NAMES } from "../common/constants";
 const baseUrl = "http://localhost:8002/api/v1";
 const signInUpUrl = "http://localhost:8002/api/v1";
 
+
 class UserService {
   static async login(user) {
     const url = signInUpUrl + "/auth/signin";

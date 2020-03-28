@@ -4,11 +4,10 @@ import {
   MDBAlert,
   MDBBtn,
 } from "mdbreact";
-import { setAuthHeader } from "../../../config/auth";
 
 import UserService from "../../../services/user.service";
 import { UserContext } from "../../../context/user.context";
-import { getAuthUserInfo } from "../../../config/auth";
+import { getAuthUserInfo, setAuthHeader, getTokenFromLocal } from "../../../config/auth";
 import { getOrderBys } from '../../../common/constants';
 
 import DateTimeUtils from "../../../utils/datetime";
@@ -158,9 +157,10 @@ const UserProfilePage = (props) => {
   };
 
   const getStoriesByAuthor = async () => {
+    setAuthHeader(getTokenFromLocal());
     setIsLoadingStories(true);
     try {
-      const res = await StoryService.getStoriesByAuthor(1, filters);
+      const res = await StoryService.getStoriesByAuthor(user.id, filters);
       console.log(res);
       const { content, totalPages } = res.data;
       setStories(content);
@@ -183,7 +183,7 @@ const UserProfilePage = (props) => {
     } else {
       getStoriesByAuthor();
     }
-}
+  }
 
   const changePage = (e, value) => {
     changeFilters('page', value);
@@ -220,6 +220,8 @@ const UserProfilePage = (props) => {
   }
 
   const changePublishedStatus = async (story) => {
+    
+    setAuthHeader(getTokenFromLocal());
     const turnOnPublished = !story.published;
     try {
       const res = await StoryService.changePublishedStatus(story.id, turnOnPublished);
@@ -241,11 +243,10 @@ const UserProfilePage = (props) => {
           open: true
         });
       }
-      closeAlert();
-      
     } catch (error) {
       console.log(error);
     }
+    closeAlert();
   }
 
   const cancel = () => {
@@ -424,7 +425,7 @@ const UserProfilePage = (props) => {
         <h3 className="text-bold"> Truyện của bạn </h3> 
         <hr style={{ border: "1px solid #ccc" }} /> 
 
-        <div className="row my-3">
+        <div className="row my-5">
             <div className="col-sm-3">
               <FormControl>
                 <TextField
@@ -477,7 +478,8 @@ const UserProfilePage = (props) => {
           </div>
         {/* {isLoadingstories && <MySpinner/>} */}
 
-        <>
+       {stories.length > 0 && (
+          <>
           <div className="row my-3">
             <div className="col-12">
               <Pagination 
@@ -565,6 +567,7 @@ const UserProfilePage = (props) => {
             </div>
           </div>
         </>
+       )}
       
 
         {(!isLoadingstories && stories.length == 0) && <NotFound message="Không tìm thấy truyện nào..." />}

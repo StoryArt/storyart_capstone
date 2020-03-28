@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { TextField, MenuItem, Tooltip, Fab, FormControl, Select, InputLabel, Checkbox, FormControlLabel } from '@material-ui/core';
+import { TextField, Tooltip, Fab, Checkbox, FormControlLabel, Button } from '@material-ui/core';
 import { Pagination } from '@material-ui/lab';
 import { Add as AddIcon } from '@material-ui/icons';
 import MainLayout from '../../../layouts/main-layout/MainLayout';
@@ -18,9 +18,10 @@ import TagsSelect from '../../../components/common/TagsSelect';
 import StoryPreview from './StoryPreview';
 import ScreenPreview from './ScreenPreview';
 import AnimationSelect from './AnimationSelect';
+import StoryTabs from './StoryTabs';
 
 
-import { getParameters, getActions, getAnimations, ANIMATIONS, ACTION_TYPES, INFORMATION_TYPES,  }  from '../../../common/constants';
+import { getParameters, getActions, ANIMATIONS, ACTION_TYPES, INFORMATION_TYPES, SCREEN_COLORS  }  from '../../../common/constants';
 
 
 import StoryService from '../../../services/story.service';
@@ -57,6 +58,7 @@ const CreateStoryPage = (props) => {
     const [openBackdrop, setOpenBackdrop] = useState(false);
     const [tags, setTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
+    const [storyTab, setStoryTab] = useState(0);
 
     let canChangeScreenContent = true;
 
@@ -313,173 +315,198 @@ const CreateStoryPage = (props) => {
             </h3>
             
 
-            {/* {isLoadingStory && <MyBackdrop open={openBackdrop} setOpen={setOpenBackdrop}/>} */}
             <MyBackdrop open={openBackdrop} setOpen={setOpenBackdrop}/>
-            <MySpinner/>
+            {/* <MySpinner/> */}
+           
 
             {(!isLoadingStory && !notfoundStory && !ValidationUtils.isEmpty(story)) && (
                 <>
-                    <div className="container" style={{ paddingBottom: '130px' }}>
-                        <div className="row mb-4">
-                            <div className="col-md-9 mx-auto">
-                                {/* Story */}
-                                <div className="card screen-card mb-2">
-                                    <div className="card-header">
-                                        <h4 className="mb-4"></h4>
-                                            <div className="row">
-                                                <div className="col-sm-4">
-                                                    <TextField 
-                                                        size="small"
-                                                        variant="outlined"
-                                                        style={{ width: '100%' }}
-                                                        label="Tiêu đề truyện..."
-                                                        value={story.title} 
-                                                        onChange={(e) => changeStory('title', e.target.value)} />
-                                                </div>
-                                                <div className='col-sm-4'>
-                                                    <ScreensSelect
-                                                        placeholder={'Chọn màn hình đầu tiên'}
+                     <StoryTabs
+                        value={storyTab}
+                        onChange={(e, value) => setStoryTab(value)}
+                    >
+                        {storyTab === 0 && (
+                            <div className="container">
+                                <div className="row mb-4">
+                                    <div className="col-md-9 mx-auto">
+                                        {/* Story */}
+                                        <div className="card screen-card mb-2">
+                                            <div className="card-header">
+                                                <h4 className="mb-4"></h4>
+                                                    <div className="row">
+                                                        <div className="col-sm-4">
+                                                            <TextField 
+                                                                size="small"
+                                                                variant="outlined"
+                                                                style={{ width: '100%' }}
+                                                                label="Tiêu đề truyện..."
+                                                                value={story.title} 
+                                                                onChange={(e) => changeStory('title', e.target.value)} />
+                                                        </div>
+                                                        <div className='col-sm-4'>
+                                                            <ScreensSelect
+                                                                placeholder={'Chọn màn hình đầu tiên'}
+                                                                screens={screens}
+                                                                value={story.firstScreenId}
+                                                                onChange={(e) => changeStory('firstScreenId', e.target.value)} 
+                                                            />
+                                                        </div>
+
+                                                        <div className='col-sm-4'>
+                                                            <AnimationSelect
+                                                                animation={story.animation}
+                                                                onChange={(e) => changeStory('animation', e.target.value)}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="row my-3">
+                                                        <div className="col-12">
+                                                            <TagsSelect
+                                                                tags={tags}
+                                                                selectedTags={selectedTags}
+                                                                setSelectedTags={(tags) => setSelectedTags([...tags])}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                    
+
+                                                    <StoryParameters 
+                                                        parameters={parameters}
+                                                        storyParameters={storyParameters}
                                                         screens={screens}
-                                                        value={story.firstScreenId}
-                                                        onChange={(e) => changeStory('firstScreenId', e.target.value)} 
-                                                    />
-                                                </div>
-
-                                                <div className='col-sm-4'>
-                                                    <AnimationSelect
-                                                        animation={story.animation}
-                                                        onChange={(e) => changeStory('animation', e.target.value)}
-                                                    />
+                                                        onChangeParam={changeParam} 
+                                                        onAddParamConditions={addParamConditions} 
+                                                        onChangeParamConditions={changeParamConditions} 
+                                                        onRemoveParamCondition={removeParamCondition}
+                                                        onRemoveParam={removeParam} />
+                                                
+                                            </div>
+                                            <div className="card-body">
+                                                <MyEditor
+                                                    placeholder="Nội dung giới thiệu"
+                                                    value={story.intro}
+                                                    onChange={(value) => changeStory('intro', value)}
+                                                />
+                                                
+                                                <div className="text-right mt-2">
+                                                    <Button
+                                                        onClick={addParameter}
+                                                        color="primary"
+                                                        varient="outlined">Thêm thông tin</Button>
+                                                    {/* <MyDropdownMenu >
+                                                        <MenuItem onClick={addParameter} >Thêm thông tin</MenuItem>
+                                                    </MyDropdownMenu> */}
                                                 </div>
                                             </div>
-                                            
-                                            <div className="row my-3">
-                                                <div className="col-12">
-                                                    <TagsSelect
-                                                        tags={tags}
-                                                        selectedTags={selectedTags}
-                                                        setSelectedTags={(tags) => setSelectedTags([...tags])}
-                                                    />
-                                                </div>
-                                            </div>
-                            
+                                        </div>
+                                        <div className="mb-5">
+                                            {/* <button 
+                                                className="btn btn-default float-right" 
+                                                onClick={() => viewStoryStructure()}>
+                                                Xem cấu trúc truyện</button> */}
 
-                                            <StoryParameters 
-                                                parameters={parameters}
-                                                storyParameters={storyParameters}
-                                                screens={screens}
-                                                onChangeParam={changeParam} 
-                                                onAddParamConditions={addParamConditions} 
-                                                onChangeParamConditions={changeParamConditions} 
-                                                onRemoveParamCondition={removeParamCondition}
-                                                onRemoveParam={removeParam} />
-                                        
-                                    </div>
-                                    <div className="card-body">
-                                        <MyEditor
-                                            placeholder="Nội dung giới thiệu"
-                                            value={story.intro}
-                                            onChange={(value) => changeStory('intro', value)}
-                                        />
-                                        
-                                        <div className="text-right mt-2">
-                                            <MyDropdownMenu >
-                                                <MenuItem onClick={addParameter} >Thêm thông tin</MenuItem>
-                                            </MyDropdownMenu>
+                                            <FormControlLabel
+                                                control={<Checkbox
+                                                    checked={story.published}
+                                                    color="primary"
+                                                    onChange={e => changeStory('published', e.target.checked)}
+                                                />}
+                                                label="Xuất bản truyện"
+                                            />
+                                                
                                         </div>
                                     </div>
                                 </div>
-                                <div className="mb-5">
-                                    <button 
-                                        className="btn btn-default float-right" 
-                                        onClick={() => viewStoryStructure()}>
-                                        Xem cấu trúc truyện</button>
+                            </div>
+                        )}
 
-                                    <button 
-                                        className="btn btn-warning float-right" 
-                                        onClick={() => saveStory(false)}>
-                                        Lưu truyện</button>
+                        {storyTab === 1 && (
+                            <div className="row">
+                                <div className="col-sm-5 px-1">
+                                    <h3 style={{ fontSize: '1.2em' }}>
+                                        <span className="mr-2">Tất cả màn hình ({screens.length})</span>
+                                        <Tooltip title="Thêm màn hình" aria-label="add" placement="top">
+                                            <Fab 
+                                                color="primary" 
+                                                style={{ width: '35px', height: '35px' }} 
+                                                onClick={handleAddScreen}>
+                                                <AddIcon />
+                                            </Fab>
+                                        </Tooltip>
+                                    
+                                    </h3>
+                                    <hr style={{ border: '1px solid #ccc' }} />
+                                    
+                                    {/* <Pagination 
+                                        count={numOfPageScreenSnapshots} 
+                                        page={screenSnapshotsPage.page}
+                                        color="default" 
+                                        onChange={(e, value) => setScreenSnapshotsPage({ page: value })} 
+                                        size="small" />
 
-                                    <FormControlLabel
-                                        control={<Checkbox
-                                            checked={story.published}
-                                            color="primary"
-                                            onChange={e => changeStory('published', e.target.checked)}
-                                        />}
-                                        label="Xuất bản truyện"
+                                    <ScreenSnapshots
+                                        page={screenSnapshotsPage.page}
+                                        screens={screenSnapshots}
+                                        setCurrentScreen={(id) => {
+                                            canChangeScreenContent = false;
+                                            setCurrentScreen(findScreenById(id));
+                                        }}
+                                        currentScreen={currentScreen}
+                                        onRemoveScreen={id => handleRemoveScreen(findScreenById(id))}
+                                    /> */}
+                                    <StoryPreview
+                                        story={story}
+                                        setCurrentScreen={(id) => {
+                                            canChangeScreenContent = false;
+                                            setCurrentScreen(findScreenById(id));
+                                        }}
+                                        screens={screens}
+                                        onClose={() => setOpenStoryPreview(false)}
+                                        open={openStoryPreview}
                                     />
-                                        
+
+                                    <br/>
+                                    <div>
+                                        <span className="screen-box" 
+                                        style={{  background: SCREEN_COLORS.FIRST_SCREEN }}></span> Màn hình đầu tiên
+                                    </div>
+                                    <div>
+                                        <span className="screen-box" 
+                                        style={{  background: SCREEN_COLORS.ENDING_SCREEN }}></span> Màn hình kết thúc
+                                    </div>
+                                    <div>
+                                        <span className="screen-box" 
+                                        style={{  background: SCREEN_COLORS.NORMAL_SCREEN }}></span> Màn hình
+                                    </div>
+
+                                
+                                </div>
+                                <div className="col-sm-7">
+                                    <h3 style={{ fontSize: '1.2em' }}>Chi tiết màn hình</h3>
+                                    <hr style={{ border: '1px solid #ccc' }} />
+                                    {/* Story screens */}
+                                    <ScreensList
+                                        currentScreen={currentScreen}
+                                        screens={screens} 
+                                        parameters={parameters}
+                                        actionsList={actionTypesList} 
+                                        storyParameters={storyParameters}
+                                        onShowScreenPreview={() => setOpenScreenPreview(true)}
+                                        onChangeScreen={changeScreen} 
+                                        onChangeActions={changeActions} 
+                                        onRemoveScreen={handleRemoveScreen} 
+                                        onAddAction={handleAddActions} 
+                                        onRemoveAction={handleRemoveAction}
+                                    />
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="row">
-                            <div className="col-sm-5 px-1">
-                                <h3 style={{ fontSize: '1.2em' }}>
-                                    <span className="mr-2">Tất cả màn hình ({screens.length})</span>
-                                    <Tooltip title="Thêm màn hình" aria-label="add" placement="top">
-                                        <Fab 
-                                            color="primary" 
-                                            style={{ width: '35px', height: '35px' }} 
-                                            onClick={handleAddScreen}>
-                                            <AddIcon />
-                                        </Fab>
-                                    </Tooltip>
-                                
-                                </h3>
-                                <hr style={{ border: '1px solid #ccc' }} />
-                                
-                                {/* <Pagination 
-                                    count={numOfPageScreenSnapshots} 
-                                    page={screenSnapshotsPage.page}
-                                    color="default" 
-                                    onChange={(e, value) => setScreenSnapshotsPage({ page: value })} 
-                                    size="small" />
-
-                                <ScreenSnapshots
-                                    page={screenSnapshotsPage.page}
-                                    screens={screenSnapshots}
-                                    setCurrentScreen={(id) => {
-                                        canChangeScreenContent = false;
-                                        setCurrentScreen(findScreenById(id));
-                                    }}
-                                    currentScreen={currentScreen}
-                                    onRemoveScreen={id => handleRemoveScreen(findScreenById(id))}
-                                /> */}
-                                <StoryPreview
-                                    story={story}
-                                    setCurrentScreen={(id) => {
-                                        canChangeScreenContent = false;
-                                        setCurrentScreen(findScreenById(id));
-                                    }}
-                                    screens={screens}
-                                    onClose={() => setOpenStoryPreview(false)}
-                                    open={openStoryPreview}
-                                />
-
-                                <br/>
-                            
-                            </div>
-                            <div className="col-sm-7">
-                                <h3 style={{ fontSize: '1.2em' }}>Chi tiết màn hình</h3>
-                                <hr style={{ border: '1px solid #ccc' }} />
-                                {/* Story screens */}
-                                <ScreensList
-                                    currentScreen={currentScreen}
-                                    screens={screens} 
-                                    parameters={parameters}
-                                    actionsList={actionTypesList} 
-                                    storyParameters={storyParameters}
-                                    onShowScreenPreview={() => setOpenScreenPreview(true)}
-                                    onChangeScreen={changeScreen} 
-                                    onChangeActions={changeActions} 
-                                    onRemoveScreen={handleRemoveScreen} 
-                                    onAddAction={handleAddActions} 
-                                    onRemoveAction={handleRemoveAction}
-                                />
-                            </div>
-                        </div>
-                    </div>
+                        )}
+                    </StoryTabs>
+                    <button 
+                        className="btn btn-warning float-right" 
+                        onClick={() => saveStory(false)}>
+                        Lưu truyện</button>
                 
                     <MyAlert 
                         open={alert.open}

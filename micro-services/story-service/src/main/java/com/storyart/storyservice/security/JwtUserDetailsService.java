@@ -1,8 +1,7 @@
-package com.storyart.apigateway.security;
+package com.storyart.storyservice.security;
 
-import com.storyart.apigateway.model.User;
-import com.storyart.apigateway.service.UserService;
-
+import com.storyart.storyservice.model.User;
+import com.storyart.storyservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,10 +27,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         } else {
             throw new UsernameNotFoundException("Username not found with username:" + username);
         }
-
-
     }
-
 
     public UserDetails loadUserById(Integer id) {
         User user = userService.findById(id);
@@ -41,6 +37,4 @@ public class JwtUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Username not found with userId: " + id);
         }
     }
-
-
 }

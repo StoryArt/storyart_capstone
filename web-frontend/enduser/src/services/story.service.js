@@ -2,7 +2,8 @@ import axios from 'axios';
 import { API_ENDPOINT_PREFIX } from '../config/api';
 import {getAuthUserInfo} from '../config/auth'
 
-const baseUrl = API_ENDPOINT_PREFIX + '/stories';
+// const baseUrl = API_ENDPOINT_PREFIX + '/stories';
+const baseUrl = 'http://localhost:8000/api/story-service/stories';
 
 class StoryService{
     static async createStory(story){
@@ -16,29 +17,29 @@ class StoryService{
     }
 
     static async getReadingStory(storyId){
-        const url = baseUrl + '/read/' + storyId;
+        const url = baseUrl + '/public/read/' + storyId;
         return axios.get(url);
     }
 
     static async getStoriesByAuthor(userId, { orderBy, asc, keyword, page, itemsPerPage }){
-        const url = baseUrl + '/get_by_author' + `?userId=${userId}&orderBy=${orderBy}&asc=${asc}&keyword=${keyword}&page=${page}&itemsPerPage=${itemsPerPage}`;
+        const url = baseUrl + '/get_by_author' + `?orderBy=${orderBy}&asc=${asc}&keyword=${keyword}&page=${page}&itemsPerPage=${itemsPerPage}`;
         return axios.get(url);
     }
 
     
     static async searchStories({ tags, keyword, isActive, isPublished, page, itemsPerPage }){
-        const url = baseUrl + `/search?keyword=${keyword}&isActive=${isActive}&isPublished=${isPublished}&page=${page}&itemsPerPage=${itemsPerPage}&tags=${tags}`;
+        const url = baseUrl + `/public/search?keyword=${keyword}&isActive=${isActive}&isPublished=${isPublished}&page=${page}&itemsPerPage=${itemsPerPage}&tags=${tags}`;
         return axios.get(url);
     }
 
     static async getTrendStories(quantity){
         if(!quantity) quantity = 12;
-        const url = baseUrl + '/trend?quantity=' + quantity;
+        const url = baseUrl + '/public/trend?quantity=' + quantity;
         return axios.get(url);
     }
 
     static async getStoryDetails(storyId){
-        const url = baseUrl + '/' + storyId;
+        const url = baseUrl + '/public/' + storyId;
         return axios.get(url);
     }
 
@@ -67,7 +68,7 @@ class StoryService{
     }
 
     static async changePublishedStatus(storyId, turnOnPublished){
-        const url = baseUrl + '/change_published?storyId=' + storyId + '&turnOnPublished=' + turnOnPublished ;
+        const url = baseUrl + '/change_published?storyId=' + storyId + '&turnOnPublished=' + turnOnPublished;
         return axios.put(url);
     }
 

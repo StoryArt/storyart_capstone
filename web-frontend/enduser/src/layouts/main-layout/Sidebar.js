@@ -144,7 +144,6 @@ const Sidebar = (props) => {
                       </ListItemIcon>
                     <ListItemText primary="Quản lý thẻ" />
                   </ListItem>
-                  
               </List>
         )}
 
