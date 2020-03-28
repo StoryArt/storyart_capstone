@@ -62,28 +62,24 @@ public class StoryController {
     }
 
     @PutMapping("rate")
-    @Secured({"ROLE_USER"})
     public ResponseEntity rateStory(@RequestParam int storyId, @RequestParam double stars, @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.rateStory(storyId, userPrincipal.getId(), stars);
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
     @PostMapping("read_history")
-    @Secured({"ROLE_USER"})
     public ResponseEntity saveReadHistory(@RequestParam int storyId, @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.saveReadHistory(storyId, userPrincipal.getId());
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
     @DeleteMapping("{storyId}")
-    @Secured({"ROLE_USER"})
     public ResponseEntity deleteStory(@PathVariable int storyId, @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.deleteStory(storyId, userPrincipal.getId());
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
     @PutMapping("change_published")
-    @Secured({"ROLE_USER"})
 //    @PreAuthorize("hasAuthority('ROLE_USER')")
     public ResponseEntity changePublishedStory(
             @RequestParam int storyId,
@@ -95,7 +91,6 @@ public class StoryController {
     }
 
     @GetMapping("get_by_author")//cai nay van chay dc ne, ko bi sao
-    @Secured({"ROLE_USER"})
     public ResponseEntity getStoriesByAuthor(
             @RequestParam String keyword,
             @RequestParam boolean asc,
@@ -139,7 +134,6 @@ public class StoryController {
     }
 
     @PostMapping("")
-    @Secured({"ROLE_USER"})
     public ResponseEntity addStory(@Valid @RequestBody CreateStoryDto story, @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.createStory(story, userPrincipal.getId());
         return new ResponseEntity(result, HttpStatus.OK);
@@ -152,7 +146,6 @@ public class StoryController {
     }
 
     @PutMapping("")
-    @Secured({"ROLE_USER"})
     public ResponseEntity updateStory(@Valid @RequestBody CreateStoryDto story, @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.updateStory(story, userPrincipal.getId());
         return new ResponseEntity(result, HttpStatus.OK);

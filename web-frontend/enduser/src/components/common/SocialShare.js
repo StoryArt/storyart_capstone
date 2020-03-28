@@ -3,6 +3,7 @@ import {
     EmailShareButton,
     FacebookShareButton,
     FacebookShareCount,
+    FacebookIcon,
     InstapaperShareButton,
     LineShareButton,
     LinkedinShareButton,
@@ -25,7 +26,8 @@ const SocialShare = (props) => {
     const { shareUrl } = props;
 
     return (
-        <FacebookShareCount url={shareUrl} >facebook share</FacebookShareCount>
+        // <FacebookShareCount size={32} round={true} url={shareUrl} >facebook share</FacebookShareCount>
+        <FacebookShareCount/>
     );
 };
 

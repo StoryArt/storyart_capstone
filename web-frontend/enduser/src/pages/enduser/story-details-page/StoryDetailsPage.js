@@ -22,6 +22,7 @@ import StringUtils from '../../../utils/string';
 import { getAuthUserInfo } from '../../../config/auth';
 import MyRating from '../../../components/common/MyRating';
 import MyAlert from '../../../components/common/MyAlert';
+import SocialShare from '../../../components/common/SocialShare';
 import { Person as PersonIcon } from '@material-ui/icons';
 
 const StoryDetailsPage = (props) => {
@@ -430,6 +431,9 @@ const StoryDetailsPage = (props) => {
                                 </div>
                                 <div className="text-center btn btn-danger btn-block mt-1" onClick={toggleModal('reportStoryModal')}>
                                     Báo cáo
+                                </div>
+                                <div>
+                                    <SocialShare shareUrl={'http://youtube.com'} />
                                 </div>
                             </div>
                             <div className="col-sm-9">
