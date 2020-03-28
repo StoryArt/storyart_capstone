@@ -20,7 +20,7 @@ const HomePage = () => {
 
     useEffect(() => {
         getTrendStories();
-        // getsuggestedStories();
+         getsuggestedStories();
     }, []);
    
 
