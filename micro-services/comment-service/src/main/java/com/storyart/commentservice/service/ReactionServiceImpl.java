@@ -197,6 +197,7 @@ public class ReactionServiceImpl implements ReactionService {
                     for (Story story: stories) {
                         if (comment.getStoryId() == story.getId()){
                             response.setStoryName(story.getTitle());
+                            response.setStoryId(story.getId());
                             break;
                         }
                     }

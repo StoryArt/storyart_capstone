@@ -122,7 +122,7 @@ const AppNavbar = (props) => {
                 StoryArt
               </Typography>
                 
-                {(!isRouteAdmin && !isUserAuth(user)) && (
+                {(!isRouteAdmin && !isUserAuth(user) && !isAdminAuth(user) && !isSysAdminAuth(user)) && (
                     <>
                         <Button 
                           onClick={() => navigateRoute('/login')} 
@@ -140,6 +140,9 @@ const AppNavbar = (props) => {
                         <Button 
                           onClick={handleLogout}
                           color="inherit">Đăng xuất</Button>
+                        <Button 
+                          onClick={() => { navigateRoute('/user/edit-profile') }}
+                          color="inherit">{ user.username }</Button>
                         <div>
                             <IconButton
                                 aria-label="account of current user"
@@ -165,8 +168,7 @@ const AppNavbar = (props) => {
                                 open={openAccountMenu}
                                 onClose={handleCloseMenu}
                             >
-                                <MenuItem onClick={() => {}}>Tài khoản</MenuItem>
-                                <MenuItem onClick={() => {}}>Profile</MenuItem>
+                                <MenuItem onClick={() => { navigateRoute('/user/edit-profile') }}>Tài khoản</MenuItem>
                             </Menu>
                         </div>
                     </>

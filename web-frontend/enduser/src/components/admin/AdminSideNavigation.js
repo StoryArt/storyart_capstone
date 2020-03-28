@@ -53,7 +53,7 @@ const AdminSideNavigation = () => {
                     </>
                 )}
                 {isSysAdminAuth(user) && (
-                    <NavLink to="/admin/admin" activeClassName="activeClass">
+                    <NavLink to="/sysadmin/admin" activeClassName="activeClass">
                         <MDBListGroupItem>
                             <MDBIcon icon="user-shield" className="mr-3"/>
                             Quan ly admin

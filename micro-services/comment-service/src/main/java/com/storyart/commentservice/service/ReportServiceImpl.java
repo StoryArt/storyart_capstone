@@ -38,14 +38,8 @@ public class ReportServiceImpl implements ReportService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vui lòng không để trống nội dung báo cáo.");
         }
         Optional<Report> rp = reportRepository.findReportByUserIdAndCommentId(reportCommentRequestDTO.getUserId(), reportCommentRequestDTO.getCommentId());
-        //List<Report> reports = reportRepository.findAll();//lay het report trong db ra luon ha anh :v de a sua, nay` luc a chua biet query
-        //ok anh
-        //for (Report report: reports) {
-        //    if(report.getUserId() == reportCommentDTO.getUserId() && report.getCommentId() == reportCommentDTO.getCommentId()){
-        //        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"This comment have been reported recently.");
-        //    }
-        //}
-        if (rp.isPresent() && rp.get().isHandled() == false) {
+
+        if (rp.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn đã báo cáo bình luận này, vui lòng đợi quản trị viên xử lý.");
         }
         //find user
@@ -79,6 +73,10 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public void reportStory(ReportStoryRequest request) {
+        if(request.getContent().trim().length()<1){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vui lòng nhập nội dung báo cáo.");
+        }
+
         Optional<Story> story = storyRepository.findById(request.getStoryId());
         if(!story.isPresent()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Truyện không tồn tại.");
@@ -89,8 +87,10 @@ public class ReportServiceImpl implements ReportService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tài khoản không tồn tại.");
         }
 
-        if(request.getContent().trim().length()<1){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vui lòng nhập nội dung báo cáo.");
+        Optional<Report> rp = reportRepository.findReportByUserIdAndStoryId(request.getUserId(), request.getStoryId());
+
+        if (rp.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn đã báo cáo bình luận này, vui lòng đợi quản trị viên xử lý.");
         }
 
         Report report = new Report();

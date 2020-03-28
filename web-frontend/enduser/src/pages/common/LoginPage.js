@@ -87,7 +87,7 @@ const LoginPage = () => {
             if(userInfo.role === ROLE_NAMES.ROLE_ADMIN){
               url = '/admin/users'
             } else if(userInfo.role === ROLE_NAMES.ROLE_SYSTEM_ADMIN){
-              url = '/admin/admin';
+              url = '/sysadmin/admin';
             }
             //wait for 400 miliseconds to redirect
             window.setTimeout(() => {
