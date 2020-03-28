@@ -1,13 +1,16 @@
-import React, { useState, useCallback } from 'react';
-import MainLayout from  '../../../layouts/main-layout/MainLayout';
+import React, { useState, useCallback, useEffect } from 'react';
+import MainLayout from '../../../layouts/main-layout/MainLayout';
 import {
     MDBNavItem, MDBNavLink, MDBTabContent, MDBTabPane, MDBNav, MDBModal,
     MDBModalHeader, MDBModalBody, MDBModalFooter, MDBBtn, MDBInput,
 } from 'mdbreact';
+import { Link } from 'react-router-dom';
 import CommentService from '../../../services/comment.service';
 import ReactionService from '../../../services/reaction.service';
 import moment from 'moment';
 import { getAuthUserInfo } from '../../../config/auth';
+
+import MyAlert from '../../../components/common/MyAlert';
 
 
 const UserHistoryPage = () => {
@@ -26,6 +29,16 @@ const UserHistoryPage = () => {
         userId: 1,
         commentId: 0,
     });
+    const [alert, setAlert] = useState({ content: '', type: 'success', open: false });
+    const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
+
+
+    useEffect(() => {
+        getCommentHistory();
+    }, []);
+    useEffect(() => {
+        getReactionHistory();
+    }, []);
     const deleteComment = async () => {
         if (userInfo !== null) {
             try {
@@ -37,10 +50,20 @@ const UserHistoryPage = () => {
                     var array = [...comments];
                     setComments(array.filter(item => item.id !== deleteRequest.commentId));
                 }
+                setAlert({
+                    content: 'Xóa bình luận thành công',
+                    type: 'success',
+                    open: true
+                });
             } catch (error) {
-                console.log(error.response.request._response);
+                setAlert({
+                    content: 'Có lỗi xảy ra',
+                    type: 'error',
+                    open: true
+                });
             }
         }
+        closeAlert();
 
     }
     const deleteReaction = async () => {
@@ -54,11 +77,20 @@ const UserHistoryPage = () => {
                     var array = [...reactions];
                     setReactions(array.filter(item => item.commentId !== deleteRequest.commentId));
                 }
+                setAlert({
+                    content: 'Xóa reaction thành công',
+                    type: 'success',
+                    open: true
+                });
             } catch (error) {
-                console.log(error.response.request._response);
+                setAlert({
+                    content: 'Có lỗi xảy ra',
+                    type: 'error',
+                    open: true
+                });
             }
         }
-
+        closeAlert();
     }
     const [modalError, setModalError] = useState('');
     const updateComment = async () => {
@@ -70,13 +102,20 @@ const UserHistoryPage = () => {
                 setModalState({ ...modalState, editModal: false });
                 var array = [...comments];
                 setComments(array.map(item => item.id === updateCommentRequest.commentId ? { ...item, content: updateCommentRequest.content } : item));
-                setModalError('');
+                setAlert({
+                    content: 'Chỉnh sửa bình luận thành công',
+                    type: 'success',
+                    open: true
+                });
             } catch (error) {
-                setModalError(error.response.data.message);
-                console.log(error);
+                setAlert({
+                    content: error.response.data.message,
+                    type: 'error',
+                    open: true
+                });
             }
         }
-
+        closeAlert();
     }
 
 
@@ -93,18 +132,6 @@ const UserHistoryPage = () => {
     const toggle = tab => e => {
         if (activeItem !== tab) {
             setActiveItem(tab);
-        }
-        if (tab === "2") {
-            var array = [...comments];
-            if (array.length < 1) {
-                getCommentHistory();
-            }
-        }
-        if (tab === "3") {
-            var array = [...reactions];
-            if (array.length < 1) {
-                getReactionHistory();
-            }
         }
     };
 
@@ -253,7 +280,10 @@ const UserHistoryPage = () => {
 
                         {comments.map((comment, index) => (
                             <div className="clearfix" key={comment.id}>
-                                Bạn đã <strong>bình luận</strong> vào truyện <strong>{comment.storyName}</strong>:
+                                Bạn đã <strong>bình luận</strong> vào truyện <Link target="_blank"
+                                    to={`/stories/details/${comment.storyId}`}>
+                                    <strong>{comment.storyName}</strong>:</Link>
+
                                 <p> "{comment.content}"
                             </p>
                                 <div>
@@ -321,7 +351,9 @@ const UserHistoryPage = () => {
 
                         {reactions.map((reaction, index) => (
                             <div className="clearfix" key={reaction.id}>
-                                Bạn đã <strong>{reaction.type}</strong> bình luận của <strong>{reaction.commentOwnerName}</strong> trong truyện <strong>{reaction.storyName}</strong>
+                                Bạn đã <strong>{reaction.type}</strong> bình luận của <strong>{reaction.commentOwnerName}</strong> trong truyện <Link target="_blank"
+                                    to={`/stories/details/${reaction.storyId}`}>
+                                    <strong>{reaction.storyName}</strong>:</Link>
                                 <div>
                                     <small>{moment(reaction.createdAt).format('HH:mm DD/MM/YYYY')}</small>
                                 </div>
@@ -370,6 +402,12 @@ const UserHistoryPage = () => {
                 </MDBTabContent>
 
             </div>
+            <MyAlert
+                open={alert.open}
+                setOpen={(open) => setAlert({ ...alert, open: open })}
+                type={alert.type}
+                content={alert.content}
+            />
         </MainLayout>
     );
 };
