@@ -277,6 +277,9 @@ const CreateStoryPage = (props) => {
                     type:'success',
                     open: true
                 });
+                if(!isEditPage){
+                    window.setTimeout(() => props.history.push(`/stories/edit/${data.id}`), 2000);
+                }
             } else {
                 setAlert({ content: Object.values(errors), type:'error', open: true });
             }
@@ -285,6 +288,9 @@ const CreateStoryPage = (props) => {
         }
         setOpenBackdrop(false);
         closeAlert();
+        
+      
+        
     }
 
     const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
@@ -320,7 +326,7 @@ const CreateStoryPage = (props) => {
            
 
             {(!isLoadingStory && !notfoundStory && !ValidationUtils.isEmpty(story)) && (
-                <>
+                <div style={{ marginBottom: '150px' }}>
                      <StoryTabs
                         value={storyTab}
                         onChange={(e, value) => setStoryTab(value)}
@@ -369,7 +375,6 @@ const CreateStoryPage = (props) => {
                                                             />
                                                         </div>
                                                     </div>
-                                    
 
                                                     <StoryParameters 
                                                         parameters={parameters}
@@ -522,7 +527,7 @@ const CreateStoryPage = (props) => {
                         screen={currentScreen}
                         changeStory={(e) => changeStory('animation', e.target.value)}
                     />
-                </>
+                </div>
             )}
 
             { (notfoundStory) && <NotFound message={"Không tìm thấy truyện này"} /> }
