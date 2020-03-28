@@ -10,7 +10,19 @@ import TagService from '../../../services/tag.service';
 
 import MySpinner from '../../../components/common/MySpinner';
 import StoryCard from '../../../components/common/StoryCard';
-import TagList from '../../../components/common/TagList';
+import TagsSelect from '../../../components/common/TagsSelect';
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+
+const MenuProps = {
+    PaperProps: {
+        style: {
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        width: 250,
+        },
+    },
+};
 
 let searchTimeout = null;
 
@@ -26,37 +38,24 @@ const SearchStoriesPage = () => {
         page: 1,
         itemsPerPage: 12,
     });
-    const [openModal, setOpenModal] = useState(false);
 
     useEffect( () => {
         getTags();
-        searchStories();
+        getStories();
     }, []);
-
-    const ITEM_HEIGHT = 48;
-    const ITEM_PADDING_TOP = 8;
-
-    const MenuProps = {
-        PaperProps: {
-          style: {
-            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-            width: 250,
-          },
-        },
-    };
 
     const changeFilters = (prop, value) => {
         filters[prop] = value;
         setFilters({ ...filters });
-        if(prop === 'tags') return;
+       
         if(prop === 'keyword'){
             clearTimeout(searchTimeout);
             searchTimeout = window.setTimeout(() => {
                 setFilters({ ...filters, page: 1 });
-                searchStories();
+                getStories();
             }, 300);
         } else {
-            searchStories();
+            getStories();
         }
     }
 
@@ -71,37 +70,24 @@ const SearchStoriesPage = () => {
     }
 
     const getStories = async () => {
-        let data = [];
         setIsLoadingStories(true);
+        const selectedTags = filters.tags.map(t => t.id);
         try {
             const res = await StoryService.searchStories({ 
                 ...filters, 
                 isActive: true, 
                 isPublished: true, 
+                tags: selectedTags
             });
             console.log(res);
             
-            data = res.data.content;
+            setStories(res.data.content);
             setTotalPages(res.data.totalPages);
         } catch (error) {
             console.log(error);
+            setStories([]);
         }
         setIsLoadingStories(false);
-        return data;
-    }
-
-    const searchStories = async () => {
-        const stories = await getStories();
-        setStories(stories);
-    }
-  
-    const handleSearch = (e) => {
-        e.preventDefault();
-        searchStories();
-    }
-
-    const toggleModal = () => {
-        setOpenModal(!openModal);
     }
 
     const changePage = (e, value) => {
@@ -114,59 +100,26 @@ const SearchStoriesPage = () => {
     return (
         <MainLayout>
             <div className="container-fluid">
-                <div className="row mb-4">
-                    <div className="col-12">
-                        <MDBCard className="mb-5">
-                            <MDBCardBody id="breadcrumb" className="d-flex align-items-center justify-content-between">
-                               <div className="col-6">
-                                    <FormControl style={{ width: '100%' }}>
-                                    <InputLabel>Chọn tag yêu thích</InputLabel>
-                                    <Select
-                                        multiple
-                                        value={filters.tags}
-                                        onChange={(e) => changeFilters('tags', e.target.value)}
-                                        input={<Input />}
-                                        renderValue={selected => (
-                                            <div>
-                                                {selectedTags.map(tag => (
-                                                    <Chip key={tag.id} label={tag.title} />
-                                                ))}
-                                            </div>
-                                        )}
-                                        MenuProps={MenuProps}
-                                    >
-                                        {tags.map(tag => (
-                                            <MenuItem key={tag.id} value={tag.id}>
-                                                <Checkbox checked={filters.tags.indexOf(tag.id) > -1} />
-                                                <ListItemText primary={tag.title} />
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                    
-                                </FormControl>
-                               </div>
-                               <div className="col-6 mt-3">
-                                    <MDBFormInline 
-                                        style={{ width: '100%' }}
-                                        className="md-form m-0" onSubmit={e => e.preventDefault()}>
-                                        <input 
-                                            className="form-control form-control-sm" type="search" 
-                                            onChange={(e) => changeFilters('keyword', e.target.value)}
-                                            placeholder="Tìm kiếm truyện" aria-label="Search"/>
-                                        <MDBBtn 
-                                            size="sm" 
-                                            color="success" 
-                                            className="my-0" 
-                                            type="submit">
-                                                <MDBIcon icon="search" />
-                                        </MDBBtn>
-                                    </MDBFormInline>
-                               </div>
-                            </MDBCardBody>
-                        </MDBCard>
-                    </div>
+            <div className="row">
+                <div className="col-sm-3">
+                    <FormControl>
+                        <InputLabel>Tìm tên truyện, tác giá</InputLabel>
+                        <Input
+                            value={filters.keyword}
+                            onChange={e => changeFilters('keyword', e.target.value)}
+                            style={{ width: '100%' }}
+                        />
+                    </FormControl>
                 </div>
-                <div className="row">
+                <div className="col-sm-6">
+                    <TagsSelect
+                        tags={tags} 
+                        setSelectedTags={(tags) => changeFilters('tags', tags)}
+                        selectedTags={filters.tags}
+                    />
+                </div>
+            </div>
+                <div className="row mt-5">
                     <div className="col-sm-3">
                         <h3 className="text-bold">Tất cả truyện</h3>
                     </div>
@@ -185,7 +138,7 @@ const SearchStoriesPage = () => {
                 {(!isLoadingStories) && (
                     <div className="row" style={{ marginBottom: '50px' }}>
                         {stories.map(story => (
-                            <div className="col-sm-3 px-2" key={story.id}>
+                            <div className="col-sm-6 col-md-4 col-lg-3 px-2" key={story.id}>
                                 <StoryCard story={story} />
                             </div>
                         ))}

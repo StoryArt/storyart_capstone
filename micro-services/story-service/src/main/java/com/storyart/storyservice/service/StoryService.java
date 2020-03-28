@@ -35,6 +35,8 @@ public interface StoryService {
     ResultDto updateStory(CreateStoryDto story, int userId);
     Page<GetStoryDto> searchStories(Set<Integer> tags, String keyword, boolean isActive,
                               boolean isPublished, int page, int itemsPerPage);
+    Page<GetStoryDto> searchStoriesOfUserProfile(int userid, Set<Integer> tags, String keyword, int page, int itemsPerPage);
+
     List<GetStoryDto> getTrendingStories(int quantity);
     Page<Story> getNewReleaseStory(int quantity);
 
@@ -49,6 +51,7 @@ public interface StoryService {
     ResultDto changePublishedStatus(int storyId, int userId, boolean turnOnPublished);
     ResultDto increaseStoryRead(int storyId);
     ResultDto saveReadHistory(int storyId, int userId);
+    ResultDto rateStory(int storyId, int userId, double stars);
 }
 
 @Service
@@ -87,6 +90,9 @@ class StoryServiceImpl implements StoryService{
     StoryTagRepository storyTagRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     ModelMapper modelMapper;
 
     @Override
@@ -100,12 +106,20 @@ class StoryServiceImpl implements StoryService{
     }
 
     @Override
-    public GetStoryDto getStoryDetails(int id) {
-        Optional<Story> story = storyRepository.findById(id);
-        if(!story.isPresent()) return null;
-        GetStoryDto dto = modelMapper.map(story.get(), GetStoryDto.class);
-        List<Tag> tags = tagRepository.findAllByStoryId(story.get().getId());
+    public GetStoryDto getStoryDetails(int storyId) {
+        Story story = storyRepository.findById(storyId).orElse(null);
+        if(story == null) return null;
+
+        GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
+
+        List<Tag> tags = tagRepository.findAllByStoryId(story.getId());
         dto.setTags(tagService.mapModelToDto(tags));
+
+        dto.setUser(userRepository.findById(story.getUserId()).orElse(null));
+
+        //get user rating
+        Rating rating = ratingRepository.findById(storyId, story.getUserId());
+        dto.setRating(rating);
         return dto;
     }
 
@@ -171,6 +185,39 @@ class StoryServiceImpl implements StoryService{
         }
         return result;
     }
+
+    @Override
+    public ResultDto rateStory(int storyId, int userId, double stars) {
+        ResultDto result = new ResultDto();
+        result.setSuccess(false);
+        Story story = storyRepository.findById(storyId).orElse(null);
+        if(story == null){
+            result.getErrors().put("NOT_FOUND", "Truyện này không tồn tại");
+        } else if(!story.isActive() ||  story.isDeactiveByAdmin()){
+            result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
+        } else {
+            Rating rating = ratingRepository.findById(storyId, userId);
+            if(rating == null){
+                rating = new Rating();
+                rating.setStoryId(storyId);
+                rating.setUserId(userId);
+                rating.setUpdatedAt(new Date());
+                System.out.println("create");
+            }
+            rating.setStars(stars);
+            ratingRepository.save(rating);
+
+            double avgStars = ratingRepository.findAvgStarsByStoryId(storyId);
+            story.setAvgRate(avgStars);
+            storyRepository.save(story);
+
+            result.setData(rating);
+            result.setSuccess(true);
+        }
+        return result;
+    }
+
+
 
     @Override
     public ResultDto deleteStory(int storyId, int userId) {
@@ -483,10 +530,34 @@ class StoryServiceImpl implements StoryService{
                 List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
                 GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
                 dto.setTags(tagService.mapModelToDto(tagList));
+                dto.setUser(userRepository.findById(story.getUserId()).orElse(null));
                 return dto;
             }
         });
 
+
+        return page2;
+    }
+
+    @Override
+    public Page<GetStoryDto> searchStoriesOfUserProfile(int userId, Set<Integer> tags, String keyword, int page, int itemsPerPage) {
+        if(StringUtils.isEmpty(keyword)) keyword = "";
+        if(tags.size() == 0) {
+            tags = tagRepository.findAll().stream().map(t -> t.getId()).collect(Collectors.toSet());
+        }
+
+        Pageable pageable =  PageRequest.of(page - 1, itemsPerPage, Sort.by("id").descending());
+        Page<Story> page1 = storyRepository.findAllByUserProfile(userId, keyword, tags, pageable);
+        Page<GetStoryDto> page2 = page1.map(new Function<Story, GetStoryDto>() {
+            @Override
+            public GetStoryDto apply(Story story) {
+                List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
+                GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
+                dto.setUser(userRepository.findById(story.getUserId()).orElse(null));
+                dto.setTags(tagService.mapModelToDto(tagList));
+                return dto;
+            }
+        });
 
         return page2;
     }

@@ -1,5 +1,7 @@
 package com.storyart.userservice.service;
 
+import com.storyart.userservice.dto.ResultDto;
+import com.storyart.userservice.dto.UserProfileDto;
 import com.storyart.userservice.model.Story;
 import com.storyart.userservice.model.User;
 import com.storyart.userservice.payload.PagedResponse;
@@ -43,4 +45,6 @@ public interface UserService {
     void createTestUser();
 
     void updateAvatar(Integer uid, String link);
+
+    ResultDto getUserPublicProfile(int userId);
 }

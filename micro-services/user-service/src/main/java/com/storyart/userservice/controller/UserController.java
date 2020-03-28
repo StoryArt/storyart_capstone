@@ -1,6 +1,7 @@
 package com.storyart.userservice.controller;
 
 import com.storyart.userservice.common.constants.RoleName;
+import com.storyart.userservice.dto.ResultDto;
 import com.storyart.userservice.exception.BadRequestException;
 import com.storyart.userservice.exception.ResourceNotFoundException;
 import com.storyart.userservice.exception.UnauthorizedException;
@@ -31,10 +32,8 @@ import java.util.Collection;
 @CrossOrigin
 public class UserController {
 
-
     @Autowired
     UserService userService;
-
 
     @GetMapping("/{uid}")
     public UserProfileResponse get(@PathVariable("uid") Integer uid) {
@@ -61,8 +60,6 @@ public class UserController {
         return new ResponseEntity(userPrincipal, HttpStatus.OK);
     }
 
-
-    //todo return profile of user, not all data
     @GetMapping(value = "/username/{username}")
     public UserProfileResponse
     findByUsername(@PathVariable("username") String username) {
@@ -78,8 +75,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/me")
-    public UserProfileResponse
-    currentUser(@CurrentUser UserPrincipal userPrincipal) {
+    public UserProfileResponse currentUser(@CurrentUser UserPrincipal userPrincipal) {
         User user = userService.findByUsername(userPrincipal.getUsername());
         UserProfileResponse userProfileResponse = new UserProfileResponse();
 
@@ -89,16 +85,14 @@ public class UserController {
             userProfileResponse = new UserProfileResponse(user);
         }
         return userProfileResponse;
-
     }
 
-    /**
-     * No need jsonobject cause of restcontroller, just return pojo object
-     */
+    @GetMapping(value = "public_profile/{userId}")
+    public ResponseEntity currentUser(@PathVariable int userId) {
+        ResultDto result = userService.getUserPublicProfile(userId);
+       return new ResponseEntity(result, HttpStatus.OK);
+    }
 
-    //todo : what is @Valid
-
-    // todo danh luong xu ly cho ham nay
     @PutMapping(value = "/{uid}")
     public UserProfileResponse
     update(@PathVariable("uid") Integer uid,
@@ -129,7 +123,6 @@ public class UserController {
         return us;
     }
 
-
     // todo missing check available user (is active or not api)
     /* Deactivating a user without checking it deactived or not */
     @DeleteMapping(value = "/{uid}")
@@ -157,21 +150,15 @@ public class UserController {
                 return new ResponseEntity<>(new ApiResponse(true, "Mở khóa tài khoản thành công!"), HttpStatus.OK);
             }
         }
-
     }
-
 
     @PostMapping(value = "/{uid}/avatar/save")
     public ResponseEntity<?> saveAvatarLink(@PathVariable("uid") Integer uid, @CurrentUser UserPrincipal userPrincipal, @RequestBody AvatarUpdateRequest avatarUpdateRequest) {
         if (userPrincipal.getId() != uid) {
             throw new UnauthorizedException("Bạn không thể chỉnh sửa nội dung này!");
-
-
         }
-
         userService.updateAvatar(uid, avatarUpdateRequest.getLink());
         return new ResponseEntity<>(new ApiResponse(true, "Lưu thành công!"), HttpStatus.OK);
     }
-
 
 }

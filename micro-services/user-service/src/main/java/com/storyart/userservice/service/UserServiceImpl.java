@@ -1,6 +1,8 @@
 package com.storyart.userservice.service;
 
 import com.storyart.userservice.common.constants.RoleName;
+import com.storyart.userservice.dto.ResultDto;
+import com.storyart.userservice.dto.UserProfileDto;
 import com.storyart.userservice.exception.BadRequestException;
 import com.storyart.userservice.model.Role;
 import com.storyart.userservice.model.Story;
@@ -12,6 +14,7 @@ import com.storyart.userservice.repository.RoleRepository;
 import com.storyart.userservice.repository.UserRepository;
 import com.storyart.userservice.security.UserPrincipal;
 import com.storyart.userservice.util.AppContants;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
@@ -44,6 +48,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    ModelMapper modelMapper;
 
 
     @Override
@@ -220,6 +227,25 @@ page=page-1;
         user.setAvatar(link);
         userRepository.save(user);
 
+    }
+
+    @Override
+    public ResultDto getUserPublicProfile(int userId) {
+        ResultDto result = new ResultDto();
+        result.setSuccess(false);
+        User user = userRepository.findById(userId).orElse(null);
+        if(user == null){
+            result.getErrors().put("NOT_FOUND", "Không tìm thấy tài khoản này trong hệ thống");
+        } else if(!user.isActive() || user.isDeactiveByAdmin()){
+            result.getErrors().put("DELETED", "Tài khoản này đã bị xóa");
+        } else {
+            UserProfileDto userProfileDto = modelMapper.map(user, UserProfileDto.class);
+            Role role = roleRepository.findRoleById(user.getRoleId()).orElse(null);
+            userProfileDto.setRole(role);
+            result.setSuccess(true);
+            result.setData(userProfileDto);
+        }
+        return result;
     }
 
     private void validatePageNumberAndSize(int page, int size) {

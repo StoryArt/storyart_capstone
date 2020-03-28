@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
 import { saveTokenToLocal, setAuthHeader, getAuthUserInfo } from '../../config/auth';
 import { ROLE_NAMES } from "../../common/constants";
+import MyAlert from '../../components/common/MyAlert';
 
 
 
@@ -11,6 +12,7 @@ const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
     const [user, setUser] = useState({ username: '', password: '' });
+    const [alert, setAlert] = useState({ open: false, type: 'success', content: '' });
 
     const changeUser = (prop, value) => setUser({ ...user, [prop]: value });
 
@@ -28,7 +30,11 @@ const LoginPage = () => {
             saveTokenToLocal(token);
             setAuthHeader(token);
 
-            alert('Dang nhap thanh cong');
+            setAlert({
+              open: true,
+              content: 'Dăng nhập thành công',
+              type: 'success'
+            });
             const userInfo = getAuthUserInfo();
             
             let url = '/home';
@@ -42,20 +48,26 @@ const LoginPage = () => {
                 window.location.href = url;
             }, 400);
           } else if(!res.data.success){
-            alert('Dang nhap khong thanh cong');
+              setAlert({
+                  open: true,
+                  content: 'Dăng nhập không thành công',
+                  type: 'error'
+              });
           }
         } catch (error) {
           if(error.response){
-            setErrorMessage(
-              <MDBAlert color="danger" >
-                {error.response.data.message}
-              </MDBAlert>
-            );
+            setAlert({
+              type: 'error',
+              content: error.response.data.message,
+              open: true
+            });
           } else {
-            alert('Dang nha khong thanh cong');
+            console.log(error); 
           }
         }
     }
+
+    const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
 
     return (
         <div className="pt-5">
@@ -88,6 +100,12 @@ const LoginPage = () => {
                         </div>
                     </div>
                 </div>
+                <MyAlert
+                  open={alert.open}
+                  setOpen={() => setAlert({ ...alert, open: true })}
+                  type={alert.type}
+                  content={alert.content}
+                />
             </div>
         </div>
     );

@@ -38,6 +38,17 @@ public class StoryController {
         return new ResponseEntity(stories, HttpStatus.OK);
     }
 
+    @GetMapping("public/search_by_user_profile")
+    public ResponseEntity searchStory(
+            @RequestParam(name = "tags") Set<Integer> tags,
+            @RequestParam String keyword,
+            @RequestParam int userId,
+            @RequestParam int page,
+            @RequestParam int itemsPerPage){
+        Page<GetStoryDto> stories = storyService.searchStoriesOfUserProfile(userId, tags, keyword, page, itemsPerPage);
+        return new ResponseEntity(stories, HttpStatus.OK);
+    }
+
     @GetMapping("public/trend")
     public ResponseEntity getTrendStories(@RequestParam int quantity){
         List<GetStoryDto> stories = storyService.getTrendingStories(quantity);
@@ -47,6 +58,13 @@ public class StoryController {
     @PutMapping("public/increase-read")
     public ResponseEntity increaseStoryRead(@RequestParam int storyId){
         ResultDto result = storyService.increaseStoryRead(storyId);
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
+
+    @PutMapping("rate")
+    @Secured({"ROLE_USER"})
+    public ResponseEntity rateStory(@RequestParam int storyId, @RequestParam double stars, @CurrentUser UserPrincipal userPrincipal){
+        ResultDto result = storyService.rateStory(storyId, userPrincipal.getId(), stars);
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
@@ -63,7 +81,7 @@ public class StoryController {
         ResultDto result = storyService.deleteStory(storyId, userPrincipal.getId());
         return new ResponseEntity(result, HttpStatus.OK);
     }
-//ko can ong
+
     @PutMapping("change_published")
     @Secured({"ROLE_USER"})
 //    @PreAuthorize("hasAuthority('ROLE_USER')")

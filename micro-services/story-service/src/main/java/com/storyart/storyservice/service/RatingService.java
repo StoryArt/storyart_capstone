@@ -1,26 +1,17 @@
 package com.storyart.storyservice.service;
 
-import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.ResultDto;
 import com.storyart.storyservice.dto.story_suggestion.RatedStoryDTO;
 import com.storyart.storyservice.dto.story_suggestion.RatingDTO;
 import com.storyart.storyservice.dto.story_suggestion.StoryCommentDTO;
 import com.storyart.storyservice.model.Rating;
-import com.storyart.storyservice.model.RatingId;
-import com.storyart.storyservice.model.Story;
-import com.storyart.storyservice.model.Tag;
+import com.storyart.storyservice.model.ids.RatingId;
 import com.storyart.storyservice.repository.*;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.Optional;
 
 public interface RatingService {
@@ -52,10 +43,9 @@ class RatingServiceIml implements RatingService {
     CommentRepository commentRepository;
 
     @Override
-    public List<Integer>  getSuggestion(Integer id, boolean flagcheck) {
-
+    public List<Integer> getSuggestion(Integer id, boolean flagcheck) {
         // Step 1
-        // find All User Rating\
+        // find All User Rating
         List<Integer> listStory = new ArrayList<>();
         if(flagcheck){
             listStory = storyRepository.findStoryThisWeek();
@@ -235,7 +225,7 @@ class RatingServiceIml implements RatingService {
 
         // Step 8
         // remove all Duplicate with Current User
-        List<Integer> listStoryCurrUser = ratingRepository.findStoryRatingById(id);
+        List<Integer> listStoryCurrUser = ratingRepository.findStoryRatingByUserId(id);
         listSuggestStory.removeAll(listStoryCurrUser);
 
         // Step 9

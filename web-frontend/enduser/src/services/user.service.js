@@ -7,21 +7,33 @@ import {
 import { ROLE_NAMES } from "../common/constants";
 //url qua gateway
 // const baseUrl = 'http://localhost:8001/api/user-service/api/v1';
-// const signInUpUrl = 'http://localhost:8001/api/v1';
+// const baseUrl = 'http://localhost:8001/api/v1';
 
 //url khong qua gateway
-const baseUrl = "http://localhost:8002/api/v1";
-const signInUpUrl = "http://localhost:8002/api/v1";
-
+// const baseUrl = "http://localhost:8002/api/v1";
+// const baseUrl = "http://localhost:8002/api/v1";
+const baseUrl = 'http://localhost:8000/api/user-service/api/v1';
 
 class UserService {
+
+  static async getCurrentUser(token){
+    setAuthHeader(token);
+    const url = baseUrl + "/user/current";
+    return axios.get(url);
+  }
+
+  static async getUserPublicProfile(userId){
+    const url = baseUrl + "/user/public_profile/" + userId;
+    return axios.get(url);
+  }
+
   static async login(user) {
-    const url = signInUpUrl + "/auth/signin";
+    const url = baseUrl + "/auth/signin";
     return axios.post(url, user);
   }
 
   static async register(user) {
-    const url = signInUpUrl + "/auth/signup";
+    const url = baseUrl + "/auth/signup";
     return axios.post(url, user);
   }
   static async addUser(user) {
