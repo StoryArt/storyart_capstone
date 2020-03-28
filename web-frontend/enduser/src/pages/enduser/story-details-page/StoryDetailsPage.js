@@ -84,8 +84,8 @@ const StoryDetailsPage = (props) => {
         commentId: 0,
         type: ''
     });
-    const [alert, setAlert] = useState({ content: '', type: 'success', open: false });
-    const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
+    //const [alert, setAlert] = useState({ content: '', type: 'success', open: false });
+    //const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
 
     const [isLastPage, setIsLastPage] = useState(true);
 
