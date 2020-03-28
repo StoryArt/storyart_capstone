@@ -43,9 +43,6 @@ public class SuggestController {
 
     @Autowired
     TagService tagService;
-
-
-
         @GetMapping("/suggest{id}")
         public ResponseEntity getSuggestion(@PathVariable("id") Integer id,
             @RequestParam(defaultValue = "1") Integer pageNo,

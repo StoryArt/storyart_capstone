@@ -152,8 +152,8 @@ const Sidebar = (props) => {
             <List>
                 <ListItem 
                 button 
-                onClick={() => navigateRoute('/admin/admin')} 
-                selected={ isRouteMatch('/admin/admin') }>
+                onClick={() => navigateRoute('/sysadmin/admin')} 
+                selected={ isRouteMatch('/sysadmin/admin') }>
                 <ListItemIcon>
                     <HistoryIcon className={classes.icon} />
                     </ListItemIcon>
@@ -164,7 +164,7 @@ const Sidebar = (props) => {
         <Divider />
 
         {/* auth user routes navigation */}
-        {(!isRouteAdmin && isUserAuth(user)) && (
+        {(!isRouteAdmin && (isUserAuth(user) || isSysAdminAuth(user) || isAdminAuth(user))) && (
             <List>
              <ListItem 
                button 

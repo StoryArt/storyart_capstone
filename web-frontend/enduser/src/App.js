@@ -11,7 +11,7 @@ import CreateStoryPage from './pages/enduser/create-story-page/CreateStoryPage';
 import SearchStoriesPage from './pages/enduser/search-stories-page/SearchStoriesPage';
 import StoryDetailsPage from './pages/enduser/story-details-page/StoryDetailsPage';
 import UserProfilePage from './pages/enduser/user-profile-page/UserProfilePage';
-import UserPublicProfilePage from './pages/enduser/user-profile-page/UserPublicProfilePage';
+import PublicUserProfilePage from './pages/enduser/user-profile-page/PublicUserProfilePage';
 import UserHistoryPage from './pages/enduser/user-history-page/UserHistoryPage';
 
 import LoginPage from './pages/common/LoginPage';
@@ -33,7 +33,7 @@ import AddAdmin from './pages/common/AddAdmin';
 
 import PrivateRoute from './pages/common/auth/PrivateRoute';
 
-import { getTokenFromLocal, setAuthHeader, interceptResponse } from './config/auth';
+import { getTokenFromLocal, setAuthHeader, interceptResponse, clearTokenFromLocal } from './config/auth';
 import ValidationUtils from './utils/validation';
 import { ROLE_NAMES } from './common/constants';
 import UserService from './services/user.service';
@@ -53,9 +53,11 @@ const styles = theme => ({
 function App() {
 
   // redirect to login page when response status is 401 or 403
-  // interceptResponse(() => {
-  //   UserService.logout();
-  // });
+  interceptResponse(() => {
+    setAuthHeader(null);
+    clearTokenFromLocal();
+    window.location.href = '/login';
+  });
 
   //get token from local storage when access the website
   useEffect(() => {
@@ -74,7 +76,6 @@ function App() {
             {/* common routes */}
             <Route exact path="/login" component={LoginPage}/>
             <Route exact path="/register" component={RegisterPage}/>
-            <Route exact path="/demo" component={DemoPage}/>
 
             {/* user routes */}
             <Route exact path="/" component={HomePage}/>
@@ -82,7 +83,7 @@ function App() {
             <Route exact path="/stories/search" component={SearchStoriesPage}/>
             <Route exact path="/stories/details/:storyId" component={StoryDetailsPage}/>
             <Route exact path="/stories/read/:storyId" component={StoryReadingPage}/>
-            {/* <Route exact path="/user/profile/:userId" component={UserPublicProfilePage}/> */}
+            <Route exact path="/user/profile/:userId" component={PublicUserProfilePage}/>
 
             <PrivateRoute 
               exact 
@@ -111,7 +112,7 @@ function App() {
 
             {/* system admin routes */}
             <PrivateRoute exact path="/admin/add" roleName={ROLE_NAMES.ROLE_SYSTEM_ADMIN}  component={AddAdmin}/>
-            <PrivateRoute exact path="/admin/admin" roleName={ROLE_NAMES.ROLE_SYSTEM_ADMIN} component={AdminManagementPage}/>
+            <PrivateRoute exact path="/sysadmin/admin" roleName={ROLE_NAMES.ROLE_SYSTEM_ADMIN} component={AdminManagementPage}/>
 
 
             {/* admin routes */}            

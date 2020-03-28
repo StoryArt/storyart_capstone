@@ -1,5 +1,5 @@
 class DateTimeUtils{
-    static getTime(datetime){
+    static getDate(datetime){
         return new Date(datetime).toLocaleDateString();
     }
 

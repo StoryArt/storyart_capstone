@@ -1,5 +1,6 @@
 package com.storyart.storyservice.dto;
 
+import com.storyart.storyservice.model.Rating;
 import com.storyart.storyservice.model.Tag;
 import com.storyart.storyservice.model.User;
 import lombok.AllArgsConstructor;
@@ -31,6 +32,7 @@ public class GetStoryDto {
     private int numOfRate;
     private int numOfRead;
 
-    User user;
+    private User user;
+    private Rating rating;
     List<TagDto> tags;
 }

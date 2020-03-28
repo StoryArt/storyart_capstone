@@ -35,7 +35,6 @@ public class InformationAction {
         if (o == null || getClass() != o.getClass()) return false;
         InformationAction info = (InformationAction) o;
         return actionId == info.getActionId() && informationId == info.getInformationId();
-
     }
 
     @Override

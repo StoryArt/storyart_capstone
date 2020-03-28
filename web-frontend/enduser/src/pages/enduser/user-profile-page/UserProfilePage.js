@@ -24,6 +24,7 @@ import MySpinner from '../../../components/common/MySpinner';
 import NotFound from '../../../components/common/NotFound';
 import MyAlert from '../../../components/common/MyAlert';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
+import UserProfileHeader from './UserProfileHeader';
 
 
 const orderBys = getOrderBys();
@@ -424,7 +425,7 @@ const UserProfilePage = (props) => {
         </div>
         <h3 className="text-bold"> Truyện của bạn </h3> 
         <hr style={{ border: "1px solid #ccc" }} /> 
-
+                            
         <div className="row my-5">
             <div className="col-sm-3">
               <FormControl>

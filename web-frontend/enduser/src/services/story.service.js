@@ -16,6 +16,11 @@ class StoryService{
         return axios.put(url, story);
     }
 
+    static async rateStory(storyId, stars){
+        const url = baseUrl + '/rate?storyId=' + storyId + '&stars=' + stars;
+        return axios.put(url);
+    }
+
     static async getReadingStory(storyId){
         const url = baseUrl + '/public/read/' + storyId;
         return axios.get(url);
@@ -29,6 +34,11 @@ class StoryService{
     
     static async searchStories({ tags, keyword, isActive, isPublished, page, itemsPerPage }){
         const url = baseUrl + `/public/search?keyword=${keyword}&isActive=${isActive}&isPublished=${isPublished}&page=${page}&itemsPerPage=${itemsPerPage}&tags=${tags}`;
+        return axios.get(url);
+    }
+
+    static async searchStoriesByUserProfile({ tags, keyword, userId, page, itemsPerPage }){
+        const url = baseUrl + `/public/search_by_user_profile?keyword=${keyword}&userId=${userId}&page=${page}&itemsPerPage=${itemsPerPage}&tags=${tags}`;
         return axios.get(url);
     }
 
@@ -49,10 +59,10 @@ class StoryService{
         const userinfo = getAuthUserInfo();
 
         if(userinfo === null){
-            const url1 = "http://localhost:8003/suggestion/suggeststory".concat('?pageNo=').concat(pageNo).concat('&pageSize=').concat(pagesize);
+            const url1 = baseUrl + "/suggestion/suggeststory".concat('?pageNo=').concat(pageNo).concat('&pageSize=').concat(pagesize);
             return axios.get(url1);
-        }else{
-            const url = "http://localhost:8003/suggestion/suggest".concat(userinfo.id).concat('?pageNo=').concat(pageNo).concat('&pageSize=').concat(pagesize);
+        } else {
+            const url = baseUrl + "/suggestion/suggest".concat(userinfo.id).concat('?pageNo=').concat(pageNo).concat('&pageSize=').concat(pagesize);
             return axios.get(url);
         }
     }

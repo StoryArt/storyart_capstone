@@ -4,13 +4,61 @@ import { Link } from "react-router-dom";
 import UserService from "../../services/user.service";
 import { saveTokenToLocal, setAuthHeader, getAuthUserInfo } from '../../config/auth';
 import { ROLE_NAMES } from "../../common/constants";
+import MyAlert from '../../components/common/MyAlert';
 
+import Avatar from '@material-ui/core/Avatar';
+import Button from '@material-ui/core/Button';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import TextField from '@material-ui/core/TextField';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import Grid from '@material-ui/core/Grid';
+import Box from '@material-ui/core/Box';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+
+function Copyright() {
+  return (
+    <Typography variant="body2" color="textSecondary" align="center">
+      {'Copyright © '}
+      <Link color="inherit" href="https://material-ui.com/">
+        Your Website
+      </Link>{' '}
+      {new Date().getFullYear()}
+      {'.'}
+    </Typography>
+  );
+}
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    marginTop: theme.spacing(8),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+}));
 
 
 const LoginPage = () => {
+  const classes = useStyles();
   const [errorMessage, setErrorMessage] = useState("");
 
     const [user, setUser] = useState({ username: '', password: '' });
+    const [alert, setAlert] = useState({ open: false, type: 'success', content: '' });
 
     const changeUser = (prop, value) => setUser({ ...user, [prop]: value });
 
@@ -28,70 +76,121 @@ const LoginPage = () => {
             saveTokenToLocal(token);
             setAuthHeader(token);
 
-            alert('Dang nhap thanh cong');
+            setAlert({
+              open: true,
+              content: 'Dăng nhập thành công',
+              type: 'success'
+            });
             const userInfo = getAuthUserInfo();
             
             let url = '/home';
             if(userInfo.role === ROLE_NAMES.ROLE_ADMIN){
               url = '/admin/users'
             } else if(userInfo.role === ROLE_NAMES.ROLE_SYSTEM_ADMIN){
-              url = '/admin/admin';
+              url = '/sysadmin/admin';
             }
             //wait for 400 miliseconds to redirect
             window.setTimeout(() => {
                 window.location.href = url;
             }, 400);
           } else if(!res.data.success){
-            alert('Dang nhap khong thanh cong');
+              setAlert({
+                  open: true,
+                  content: 'Dăng nhập không thành công',
+                  type: 'error'
+              });
           }
         } catch (error) {
           if(error.response){
-            setErrorMessage(
-              <MDBAlert color="danger" >
-                {error.response.data.message}
-              </MDBAlert>
-            );
+            setAlert({
+              type: 'error',
+              content: error.response.data.message,
+              open: true
+            });
           } else {
-            alert('Dang nha khong thanh cong');
+            console.log(error); 
           }
         }
+        closeAlert();
     }
+
+    const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
 
     return (
         <div className="pt-5">
-            <h3 className="text-center text-bold">Dang nhap tai khoan</h3>
-            <div className="container">
-                <div className="row mt-5">
-                    <div className="col-sm-6 mx-auto">
-                        <div className="card">
-                            <div className="card-body">
-                              {errorMessage}
-                                <form onSubmit={login}>
-                                    <MDBInput 
-                                        value={user.username}
-                                        label="Ten dang nhap" 
-                                        onChange={(e) => changeUser('username', e.target.value)}/>
-                                    <MDBInput 
-                                        value={user.password}
-                                        label="Mat khau" 
-                                        type="password"
-                                        onChange={(e) => changeUser('password', e.target.value)} />
-                                    <button className="btn btn-success float-right ml-0" type="submit">Dang nhap</button>
-                                    <button 
-                                        className="btn btn-secondary float-right" 
-                                        type="button"
-                                        onClick={clearForm}>Xoa</button>
-                                    <div className="clearfix"></div>
-                                    <div>Neu ban chua co tai khoan, vui long <Link style={{ color: 'green' }} to="/register">dang ki</Link>!</div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {/* <h3 className="text-center text-bold">D</h3> */}
+            <Container component="main" maxWidth="xs">
+            <CssBaseline />
+            <div className={classes.paper}>
+              <Avatar className={classes.avatar}>
+                <LockOutlinedIcon />
+              </Avatar>
+              <Typography component="h1" variant="h5">
+                Đăng nhập tài khoản
+              </Typography>
+              <div>  {errorMessage}</div>
+              <form className={classes.form} noValidate onSubmit={login}>
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  fullWidth
+                  value={user.username}
+                  label="Tên đăng nhập" 
+                  onChange={(e) => changeUser('username', e.target.value)}
+                  autoFocus
+                />
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  value={user.password}
+                  label="Mật khẩu" 
+                  type="password"
+                  onChange={(e) => changeUser('password', e.target.value)} 
+                  type="password"
+                  autoComplete="current-password"
+                />
+                {/* <FormControlLabel
+                  control={<Checkbox value="remember" color="primary" />}
+                  label="Remember me"
+                /> */}
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                >
+                  Đăng nhập
+                </Button>
+                <Grid container>
+                  <Grid item xs>
+                    <Link href="#" variant="body2">
+                      Quên mật khẩu
+                    </Link>
+                  </Grid>
+                  <Grid item>
+                    <Link to="/register" variant="body2">
+                      {"Nếu bạn chưa có tài khoản, hãy đăng kí nhé!"}
+                    </Link>
+                  </Grid>
+                </Grid>
+              </form>
             </div>
+          </Container>
+  
+          <MyAlert
+                  open={alert.open}
+                  setOpen={() => setAlert({ ...alert, open: true })}
+                  type={alert.type}
+                  content={alert.content}
+                />
         </div>
     );
 };
 
 
 export default LoginPage;
+

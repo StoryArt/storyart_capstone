@@ -20,9 +20,10 @@ import TagList from '../../../components/common/TagList';
 import StringUtils from '../../../utils/string';
 
 import { getAuthUserInfo } from '../../../config/auth';
+import MyRating from '../../../components/common/MyRating';
 import MyAlert from '../../../components/common/MyAlert';
-
-//import { UserContext } from '../../../context/user.context';
+import SocialShare from '../../../components/common/SocialShare';
+import { Person as PersonIcon } from '@material-ui/icons';
 
 const StoryDetailsPage = (props) => {
 
@@ -33,6 +34,9 @@ const StoryDetailsPage = (props) => {
     const [story, setStory] = useState({});
     const [storyNotfound, setStoryNotfound] = useState(false);
     const [isLoadingStory, setIsLoadingStory] = useState(false);
+    const [alert, setAlert] = useState({ open: false, type: 'success', content: '' })
+
+
     const [modalState, setModalState] = useState({
         deleteModal: false,
         editModal: false,
@@ -84,6 +88,19 @@ const StoryDetailsPage = (props) => {
     const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
 
     const [isLastPage, setIsLastPage] = useState(true);
+
+    useEffect(() => {
+        getComments();
+        if (userInfo !== null) {
+            setUserId(userInfo.id);
+        }
+    }, []);
+
+    useEffect(() => {
+        const { storyId } = props.match.params;
+        getStoryDetails(storyId);
+    }, []);
+
 
     const updateComment = async () => {
         try {
@@ -420,17 +437,35 @@ const StoryDetailsPage = (props) => {
         closeAlert();
     }
 
-    useEffect(() => {
-        getComments();
-        if (userInfo !== null) {
-            setUserId(userInfo.id);
+    const rateStory = async (stars) => {
+        if (ValidationUtils.isEmpty(stars)) return;
+        console.log(stars);
+        try {
+            const res = await StoryService.rateStory(story.id, stars);
+            console.log(res);
+            const { success, errors, data } = res.data;
+            if (success) {
+                story.rating.stars = data.stars;
+                setStory({ ...story });
+                setAlert({
+                    open: true,
+                    type: 'success',
+                    content: `Bạn vừa đánh giá ${story.title} ${data.stars} sao`
+                })
+            } else {
+                setAlert({
+                    open: true,
+                    type: 'error',
+                    content: Object.values(errors)[0]
+                })
+            }
+        } catch (error) {
+            console.log(error);
         }
-    }, []);
+        closeAlert();
+    }
 
-    useEffect(() => {
-        const { storyId } = props.match.params;
-        getStoryDetails(storyId);
-    }, []);
+    const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
 
     const reacted = {
         color: 'blue'
@@ -448,7 +483,7 @@ const StoryDetailsPage = (props) => {
                             <div className="col-sm-3">
                                 <img
                                     className="img-fluid"
-                                    src={story.image} />
+                                    src={ValidationUtils.isEmpty(story.image) ? '/assets/img/no_image.jpeg' : story.image} />
                                 <div className="text-center">
                                     <Link
                                         className="btn btn-success btn-block mt-2"
@@ -458,9 +493,17 @@ const StoryDetailsPage = (props) => {
                                 <div className="text-center btn btn-danger btn-block mt-1" onClick={toggleModal('reportStoryModal')}>
                                     Báo cáo
                                 </div>
+                                <div>
+                                    <SocialShare shareUrl={'http://youtube.com'} />
+                                </div>
                             </div>
                             <div className="col-sm-9">
-                                <h3 className="font-weight-bold">{story.title} / <small>Nguyen Van A</small></h3>
+                                <h3 className="font-weight-bold">{story.title}</h3>
+                                {!ValidationUtils.isEmpty(story.user) && (
+                                    <h4>
+                                        <Link to={`/user/profile/${story.user.id}`}><PersonIcon /> {story.user.name}</Link>
+                                    </h4>
+                                )}
                                 <strong style={{ fontSize: '1.2em', color: 'orange' }}>Điểm trung bình: {story.avgRate}</strong>
                                 <div className="my-3">
                                     <strong>Giới thiệu</strong>
@@ -468,7 +511,13 @@ const StoryDetailsPage = (props) => {
                                 </div>
                                 <strong>Tags:</strong> <TagList tags={story.tags} />
                                 <div className="my-3">
-                                    <strong>Đánh giá truyện:</strong> <MDBRating iconRegular />
+                                    <strong>Đánh giá truyện:</strong>
+                                    {ValidationUtils.isEmpty(story.rating) && (
+                                        <small>Hãy để lại đánh giá để chúng tôi biết thêm về sở thích đọc truyện của bạn nhé</small>
+                                    )}
+                                    <MyRating
+                                        onChange={(value) => rateStory(value)}
+                                        value={ValidationUtils.isEmpty(story.rating) ? 0 : story.rating.stars} />
                                 </div>
                                 <form onSubmit={e => { e.preventDefault(); sendComment(); }}>
                                     <div className="form-group">
@@ -487,9 +536,11 @@ const StoryDetailsPage = (props) => {
                             <div className="col-sm-3">
                                 <h4 className="text-bold">Thông tin truyện</h4>
                                 <hr />
-                                <div>
-                                    <strong>Tác giả: </strong>Nguyen Van A
-                         </div>
+                                {!ValidationUtils.isEmpty(story.user) && (
+                                    <div>
+                                        <strong>Tác giả: </strong><Link to={`/user/profile/${story.user.id}`}>{story.user.name}</Link>
+                                    </div>
+                                )}
                                 <div>
                                     <strong>Ngày tạo: </strong>{new Date(story.createdAt).toLocaleDateString()}
                                 </div>
@@ -505,7 +556,7 @@ const StoryDetailsPage = (props) => {
                                         <MDBDropdown className="float-right">
                                             <MDBDropdownToggle caret color="ins">
                                                 Sắp xếp
-                                    </MDBDropdownToggle>
+                                         </MDBDropdownToggle>
                                             <MDBDropdownMenu basic >
                                                 <MDBDropdownItem onClick={e => getCommentsBySort('reaction')}>Nổi bật</MDBDropdownItem>
                                                 <MDBDropdownItem onClick={e => getCommentsBySort('createdAt')}>Mới nhất</MDBDropdownItem>
@@ -673,6 +724,12 @@ const StoryDetailsPage = (props) => {
                     content={alert.content}
                 />
             </div>
+            <MyAlert
+                content={alert.content}
+                type={alert.type}
+                open={alert.open}
+                setOpen={() => setAlert({ ...alert, open: true })}
+            />
         </MainLayout>
 
     );

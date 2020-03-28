@@ -45,7 +45,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
 
-
     @Bean(BeanIds.AUTHENTICATION_MANAGER)
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -89,7 +88,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         permitAll().
                 antMatchers("/api/v1/auth/**").
                     permitAll().
-                antMatchers("/api/v1/user/checkingUserAvailability").
+                antMatchers("/api/v1/user/checkingUserAvailability",
+                        "/api/v1/user/public_profile").
                     permitAll().
                 antMatchers(HttpMethod.POST,"/api/v1/auth/signup").permitAll().
 

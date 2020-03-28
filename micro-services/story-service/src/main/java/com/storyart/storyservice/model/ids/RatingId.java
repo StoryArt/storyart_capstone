@@ -1,4 +1,4 @@
-package com.storyart.storyservice.model;
+package com.storyart.storyservice.model.ids;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

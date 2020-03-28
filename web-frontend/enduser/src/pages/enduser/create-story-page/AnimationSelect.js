@@ -1,11 +1,18 @@
 import React from 'react';
-import { getAnimations } from '../../../common/constants';
+import { getAnimations, ANIMATIONS } from '../../../common/constants';
 import { FormControl, InputLabel, Select, MenuItem } from '@material-ui/core';
 
 const animations = getAnimations();
 
 const AnimationSelect = (props) => {
     const { onChange, animation } = props;
+
+    // const getAnimationTitle = (animation) => {
+    //     switch(animation){
+    //         case ANIMATIONS.FADE: return 'Phai màu';
+    //         case ANIMATIONS.FADE: return 'Phai màu';
+    //     }
+    // }
 
     return (
         <FormControl size="small" variant="outlined" style={{ width: '100%' }}>
