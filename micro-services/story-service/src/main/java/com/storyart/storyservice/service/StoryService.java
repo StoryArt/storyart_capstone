@@ -10,6 +10,7 @@ import com.storyart.storyservice.dto.read_story.ReadStoryDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryInformationDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryScreenDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryTagDto;
+import com.storyart.storyservice.dto.statistic.*;
 import com.storyart.storyservice.dto.statistics.ReadStatisticDto;
 import com.storyart.storyservice.model.*;
 import com.storyart.storyservice.repository.*;
@@ -54,6 +55,12 @@ public interface StoryService {
     ResultDto saveReadHistory(int storyId, int userId);
     ResultDto rateStory(int storyId, int userId, double stars);
     ResultDto getReadStatisticsByDateRangeOfUser(Date from, Date to, int userId);
+
+    StorySummarizeResponse getStorySummarizeResponse(int sid);
+
+    StoryReactByRange getReactStatisticInTimeRange(int sid, TimeRangeRequest timeRangeRequest);
+
+    List<IRatingClassify> getRatingClassify(int sid);
 }
 
 @Service
@@ -748,9 +755,6 @@ class StoryServiceImpl implements StoryService{
         dto.setTags(tagService.mapModelToDto(tagList));
         dto.setNumOfComment(commentRepository.countCommentByStoryId(story.getId()));
         dto.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
-        User u = userRepository.findById(story.getUserId()).orElse(null);
-        if(u != null) u.setPassword(null);
-        dto.setUser(u);
         return dto;
     }
 
@@ -824,6 +828,94 @@ class StoryServiceImpl implements StoryService{
             list.add(tagsList.get(index));
         }
         return list.stream().map(t -> t.getId()).collect(Collectors.toList());
+    }
+    @Override
+    public StorySummarizeResponse getStorySummarizeResponse(int sid) {
+        Story story = storyRepository.findById(sid).orElse(null);
+        if (story != null) {
+            StorySummarizeResponse storySummarizeResponse = modelMapper.map(story, StorySummarizeResponse.class);
+
+
+
+
+
+            List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
+            storySummarizeResponse.setTags(tagService.mapModelToDto(tagList));
+            storySummarizeResponse.setNumOfComment(commentRepository.countCommentByStoryId(story.getId()));
+            storySummarizeResponse.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
+
+            //todo:xoa dong nay
+            storySummarizeResponse.setNumOfComment(new Random().nextInt(1000));
+            storySummarizeResponse.setNumOfHitPoint(new Random().nextInt(300));
+            storySummarizeResponse.setNumOfClickLink(new Random().nextInt(200));
+            storySummarizeResponse.setNumOfShare(new Random().nextInt(400));
+
+
+            return storySummarizeResponse;
+
+        }
+        return null;
+
+    }
+
+    @Autowired
+    CommentMicroService commentService;
+
+    StoryReactByRange storyReactByRange = new StoryReactByRange();
+
+
+    //lấy so lieu cho do thi reaction(share, view, click link, hitpoint, comment)
+    @Override
+    public StoryReactByRange getReactStatisticInTimeRange(int sid, TimeRangeRequest timeRangeRequest) {
+        List<NumberOfCommentByDate> commentByDay = commentService.getCommentListResponce(sid, 0, timeRangeRequest.getStart(), timeRangeRequest.getEnd()).getNumberOfCommentByDates();
+
+        List<Integer> shareByDay = new ArrayList<>();
+        List<Integer> hitPointByDay = new ArrayList<>();
+        List<Integer> clickLinkByDay = new ArrayList<>();
+
+        //todo them ham goi api vao day
+        //random so lieu cau 3 yeu to hitpointm ckick link va share
+        for(int i=0; i< commentByDay.size(); i++){
+            shareByDay.add(new Random().nextInt(10));
+        }
+        for(int i=0; i< commentByDay.size(); i++){
+            hitPointByDay.add(new Random().nextInt(100));
+        } for(int i=0; i< commentByDay.size(); i++){
+            clickLinkByDay.add(new Random().nextInt(20));
+        }
+        //dulieu gia
+
+
+
+
+
+        StoryReactByRange storyReactByRange = new StoryReactByRange();
+        storyReactByRange.setNumOfClickLink(clickLinkByDay);
+        storyReactByRange.setNumOfShare(shareByDay);
+        storyReactByRange.setNumOfHitPoint(hitPointByDay);
+        for (NumberOfCommentByDate numberOfCommentByDate : commentByDay) {
+            Integer comment = numberOfCommentByDate.getNumberOfComment();
+//            storyReactByRange.getNumOfComment().add(comment);
+            storyReactByRange.getNumOfComment().add(new Random().nextInt(50));
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(numberOfCommentByDate.getDate());
+            String time = cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.MONTH);
+            storyReactByRange.getTimes().add(time);
+            //click
+        }
+
+//todo: xoa dong nay di
+        this.storyReactByRange=storyReactByRange;
+
+        return storyReactByRange;
+
+
+    }
+
+    @Override
+    public List<IRatingClassify> getRatingClassify(int sid) {
+        return ratingRepository.countStarByStoryId(sid);
+
     }
 
 

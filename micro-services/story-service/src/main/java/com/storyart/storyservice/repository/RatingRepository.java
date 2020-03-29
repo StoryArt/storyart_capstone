@@ -1,6 +1,7 @@
 package com.storyart.storyservice.repository;
 
 
+import com.storyart.storyservice.dto.statistic.IRatingClassify;
 import com.storyart.storyservice.model.Rating;
 import com.storyart.storyservice.model.ids.RatingId;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,5 +33,8 @@ public interface RatingRepository extends JpaRepository<Rating, RatingId> {
 //    int countRateByStoryId (int storyId);
 
     int countRatingByStoryId(int storyId);
+    @Query(value = "SELECT stars+1 as 'star', count(*) as 'count'\n" +
+            " FROM storyart_db.rating where story_id=:sid group by stars order by stars" , nativeQuery = true)
+    List<IRatingClassify> countStarByStoryId(@Param("sid") Integer sid);
 
 }
