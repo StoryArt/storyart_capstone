@@ -14,8 +14,18 @@ const ReportManagementPage = () => {
   const userInfo = getAuthUserInfo();
   useEffect(() => {
     getCommentReportsData(false);
+  }, []);
+  useEffect(() => {
     getStoryReportsData(false);
   }, []);
+  const [activeItem, setActiveItem] = useState('1');
+  const toggle = (tab) => e => {
+    if (activeItem !== tab) {
+      setActiveItem(tab);
+    }
+
+
+  };
   const [handleModal, setHandleModal] = useState(false);
   const [pageNo, setPageNo] = useState(1);
   const [storyPageNo, setStoryPageNo] = useState(1);
@@ -31,12 +41,12 @@ const ReportManagementPage = () => {
         setPageNo(1);
         const res = await ReportService.getCommentReports(1, isHandled);
         setTotalPages(res.data.totalPages);
-        convertData(res.data);
+        convertData(res.data.content);
       }
       else {
         const res = await ReportService.getCommentReports(pageNo, isHandled);
         setTotalPages(res.data.totalPages);
-        convertData(res.data);
+        convertData(res.data.content);
       }
 
 
@@ -51,12 +61,12 @@ const ReportManagementPage = () => {
         setStoryPageNo(1);
         const res = await ReportService.getStoryReports(1, isHandled);
         setTotalStoryPages(res.data.totalPages);
-        convertStoryData(res.data);
+        convertStoryData(res.data.content);
       }
       else {
         const res = await ReportService.getStoryReports(storyPageNo, isHandled);
         setTotalStoryPages(res.data.totalPages);
-        convertStoryData(res.data);
+        convertStoryData(res.data.content);
       }
 
 
@@ -64,9 +74,10 @@ const ReportManagementPage = () => {
 
     }
   }
-
+  const [storyData, setStoryData] = useState([]);
   function convertStoryData(data) {
-    var storyList = data.content;
+    setStoryData(data);
+    var storyList = data;
     var rowsList = [];
 
     storyList.forEach(element => {
@@ -80,12 +91,12 @@ const ReportManagementPage = () => {
       row["authorEmail"] = element["authorEmail"];
       row["handle"] = (element.handled ?
         (
-          <MDBBtn color="primary" onClick={e => handleReport(element)}>
+          <MDBBtn color="primary" onClick={e => handleReport("story", element)}>
             Xem lại
           </MDBBtn>
         )
         :
-        (<MDBBtn color="success" onClick={e => handleReport(element)}>
+        (<MDBBtn color="success" onClick={e => handleReport("story", element)}>
           Xử lý
         </MDBBtn>)
 
@@ -97,9 +108,10 @@ const ReportManagementPage = () => {
   }
 
 
-
+  const [commentData, setCommentData] = useState([]);
   function convertData(data) {
-    var reportList = data.content;
+    setCommentData(data);
+    var reportList = data;
     var rowsList = [];
 
     reportList.forEach(element => {
@@ -113,12 +125,12 @@ const ReportManagementPage = () => {
       row["commentOwnerEmail"] = element["commentOwnerEmail"];
       row["handle"] = (element.handled ?
         (
-          <MDBBtn color="primary" onClick={e => handleReport(element)}>
+          <MDBBtn color="primary" onClick={e => handleReport("comment", element)}>
             Xem lại
           </MDBBtn>
         )
         :
-        (<MDBBtn color="success" onClick={e => handleReport(element)}>
+        (<MDBBtn color="success" onClick={e => handleReport("comment", element)}>
           Xử lý
         </MDBBtn>)
 
@@ -130,15 +142,15 @@ const ReportManagementPage = () => {
   }
 
   const [reportContent, setReportContent] = useState({});
-  const handleReport = (report) => {
+  const handleReport = (type, report) => {
     setHandleOption("Không có vi phạm");
     setHandleModal(true);
     setReportContent(report);
-    if (activeItem === "1") {
+    if (type === "comment") {
       getReportsByCommentId(1, report.commentId, report.handled);
       setCommentId(report.commentId);
     }
-    if (activeItem === "2") {
+    if (type === "story") {
       getReportsByStoryId(1, report.storyId, report.handled);
       setStoryId(report.storyId);
     }
@@ -189,9 +201,17 @@ const ReportManagementPage = () => {
 
 
   const changeHandlePage = (event, value) => {
-    if (value !== handlePageNo) {
-      getReportsByCommentId(value, commentId, reportContent.handled);
+    if (activeItem === "1") {
+      if (value !== handlePageNo) {
+        getReportsByCommentId(value, commentId, reportContent.handled);
+      }
     }
+    if (activeItem === "2") {
+      if (value !== handlePageNo) {
+        getReportsByStoryId(value, storyId, reportContent.handled);
+      }
+    }
+
   }
 
   const changePage = async (event, value) => {
@@ -199,7 +219,7 @@ const ReportManagementPage = () => {
       setPageNo(value);
       try {
         const res = await ReportService.getCommentReports(value, handled);
-        convertData(res.data);
+        convertData(res.data.content);
       } catch (error) {
 
       }
@@ -208,13 +228,7 @@ const ReportManagementPage = () => {
 
 
 
-  const [activeItem, setActiveItem] = useState('1');
-  const toggle = tab => e => {
-    if (activeItem !== tab) {
-      setActiveItem(tab);
-    }
 
-  };
 
   const [dataTable, setDataTable] = useState({
     columns: [
@@ -362,10 +376,10 @@ const ReportManagementPage = () => {
       if (handleOption === "Vô hiệu hóa tài khoản") {
         handleRequest.type = "user";
         handleRequest.action = "deactivate";
-        if (reportContent.commentOwnerId !== null) {
+        if (reportContent.commentOwnerId !== undefined) {
           handleRequest.id = reportContent.commentOwnerId;
         }
-        if (reportContent.userId !== null) {
+        if (reportContent.userId !== undefined) {
           handleRequest.id = reportContent.userId;
         }
 
@@ -419,61 +433,81 @@ const ReportManagementPage = () => {
   }
 
   const changeStatusWhenReview = async (type, status) => {
-    var handleRequest = {
-      type: '',
-      id: 0,
-      action: '',
-      reportIds: []
-    };
-    if (type === "comment") {
-      setReportContent({ ...reportContent, commentIsDisableByAdmin: !status });
-      handleRequest.type = "comment";
-      handleRequest.id = commentId;
-      if (status) {
-        handleRequest.action = "activate";
-      }
-      else {
-        handleRequest.action = "deactivate";
-      }
-
-
-    }
-    if (type === "user") {
-      setReportContent({ ...reportContent, userIsDisableByAdmin: !status });
-      //setComments(array.map(item => item.id === updateCommentRequest.commentId ? { ...item, content: updateCommentRequest.content } : item));
-      handleRequest.type = "user";
-      if (activeItem === "1") {
-        handleRequest.id = reportContent.commentOwnerId;
-        //var array = [...dataTable.rows];
-        //array.map(item => item.commentOwner === reportContent.commentOwner ? { ...item, userIsDisableByAdmin: !status } : item);
-        //setDataTable({ ...dataTable, rows: array });
-      }
-      if (activeItem === "2") {
-        handleRequest.id = reportContent.userId;
-      }
-
-      if (status) {
-        handleRequest.action = "activate";
-      }
-      else {
-        handleRequest.action = "deactivate";
-      }
-    }
-    if (type === "story") {
-      setReportContent({ ...reportContent, storyIsDisableByAdmin: !status });
-      handleRequest.type = "story";
-      handleRequest.id = reportContent.storyId;
-      if (status) {
-        handleRequest.action = "activate";
-      }
-      else {
-        handleRequest.action = "deactivate";
-      }
-    }
     try {
-      const res = await ReportService.handleReport(handleRequest);
+      var handleRequest = {
+        type: '',
+        id: 0,
+        action: '',
+        reportIds: []
+      };
+      if (type === "comment") {
+        handleRequest.type = "comment";
+        handleRequest.id = commentId;
+        if (status) {
+          handleRequest.action = "activate";
+        }
+        else {
+          handleRequest.action = "deactivate";
+        }
+        const res = await ReportService.handleReport(handleRequest);
+        var content = [...commentData];
+        var sutats = !status;
+        convertData(content.map(item => item.commentId === reportContent.commentId ? { ...item, commentIsDisableByAdmin: sutats } : item));
+
+        setReportContent({ ...reportContent, commentIsDisableByAdmin: !status });
+
+
+      }
+      if (type === "user") {
+        handleRequest.type = "user";
+        if (status) {
+          handleRequest.action = "activate";
+        }
+        else {
+          handleRequest.action = "deactivate";
+        }
+        if (activeItem === "1") {
+          handleRequest.id = reportContent.commentOwnerId;
+          const res = await ReportService.handleReport(handleRequest);
+          var content = [...commentData];
+          var contentStory = [...storyData];
+          var sutats = !status;
+          convertData(content.map(item => item.commentOwnerId === reportContent.commentOwnerId ? { ...item, userIsDisableByAdmin: sutats } : item));
+          convertStoryData(contentStory.map(item => item.userId === reportContent.commentOwnerId ? { ...item, userIsDisableByAdmin: sutats } : item));
+        }
+        if (activeItem === "2") {
+          handleRequest.id = reportContent.userId;
+          const res = await ReportService.handleReport(handleRequest);
+          var content = [...storyData];
+          var contentComment = [...commentData];
+          var sutats = !status;
+          convertStoryData(content.map(item => item.userId === reportContent.userId ? { ...item, userIsDisableByAdmin: sutats } : item));
+          convertData(contentComment.map(item => item.commentOwnerId === reportContent.userId ? { ...item, userIsDisableByAdmin: sutats } : item));
+        }
+
+
+        setReportContent({ ...reportContent, userIsDisableByAdmin: !status });
+      }
+      if (type === "story") {
+        handleRequest.type = "story";
+        handleRequest.id = reportContent.storyId;
+        if (status) {
+          handleRequest.action = "activate";
+        }
+        else {
+          handleRequest.action = "deactivate";
+        }
+        const res = await ReportService.handleReport(handleRequest);
+        setReportContent({ ...reportContent, storyIsDisableByAdmin: !status });
+        var content = [...storyData];
+        var sutats = !status;
+        convertStoryData(content.map(item => item.storyId === reportContent.storyId ? { ...item, storyIsDisableByAdmin: sutats } : item));
+
+      }
     } catch (error) {
+
     }
+
 
   }
 
@@ -593,7 +627,7 @@ const ReportManagementPage = () => {
 
         <MDBModal isOpen={handleModal} size='md' toggle={e => setHandleModal(!handleModal)}>
           <MDBModalHeader toggle={e => setHandleModal(!handleModal)}>Xử lý báo cáo</MDBModalHeader>
-          {activeItem === '1' &&
+          {activeItem === "1" &&
             <MDBModalBody>
               <p>Tên người dùng: <strong>{reportContent.commentOwner}</strong></p>
               <p>Nội dung bình luận: "<strong>{reportContent.commentContent}</strong>"</p>
@@ -643,7 +677,7 @@ const ReportManagementPage = () => {
               </MDBTable>
             </MDBModalBody>
           }
-          {activeItem === '2' &&
+          {activeItem === "2" &&
             <MDBModalBody>
               <p>Tác giả: <strong>{reportContent.authorName}</strong></p>
               <p>Tên truyện: "<strong>{reportContent.storyName}</strong>"</p>

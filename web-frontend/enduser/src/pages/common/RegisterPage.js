@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { MDBInput, MDBAlert } from "mdbreact";
 import UserService from "../../services/user.service";
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 
 import {
@@ -11,24 +11,24 @@ import {
   Grid,
   Button
 } from "@material-ui/core";
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   paper: {
     marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: theme.palette.secondary.main
   },
   form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(3),
+    width: "100%", // Fix IE 11 issue.
+    marginTop: theme.spacing(3)
   },
   submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
+    margin: theme.spacing(3, 0, 2)
+  }
 }));
 
 const RegisterPage = () => {
@@ -40,15 +40,17 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [introContent, setIntroContent] = useState("");
-  
+
   const [errorMessage, setErrorMessage] = useState("");
 
-
   async function handleSubmit(event) {
-    
     event.preventDefault();
-    let randomImage="https://avatars.dicebear.com/v2/avataaars/"+username+".svg"+"?options[mood][]=happy&options[mouth][]=smile&options[accessories][]=sunglasses"
-   
+    let randomImage =
+      "https://avatars.dicebear.com/v2/avataaars/" +
+      username +
+      ".svg" +
+      "?options[mood][]=happy&options[mouth][]=smile&options[accessories][]=sunglasses";
+
     let user = {
       name: name,
       username: username,
@@ -57,7 +59,7 @@ const RegisterPage = () => {
       email: email,
       avatar: randomImage
     };
-   
+
     try {
       const res = await UserService.register(user);
       if (res.data.success == true) {
@@ -76,30 +78,23 @@ const RegisterPage = () => {
         err = error.response.data.message;
       }
       setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
-
     }
   }
 
   return (
-
-
-
     <div className="signup flex justify-center w-full h-full-screen">
-    <div className="p-8">
-      <Card className="signup-card position-relative y-center">
-        <Grid container>
-          <Grid item lg={5} md={5} sm={5} xs={12}>
-            <div className="p-8 flex justify-center bg-light-gray items-center h-full">
-              <img
-                src=""
-                alt=""
-              />
-            </div>
-          </Grid>
-          <Grid item lg={7} md={7} sm={7} xs={12}>
-            <div className="p-9 h-full">
-              <form  onSubmit={handleSubmit}>
-                {/* <TextValidator
+      <div className="p-8">
+        <Card className="signup-card position-relative y-center">
+          <Grid container>
+            <Grid item lg={5} md={5} sm={5} xs={12}>
+              <div className="p-8 flex justify-center bg-light-gray items-center h-full">
+                <img src="" alt="" />
+              </div>
+            </Grid>
+            <Grid item lg={7} md={7} sm={7} xs={12}>
+              <div className="p-9 h-full">
+                <form onSubmit={handleSubmit}>
+                  {/* <TextValidator
                   className="mb-6 w-full"
                   variant="outlined"
                   label="Tên đăng nhập"
@@ -110,25 +105,25 @@ const RegisterPage = () => {
                   validators={["required"]}
                   errorMessages={["Tên đăng nhập không hợp lệ"]}
                 /> */}
-                <TextField
-                  name="firstName"
-                  variant="outlined"
-                  required
-                  fullWidth
-                  value={username}
-                  onChange={e => setUsername(e.target.value)}
-                  label="Tên đăng nhập"
-                  autoFocus
-                />
-                   <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  value={name}
-                  label="tên đầy đủ"
-                  onChange={e => setName(e.target.value)}
-                />
-                {/* <TextValidator
+                  <TextField
+                    name="firstName"
+                    variant="outlined"
+                    required
+                    fullWidth
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+                    label="Tên đăng nhập"
+                    autoFocus
+                  />
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    value={name}
+                    label="tên đầy đủ"
+                    onChange={e => setName(e.target.value)}
+                  />
+                  {/* <TextValidator
                   className="mb-6 w-full"
                   variant="outlined"
                   label="Email"
@@ -143,56 +138,54 @@ const RegisterPage = () => {
                   ]}
                 /> */}
 
-<TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  type="email"
-                  label="Email"
-                  onChange={e => setEmail(e.target.value)}
-                />
-               <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  value={password}
-                  type="password"
-                  label="Mật khẩu"
-                  onChange={e => setPassword(e.target.value)}
-                />
-                {/* <FormControlLabel
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    type="email"
+                    label="Email"
+                    onChange={e => setEmail(e.target.value)}
+                  />
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    value={password}
+                    type="password"
+                    label="Mật khẩu"
+                    onChange={e => setPassword(e.target.value)}
+                  />
+                  {/* <FormControlLabel
                   className="mb-4"
                   name="agreement"
                   onChange={this.handleChange}
                   control={<Checkbox />}
                   label="I have read and agree to the terms of service."
                 /> */}
-                <div className="flex items-center">
-                  <Button
-                    className="capitalize"
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                  >
-                   Đăng ký
-                  </Button>
-                  <span className="mx-2 ml-5">or</span>
-                  <Button
-                    className="capitalize"
-                    onClick={() =>
-                      this.props.history.push("/session/signin")
-                    }
-                  >
-                  Đăng nhập
-                  </Button>
-                </div>
-              </form>
-            </div>
+                  <div className="flex items-center">
+                    <Button
+                      className="capitalize"
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                    >
+                      Đăng ký
+                    </Button>
+                    <span className="mx-2 ml-5">or</span>
+                    <Button
+                      className="capitalize"
+                      onClick={() => this.props.history.push("/session/signin")}
+                    >
+                      Đăng nhập
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </Grid>
           </Grid>
-        </Grid>
-      </Card>
+        </Card>
+      </div>
     </div>
-  </div>
     // <div className="py-5">
     //     <Container component="main" maxWidth="xs">
     //       <CssBaseline />
@@ -261,7 +254,7 @@ const RegisterPage = () => {
     //                 onChange={e => setIntroContent(e.target.value)}
     //               />
     //             </Grid>
-                
+
     //           </Grid>
     //           <Button
     //             type="submit"
@@ -281,20 +274,11 @@ const RegisterPage = () => {
     //           </Grid>
     //         </form>
     //       </div>
-          
+
     //     </Container>
-      
+
     // </div>
- 
- 
- 
- 
- 
- );
+  );
 };
 
 export default RegisterPage;
-
-
-
-

@@ -16,6 +16,8 @@ public class ReactionHistoryResponseDTO {
     private int commentId;
     private int commentOwnerId;
     private String commentOwnerName;
+
+    private int storyId;
     private String storyName;
     private String type;
     private boolean isActive;

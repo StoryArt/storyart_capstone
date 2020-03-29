@@ -57,7 +57,7 @@ function App() {
   interceptResponse(() => {
     setAuthHeader(null);
     clearTokenFromLocal();
-    // window.location.href = '/home';
+    window.location.href = '/login';
   });
 
   //get token from local storage when access the website
@@ -77,7 +77,6 @@ function App() {
             {/* common routes */}
             <Route exact path="/login" component={LoginPage}/>
             <Route exact path="/register" component={RegisterPage}/>
-            <Route exact path="/demo" component={DemoPage}/>
 
             {/* user routes */}
             <Route exact path="/" component={HomePage}/>
@@ -121,7 +120,7 @@ function App() {
 
             {/* system admin routes */}
             <PrivateRoute exact path="/admin/add" roleName={ROLE_NAMES.ROLE_SYSTEM_ADMIN}  component={AddAdmin}/>
-            <PrivateRoute exact path="/admin/admin" roleName={ROLE_NAMES.ROLE_SYSTEM_ADMIN} component={AdminManagementPage}/>
+            <PrivateRoute exact path="/sysadmin/admin" roleName={ROLE_NAMES.ROLE_SYSTEM_ADMIN} component={AdminManagementPage}/>
 
 
             {/* admin routes */}            

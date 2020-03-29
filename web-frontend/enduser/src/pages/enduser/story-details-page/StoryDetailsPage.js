@@ -22,6 +22,7 @@ import StringUtils from '../../../utils/string';
 import { getAuthUserInfo } from '../../../config/auth';
 import MyRating from '../../../components/common/MyRating';
 import MyAlert from '../../../components/common/MyAlert';
+import SocialShare from '../../../components/common/SocialShare';
 import { Person as PersonIcon } from '@material-ui/icons';
 
 const StoryDetailsPage = (props) => {
@@ -61,8 +62,6 @@ const StoryDetailsPage = (props) => {
     const [comments, setComments] = useState([]);
     const [sortBy, setSortBy] = useState('reaction');
     const [isOpenModal, setOpen] = useState(false);
-
-    const [commentError, setCommentError] = useState('');
     const [commentContent, setCommentContent] = useState('');
     const [reportCommentRequest, setReportCommentRequest] = useState({
         userId: 0,
@@ -85,6 +84,8 @@ const StoryDetailsPage = (props) => {
         commentId: 0,
         type: ''
     });
+    //const [alert, setAlert] = useState({ content: '', type: 'success', open: false });
+    //const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
 
     const [isLastPage, setIsLastPage] = useState(true);
 
@@ -109,10 +110,20 @@ const StoryDetailsPage = (props) => {
             setModalState({ ...modalState, editModal: false });
             var array = [...comments];
             setComments(array.map(item => item.id === updateCommentRequest.commentId ? { ...item, content: updateCommentRequest.content } : item));
-            setModalError('');
+            setAlert({
+                content: 'Chỉnh sửa bình luận thành công',
+                type: 'success',
+                open: true
+            });
         } catch (error) {
-            setModalError(error.response.data.message);
+            //setModalError(error.response.data.message);
+            setAlert({
+                content: error.response.data.message,
+                type: 'error',
+                open: true
+            });
         }
+        closeAlert();
     }
 
     const toggleModal = (modal, commentIdSpec, index, username, content) => e => {
@@ -131,7 +142,7 @@ const StoryDetailsPage = (props) => {
             setCommentIndex({ commentIndex: index });
             if (modalState.editModal === true) {
                 setModalState({ ...modalState, editModal: false });
-                setModalError('');
+                //setModalError('');
             }
             else {
                 setModalState({ ...modalState, editModal: true });
@@ -140,13 +151,17 @@ const StoryDetailsPage = (props) => {
         }
         if (modal === 'reportModal') {
             if (userInfo === null) {
-                setModalState({ ...modalState, isLoggedInModal: true });
+                setAlert({
+                    content: 'Vui lòng đăng nhập để sử dụng tính năng này',
+                    type: 'error',
+                    open: true
+                });
             }
             else {
                 setReportCommentModalInfo({ userName: username, comment: content });
                 if (modalState.reportModal === true) {
                     setModalState({ ...modalState, reportModal: false });
-                    setModalError('');
+                    //setModalError('');
                 }
                 else {
                     setModalState({ ...modalState, reportModal: true });
@@ -158,25 +173,21 @@ const StoryDetailsPage = (props) => {
         }
         if (modal === 'reportStoryModal') {
             if (userInfo === null) {
-                setModalState({ ...modalState, isLoggedInModal: true });
+                setAlert({
+                    content: 'Vui lòng đăng nhập để sử dụng tính năng này',
+                    type: 'error',
+                    open: true
+                });
             }
             else {
                 //setReportStoryModalInfo({ userName: "update later", storyName: story.title });
                 if (modalState.reportStoryModal === true) {
                     setModalState({ ...modalState, reportStoryModal: false });
-                    setModalError('');
+                    //setModalError('');
                 }
                 else {
                     setModalState({ ...modalState, reportStoryModal: true });
                 }
-            }
-        }
-        if (modal === 'isLoggedInModal') {
-            if (modalState.isLoggedInModal === true) {
-                setModalState({ ...modalState, isLoggedInModal: false });
-            }
-            else {
-                setModalState({ ...modalState, repoisLoggedInModalrtModal: true });
             }
         }
     }
@@ -192,14 +203,28 @@ const StoryDetailsPage = (props) => {
                 var array = [...comments];
                 setComments(array.filter(item => item.id !== deleteRequest.commentId));
             }
+            setAlert({
+                content: 'Xóa bình luận thành công',
+                type: 'success',
+                open: true
+            });
         } catch (error) {
-            console.log(error.response.request._response);
+            setAlert({
+                content: 'Xóa bình luận thất bại',
+                type: 'error',
+                open: true
+            });
         }
+        closeAlert();
     }
 
     const sendComment = async () => {
         if (userId === 0) {
-            setModalState({ ...modalState, isLoggedInModal: true });
+            setAlert({
+                content: 'Vui lòng đăng nhập để sử dụng tính năng này',
+                type: 'error',
+                open: true
+            });
         }
         else {
             try {
@@ -213,14 +238,21 @@ const StoryDetailsPage = (props) => {
                 var array = [...comments];
                 array.unshift(res.data);
                 setCommentContent('');
-                //setSendCommentRequest({ ...sendCommentRequest, content: '' });
                 setComments(array);
-                setCommentError('');
+                setAlert({
+                    content: 'Gửi bình luận thành công',
+                    type: 'success',
+                    open: true
+                });
             } catch (error) {
-                setCommentError(error.response.data.message);
+                setAlert({
+                    content: error.response.data.message,
+                    type: 'error',
+                    open: true
+                });
             }
         }
-
+        closeAlert();
     }
 
     const getCommentsBySort = async (sortString) => {
@@ -268,16 +300,30 @@ const StoryDetailsPage = (props) => {
             const res = await ReportService.reportComment(reportComment);
             setReportCommentRequest({ ...reportCommentRequest, content: '' });
             setModalState({ ...modalState, reportModal: false });
-            setModalError('');
+            setAlert({
+                content: 'Đã gửi báo cáo',
+                type: 'success',
+                open: true
+            });
+            //setModalError('');
         } catch (error) {
-            setModalError(error.response.data.message);
-            //console.log(error.response.request._response);
+            //setModalError(error.response.data.message);
+            setAlert({
+                content: error.response.data.message,
+                type: 'error',
+                open: true
+            });
         }
+        closeAlert();
     }
 
     const like = async (type, commentId) => {
         if (userInfo === null) {
-            setModalState({ ...modalState, isLoggedInModal: true });
+            setAlert({
+                content: 'Vui lòng đăng nhập để sử dụng tính năng này',
+                type: 'error',
+                open: true
+            });
         }
         else {
             try {
@@ -307,11 +353,16 @@ const StoryDetailsPage = (props) => {
 
             }
         }
+        closeAlert();
     }
 
     const dislike = async (type, commentId) => {
         if (userInfo === null) {
-            setModalState({ ...modalState, isLoggedInModal: true });
+            setAlert({
+                content: 'Vui lòng đăng nhập để sử dụng tính năng này',
+                type: 'error',
+                open: true
+            });
         }
         else {
             try {
@@ -340,7 +391,7 @@ const StoryDetailsPage = (props) => {
 
             }
         }
-
+        closeAlert();
     }
 
     const getStoryDetails = async (storyId) => {
@@ -369,29 +420,40 @@ const StoryDetailsPage = (props) => {
             }
             const res = await ReportService.reportStory(request);
             setModalState({ ...modalState, reportStoryModal: false });
-            setModalError('');
+            //setModalError('');
+            setAlert({
+                content: 'Đã gửi báo cáo truyện',
+                type: 'success',
+                open: true
+            });
         } catch (error) {
-            setModalError(error.response.data.message)
+            //setModalError(error.response.data.message)
+            setAlert({
+                content: error.response.data.message,
+                type: 'error',
+                open: true
+            });
         }
+        closeAlert();
     }
 
     const rateStory = async (stars) => {
-        if(ValidationUtils.isEmpty(stars)) return;
+        if (ValidationUtils.isEmpty(stars)) return;
         console.log(stars);
         try {
             const res = await StoryService.rateStory(story.id, stars);
             console.log(res);
             const { success, errors, data } = res.data;
-            if(success) {
+            if (success) {
                 story.rating.stars = data.stars;
                 setStory({ ...story });
-                setAlert({ 
+                setAlert({
                     open: true,
                     type: 'success',
                     content: `Bạn vừa đánh giá ${story.title} ${data.stars} sao`
                 })
             } else {
-                setAlert({ 
+                setAlert({
                     open: true,
                     type: 'error',
                     content: Object.values(errors)[0]
@@ -404,7 +466,7 @@ const StoryDetailsPage = (props) => {
     }
 
     const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
-    
+
     const reacted = {
         color: 'blue'
     };
@@ -431,12 +493,15 @@ const StoryDetailsPage = (props) => {
                                 <div className="text-center btn btn-danger btn-block mt-1" onClick={toggleModal('reportStoryModal')}>
                                     Báo cáo
                                 </div>
+                                <div>
+                                    <SocialShare shareUrl={'http://youtube.com'} />
+                                </div>
                             </div>
                             <div className="col-sm-9">
                                 <h3 className="font-weight-bold">{story.title}</h3>
                                 {!ValidationUtils.isEmpty(story.user) && (
                                     <h4>
-                                        <Link to={`/user/profile/${story.user.id}`}><PersonIcon/> { story.user.name }</Link>
+                                        <Link to={`/user/profile/${story.user.id}`}><PersonIcon /> {story.user.name}</Link>
                                     </h4>
                                 )}
                                 <strong style={{ fontSize: '1.2em', color: 'orange' }}>Điểm trung bình: {story.avgRate}</strong>
@@ -446,16 +511,14 @@ const StoryDetailsPage = (props) => {
                                 </div>
                                 <strong>Tags:</strong> <TagList tags={story.tags} />
                                 <div className="my-3">
-                                    <strong>Đánh giá truyện:</strong> 
+                                    <strong>Đánh giá truyện:</strong>
                                     {ValidationUtils.isEmpty(story.rating) && (
                                         <small>Hãy để lại đánh giá để chúng tôi biết thêm về sở thích đọc truyện của bạn nhé</small>
                                     )}
-                                    <MyRating 
-                                        onChange={(value) => rateStory(value)} 
+                                    <MyRating
+                                        onChange={(value) => rateStory(value)}
                                         value={ValidationUtils.isEmpty(story.rating) ? 0 : story.rating.stars} />
                                 </div>
-
-                                {commentError.length > 0 && <small style={{ color: 'red' }}>(*){commentError}</small>}
                                 <form onSubmit={e => { e.preventDefault(); sendComment(); }}>
                                     <div className="form-group">
                                         <textarea
@@ -473,11 +536,11 @@ const StoryDetailsPage = (props) => {
                             <div className="col-sm-3">
                                 <h4 className="text-bold">Thông tin truyện</h4>
                                 <hr />
-                                { !ValidationUtils.isEmpty(story.user) && (
+                                {!ValidationUtils.isEmpty(story.user) && (
                                     <div>
-                                        <strong>Tác giả: </strong><Link to={`/user/profile/${story.user.id}`}>{ story.user.name }</Link>
-                                    </div> 
-                                ) }
+                                        <strong>Tác giả: </strong><Link to={`/user/profile/${story.user.id}`}>{story.user.name}</Link>
+                                    </div>
+                                )}
                                 <div>
                                     <strong>Ngày tạo: </strong>{new Date(story.createdAt).toLocaleDateString()}
                                 </div>
@@ -506,7 +569,7 @@ const StoryDetailsPage = (props) => {
                                     <div className="row mb-3" key={comment.id}>
                                         <div className="col-1 px-0">
                                             <img className="img-fluid"
-                                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSIXnjwudDywy5WuyASjNbpjnoRmyLKFYyvcfuJJEtqRCcUBJeb" />
+                                                src={comment.userAvatarUrl} />
                                         </div>
                                         <div className="col-11">
                                             <small>
@@ -533,7 +596,7 @@ const StoryDetailsPage = (props) => {
                                                 </i>
                                                 <span className="dislikes-count"> {comment.dislikes.length}</span>
                                             </span>
-                                            {(userId !== comment.userId && userInfo !== null) &&
+                                            {userId !== comment.userId &&
                                                 <button type="button" class="btn btn-danger" onClick={toggleModal('reportModal', comment.id, index, comment.username, comment.content)}>
                                                     <i class="far fa-flag" ></i>
                                                 </button>
@@ -638,17 +701,7 @@ const StoryDetailsPage = (props) => {
                                     </MDBModalFooter>
                                 </MDBModal>
 
-                                <MDBModal isOpen={modalState.isLoggedInModal} toggle={toggleModal('isLoggedInModal')}>
-                                    <MDBModalHeader toggle={toggleModal('isLoggedInModal')}>Bạn chưa đăng nhập!</MDBModalHeader>
-                                    <MDBModalBody>
-                                        Vui lòng đăng nhập để sử dụng tính năng này.
-                                    </MDBModalBody>
-                                    <MDBModalFooter>
-                                        <MDBBtn color='success' onClick={toggleModal('isLoggedInModal')}>
-                                            OK
-                                        </MDBBtn>
-                                    </MDBModalFooter>
-                                </MDBModal>
+
                                 {!isLastPage &&
                                     <div className="text-center">
                                         <button className="btn btn-secondary" onClick={getComments}>Xem thêm</button>
@@ -664,11 +717,17 @@ const StoryDetailsPage = (props) => {
 
                 )}
                 {storyNotfound && <NotFound message="Không tìm thấy câu truyện này" />}
+                <MyAlert
+                    open={alert.open}
+                    setOpen={(open) => setAlert({ ...alert, open: open })}
+                    type={alert.type}
+                    content={alert.content}
+                />
             </div>
             <MyAlert
-                content={alert.content} 
-                type={alert.type} 
-                open={alert.open} 
+                content={alert.content}
+                type={alert.type}
+                open={alert.open}
                 setOpen={() => setAlert({ ...alert, open: true })}
             />
         </MainLayout>

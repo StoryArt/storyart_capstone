@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Spring, Transition, animated } from 'react-spring/renderprops';
 import Fullscreen from "react-full-screen";
 import { Zoom, Fade, Collapse, Slide, Grow, IconButton, Tooltip } from '@material-ui/core';
 

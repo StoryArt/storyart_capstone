@@ -69,7 +69,7 @@ const AddAdmin = () => {
             <MDBAlert color="success">{res.data.message}</MDBAlert>
           );
 
-          window.location.href = "/admin/admin";
+          window.location.href = "/sysadmin/admin";
         }, 2000);
       }
     } catch (error) {

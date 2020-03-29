@@ -21,6 +21,7 @@ public class ResponseListCommentDTO {
     private int id;
     private int userId;
     private String username;
+    private String userAvatarUrl;
     private int storyId;
     private String content;
     private boolean isActive;

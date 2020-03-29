@@ -19,7 +19,7 @@ public class CommentController {
     @Autowired
     CommentService commentService;
 
-    @GetMapping("/getAll")
+    @GetMapping("/public/getAll")
     public Page<ResponseListCommentDTO> getAllCommentByStoryId(
             @RequestParam(defaultValue = "0") Integer storyId,
             @RequestParam(defaultValue = "1") Integer pageNo,

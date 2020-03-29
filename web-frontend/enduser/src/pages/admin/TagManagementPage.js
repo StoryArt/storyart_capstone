@@ -4,6 +4,8 @@ import TagService from "../../services/tag.service";
 import axios from "axios";
 import DateTimeUtils from '../../utils/datetime';
 
+import MyAlert from '../../components/common/MyAlert';
+
 import {
   MDBDataTable, MDBNotification, MDBContainer, MDBRow,MDBCol,
   MDBModal, MDBBtn, MDBModalHeader, MDBModalFooter, MDBModalBody,
@@ -26,7 +28,13 @@ class TagManagementPage extends React.Component {
     status: "",
     currId: "",
     title: "",
-    loading: false
+    loading: false,
+
+    open: true,
+    content: '',
+    type: ''
+    
+
   };
 
   showModal = () => {
@@ -54,6 +62,13 @@ class TagManagementPage extends React.Component {
     this.setState({ title: e.target.value });
   }
 
+  openAleart(e) {
+    this.setState({ open: true });
+  }
+  closeAleart(e) {
+    this.setState({ open: false });
+  }
+
   handleCancel = () => {
     this.setState({ visible: false });
     this.setState({ visible2: false });
@@ -72,15 +87,34 @@ class TagManagementPage extends React.Component {
     this.loadData();
   }
 
+  wait() {
+    setTimeout(() => {
+      this.closeAleart()
+    }, 2000);
+  };
+
+
   handleSubmit = e => {
     let tag = { title: this.state.title };
     
     TagService.addTag(tag).then(res => {
+      this.setState({
+        open: true,
+        content: 'Thêm Mới Thành Công',
+        type: 'success'
+      });
       this.setState({ visible: false });
       this.setState({ status: "", currId: "", title: "" });
       this.loadData();
+      this.wait();
     }).catch(error => {
       console.log(error);
+      this.setState({
+        open: true,
+        content: error,
+        type: 'error'
+      });
+      this.wait();
     })
     
   };
@@ -106,11 +140,24 @@ class TagManagementPage extends React.Component {
       isUpdate: isUpdate
     };
      TagService.updateTag(tag).then(res => {
+      this.setState({
+        open: true,
+        content: 'Cập Nhật Thành Công',
+        type: 'success'
+      });
       this.setState({ visible3: false });
       this.setState({ status: "", currId: "", title: "" });
       this.loadData();
+      this.wait();
     }).catch(error => {
       console.log(error);
+      this.setState({
+        open: true,
+        content: error,
+        type: 'error'
+      });
+      this.wait();
+     
     });
   };
 
@@ -147,9 +194,7 @@ class TagManagementPage extends React.Component {
 
   render() {
     const { data } = this.state;
-    
-  const [openAlert, setOpenAlert] = useState(false);
-  const [alert, setAlert] = useState({ content: '', type: 'success' });
+
 
     //
     data.map((dat, index) => {
@@ -321,6 +366,12 @@ class TagManagementPage extends React.Component {
             </div>
           </MDBCard>
         </MDBContainer>
+        <MyAlert
+                  open={this.state.open}
+                  setOpen={e => this.openAleart(e)}
+                  type={this.state.type}
+                  content={this.state.content}
+                />
       </MainLayout>
     );
   }
