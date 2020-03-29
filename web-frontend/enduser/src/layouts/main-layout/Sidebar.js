@@ -177,8 +177,8 @@ const Sidebar = (props) => {
                </ListItem>
                <ListItem 
                  button 
-                 onClick={() => navigateRoute('/user/edit-profile')} 
-                 selected={ isRouteMatch('/user/edit-profile')}>
+                 onClick={() => navigateRoute('/user/my-profile')} 
+                 selected={ isRouteMatch('/user/my-profile')}>
                  <ListItemIcon>
                    <AccountCircle className={classes.icon} />
                    </ListItemIcon>

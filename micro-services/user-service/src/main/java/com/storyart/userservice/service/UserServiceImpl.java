@@ -230,7 +230,7 @@ page=page-1;
     }
 
     @Override
-    public ResultDto getUserPublicProfile(int userId) {
+    public ResultDto getUserProfile(int userId) {
         ResultDto result = new ResultDto();
         result.setSuccess(false);
         User user = userRepository.findById(userId).orElse(null);
@@ -239,6 +239,7 @@ page=page-1;
         } else if(!user.isActive() || user.isDeactiveByAdmin()){
             result.getErrors().put("DELETED", "Tài khoản này đã bị xóa");
         } else {
+            user.setPassword(null);
             UserProfileDto userProfileDto = modelMapper.map(user, UserProfileDto.class);
             Role role = roleRepository.findRoleById(user.getRoleId()).orElse(null);
             userProfileDto.setRole(role);

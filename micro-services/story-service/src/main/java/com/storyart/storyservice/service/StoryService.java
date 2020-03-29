@@ -307,6 +307,41 @@ class StoryServiceImpl implements StoryService{
         return result;
     }
 
+    public void validateCreateStory(CreateStoryDto createStoryDto){
+        ResultDto result = new ResultDto();
+        Story story = modelMapper.map(createStoryDto, Story.class);
+        HashMap<String, String> screenIdsMap = new HashMap<>();
+        HashMap<String, String> actionIdsMap = new HashMap<>();
+        HashMap<String, String> informationIdsMap = new HashMap<>();
+        createStoryDto.getScreens().stream().forEach(screen -> {
+            screenIdsMap.put(screen.getId(), MyStringUtils.generateUniqueId());
+        });
+
+        //check all screens
+        createStoryDto.getScreens().stream().forEach(screen -> {
+            Screen savedScreen = modelMapper.map(screen, Screen.class);
+
+            savedScreen.setId(screenIdsMap.get(screen.getId()));
+            savedScreen.setNextScreenId(screenIdsMap.get(screen.getNextScreenId()));
+            screenRepository.save(savedScreen);
+
+            screen.getActions().stream().forEach(action -> {
+                Action savedAction = modelMapper.map(action, Action.class);
+
+                savedAction.setId(MyStringUtils.generateUniqueId());
+                savedAction.setScreenId(savedScreen.getId());
+                if(action.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())){
+                    savedAction.setValue(screenIdsMap.get(action.getValue()));
+                }
+                savedAction.setNextScreenId(screenIdsMap.get(action.getNextScreenId()));
+
+                actionRepository.save(savedAction);
+                actionIdsMap.put(action.getId(), savedAction.getId());
+            });
+        });
+
+    }
+
     @Override
     public ResultDto createStory(CreateStoryDto createStoryDto, int userId) {
 

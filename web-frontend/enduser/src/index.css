@@ -357,3 +357,8 @@ canvas{
 .modal{
   z-index: 1100;
 }
+
+.fullsize{
+  width: 100%;
+  height: 100%;
+}

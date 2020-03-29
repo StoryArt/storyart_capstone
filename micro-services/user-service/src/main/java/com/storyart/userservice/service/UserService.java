@@ -46,5 +46,5 @@ public interface UserService {
 
     void updateAvatar(Integer uid, String link);
 
-    ResultDto getUserPublicProfile(int userId);
+    ResultDto getUserProfile(int userId);
 }

@@ -101,19 +101,24 @@ function App() {
               path="/stories/edit/:storyId" 
               roleName={ROLE_NAMES.ROLE_USER} 
               component={CreateStoryPage}/>
-            
-            {/* <PrivateRoute 
-              exact 
-              path="/user/edit-profile" 
-              roleName={ROLE_NAMES.ROLE_USER}  
-              component={UserProfilePage}/> */}
 
-              {/*TA: chuyen qua edit proòile o trang nay */}
-               <PrivateRoute 
+            <PrivateRoute 
               exact 
-              path="/user/edit-profile" 
-              roleName={ROLE_NAMES.ROLE_USER}  
-              component={EditUserProfilePage}/>
+              path="/user/my-profile/:storyId" 
+              roleName={ROLE_NAMES.ROLE_USER} 
+              component={CreateStoryPage}/>
+
+              <PrivateRoute 
+                exact 
+                path="/user/my-profile" 
+                roleName={ROLE_NAMES.ROLE_USER}  
+                component={UserProfilePage}/>
+
+              <PrivateRoute 
+                exact 
+                path="/user/edit-profile" 
+                roleName={ROLE_NAMES.ROLE_USER}  
+                component={EditUserProfilePage}/>
            
             <PrivateRoute 
               exact 

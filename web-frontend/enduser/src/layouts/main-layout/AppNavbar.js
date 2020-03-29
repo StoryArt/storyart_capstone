@@ -141,7 +141,7 @@ const AppNavbar = (props) => {
                           onClick={handleLogout}
                           color="inherit">Đăng xuất</Button>
                         <Button 
-                          onClick={() => { navigateRoute('/user/edit-profile') }}
+                          onClick={() => { navigateRoute('/user/my-profile') }}
                           color="inherit">{ user.username }</Button>
                         <div>
                             <IconButton
