@@ -25,6 +25,7 @@ import NotFound from '../../../components/common/NotFound';
 import MyAlert from '../../../components/common/MyAlert';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
 import UserProfileHeader from './UserProfileHeader';
+import Typography from '@material-ui/core/Typography';
 
 
 const orderBys = getOrderBys();
@@ -286,7 +287,7 @@ const UserProfilePage = (props) => {
                 </div> 
               </div> 
               <div className="card-body">
-                {errorMessage}
+              {errorMessage}
                 <form
                   onSubmit={handleUploadAvatar}
                   enctype="multipart/form-data"
