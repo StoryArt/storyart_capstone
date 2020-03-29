@@ -13,6 +13,7 @@ import StoryDetailsPage from './pages/enduser/story-details-page/StoryDetailsPag
 import UserProfilePage from './pages/enduser/user-profile-page/UserProfilePage';
 import PublicUserProfilePage from './pages/enduser/user-profile-page/PublicUserProfilePage';
 import UserHistoryPage from './pages/enduser/user-history-page/UserHistoryPage';
+import EditUserProfilePage from './pages/enduser/user-profile-page/EditUserProfilePage';
 
 import LoginPage from './pages/common/LoginPage';
 import RegisterPage from './pages/common/RegisterPage';
@@ -97,11 +98,18 @@ function App() {
               roleName={ROLE_NAMES.ROLE_USER} 
               component={CreateStoryPage}/>
             
-            <PrivateRoute 
+            {/* <PrivateRoute 
               exact 
               path="/user/edit-profile" 
               roleName={ROLE_NAMES.ROLE_USER}  
-              component={UserProfilePage}/>
+              component={UserProfilePage}/> */}
+
+              {/*TA: chuyen qua edit proòile o trang nay */}
+               <PrivateRoute 
+              exact 
+              path="/user/edit-profile" 
+              roleName={ROLE_NAMES.ROLE_USER}  
+              component={EditUserProfilePage}/>
            
             <PrivateRoute 
               exact 

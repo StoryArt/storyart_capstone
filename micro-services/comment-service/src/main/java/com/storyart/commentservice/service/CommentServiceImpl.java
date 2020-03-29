@@ -72,6 +72,7 @@ public class CommentServiceImpl implements CommentService {
         response.setUsername(user.get().getName());
         response.setLikes(new ArrayList<>());
         response.setDislikes(new ArrayList<>());
+        response.setUserAvatarUrl(user.get().getAvatar());
         
         return response;
     }
@@ -192,6 +193,7 @@ public class CommentServiceImpl implements CommentService {
             for (User user:users) {
                 if(comment.getUserId() == user.getId()){
                     comment.setUsername(user.getName());
+                    comment.setUserAvatarUrl(user.getAvatar());
                     break;
                 }
             }

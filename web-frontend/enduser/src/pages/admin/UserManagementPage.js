@@ -11,6 +11,11 @@ import NotFoundPage from "../../pages/common/NotFoundPage";
 import { setAuthHeader } from "../../config/auth";
 import Pagination from "@material-ui/lab/Pagination";
 
+
+
+
+
+
 const UserManagementPage = () => {
   const [convertedList, setConvertedList] = useState([]);
   const [pageInfo, setPageInfo] = useState({
@@ -21,10 +26,9 @@ const UserManagementPage = () => {
     last: true
   });
   const [pageNo, setPageNo] = useState(1);
-
   useEffect(() => {
     getMyProfile();
-   LoadUsersByPage();
+    LoadUsersByPage();
   
   }, []);
 

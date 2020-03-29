@@ -169,7 +169,7 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(page, size);
 
 
-        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(search,RoleName.ROLE_ADMIN, pageable);
+        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(search,RoleName.ROLE_ADMIN.toString(), pageable);
         List<User> usersList = userPage.toList();
 
         List<UserInManagementResponse> users = convertUserlist(usersList);
@@ -194,7 +194,7 @@ public class UserServiceImpl implements UserService {
 page=page-1;
         validatePageNumberAndSize(page, size);
         Pageable pageable = PageRequest.of(page, size);
-        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(searchtxt,RoleName.ROLE_USER, pageable);
+        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(searchtxt,RoleName.ROLE_USER.toString(), pageable);
         List<User> usersList = userPage.toList();
         List<UserInManagementResponse> users = convertUserlist(usersList);
         return new PagedResponse<UserInManagementResponse>(users, 1+userPage.getNumber(), userPage.getSize(),

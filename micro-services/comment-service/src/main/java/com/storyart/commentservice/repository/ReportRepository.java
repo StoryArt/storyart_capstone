@@ -14,6 +14,9 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
     @Query("select r from Report r where r.userId = ?1 and r.commentId = ?2 and r.isHandled=false ")
     Optional<Report> findReportByUserIdAndCommentId(int userId, int commentId);
 
+    @Query("select r from Report r where r.userId = ?1 and r.storyId = ?2 and r.isHandled=false ")
+    Optional<Report> findReportByUserIdAndStoryId(int userId, int storyId);
+
     @Query("select r from Report r where r.storyId = 0 and r.isHandled=?1 group by r.commentId order by count(r.commentId) desc ")
     Page<Report> findReportComment(boolean isHandled, Pageable pageable);
 
