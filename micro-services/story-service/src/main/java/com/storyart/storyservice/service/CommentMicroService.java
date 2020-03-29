@@ -9,7 +9,7 @@ import javax.validation.Valid;
 
 @FeignClient(name="comment-service")
 public interface CommentMicroService {
-    @GetMapping(value = "/api/v1/comment/getCommentStatistic")
+    @GetMapping(value = "/api/v1/comment/public/getCommentStatistic")
     StatisticResponse getCommentListResponce(@RequestParam(defaultValue = "0") @Valid Integer storyId,
                                              @RequestParam(defaultValue = "0") @Valid Integer userId,
                                              @RequestParam(defaultValue = "0") @Valid String start,
