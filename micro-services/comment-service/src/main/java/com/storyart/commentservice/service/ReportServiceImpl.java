@@ -103,9 +103,26 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Page<ReportCommentResponseDTO> getListReportComment(boolean isHandled, int pageNo, int pageSize) {
+    public Page<ReportCommentResponseDTO> getListReportComment(String searchString, boolean isHandled, int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<Report> reportPage = reportRepository.findReportComment(isHandled, pageable);
+        Page<Report> reportPage;
+        if(searchString.trim().length()<1){
+            reportPage = reportRepository.findReportComment(isHandled, pageable);
+        }else {
+            List<Integer> commentIds = new ArrayList<>();
+            try{
+                int commentId = Integer.parseInt(searchString);
+                commentIds.add(commentId);
+            }
+            catch (Exception e){
+                List<Integer> userIds = userRepository.findUserIdsBySearchString(searchString);
+                commentIds =commentRepository.findAllCommentIdByUserIds(userIds);
+
+            }
+            reportPage = reportRepository.findReportCommentWithCommentIds(isHandled, commentIds, pageable);
+        }
+        
+        
 
         Page<ReportCommentResponseDTO> responsePage = reportPage.map(new Function<Report, ReportCommentResponseDTO>() {
             @Override
@@ -210,9 +227,23 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Page<StoryReportResponse> getListReportStory(boolean isHandled, int pageNo, int pageSize) {
+    public Page<StoryReportResponse> getListReportStory(String searchString,boolean isHandled, int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<Report> reportPage = reportRepository.findReportStory(isHandled, pageable);
+        Page<Report> reportPage;
+        if(searchString.trim().length()<1){
+            reportPage = reportRepository.findReportStory(isHandled, pageable);
+        }else {
+            List<Integer> storyIds = new ArrayList<>();
+            try{
+                int storyId = Integer.parseInt(searchString);
+                storyIds.add(storyId);
+            }
+            catch (Exception e){
+                List<Integer> userIds = userRepository.findUserIdsBySearchString(searchString);
+                storyIds =storyRepository.findAllStoryIdByUserIds(userIds);
+            }
+            reportPage = reportRepository.findReportCommentWithStoryIds(isHandled, storyIds, pageable);
+        }
 
         Page<StoryReportResponse> responsePage = reportPage.map(new Function<Report, StoryReportResponse>() {
             @Override
