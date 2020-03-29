@@ -228,6 +228,13 @@ page=page-1;
         userRepository.save(user);
 
     }
+    @Override
+    public void updateProfileImage(Integer uid,String link) {
+        User user= findById(uid);
+        user.setProfileImage(link);
+        userRepository.save(user);
+
+    }
 
     @Override
     public ResultDto getUserPublicProfile(int userId) {

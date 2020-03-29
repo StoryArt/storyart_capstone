@@ -18,6 +18,7 @@ public class UserProfileDto {
     private String name;
     private String password;
     private String avatar;
+    private String profileImage;
     private int roleId;
     private String introContent;
     private boolean isActive;

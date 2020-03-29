@@ -45,6 +45,9 @@ public interface UserService {
     void createTestUser();
 
     void updateAvatar(Integer uid, String link);
+    void updateProfileImage(Integer uid, String link);
+
+
 
     ResultDto getUserPublicProfile(int userId);
 }

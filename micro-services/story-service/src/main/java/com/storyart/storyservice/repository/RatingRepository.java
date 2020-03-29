@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, RatingId> {
 
-    @Query(value = "SELECT * FROM rating where rating.story_id = :storyid and not user_id = :userid", nativeQuery = true)
+        @Query(value = "SELECT * FROM rating where rating.story_id = :storyid and not user_id = :userid", nativeQuery = true)
     List<Rating> findRatingByStoryIdEXceptId(@Param("storyid") Integer storyid, @Param("userid") Integer userid);
 
     @Query(value = "select story_id from rating where user_id = :userid ", nativeQuery = true)

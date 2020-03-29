@@ -28,6 +28,8 @@ public class UserProfileResponse {
     private Integer storyCount;
     private boolean isActive;
 
+    private String profileImage;
+
     private String intro_content;
     private RoleName role;
     private String  avatar;
@@ -46,6 +48,7 @@ public class UserProfileResponse {
         this.setActive(user.isActive());
               this.role = BeanUtil.getBean(RoleService.class).findRoleById(user.getRoleId()).getName();
 this.setAvatar(user.getAvatar());
+this.setProfileImage(user.getProfileImage());
     }
 
 
