@@ -25,8 +25,11 @@ import NotFound from '../../../components/common/NotFound';
 import MyAlert from '../../../components/common/MyAlert';
 import MyBackdrop from '../../../components/common/MyBackdrop';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
+import MyDatePicker from '../../../components/common/MyDatePicker';
 import UserProfileHeader from './UserProfileHeader';
 import Typography from '@material-ui/core/Typography';
+import UserReadingChart from "./UserReadingChart";
+import StatisticService from '../../../services/statistic.service';
 
 
 const orderBys = getOrderBys();
@@ -44,6 +47,8 @@ const UserProfilePage = (props) => {
   const [story, setStory] = useState(null);
   const [isLoadingstories, setIsLoadingStories] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
+  const [dateRange, setDateRange] = useState({ from: new Date(), to: new Date() });
+  const [readingStatisticData, setReadingStatisticData] = useState([]);
   const [filters, setFilters] = useState({
     keyword: '',
     orderBy: 'avg_rate',
@@ -52,15 +57,40 @@ const UserProfilePage = (props) => {
     itemsPerPage: 10,
   });
 
-  const [openAlert, setOpenAlert] = useState(false);
   const [alert, setAlert] = useState({ content: '', type: 'success', open: false });
   const [dialog, setDialog] = useState({ content: '', open: false });
 
   useEffect(() => {
-    getUserInfo();
-    getStoriesByAuthor();
+    getReadStatistic();
+    initData();
   }, []);
 
+  const initData = async () => {
+    await getUserInfo();
+    if(!userNotfound){
+      getStoriesByAuthor();
+    }
+  }
+
+  const getReadStatistic = async () => {
+    let { from, to } = dateRange;
+    
+    from = from.toLocaleDateString();
+    to = to.toLocaleDateString();
+    console.log(from);
+    console.log(to);
+    try {
+      const res = await StatisticService.getReadStatisticsOfUser(to, to);
+      const { data, success, errors } = res.data;
+      
+      if(success){
+        console.log(data);
+        setReadingStatisticData(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const getStoriesByAuthor = async () => {
     setAuthHeader(getTokenFromLocal());
@@ -96,8 +126,8 @@ const UserProfilePage = (props) => {
       console.log(error);   
     }
     setLoadingUser(false);
-    setOpenBackdrop(false)
-}
+    setOpenBackdrop(false);
+  }
 
   const changeFilters = (prop, value) => {
     filters[prop] = value;
@@ -182,16 +212,45 @@ const UserProfilePage = (props) => {
     setDialog({ ...dialog, open: false });
   }
 
+  const changeDateRange = (prop, value) => {
+    setDateRange({ ...dateRange, [prop]: value });
+    getReadStatistic();
+  }
+
   return (
     <MainLayout>
       <div className="container-fluid" style={{ paddingBottom: '100px' }}>
         {(!isloadingUser && !userNotfound && !ValidationUtils.isEmpty(user)) && (
           <>
-            <div className="row mb-5">
+              <div className="row mb-5">
                 <div className="col-12">
                   <UserProfileHeader user={user} canEdit={true} />
                 </div> 
               </div>
+
+                <h3 className="text-bold"> Thống kê </h3> 
+                <hr style={{ border: "1px solid #ccc" }} /> 
+                <div className="row my-5">
+                  <div className="col-12">
+                    <MyDatePicker
+                      date={dateRange.from}
+                      setDate={(value) =>  changeDateRange('from', value)}
+                      label="Tù ngày"
+                    />
+                    <span className="mr-4"></span>
+                     <MyDatePicker
+                      date={dateRange.to}
+                      setDate={(value) => changeDateRange('to', value)}
+                      label="Đến ngày"
+                    />
+                    <UserReadingChart
+                      data={readingStatisticData}
+                      dataKeyName="dateCreated"
+                      dataKeyArea="readCount"
+                    />
+                  </div>
+                </div>
+
                 <h3 className="text-bold"> Truyện của bạn </h3> 
                 <hr style={{ border: "1px solid #ccc" }} /> 
                                     
