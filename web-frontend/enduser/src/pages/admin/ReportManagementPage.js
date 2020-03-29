@@ -39,12 +39,12 @@ const ReportManagementPage = () => {
     try {
       if (isHandled !== handled) {
         setPageNo(1);
-        const res = await ReportService.getCommentReports(1, isHandled);
+        const res = await ReportService.getCommentReports(searchString, 1, isHandled);
         setTotalPages(res.data.totalPages);
         convertData(res.data.content);
       }
       else {
-        const res = await ReportService.getCommentReports(pageNo, isHandled);
+        const res = await ReportService.getCommentReports(searchString, pageNo, isHandled);
         setTotalPages(res.data.totalPages);
         convertData(res.data.content);
       }
@@ -59,12 +59,12 @@ const ReportManagementPage = () => {
     try {
       if (isHandled !== storyHandled) {
         setStoryPageNo(1);
-        const res = await ReportService.getStoryReports(1, isHandled);
+        const res = await ReportService.getStoryReports(searchStoryString, 1, isHandled);
         setTotalStoryPages(res.data.totalPages);
         convertStoryData(res.data.content);
       }
       else {
-        const res = await ReportService.getStoryReports(storyPageNo, isHandled);
+        const res = await ReportService.getStoryReports(searchStoryString, storyPageNo, isHandled);
         setTotalStoryPages(res.data.totalPages);
         convertStoryData(res.data.content);
       }
@@ -218,7 +218,7 @@ const ReportManagementPage = () => {
     if (value !== pageNo) {
       setPageNo(value);
       try {
-        const res = await ReportService.getCommentReports(value, handled);
+        const res = await ReportService.getCommentReports(searchString, value, handled);
         convertData(res.data.content);
       } catch (error) {
 
@@ -417,8 +417,12 @@ const ReportManagementPage = () => {
     else {
       setHandledDropdown('Chưa xử lý');
     }
+    if (isHandled !== handled) {
+      getCommentReportsData(isHandled);
+    }
     setHandled(isHandled);
-    getCommentReportsData(isHandled);
+
+
   }
 
   const getStoryReportsByIsHandled = (isHandled) => {
@@ -428,8 +432,10 @@ const ReportManagementPage = () => {
     else {
       setHandledStoryDropdown('Chưa xử lý');
     }
+    if (isHandled !== storyHandled) {
+      getStoryReportsData(isHandled);
+    }
     setStoryHandled(isHandled);
-    getStoryReportsData(isHandled);
   }
 
   const changeStatusWhenReview = async (type, status) => {
@@ -510,11 +516,49 @@ const ReportManagementPage = () => {
 
 
   }
+  const [searchString, setSearchString] = useState('');
+  const [searchStoryString, setSearchStoryString] = useState('');
+  const search = () => {
+    getCommentReportsData(handled);
+  }
+  const searchStory = () => {
+    getStoryReportsData(handled);
+  }
+  const searchInput = {
+    width: '400px'
+  }
+  const searchClear = {
+    position: 'absolute',
+    right: '5px',
+    top: '0',
+    bottom: '0',
+    height: '14px',
+    margin: 'auto',
+    cursor: 'pointer',
+    color: '#ccc'
+  }
+  //   .searchinput {
+  //     width: 200px;
+  // }
+  // .searchclear {
+  //     position: absolute;
+  //     right: 5px;
+  //     top: 0;
+  //     bottom: 0;
+  //     height: 14px;
+  //     margin: auto;
+  //     font-size: 14px;
+  //     cursor: pointer;
+  //     color: #ccc;
+  // }
+
 
 
 
 
   return (
+
+
     <MainLayout>
       <div className="container-fluid">
 
@@ -538,15 +582,32 @@ const ReportManagementPage = () => {
               <MDBCardBody>
 
                 {/* <div class="row"> */}
-                <MDBDropdown>
-                  <MDBDropdownToggle caret color="ins">
-                    {handledDropdown}
-                  </MDBDropdownToggle>
-                  <MDBDropdownMenu basic >
-                    <MDBDropdownItem onClick={e => getCommentReportsByIsHandled(false)}>Chưa xử lý</MDBDropdownItem>
-                    <MDBDropdownItem onClick={e => getCommentReportsByIsHandled(true)}>Đã xử lý</MDBDropdownItem>
-                  </MDBDropdownMenu>
-                </MDBDropdown>
+                <div className="row">
+                  <MDBDropdown>
+                    <MDBDropdownToggle caret color="ins">
+                      {handledDropdown}
+                    </MDBDropdownToggle>
+                    <MDBDropdownMenu basic >
+                      <MDBDropdownItem onClick={e => getCommentReportsByIsHandled(false)}>Chưa xử lý</MDBDropdownItem>
+                      <MDBDropdownItem onClick={e => getCommentReportsByIsHandled(true)}>Đã xử lý</MDBDropdownItem>
+                    </MDBDropdownMenu>
+                  </MDBDropdown>
+                  <form className="row ml-2" onSubmit={e => { e.preventDefault(); search(); }}>
+                    <div className="form-group">
+                      <input
+
+                        type="search"
+                        style={searchInput}
+                        className="form-control"
+                        placeholder="Tìm kiếm bằng: mã bình luận, tên tài khoản, email"
+                        value={searchString}
+                        onChange={e => setSearchString(e.target.value)}></input>
+                      {/* <i style={searchClear} class="far fa-times-circle"></i> */}
+                    </div>
+                    {/* <button className="btn btn-success float-right" type="submit">Tìm</button> */}
+                  </form>
+                </div>
+
                 {/* <MDBInput label="Nhập nội dung tìm kiếm (mã bình luận, tên tài khoản,...)"></MDBInput> */}
                 {/* 
                   </MDBInput>
@@ -582,16 +643,31 @@ const ReportManagementPage = () => {
             <MDBCard>
               <MDBCardBody>
 
-                {/* <div class="row"> */}
-                <MDBDropdown>
-                  <MDBDropdownToggle caret color="ins">
-                    {handledStoryDropdown}
-                  </MDBDropdownToggle>
-                  <MDBDropdownMenu basic >
-                    <MDBDropdownItem onClick={e => getStoryReportsByIsHandled(false)}>Chưa xử lý</MDBDropdownItem>
-                    <MDBDropdownItem onClick={e => getStoryReportsByIsHandled(true)}>Đã xử lý</MDBDropdownItem>
-                  </MDBDropdownMenu>
-                </MDBDropdown>
+                <div class="row">
+                  <MDBDropdown>
+                    <MDBDropdownToggle caret color="ins">
+                      {handledStoryDropdown}
+                    </MDBDropdownToggle>
+                    <MDBDropdownMenu basic >
+                      <MDBDropdownItem onClick={e => getStoryReportsByIsHandled(false)}>Chưa xử lý</MDBDropdownItem>
+                      <MDBDropdownItem onClick={e => getStoryReportsByIsHandled(true)}>Đã xử lý</MDBDropdownItem>
+                    </MDBDropdownMenu>
+                  </MDBDropdown>
+                  <form className="row ml-2" onSubmit={e => { e.preventDefault(); searchStory(); }}>
+                    <div className="form-group">
+                      <input
+
+                        type="search"
+                        style={searchInput}
+                        className="form-control"
+                        placeholder="Tìm kiếm bằng: mã bình luận, tên tài khoản, email"
+                        value={searchStoryString}
+                        onChange={e => setSearchStoryString(e.target.value)}></input>
+                      {/* <i style={searchClear} class="far fa-times-circle"></i> */}
+                    </div>
+                    {/* <button className="btn btn-success float-right" type="submit">Tìm</button> */}
+                  </form>
+                </div>
                 {/* <MDBInput label="Nhập nội dung tìm kiếm (mã bình luận, tên tài khoản,...)"></MDBInput> */}
                 {/* 
                   </MDBInput>
@@ -635,17 +711,23 @@ const ReportManagementPage = () => {
               <p>Email: <strong>{reportContent.commentOwnerEmail}</strong></p>
               {reportContent.handled &&
                 <div>
-                  <div style={{ display: "flex" }}>
+                  <div className="row">
 
-                    <p>Trạng thái bình luận:
-                    <strong onClick={e => changeStatusWhenReview('comment', reportContent.commentIsDisableByAdmin)} style={reportContent.commentIsDisableByAdmin ? ({ color: 'red', cursor: 'pointer' }) : ({ color: 'green', cursor: 'pointer' })}> {reportContent.commentIsDisableByAdmin ? "Đã ẩn" : "Bình thường"} </strong>
+                    <p className="col-sm-8">Trạng thái bình luận:
+                    <strong style={reportContent.commentIsDisableByAdmin ? ({ color: 'red' }) : ({ color: 'green' })}> {reportContent.commentIsDisableByAdmin ? "Đã ẩn" : "Bình thường"} </strong>
                     </p>
+                    <MDBBtn className="col-sm-3 float-right" color="primary"
+                      onClick={e => changeStatusWhenReview('comment', reportContent.commentIsDisableByAdmin)}
+                    >{reportContent.commentIsDisableByAdmin ? "Mở lại" : "Ẩn"}</MDBBtn>
                   </div>
 
-                  <div style={{ display: "flex" }}>
-                    <p>Trạng thái người dùng:
-                  <strong onClick={e => changeStatusWhenReview('user', reportContent.userIsDisableByAdmin)} style={reportContent.userIsDisableByAdmin ? ({ color: 'red', cursor: 'pointer' }) : ({ color: 'green', cursor: 'pointer' })}> {reportContent.userIsDisableByAdmin ? "Đã vô hiệu hóa" : "Bình thường"} </strong>
+                  <div className="row">
+                    <p className="col-sm-8">Trạng thái người dùng:
+                  <strong style={reportContent.userIsDisableByAdmin ? ({ color: 'red' }) : ({ color: 'green' })}> {reportContent.userIsDisableByAdmin ? "Đã vô hiệu hóa" : "Bình thường"} </strong>
                     </p>
+                    <MDBBtn className="col-sm-3 float-right" color="primary"
+                      onClick={e => changeStatusWhenReview('user', reportContent.userIsDisableByAdmin)}>
+                      {reportContent.userIsDisableByAdmin ? "Mở lại" : "Vô hiệu hóa"}</MDBBtn>
                   </div>
 
                 </div>
@@ -685,17 +767,25 @@ const ReportManagementPage = () => {
               <p>Email: <strong>{reportContent.authorEmail}</strong></p>
               {reportContent.handled &&
                 <div>
-                  <div style={{ display: "flex" }}>
+                  <div className="row">
 
-                    <p>Trạng thái truyện:
-                    <strong onClick={e => changeStatusWhenReview('story', reportContent.storyIsDisableByAdmin)} style={reportContent.storyIsDisableByAdmin ? ({ color: 'red', cursor: 'pointer' }) : ({ color: 'green', cursor: 'pointer' })}> {reportContent.storyIsDisableByAdmin ? "Đã ẩn" : "Bình thường"} </strong>
+                    <p className="col-sm-8">Trạng thái truyện:
+                    <strong style={reportContent.storyIsDisableByAdmin ? ({ color: 'red' }) : ({ color: 'green' })}> {reportContent.storyIsDisableByAdmin ? "Đã ẩn" : "Bình thường"} </strong>
                     </p>
+                    <MDBBtn className="col-sm-3 float-right" color="primary"
+                      onClick={e => changeStatusWhenReview('story', reportContent.storyIsDisableByAdmin)}>
+                      {reportContent.storyIsDisableByAdmin ? "Mở lại" : "Ẩn"}
+                    </MDBBtn>
                   </div>
 
-                  <div style={{ display: "flex" }}>
-                    <p>Trạng thái người dùng:
-                  <strong onClick={e => changeStatusWhenReview('user', reportContent.userIsDisableByAdmin)} style={reportContent.userIsDisableByAdmin ? ({ color: 'red', cursor: 'pointer' }) : ({ color: 'green', cursor: 'pointer' })}> {reportContent.userIsDisableByAdmin ? "Đã vô hiệu hóa" : "Bình thường"} </strong>
+                  <div className="row">
+                    <p className="col-sm-8">Trạng thái người dùng:
+                  <strong style={reportContent.userIsDisableByAdmin ? ({ color: 'red' }) : ({ color: 'green' })}> {reportContent.userIsDisableByAdmin ? "Đã vô hiệu hóa" : "Bình thường"} </strong>
                     </p>
+                    <MDBBtn className="col-sm-3 float-right" color="primary"
+                      onClick={e => changeStatusWhenReview('user', reportContent.userIsDisableByAdmin)} >
+                      {reportContent.userIsDisableByAdmin ? "Mở lại" : "Vô hiệu hóa"}
+                    </MDBBtn>
                   </div>
 
                 </div>

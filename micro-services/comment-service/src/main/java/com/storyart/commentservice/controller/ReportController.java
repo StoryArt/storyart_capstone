@@ -36,6 +36,7 @@ public class ReportController {
 
     @GetMapping("/getCommentReports")
     public Page<ReportCommentResponseDTO> getCommentReports(
+            @RequestParam(defaultValue = "") String searchString,
             @RequestParam(defaultValue = "false") boolean isHandled,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
@@ -43,11 +44,12 @@ public class ReportController {
         if (pageNo < 0) {
             pageNo = 0;
         }
-        return reportService.getListReportComment(isHandled,pageNo, pageSize);
+        return reportService.getListReportComment(searchString,isHandled,pageNo, pageSize);
     }
 
     @GetMapping("/getStoryReports")
     public Page<StoryReportResponse> getStoryReports(
+            @RequestParam(defaultValue = "") String searchString,
             @RequestParam(defaultValue = "false") boolean isHandled,
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize) {
@@ -55,7 +57,7 @@ public class ReportController {
         if (pageNo < 0) {
             pageNo = 0;
         }
-        return reportService.getListReportStory(isHandled,pageNo, pageSize);
+        return reportService.getListReportStory(searchString,isHandled,pageNo, pageSize);
     }
 
     @GetMapping("/getReportsByCommentId")

@@ -31,4 +31,7 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     List<Comment> findAllByCommentIds(List<Integer> commentIds);
 
     List<Comment> findAllByStoryIdInAndActiveAndDisableByAdminAndCreatedAtBetweenOrderByCreatedAtDesc(List<Integer> storyIds,boolean isActive,boolean isDisableByAdmin, Date startDate, Date endDate);
+
+    @Query("select c.id from Comment c where c.userId in ?1")
+    List<Integer> findAllCommentIdByUserIds(List<Integer> userIds);
 }

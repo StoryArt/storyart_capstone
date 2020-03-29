@@ -9,6 +9,6 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
     @Query("select s.id from Story s where s.userId = ?1 and s.active = true and s.deactiveByAdmin=false")
     List<Integer> getAllStoryIdByUserId(int userId);
 
-    @Query("update Story s set s.deactiveByAdmin = ?2 where s.id=?1")
-    void updateDisableByAdminStatus(int storyId,boolean status);
+    @Query("select c.id from Comment c where c.userId in ?1")
+    List<Integer> findAllStoryIdByUserIds(List<Integer> userIds);
 }
