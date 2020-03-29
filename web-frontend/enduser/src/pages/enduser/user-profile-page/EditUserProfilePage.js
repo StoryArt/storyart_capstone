@@ -8,7 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import TextField from "@material-ui/core/TextField";
-import Typography from '@material-ui/core/Typography';
+import Typography from "@material-ui/core/Typography";
 
 import SendIcon from "@material-ui/icons/Send";
 
@@ -45,9 +45,10 @@ const EditUserProfilePage = props => {
   const [errorMessage, setErrorMessage] = useState("");
   const [avatar, setAvatar] = useState(null);
   const [upfile, setUploadFile] = useState(null);
-
+  const [banner, setBanner] = useState(null);
+  const [upfileBanner, setUploadFileBanner] = useState(null);
   const [saveAvatarBt, setSaveAvatarBt] = useState("disabled");
-
+  const [saveBannerBt, setSaveBannerBt] = useState("disabled");
   const [story, setStory] = useState(null);
 
   const [alert, setAlert] = useState({
@@ -100,7 +101,7 @@ const EditUserProfilePage = props => {
       });
       window.setTimeout(() => {
         closeAlert();
-    }, 3000);
+      }, 3000);
     }
   }
 
@@ -121,7 +122,7 @@ const EditUserProfilePage = props => {
 
       setJointAt(date.toString());
       setIsActive(res.data.is_active);
-      setAvatar(res.data.avatar);
+      setBanner(res.data.profileImage);
     } catch (error) {
       console.log(error);
     }
@@ -159,7 +160,7 @@ const EditUserProfilePage = props => {
           });
           window.setTimeout(() => {
             closeAlert();
-        }, 3000);
+          }, 3000);
         } catch (error) {
           // setErrorMessage(
           //   <MDBAlert color="danger">Lưu thất bại. Thử lại!</MDBAlert>
@@ -171,7 +172,7 @@ const EditUserProfilePage = props => {
           });
           window.setTimeout(() => {
             closeAlert();
-        }, 3000);
+          }, 3000);
         }
       }
     } catch (error) {
@@ -185,10 +186,90 @@ const EditUserProfilePage = props => {
       });
       window.setTimeout(() => {
         closeAlert();
-    }, 3000);
+      }, 3000);
     }
   };
 
+  const onChangeBanner = async file => {
+    setUploadFileBanner(file);
+
+    var reader = new FileReader();
+
+    reader.onload = function(e) {
+      setBanner(e.target.result);
+    };
+
+    reader.readAsDataURL(file);
+    setSaveBannerBt("");
+  };
+
+  const handleUploadBanner = async event => {
+    event.preventDefault();
+    try {
+      const res = await UserService.uploadProfileImage(upfileBanner);
+      console.log(res);
+
+      if (res.data.status == 200) {
+        let linkImgur = res.data.data.link;
+        try {
+          const r2 = await UserService.saveToDatabaseProfileImage(
+            id,
+            linkImgur
+          );
+          // setErrorMessage(<MDBAlert color="success">Lưu thành công!</MDBAlert>);
+
+          setAlert({
+            open: true,
+            content: "Đã cập nhật Hình nền!",
+            type: "success"
+          });
+          window.setTimeout(() => {
+            closeAlert();
+          }, 3000);
+        } catch (error) {
+          // setErrorMessage(
+          //   <MDBAlert color="danger">Lưu thất bại. Thử lại!</MDBAlert>
+          // );
+          setAlert({
+            open: true,
+            content: "Lưu thất bại. Thử lại!",
+            type: "error"
+          });
+          window.setTimeout(() => {
+            closeAlert();
+          }, 3000);
+        }
+      }
+    } catch (error) {
+      // setErrorMessage(
+      //   <MDBAlert color="danger">Upload thất bại. Thử lại!</MDBAlert>
+      // );
+      setAlert({
+        open: true,
+        content: "Upload thất bại. Thử lại!",
+        type: "error"
+      });
+      window.setTimeout(() => {
+        closeAlert();
+      }, 3000);
+    }
+  };
+
+  const mystyle = {
+    textAlign: "center",
+    margin: "0 auto"
+  };
+  const mystyleLeft = {
+    textAlign: "left",
+    paddingTop: "200px",
+    margin: "0 auto"
+  };
+  const mystyleRight = {
+    textAlign: "right",
+    margin: "0 auto"
+  };
+
+  
   const statusButton = [];
   statusButton.push(
     <MDBBtn
@@ -211,41 +292,50 @@ const EditUserProfilePage = props => {
       />
       {errorMessage}
 
-      <div>
-      <Typography component="h1" variant="h4">
-              Tài khoản
-            </Typography>
-        <form onSubmit={handleUploadAvatar} enctype="multipart/form-data">
-          <div className="row">
-            {/* //avatar */}
-            <div className="form-group col-sm-6 field avatar">
-              <div className="avatar-container">
-                <label htmlFor="avatar1">
-                  Avatar
-                </label>
-                <div className="avatar-80">
-                  <img id="avatar1" name="avatar1" src={avatar} width="80" />
-                </div>
-              </div>
-              <div className="control">
-                <input
-                  type="file"
-                  name="image"
-                  accept=".jpg, .gif, .png"
-                  onChange={e => onChangeAvatar(e.target.files[0])}
-                />
-                <p className="tips">JPG, GIF or PNG, Max size: 10MB</p>
-                <div className="form-group">
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    type="submit"
-                    disabled={saveAvatarBt}
-                  >
-                    <CloudUploadIcon />
-                    <span className="pl-2 capitalize">Lưu avatar</span>
-                  </Button>
-                  {/* <button
+      <div style={mystyle}>
+        <Typography component="h1" variant="h4">
+          Tài khoản
+        </Typography>
+        <div className="col-sm-12">
+          <div className="" style={mystyleRight}>
+            <form
+              style={mystyle}
+              onSubmit={handleUploadBanner}
+              enctype="multipart/form-data"
+            >
+              <div className="row">
+                {/* //avatar */}
+                <div className="form-group field banner">
+                  <div className="banner-container">
+                    <label htmlFor="banner1">hình nền</label>
+                    <div className="banner-600">
+                      <img
+                        id="banner1"
+                        name="banner1"
+                        src={banner}
+                        width="200"
+                      />
+                    </div>
+                  </div>
+                  <div className="control">
+                    <input
+                      type="file"
+                      name="image"
+                      accept=".jpg, .gif, .png"
+                      onChange={e => onChangeBanner(e.target.files[0])}
+                    />
+                    <p className="tips">JPG, GIF or PNG, Max size: 10MB</p>
+                    <div className="form-group">
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        type="submit"
+                        disabled={saveBannerBt}
+                      >
+                        <CloudUploadIcon />
+                        <span className="pl-2 capitalize">Lưu Hình Nền</span>
+                      </Button>
+                      {/* <button
                         disabled={saveAvatarBt}
                         className="btn float-left"
                         style={{
@@ -258,15 +348,79 @@ const EditUserProfilePage = props => {
                       >
                         Lưu avatar
                       </button> */}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
-        </form>
 
-        <form onSubmit={handleUpdateProfile}>
+
+          <div className="" style={mystyleLeft}>
+            <form
+              style={mystyle}
+              onSubmit={handleUploadAvatar}
+              enctype="multipart/form-data"
+            >
+              <div className="row">
+                {/* //avatar */}
+                <div style={mystyle} className="form-group field avatar">
+                  <div className="avatar-container">
+                    <label htmlFor="avatar1">Avatar</label>
+                    <div className="avatar-80">
+                      <img
+                        id="avatar1"
+                        name="avatar1"
+                        src={avatar}
+                        width="80"
+                      />
+                    </div>
+                  </div>
+                  <div className="control">
+                    <input
+                      type="file"
+                      name="image"
+                      accept=".jpg, .gif, .png"
+                      onChange={e => onChangeAvatar(e.target.files[0])}
+                    />
+                    <p className="tips">JPG, GIF or PNG, Max size: 10MB</p>
+                    <div className="form-group">
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        type="submit"
+                        disabled={saveAvatarBt}
+                      >
+                        <CloudUploadIcon />
+                        <span className="pl-2 capitalize">Lưu avatar</span>
+                      </Button>
+                      {/* <button
+                        disabled={saveAvatarBt}
+                        className="btn float-left"
+                        style={{
+                          clear: "both",
+                          fontSize: "1.1em",
+                          margin: 0,
+                          color: "#fff",
+                          backgroundColor: "#007bff"
+                        }}
+                      >
+                        Lưu avatar
+                      </button> */}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+
+
+        <hr style={{ border: "1px solid #ccc" }} />
+        <form style={mystyle} onSubmit={handleUpdateProfile}>
           <div className="row">
-            <div className="col-sm-6">
+            <div style={mystyle} className="col-sm-6">
               {/* //name */}
               <div className="form-group">
                 {/* <label htmlFor="name">
@@ -287,7 +441,7 @@ const EditUserProfilePage = props => {
                 {/* <label htmlFor="username">
                   <strong>Tên đăng nhập</strong>
                 </label> */}
-                
+
                 {/* <input
                   type="text"
                   id="username"
@@ -296,7 +450,7 @@ const EditUserProfilePage = props => {
                   className="form-control"
                   onChange={e => setUs(e.target.value)}
                 /> */}
-                 <TextField
+                <TextField
                   variant="outlined"
                   margin="normal"
                   fullWidth
@@ -305,7 +459,6 @@ const EditUserProfilePage = props => {
                   value={us}
                   onChange={e => setUs(e.target.value)}
                 />
-
               </div>
               {/* //email */}
               <div className="form-group">
@@ -321,7 +474,7 @@ const EditUserProfilePage = props => {
                   onChange={e => setEmail(e.target.value)}
                 /> */}
 
-<TextField
+                <TextField
                   variant="outlined"
                   margin="normal"
                   fullWidth
@@ -329,7 +482,6 @@ const EditUserProfilePage = props => {
                   autoFocus
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-
                 />
               </div>
               <div className="form-group">
