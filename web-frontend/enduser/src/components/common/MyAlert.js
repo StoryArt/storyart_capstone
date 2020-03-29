@@ -15,7 +15,7 @@ const MyAlert = (props) => {
         <Snackbar 
             anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             open={open} 
-            autoHideDuration={6000} 
+            autoHideDuration={2000} 
             onClose={handleClose}>
             <Alert 
                 elevation={6} variant="filled" 

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -26,8 +27,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 //    Page<User> findAdminByUsernameOrEmail( String search,Pageable pageable);
 
     // tim nhung user co role trong bang user_role la 1
-    @Query(value = "SELECT * FROM storyart_db.user u  WHERE u.role_id=(select id from role where name=?2) and (u.username LIKE %?1% or u.email like %?1%)"
-     , countQuery = "SELECT count(*) FROM storyart_db.user u  WHERE u.role_id= (select id from role where name=?2) and (u.username LIKE %?1% or u.email like %?1%)"
+    @Query(value = "SELECT * FROM storyart_db.user u  WHERE u.role_id in (select distinct id from role where name=:rolename) and (u.username LIKE %:search% or u.email like %:search%)"
+     , countQuery = "SELECT count(*) FROM storyart_db.user u  WHERE u.role_id in (select distinct id from role where name=:rolename) and (u.username LIKE %:search% or u.email like %:search%)"
             , nativeQuery = true)
-    Page<User> findByRoleNameUsernameOrEmail(String search, RoleName roleName, Pageable pageable);
+    Page<User> findByRoleNameUsernameOrEmail(@Param("search") String search,@Param("rolename") String roleName, Pageable pageable);
 }

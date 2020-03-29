@@ -114,8 +114,9 @@ class StoryServiceImpl implements StoryService{
 
         List<Tag> tags = tagRepository.findAllByStoryId(story.getId());
         dto.setTags(tagService.mapModelToDto(tags));
-
-        dto.setUser(userRepository.findById(story.getUserId()).orElse(null));
+        User user = userRepository.findById(story.getUserId()).orElse(null);
+        if (user != null) user.setPassword(null);
+        dto.setUser(user);
 
         //get user rating
         Rating rating = ratingRepository.findById(storyId, story.getUserId());
@@ -698,6 +699,9 @@ class StoryServiceImpl implements StoryService{
         dto.setTags(tagService.mapModelToDto(tagList));
         dto.setNumOfComment(commentRepository.countCommentByStoryId(story.getId()));
         dto.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
+        User u = userRepository.findById(story.getUserId()).orElse(null);
+        if(u != null) u.setPassword(null);
+        dto.setUser(u);
         return dto;
     }
 
