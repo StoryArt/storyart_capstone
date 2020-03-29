@@ -9,6 +9,7 @@ import {
 import Pagination from '@material-ui/lab/Pagination';
 import ReportService from '../../services/report.service';
 import { getAuthUserInfo } from '../../config/auth';
+import { Tabs, Tab } from '@material-ui/core';
 
 const ReportManagementPage = () => {
   const userInfo = getAuthUserInfo();
@@ -551,6 +552,12 @@ const ReportManagementPage = () => {
   //     cursor: pointer;
   //     color: #ccc;
   // }
+  const [tabValue, setTabValue] = useState(0);
+  const handleTabChange = (event, newValue) => {
+    if (newValue !== tabValue) {
+      setTabValue(newValue);
+    }
+  }
 
 
 
@@ -560,16 +567,30 @@ const ReportManagementPage = () => {
 
 
     <MainLayout>
-      <div className="container-fluid">
-
-        <MDBNav className="nav-tabs" className="mb-4">
+      <div className="container-fluid" >
+        {/* <Tabs aria-label="simple tabs example" value={tabValue} onChange={handleTabChange}>
+          <Tab label="Item One" value={tabValue} index={0}>1</Tab>
+          <Tab label="Item Two" value={tabValue} index={1}>2</Tab>
+          <Tab label="Item Three" value={tabValue} index={2}>3</Tab>
+        </Tabs> */}
+        <MDBNav className="nav-tabs">
           <MDBNavItem>
-            <MDBNavLink to="#" active={activeItem === "1"} onClick={toggle("1")} role="tab" >
+            <MDBNavLink
+              link
+              to="#"
+              active={activeItem === "1"}
+              onClick={toggle("1")}
+              role="tab" >
               Bình luận
                         </MDBNavLink>
           </MDBNavItem>
           <MDBNavItem>
-            <MDBNavLink to="#" active={activeItem === "2"} onClick={toggle("2")} role="tab" >
+            <MDBNavLink
+              link
+              to="#"
+              active={activeItem === "2"}
+              onClick={toggle("2")}
+              role="tab" >
               Truyện
                         </MDBNavLink>
           </MDBNavItem>
