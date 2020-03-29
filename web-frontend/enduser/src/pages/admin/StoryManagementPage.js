@@ -12,9 +12,10 @@ import MySpinner from '../../components/common/MySpinner';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import TagList from '../../components/common/TagList';
 import MyAlert from '../../components/common/MyAlert';
+import ValidationUtils from '../../utils/validation';
 
 let searchTimeout = null;
-
+let currentStory = null;
 
 const useStyles = makeStyles({
   table: {
@@ -26,13 +27,15 @@ const orderBys = getOrderBys()
 
 const StoryManagementPage =  (props) => {
   const classes = useStyles();
+  
 
   const [stories, setStories] = useState([]);
   const [isLoadingStories, setIsLoadingStories] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogContent, setDialogContent] = useState('');
-  const [story, setStory] = useState(null);
+  // const [story, setStory] = useState(null);
+  
   const [openAlert, setOpenAlert] = useState(false);
   const [alert, setAlert] = useState({ content: '', type: 'success' });
   const [filters, setFilters] = useState({
@@ -60,7 +63,6 @@ const StoryManagementPage =  (props) => {
       } else {
           searchStories();
       }
-      searchStories();
   }
 
 const changePage = (e, value) => {
@@ -89,33 +91,36 @@ const changePage = (e, value) => {
       setStories(stories);
   }
 
-  const readStory = (story) => {
-    window.open('/stories/read/' + story.id);
+  const viewStory = (story) => {
+    window.open('/stories/details/' + story.id);
   }
 
   const updateStory = async () => {
-    const enable = story.deactiveByAdmin ? true : false;
+    // console.log(currentStory);
+    const enable = currentStory.deactiveByAdmin ? true : false;
     try {
-      const res = await StoryService.updateStoryByAdmin(story.id, enable);
+      const res = await StoryService.updateStoryByAdmin(currentStory.id, enable);
       console.log(res);
       if(res.data.success){
-        const s = stories.find(st => st.id === story.id);
+        const s = stories.find(st => st.id === currentStory.id);
         s.deactiveByAdmin = enable ? false : true;
         setStories([...stories]);
         setAlert({ content: 'Cập nhật thành công', type: 'success' });
+      } else {
+        setAlert({ content: Object.values(res.data.errors)[0], type: 'error' });
       }
     } catch (error) {
       console.log(error);
-      setAlert({ content: 'Không thể câp nhật truyện', type: 'error' });
     }
+    currentStory = null;
     setOpenAlert(true);
-    setStory(null);
     setOpenDialog(false);
   }
 
   const handleUpdateByAdmin = (story) => {
-    setStory(story);
-    const enable = story.deactiveByAdmin ? true : false;
+    console.log(story);
+    currentStory = story;
+    const enable = currentStory.deactiveByAdmin ? true : false;
     if(enable){
       setDialogContent('Bạn có chắc muốn khôi phục truyện này chứ?')
     } else {
@@ -126,7 +131,7 @@ const changePage = (e, value) => {
 
   const cancel = () => {
     setOpenDialog(false);
-    setStory(null);
+    currentStory = null;
   }
 
   return (
@@ -137,7 +142,7 @@ const changePage = (e, value) => {
           <div className="col-12">
             <h3 className="">Thống kê</h3>
             <hr style={{ border: '1px solid #ccc' }} />
-            data will stay here
+              data will stay here
           </div>
         </div>
         <div className="row mt-5">
@@ -218,9 +223,9 @@ const changePage = (e, value) => {
                     <TableCell align="center">Ảnh</TableCell>
                     {/* <TableCell align="center">Giới thiệu</TableCell> */}
                     <TableCell align="center">Số màn hình</TableCell>
-                    <TableCell align="center">Số lượt đọc</TableCell>
-                    <TableCell align="center">Số lượt bình luận</TableCell>
-                    <TableCell align="center">Số lượt đánh giá</TableCell>
+                    <TableCell align="center">Lượt đọc</TableCell>
+                    <TableCell align="center">Lượt bình luận</TableCell>
+                    <TableCell align="center">Lượt đánh giá</TableCell>
                     <TableCell align="center">Đánh giá trung bình</TableCell>
                     <TableCell align="center">Trạng thái</TableCell>
                     <TableCell align="center">Tác giả</TableCell>
@@ -236,18 +241,15 @@ const changePage = (e, value) => {
                       <TableCell align="center">
                         <img style={{ width: '80px' }}  src={story.image}/>
                       </TableCell>
-                      {/* <TableCell align="center">
-                        <div style={{ maxWidth: '200px' }}>
-                          {story.intro}
-                        </div>
-                      </TableCell> */}
                       <TableCell align="center">{story.numOfScreen}</TableCell>
                       <TableCell align="center">{story.numOfRead}</TableCell>
                       <TableCell align="center">{story.numOfComment}</TableCell>
                       <TableCell align="center">{story.numOfRate}</TableCell>
                       <TableCell align="center">{story.avgRate}</TableCell>
-                      <TableCell align="center">{story.deactiveByAdmin ? <span className="text-danger">INACTIVE</span> : <span className="text-success">ACTIVE</span>}</TableCell>
-                      <TableCell align="center">{story.user.name}</TableCell>
+                      <TableCell align="center">{story.deactiveByAdmin ? <span className="text-danger">ĐÃ BỊ KHÓA</span> : <span className="text-success">CHƯA KHÓA</span>}</TableCell>
+                      <TableCell align="center">
+                        {ValidationUtils.isEmpty(story.user) ? '' : story.user.name}
+                        </TableCell>
                       <TableCell align="center">
                         <div style={{ maxWidth: '150px' }}>
                           <small>
@@ -257,13 +259,13 @@ const changePage = (e, value) => {
                       </TableCell>
                       <TableCell align="center">
                         <MyDropdownMenu>
-                          <MenuItem onClick={() => readStory(story)}>
-                             Đọc truyện
+                          <MenuItem onClick={() => viewStory(story)}>
+                             Xem truyện
                           </MenuItem>
                           {/* <MenuItem>Chi tiết</MenuItem> */}
                           <Divider/>
                           <MenuItem onClick={() => handleUpdateByAdmin(story)}>
-                            {story.deactiveByAdmin ? 'Khôi phục truyện' : 'Vô hiệu truyện'}
+                            {story.deactiveByAdmin ? 'Khôi phục truyện' : 'Xóa truyện'}
                           </MenuItem>
                         </MyDropdownMenu>
                       </TableCell>

@@ -56,9 +56,9 @@ class TagServiceImpl implements TagService{
         Tag tag = new Tag();
         Tag checktag = tagRepository.findByTitle(tagDTO.getTitle());
         if (checktag != null) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Sorry Tag Title existed ");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Xin lỗi, Nhãn này đã tồn tại");
         } else if (tagDTO.getTitle().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Sorry Tag Title is required ");
+            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Xin hãy nhập Nhãn:");
         } else {
             tag.setTitle(tagDTO.getTitle());
             tag.setActive(true);
@@ -72,9 +72,9 @@ class TagServiceImpl implements TagService{
         Optional<Tag> tagCheck = tagRepository.findById(tagDTO.getId());
         Tag tag = tagCheck.get();
         if (!tagCheck.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Sorry, Tag do not exist ");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Xin lỗi, Nhãn không tồn tại ");
         } else if (tagDTO.getTitle().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Sorry Tag Title is required ");
+            throw new ResponseStatusException(HttpStatus.LENGTH_REQUIRED, "Xin hãy nhập Nhãn:");
         } else {
             tag.setTitle(tagDTO.getTitle());
             boolean flag = tagDTO.isActive();

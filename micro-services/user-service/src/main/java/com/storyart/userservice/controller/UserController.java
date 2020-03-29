@@ -1,6 +1,5 @@
 package com.storyart.userservice.controller;
 
-import com.storyart.userservice.common.constants.RoleName;
 import com.storyart.userservice.dto.ResultDto;
 import com.storyart.userservice.exception.BadRequestException;
 import com.storyart.userservice.exception.ResourceNotFoundException;
@@ -15,12 +14,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import javax.websocket.server.PathParam;
-import java.util.Collection;
 
 /**
  * ref from usercontroller
@@ -55,9 +49,9 @@ public class UserController {
     }
 
     @GetMapping("current")
-    @Secured({"ROLE_USER", "ROLE_ADMIN", "ROLE_SYSTEM_ADMIN"})
     public ResponseEntity getCurrentUser(@CurrentUser UserPrincipal userPrincipal){
-        return new ResponseEntity(userPrincipal, HttpStatus.OK);
+        ResultDto result = userService.getUserProfile(userPrincipal.getId());
+        return new ResponseEntity(result, HttpStatus.OK);
     }
 
     @GetMapping(value = "/username/{username}")
@@ -89,7 +83,7 @@ public class UserController {
 
     @GetMapping(value = "public_profile/{userId}")
     public ResponseEntity currentUser(@PathVariable int userId) {
-        ResultDto result = userService.getUserPublicProfile(userId);
+        ResultDto result = userService.getUserProfile(userId);
        return new ResponseEntity(result, HttpStatus.OK);
     }
 
@@ -158,6 +152,15 @@ public class UserController {
             throw new UnauthorizedException("Bạn không thể chỉnh sửa nội dung này!");
         }
         userService.updateAvatar(uid, avatarUpdateRequest.getLink());
+        return new ResponseEntity<>(new ApiResponse(true, "Lưu thành công!"), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/{uid}/profileImage/save")
+    public ResponseEntity<?> saveProfileImageLink(@PathVariable("uid") Integer uid, @CurrentUser UserPrincipal userPrincipal, @RequestBody AvatarUpdateRequest avatarUpdateRequest) {
+        if (userPrincipal.getId() != uid) {
+            throw new UnauthorizedException("Bạn không thể chỉnh sửa nội dung này!");
+        }
+        userService.updateProfileImage(uid, avatarUpdateRequest.getLink());
         return new ResponseEntity<>(new ApiResponse(true, "Lưu thành công!"), HttpStatus.OK);
     }
 

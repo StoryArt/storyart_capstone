@@ -169,7 +169,7 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(page, size);
 
 
-        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(search,RoleName.ROLE_ADMIN, pageable);
+        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(search,RoleName.ROLE_ADMIN.toString(), pageable);
         List<User> usersList = userPage.toList();
 
         List<UserInManagementResponse> users = convertUserlist(usersList);
@@ -194,7 +194,7 @@ public class UserServiceImpl implements UserService {
 page=page-1;
         validatePageNumberAndSize(page, size);
         Pageable pageable = PageRequest.of(page, size);
-        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(searchtxt,RoleName.ROLE_USER, pageable);
+        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(searchtxt,RoleName.ROLE_USER.toString(), pageable);
         List<User> usersList = userPage.toList();
         List<UserInManagementResponse> users = convertUserlist(usersList);
         return new PagedResponse<UserInManagementResponse>(users, 1+userPage.getNumber(), userPage.getSize(),
@@ -228,9 +228,16 @@ page=page-1;
         userRepository.save(user);
 
     }
+    @Override
+    public void updateProfileImage(Integer uid,String link) {
+        User user= findById(uid);
+        user.setProfileImage(link);
+        userRepository.save(user);
+
+    }
 
     @Override
-    public ResultDto getUserPublicProfile(int userId) {
+    public ResultDto getUserProfile(int userId) {
         ResultDto result = new ResultDto();
         result.setSuccess(false);
         User user = userRepository.findById(userId).orElse(null);
@@ -239,6 +246,7 @@ page=page-1;
         } else if(!user.isActive() || user.isDeactiveByAdmin()){
             result.getErrors().put("DELETED", "Tài khoản này đã bị xóa");
         } else {
+            user.setPassword(null);
             UserProfileDto userProfileDto = modelMapper.map(user, UserProfileDto.class);
             Role role = roleRepository.findRoleById(user.getRoleId()).orElse(null);
             userProfileDto.setRole(role);

@@ -20,7 +20,7 @@ const HomePage = () => {
 
     useEffect(() => {
         getTrendStories();
-        // getsuggestedStories();
+         getsuggestedStories();
     }, []);
    
 
@@ -92,7 +92,7 @@ const HomePage = () => {
                 {!trendStoriesLoading && (
                     <div className="row">
                         {trendStories.map(story => (
-                            <div className="col-sm-3 px-2" key={story.id}>
+                            <div className="col-sm-12 col-md-6 col-lg-3 px-2" key={story.id}>
                                 <StoryCard story={story} />
                             </div>
                         ))}

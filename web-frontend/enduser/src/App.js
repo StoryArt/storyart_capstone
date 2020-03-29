@@ -13,6 +13,7 @@ import StoryDetailsPage from './pages/enduser/story-details-page/StoryDetailsPag
 import UserProfilePage from './pages/enduser/user-profile-page/UserProfilePage';
 import PublicUserProfilePage from './pages/enduser/user-profile-page/PublicUserProfilePage';
 import UserHistoryPage from './pages/enduser/user-history-page/UserHistoryPage';
+import EditUserProfilePage from './pages/enduser/user-profile-page/EditUserProfilePage';
 
 import LoginPage from './pages/common/LoginPage';
 import RegisterPage from './pages/common/RegisterPage';
@@ -49,25 +50,29 @@ const styles = theme => ({
   }
 });
 
+let isSetupAuth = false;
+
 
 function App() {
-
-  // redirect to login page when response status is 401 or 403
-  interceptResponse(() => {
-    setAuthHeader(null);
-    clearTokenFromLocal();
-    window.location.href = '/login';
-  });
-
-  //get token from local storage when access the website
-  useEffect(() => {
+  
+  if(!isSetupAuth){
+    //get token from local storage when user access the website
     const token = getTokenFromLocal();
     if(ValidationUtils.isEmpty(token)){
       setAuthHeader(null);
     } else {
       setAuthHeader(token);
     }
-  }, []);
+
+    // redirect to login page when response status is 401 or 403
+    interceptResponse(() => {
+      setAuthHeader(null);
+      clearTokenFromLocal();
+      window.location.href = '/login';
+    });
+
+    isSetupAuth = true;
+  }
 
   return (
     <GlobalContext>
@@ -96,12 +101,24 @@ function App() {
               path="/stories/edit/:storyId" 
               roleName={ROLE_NAMES.ROLE_USER} 
               component={CreateStoryPage}/>
-            
+
             <PrivateRoute 
               exact 
-              path="/user/edit-profile" 
-              roleName={ROLE_NAMES.ROLE_USER}  
-              component={UserProfilePage}/>
+              path="/user/my-profile/:storyId" 
+              roleName={ROLE_NAMES.ROLE_USER} 
+              component={CreateStoryPage}/>
+
+              <PrivateRoute 
+                exact 
+                path="/user/my-profile" 
+                roleName={ROLE_NAMES.ROLE_USER}  
+                component={UserProfilePage}/>
+
+              <PrivateRoute 
+                exact 
+                path="/user/edit-profile" 
+                roleName={ROLE_NAMES.ROLE_USER}  
+                component={EditUserProfilePage}/>
            
             <PrivateRoute 
               exact 

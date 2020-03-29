@@ -36,7 +36,7 @@ const UserSideNavigation = () => {
                                 Lịch sử
                             </MDBListGroupItem>
                         </NavLink>
-                        <NavLink to="/user/edit-profile" activeClassName="activeClass">
+                        <NavLink to="/user/my-profile" activeClassName="activeClass">
                             <MDBListGroupItem>
                                 <MDBIcon icon="book" className="mr-3"/>
                                 Quản lý tài khoản

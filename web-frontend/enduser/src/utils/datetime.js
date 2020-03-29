@@ -1,11 +1,19 @@
 class DateTimeUtils{
     static getDate(datetime){
-        return new Date(datetime).toLocaleDateString();
+        try {
+            return new Date(datetime).toLocaleDateString();
+        } catch (error) {
+            return 'Chưa xác định';
+        }
     }
 
     static getDateTime(datetime){
-        const d = new Date(datetime);
-        return d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+        try {
+            const d = new Date(datetime);
+            return d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+        } catch (error) {
+            return 'Chưa xác định';
+        }
     }
 }
 
