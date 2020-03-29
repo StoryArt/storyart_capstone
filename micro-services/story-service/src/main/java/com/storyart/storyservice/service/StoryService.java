@@ -10,6 +10,7 @@ import com.storyart.storyservice.dto.read_story.ReadStoryDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryInformationDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryScreenDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryTagDto;
+import com.storyart.storyservice.dto.statistics.ReadStatisticDto;
 import com.storyart.storyservice.model.*;
 import com.storyart.storyservice.repository.*;
 import com.storyart.storyservice.utils.MyStringUtils;
@@ -52,6 +53,7 @@ public interface StoryService {
     ResultDto increaseStoryRead(int storyId);
     ResultDto saveReadHistory(int storyId, int userId);
     ResultDto rateStory(int storyId, int userId, double stars);
+    ResultDto getReadStatisticsByDateRangeOfUser(Date from, Date to, int userId);
 }
 
 @Service
@@ -91,6 +93,9 @@ class StoryServiceImpl implements StoryService{
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    HistoryRepository historyRepository;
 
     @Autowired
     ModelMapper modelMapper;
@@ -218,6 +223,15 @@ class StoryServiceImpl implements StoryService{
         return result;
     }
 
+    @Override
+    public ResultDto getReadStatisticsByDateRangeOfUser(Date from, Date to, int userId) {
+        ResultDto result = new ResultDto();
+
+        List<ReadStatisticDto> data = historyRepository.findReadingStatisticsByDateRangeOfUser(from, to, userId);
+        result.setData(data);
+        result.setSuccess(true);
+        return result;
+    }
 
 
     @Override

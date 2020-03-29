@@ -14,15 +14,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 
-@Setter
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-class ReadingHistoryId implements Serializable {
-    private int userId;
-    private int storyId;
-}
-
 
 @Entity
 @Table(name = "reading_history")
@@ -30,14 +21,13 @@ class ReadingHistoryId implements Serializable {
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(ReadingHistoryId.class)
 public class ReadingHistory extends DateAudit {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotNull
     private Integer userId;
 
     @NotNull
