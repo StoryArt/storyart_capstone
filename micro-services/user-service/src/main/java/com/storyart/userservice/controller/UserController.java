@@ -155,4 +155,13 @@ public class UserController {
         return new ResponseEntity<>(new ApiResponse(true, "Lưu thành công!"), HttpStatus.OK);
     }
 
+    @PostMapping(value = "/{uid}/profileImage/save")
+    public ResponseEntity<?> saveProfileImageLink(@PathVariable("uid") Integer uid, @CurrentUser UserPrincipal userPrincipal, @RequestBody AvatarUpdateRequest avatarUpdateRequest) {
+        if (userPrincipal.getId() != uid) {
+            throw new UnauthorizedException("Bạn không thể chỉnh sửa nội dung này!");
+        }
+        userService.updateProfileImage(uid, avatarUpdateRequest.getLink());
+        return new ResponseEntity<>(new ApiResponse(true, "Lưu thành công!"), HttpStatus.OK);
+    }
+
 }

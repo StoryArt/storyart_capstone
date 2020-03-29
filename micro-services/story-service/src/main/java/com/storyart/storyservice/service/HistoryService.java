@@ -42,7 +42,7 @@ class HistoryServiceIml implements HistoryService {
 
     @Override
     public   List<Integer> jaccardCalculate(Integer id) {
-        List<ReadingHistory> CurrentUserHistory = historyRepository.findHistoryById(id);
+        List<ReadingHistory> CurrentUserHistory = historyRepository.findHistoryByIdOnly(id);
         HistoryDTO currentUserH = new HistoryDTO();
         currentUserH.setUserid(id);
         List<Integer> listCurr = new ArrayList<>();
@@ -55,19 +55,21 @@ class HistoryServiceIml implements HistoryService {
 
         List<Integer> check = historyRepository.findUserIdHistoryExceptId(id);
         // get list history except current
-        for (int x = 0; x < check.size(); x++) {
-            List<ReadingHistory> byId = historyRepository.findHistoryById(check.get(x));
-            int o = 0;
-            HistoryDTO dto = new HistoryDTO();
-            dto.setUserid(byId.get(o).getUserId());
+        List<ReadingHistory> byId = historyRepository.findHistoryById(check);
 
+        for (Integer integer : check){
+            HistoryDTO dto = new HistoryDTO();
             List<Integer> list = new ArrayList<>();
-            for (int i = 0; i < byId.size(); i++) {
-                list.add(byId.get(i).getStoryId());
-            }
+          for(int i = 0; i < byId.size(); i++){
+              if(integer.equals(byId.get(i).getUserId())){
+                  dto.setUserid(byId.get(integer).getUserId());
+                  list.add(byId.get(i).getStoryId());
+              }
+          }
             dto.setListStory(list);
             listHistory.add(dto);
         }
+
 
         // count similarity
         Double MostFit = 0.0;
@@ -83,7 +85,6 @@ class HistoryServiceIml implements HistoryService {
 
         // find story current does not read
         List<Integer> MostFitHistory = historyRepository.findListHistory(MostFitId);
-        List<Story> listStory = new ArrayList<>();
         MostFitHistory.removeAll(currentUserH.getListStory());
 
         return MostFitHistory;

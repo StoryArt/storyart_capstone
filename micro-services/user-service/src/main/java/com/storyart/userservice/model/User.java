@@ -40,6 +40,9 @@ public class User extends DateAudit {
     @Size(max = 1000, message = "")
     private String avatar;
 
+    @Size(max = 1000, message = "")
+    private String profileImage;
+
     private int roleId;
 
     @Size(max = 300, message = "Thông tin giới thiệu có độ dài tối đa là 300 ký tự")
