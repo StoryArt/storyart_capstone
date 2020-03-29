@@ -102,12 +102,12 @@ const SearchStoriesPage = () => {
             <div className="container-fluid">
             <div className="row">
                 <div className="col-sm-3">
-                    <FormControl>
-                        <InputLabel>Tìm tên truyện, tác giá</InputLabel>
+                    <FormControl style={{ width: '100%' }}>
+                        <InputLabel>Tìm truyện, tác giá</InputLabel>
                         <Input
                             value={filters.keyword}
                             onChange={e => changeFilters('keyword', e.target.value)}
-                            style={{ width: '100%' }}
+                            
                         />
                     </FormControl>
                 </div>
@@ -128,7 +128,7 @@ const SearchStoriesPage = () => {
                             style={{float: 'right'}}
                             count={totalPages} 
                             page={filters.page}
-                            color="success" 
+                            color="default" 
                             onChange={changePage} />
                          <div className="clearfix"></div>
                     </div>
