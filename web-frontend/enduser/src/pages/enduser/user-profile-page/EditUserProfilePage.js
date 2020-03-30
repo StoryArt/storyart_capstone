@@ -76,9 +76,6 @@ const EditUserProfilePage = props => {
     try {
       const res = await UserService.updateProfile(user, profile.id);
       setProfile(res.data);
-
-      // setErrorMessage(<MDBAlert color="success">Lưu thành công</MDBAlert>);
-
       setAlert({
         open: true,
         content: "Lưu thành công",
@@ -93,7 +90,6 @@ const EditUserProfilePage = props => {
       } else if (typeof error.response.data.message == "string") {
         err = error.response.data.message;
       }
-      // setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
       setAlert({
         open: true,
         content: { err },
@@ -140,19 +136,30 @@ const EditUserProfilePage = props => {
     reader.readAsDataURL(file);
     setSaveAvatarBt("");
   };
-
-  const handleUploadAvatar = async event => {
+  const handleUpload = async event => {
     event.preventDefault();
     try {
-      const res = await UserService.uploadAvatar(upfile);
-      console.log(res);
-
+      let res = null;
+      let flag = "";
+      if(upfile != null){
+        res = await UserService.uploadAvatar(upfile);
+        flag = "avatar";
+        console.log(res);
+      }else if (upfileBanner != null){
+        res = await UserService.uploadProfileImage(upfileBanner);
+        flag = "image";
+        console.log(res);
+      }
       if (res.data.status == 200) {
         let linkImgur = res.data.data.link;
         try {
-          const r2 = await UserService.saveToDatabase(id, linkImgur);
-          // setErrorMessage(<MDBAlert color="success">Lưu thành công!</MDBAlert>);
 
+          if(flag ==="avatar"){
+            const r2 = await UserService.saveToDatabase(id, linkImgur);
+          }else if (flag = "image"){
+
+            const r2 = await UserService.saveToDatabaseProfileImage(id, linkImgur);
+          }
           setAlert({
             open: true,
             content: "Đã cập nhật avatar!",
@@ -162,9 +169,6 @@ const EditUserProfilePage = props => {
             closeAlert();
           }, 3000);
         } catch (error) {
-          // setErrorMessage(
-          //   <MDBAlert color="danger">Lưu thất bại. Thử lại!</MDBAlert>
-          // );
           setAlert({
             open: true,
             content: "Lưu thất bại. Thử lại!",
@@ -176,9 +180,6 @@ const EditUserProfilePage = props => {
         }
       }
     } catch (error) {
-      // setErrorMessage(
-      //   <MDBAlert color="danger">Upload thất bại. Thử lại!</MDBAlert>
-      // );
       setAlert({
         open: true,
         content: "Upload thất bại. Thử lại!",
@@ -201,58 +202,6 @@ const EditUserProfilePage = props => {
 
     reader.readAsDataURL(file);
     setSaveBannerBt("");
-  };
-
-  const handleUploadBanner = async event => {
-    event.preventDefault();
-    try {
-      const res = await UserService.uploadProfileImage(upfileBanner);
-      console.log(res);
-
-      if (res.data.status == 200) {
-        let linkImgur = res.data.data.link;
-        try {
-          const r2 = await UserService.saveToDatabaseProfileImage(
-            id,
-            linkImgur
-          );
-          // setErrorMessage(<MDBAlert color="success">Lưu thành công!</MDBAlert>);
-
-          setAlert({
-            open: true,
-            content: "Đã cập nhật Hình nền!",
-            type: "success"
-          });
-          window.setTimeout(() => {
-            closeAlert();
-          }, 3000);
-        } catch (error) {
-          // setErrorMessage(
-          //   <MDBAlert color="danger">Lưu thất bại. Thử lại!</MDBAlert>
-          // );
-          setAlert({
-            open: true,
-            content: "Lưu thất bại. Thử lại!",
-            type: "error"
-          });
-          window.setTimeout(() => {
-            closeAlert();
-          }, 3000);
-        }
-      }
-    } catch (error) {
-      // setErrorMessage(
-      //   <MDBAlert color="danger">Upload thất bại. Thử lại!</MDBAlert>
-      // );
-      setAlert({
-        open: true,
-        content: "Upload thất bại. Thử lại!",
-        type: "error"
-      });
-      window.setTimeout(() => {
-        closeAlert();
-      }, 3000);
-    }
   };
 
   const mystyle = {
@@ -297,10 +246,10 @@ const EditUserProfilePage = props => {
           Tài khoản
         </Typography>
         <div className="col-sm-12">
-          <div className="" style={mystyleRight}>
+          <div  style={mystyleRight}>
             <form
               style={mystyle}
-              onSubmit={handleUploadBanner}
+              onSubmit={handleUpload}
               enctype="multipart/form-data"
             >
               <div className="row">
@@ -335,19 +284,6 @@ const EditUserProfilePage = props => {
                         <CloudUploadIcon />
                         <span className="pl-2 capitalize">Lưu Hình Nền</span>
                       </Button>
-                      {/* <button
-                        disabled={saveAvatarBt}
-                        className="btn float-left"
-                        style={{
-                          clear: "both",
-                          fontSize: "1.1em",
-                          margin: 0,
-                          color: "#fff",
-                          backgroundColor: "#007bff"
-                        }}
-                      >
-                        Lưu avatar
-                      </button> */}
                     </div>
                   </div>
                 </div>
@@ -356,10 +292,10 @@ const EditUserProfilePage = props => {
           </div>
 
 
-          <div className="" style={mystyleLeft}>
+          <div  style={mystyleLeft}>
             <form
               style={mystyle}
-              onSubmit={handleUploadAvatar}
+              onSubmit={handleUpload}
               enctype="multipart/form-data"
             >
               <div className="row">
