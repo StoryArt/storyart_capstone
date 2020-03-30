@@ -14,14 +14,14 @@ import java.util.List;
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, RatingId> {
 
-        @Query(value = "SELECT * FROM rating where rating.story_id = :storyid and not user_id = :userid", nativeQuery = true)
-    List<Rating> findRatingByStoryIdEXceptId(@Param("storyid") Integer storyid, @Param("userid") Integer userid);
+        @Query(value = "SELECT * FROM rating where rating.story_id in(:storyid) and not user_id = :userid order by rating.user_id", nativeQuery = true)
+    List<Rating> findRatingByStoryIdEXceptId(@Param("storyid") List<Integer> storyid, @Param("userid") Integer userid);
 
     @Query(value = "select story_id from rating where user_id = :userid ", nativeQuery = true)
     List<Integer> findStoryRatingByUserId(@Param("userid") Integer userid);
 
-    @Query(value = "SELECT * FROM rating where user_id = :userid", nativeQuery = true)
-    List<Rating> findRatingByUserId(@Param("userid") Integer userid);
+    @Query(value = "SELECT * FROM rating where user_id = :userid and rating.story_id in (:storyid)", nativeQuery = true)
+    List<Rating> findRatingByUserId(@Param("userid") Integer userid, @Param("storyid") List<Integer> storyid);
 
     @Query(value = "SELECT ROUND(AVG(stars), 1) FROM rating where story_id = ?1", nativeQuery = true)
     double findAvgStarsByStoryId(int storyId);

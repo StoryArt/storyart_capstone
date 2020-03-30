@@ -53,18 +53,68 @@ class RatingServiceIml implements RatingService {
             listStory = storyRepository.findStoryExceptThisWeek();
         }
 
-
+        List<RatingDTO> listRatingUser = new ArrayList<>();
         List<RatedStoryDTO> ListAssumRatedStory = new ArrayList<>();
 
-        for (Integer story : listStory) {
-            List<RatingDTO> listRatingUser = new ArrayList<>();
-            List<Rating> ratingUser = ratingRepository.findRatingByStoryIdEXceptId(story, id);
+        List<Rating> ratingUser = ratingRepository.findRatingByStoryIdEXceptId(listStory, id);
 
-            if(ratingUser.size() >0 ){
+        //----------------------
 
-                for (Rating rate : ratingUser) {
+        RatingDTO currUser = new RatingDTO();
+        currUser.setUserid(id);
+        List<Rating> currUserRating = ratingRepository.findRatingByUserId(id, listStory);
+        double sumCurr = 0.0;
+        for (Rating rate : currUserRating) {
+            sumCurr += rate.getStars();
+        }
+        double normalizeCurrUser = sumCurr / currUserRating.size();
 
-                    List<Rating> userRating = ratingRepository.findRatingByUserId(rate.getUserId());
+        List<RatedStoryDTO> listCurrRated = new ArrayList<>();
+        for (Integer storyid : listStory) {
+            boolean flag = true;
+            RatedStoryDTO ratedDTO = new RatedStoryDTO();
+            for (Rating rate : currUserRating) {
+                if (storyid.equals(rate.getStoryId())) {
+                    ratedDTO.setStoryId(rate.getStoryId());
+                    double userPoint = rate.getStars() - normalizeCurrUser;
+                    ratedDTO.setRatedPoint(userPoint);
+                    flag = false;
+                    listCurrRated.add(ratedDTO);
+                }
+            }
+            if(flag){
+                ratedDTO.setStoryId(storyid);
+                double userPoint = 0;
+                ratedDTO.setRatedPoint(userPoint);
+                listCurrRated.add(ratedDTO);
+            }
+        }
+
+        for(Integer integer : listStory) {
+            boolean flag2 = false;
+            List<Rating> userInStory = new ArrayList<>();
+            for (Rating rate : ratingUser) {
+
+                if (integer.equals(rate.getStoryId())) {
+                    userInStory.add(rate);
+                    flag2 = true;
+                }
+            }
+            RatedStoryDTO AssumRatedStory = new RatedStoryDTO();
+            if (!flag2) {
+                AssumRatedStory = new RatedStoryDTO();
+                AssumRatedStory.setStoryId(integer);
+                AssumRatedStory.setRatedPoint(0.0);
+                ListAssumRatedStory.add(AssumRatedStory);
+            } else {
+
+                for (Rating rated : userInStory) {
+                    List<Rating> userRating = new ArrayList<>();
+                    for (Rating rate : ratingUser) {
+                        if (rate.getUserId() == rated.getUserId()) {
+                            userRating.add(rate);
+                        }
+                    }
                     RatingDTO dtoUSER = new RatingDTO();
 
                     List<RatedStoryDTO> listRated = new ArrayList<>();
@@ -77,9 +127,10 @@ class RatingServiceIml implements RatingService {
                     }
                     double normalizeNumber = sum / userRating.size();
 
+
                     // Step 3
                     // Find Rating of selected User
-                    dtoUSER.setUserid(rate.getUserId());
+                    dtoUSER.setUserid(rated.getUserId());
 
                     for (Integer storyid : listStory) {
                         boolean flag = true;
@@ -94,7 +145,7 @@ class RatingServiceIml implements RatingService {
                                 flag = false;
                             }
                         }
-                        if(flag){
+                        if (flag) {
                             ratedDTO.setStoryId(storyid);
                             double userPoint = 0;
                             ratedDTO.setRatedPoint(userPoint);
@@ -106,46 +157,7 @@ class RatingServiceIml implements RatingService {
                 }
 
 
-
-
-                // step 4
-                // get Current User
-                // count Rating of current User
-                RatingDTO currUser = new RatingDTO();
-                currUser.setUserid(id);
-                List<Rating> currUserRating = ratingRepository.findRatingByUserId(id);
-                double sum = 0;
-                for (Rating rate : currUserRating) {
-                    sum += rate.getStars();
-                }
-                double normalizeCurrUser = sum / currUserRating.size();
-
-                List<RatedStoryDTO> listCurrRated = new ArrayList<>();
-                for (Integer storyid : listStory) {
-                    boolean flag = true;
-                    RatedStoryDTO ratedDTO = new RatedStoryDTO();
-                    for (Rating rate : currUserRating) {
-                        if (storyid.equals(rate.getStoryId())) {
-                            ratedDTO.setStoryId(rate.getStoryId());
-                            double userPoint = rate.getStars() - normalizeCurrUser;
-                            ratedDTO.setRatedPoint(userPoint);
-                            flag = false;
-                        }
-                    }
-                    if(flag){
-                        ratedDTO.setStoryId(storyid);
-                        double userPoint = 0;
-                        ratedDTO.setRatedPoint(userPoint);
-                    }
-                    listCurrRated.add(ratedDTO);
-
-                }
-
-
-
-                // step 5
-                // Calculate Similarity of current User and Selected User
-                // Pick top 2
+                // ------------
                 int MostFitId = 0;
                 double MostFit = 0;
                 int SecondFitId = 0;
@@ -163,10 +175,10 @@ class RatingServiceIml implements RatingService {
 
                     } else {
                         double cosine = cosineSimilarity(listRatingCurrentUser, listRatingSelectedUser);
-                        if(MostFit == 0){
+                        if (MostFit == 0) {
                             MostFitId = dto.getUserid();
                             MostFit = cosine;
-                        }else if (cosine >= MostFit) {
+                        } else if (cosine >= MostFit) {
                             SecondFitId = MostFitId;
                             SecondFit = MostFit;
                             MostFitId = dto.getUserid();
@@ -183,37 +195,31 @@ class RatingServiceIml implements RatingService {
 
                 double normalizePointMostFit = 0.0;
                 double normalizePointSecondFit = 0.0;
-                for(RatingDTO dto : listRatingUser){
-                    if(dto.getUserid() ==MostFitId ){
-                        for(RatedStoryDTO dto2 : dto.getListPoint()){
-                            if(dto2.getStoryId() == story){
+                for (RatingDTO dto : listRatingUser) {
+                    if (dto.getUserid() == MostFitId) {
+                        for (RatedStoryDTO dto2 : dto.getListPoint()) {
+                            if (dto2.getStoryId() == integer) {
                                 normalizePointMostFit = dto2.getRatedPoint();
                             }
                         }
                     }
-                    if(dto.getUserid() ==SecondFitId ){
-                        for(RatedStoryDTO dto2 : dto.getListPoint()){
-                            if(dto2.getStoryId() == story){
+                    if (dto.getUserid() == SecondFitId) {
+                        for (RatedStoryDTO dto2 : dto.getListPoint()) {
+                            if (dto2.getStoryId() == integer) {
                                 normalizePointSecondFit = dto2.getRatedPoint();
                             }
                         }
                     }
                 }
 
-                RatedStoryDTO AssumRatedStory = new RatedStoryDTO();
-                AssumRatedStory.setStoryId(story);
-                Double ra = ((normalizePointMostFit * MostFit) + (normalizePointSecondFit * SecondFit) ) / ((Math.abs(MostFit)) + (Math.abs(SecondFit)));
+                AssumRatedStory.setStoryId(integer);
+                Double ra = ((normalizePointMostFit * MostFit) + (normalizePointSecondFit * SecondFit)) / ((Math.abs(MostFit)) + (Math.abs(SecondFit)));
                 Double AssumtionPoint = ra + normalizeCurrUser;
                 AssumRatedStory.setRatedPoint(AssumtionPoint);
                 ListAssumRatedStory.add(AssumRatedStory);
-            }else{
-                RatedStoryDTO AssumRatedStory = new RatedStoryDTO();
-                AssumRatedStory.setStoryId(story);
-                AssumRatedStory.setRatedPoint(0.0);
-                ListAssumRatedStory.add(AssumRatedStory);
             }
-
         }
+
         // Step 7
         // remove all lesser than 2.5
         List<Integer> listSuggestStory = new ArrayList<>();
@@ -279,18 +285,37 @@ class RatingServiceIml implements RatingService {
 
         List<StoryCommentDTO> list = new ArrayList<>();
         List<Integer> listStory = storyRepository.findAllStory();
-        for (Integer integer: listStory){
-            int comment = commentRepository.countCommentByStoryId(integer);
-            int like = commentRepository.countLikeCommentByStoryId(integer);
-            int dislike = commentRepository.countDisLikeCommentByStoryId(integer);
+        List<Integer> comment = commentRepository.countCommentByStoryIds(listStory);
+        List<Integer> like = commentRepository.countLikeCommentByStoryIds(listStory);
+        List<Integer> dislike = commentRepository.countDisLikeCommentByStoryIds(listStory);
 
-            double point = ((comment * 0.4) + (like * 0.3) + (dislike * 0.3))/(comment + like + dislike);
+        for(Integer integer : listStory){
+            int sum = 0;
+            for(Integer inter : comment){
+                if(inter.equals(integer)){
+                    sum = sum +1;
+                }
+            }
+            int sumlike = 0;
+            for(Integer inter : like){
+                if(inter.equals(integer)){
+                    sumlike = sumlike +1;
+                }
+            }
+
+            int sumdislike = 0;
+            for(Integer inter : dislike){
+                if(inter.equals(integer)){
+                    sumdislike = sumdislike +1;
+                }
+            }
+
+            double point = ((sum * 0.4) + (sumlike * 0.3) + (sumdislike * 0.3))/(sum + sumlike + sumdislike);
             StoryCommentDTO dto = new StoryCommentDTO();
             dto.setStoryId(integer);
             dto.setPoint(point);
             list.add(dto);
         }
-
 
         List<Integer> listSuggestion = new ArrayList<>();
         int topid = 0;
