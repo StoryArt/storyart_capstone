@@ -1,11 +1,13 @@
 package com.storyart.storyservice.repository;
 
+import com.storyart.storyservice.dto.statistics.ReadStatisticDto;
 import com.storyart.storyservice.model.ReadingHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -22,4 +24,10 @@ public interface HistoryRepository extends JpaRepository<ReadingHistory, Integer
 
     @Query(value = "select story_id from reading_history where user_id = :param", nativeQuery = true)
     List<Integer>  findListHistory(@Param("param") Integer userid);
+
+    @Query(value = "select count(id) as readCount, DATE(created_at) as dateCreated from reading_history " +
+            "where (story_id IN (select id from story where user_id = ?3) " +
+            "and DATE(created_at) <= DATE(?2) and DATE(created_at) >= DATE(?1)) GROUP BY DATE(created_at)",
+            nativeQuery = true)
+    List<ReadStatisticDto> findReadingStatisticsByDateRangeOfUser(Date from, Date to, int userId);
 }

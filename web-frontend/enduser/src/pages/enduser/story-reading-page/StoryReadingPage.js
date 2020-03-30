@@ -150,7 +150,7 @@ const ReadStoryPage = (props) => {
             </Tooltip>
               
                 {(!isLoading && !notfound && !ValidationUtils.isEmpty(story)) && (
-                    <div className="container">
+                    <div className="container" >
                         {informations.map(information => (
                             <div  
                                 className="text-bold"

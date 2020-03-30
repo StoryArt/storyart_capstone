@@ -490,9 +490,12 @@ const StoryDetailsPage = (props) => {
                                         to={`/stories/read/${story.id}`}>Dọc truyện</Link>
                                     {/* <Link className="btn btn-warning" to={`/stories/edit/${story.id}`}>Sua truyen</Link> */}
                                 </div>
-                                <div className="text-center btn btn-danger btn-block mt-1" onClick={toggleModal('reportStoryModal')}>
-                                    Báo cáo
-                                </div>
+                                {userId !== story.user.id &&
+                                    <div className="text-center btn btn-danger btn-block mt-1" onClick={toggleModal('reportStoryModal')}>
+                                        Báo cáo
+                                    </div>
+                                }
+
                                 <div>
                                     <SocialShare shareUrl={'http://youtube.com'} />
                                 </div>
@@ -682,7 +685,7 @@ const StoryDetailsPage = (props) => {
                                     <MDBModalHeader toggle={toggleModal('reportStoryModal')}>Báo cáo truyện</MDBModalHeader>
                                     <MDBModalBody>
                                         <p>Truyện: <strong>{story.title}</strong></p>
-                                        <p>Tác giả: <strong>update later</strong></p>
+                                        <p>Tác giả: <strong>{story.user.name}</strong></p>
                                         {modalError.length > 0 && <small style={{ color: 'red' }}>(*){modalError}</small>}
                                         <form className='mx-3 grey-text'>
                                             <MDBInput

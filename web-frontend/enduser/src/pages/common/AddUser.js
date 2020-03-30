@@ -89,166 +89,166 @@ const CreateAccount = () => {
   }
 
   return (
-    // <div className="pt-5">
-    //   <h3 className="text-center text-bold">+ User</h3>
-    //   <div className="container">
-    //     <div className="row mt-5">
-    //       <div className="col-sm-8 mx-auto">
-    //         <div className="card">
-    //           <div className="card-body">
-    //             <form onSubmit={handleSubmit}>
-    //               {errorMessage}
+    <div className="pt-5">
+      <h3 className="text-center text-bold">+ User</h3>
+      <div className="container">
+        <div className="row mt-5">
+          <div className="col-sm-8 mx-auto">
+            <div className="card">
+              <div className="card-body">
+                <form onSubmit={handleSubmit}>
+                  {errorMessage}
 
-    //               <div className="row">
-    //                 <div className="col-sm-6">
-    //                   <MDBInput
-    //                     value={username}
-    //                     label="Ten dang nhap"
-    //                     onChange={e => setUsername(e.target.value)}
-    //                   />
-    //                 </div>
-    //                 <div className="col-sm-6">
-    //                   <MDBInput
-    //                     value={name}
-    //                     label="Ten day du"
-    //                     onChange={e => setName(e.target.value)}
-    //                   />
-    //                 </div>
-    //                 <div className="col-sm-6">
-    //                   <MDBInput
-    //                     value={email}
-    //                     type="email"
-    //                     label="Email"
-    //                     onChange={e => setEmail(e.target.value)}
-    //                   />
-    //                 </div>
-    //                 <div className="col-sm-6">
-    //                   <MDBInput
-    //                     value={password}
-    //                     type="password"
-    //                     label="Mat khau"
-    //                     onChange={e => setPassword(e.target.value)}
-    //                   />
-    //                 </div>
+                  <div className="row">
+                    <div className="col-sm-6">
+                      <MDBInput
+                        value={username}
+                        label="Ten dang nhap"
+                        onChange={e => setUsername(e.target.value)}
+                      />
+                    </div>
+                    <div className="col-sm-6">
+                      <MDBInput
+                        value={name}
+                        label="Ten day du"
+                        onChange={e => setName(e.target.value)}
+                      />
+                    </div>
+                    <div className="col-sm-6">
+                      <MDBInput
+                        value={email}
+                        type="email"
+                        label="Email"
+                        onChange={e => setEmail(e.target.value)}
+                      />
+                    </div>
+                    <div className="col-sm-6">
+                      <MDBInput
+                        value={password}
+                        type="password"
+                        label="Mat khau"
+                        onChange={e => setPassword(e.target.value)}
+                      />
+                    </div>
 
-    //                {/* //khong can thong tin gioi thieu */}
-    //                 {/* <div className="col-12">
-    //                   <MDBInput
-    //                     type="textarea"
-    //                     rows="3"
-    //                     value={intro_content}
-    //                     label="Nhap thong tin gioi thieu"
-    //                     onChange={e => setIntro_content(e.target.value)}
-    //                   />
-    //                 </div> */}
-    //               </div>
+                   {/* //khong can thong tin gioi thieu */}
+                    {/* <div className="col-12">
+                      <MDBInput
+                        type="textarea"
+                        rows="3"
+                        value={intro_content}
+                        label="Nhap thong tin gioi thieu"
+                        onChange={e => setIntro_content(e.target.value)}
+                      />
+                    </div> */}
+                  </div>
 
-    //               <button
-    //                 className="btn btn-success float-right ml-0"
-    //                 type="submit"
-    //               >
-    //                 Lưu
-    //               </button>
+                  <button
+                    className="btn btn-success float-right ml-0"
+                    type="submit"
+                  >
+                    Lưu
+                  </button>
 
-    //               <div className="clearfix"></div>
-    //             </form>
-    //           </div>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
+                  <div className="clearfix"></div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     
 
-    <div className="py-5">
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <div className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            + Tạo tài khoản người dùng
-          </Typography>
-          {errorMessage}
-          <form className={classes.form} noValidate onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  name="firstName"
-                  variant="outlined"
-                  required
-                  fullWidth
-                  value={username}
-                  onChange={e => setUsername(e.target.value)}
-                  label="Tên đăng nhập"
-                  autoFocus
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  value={name}
-                  label="tên đầy đủ"
-                  onChange={e => setName(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  type="email"
-                  label="Email"
-                  onChange={e => setEmail(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  value={password}
-                  type="password"
-                  label="Mật khẩu"
-                  onChange={e => setPassword(e.target.value)}
-                />
-              </Grid>
-              {/* <Grid item xs={12}>
-                  <TextField
-                    variant="outlined"
-                    required
-                    multiline
-                    fullWidth
-                    rows="3"
-                    value={introContent}
-                    label="Thông tin giới thiệu về bạn..."
-                    onChange={e => setIntroContent(e.target.value)}
-                  />
-                </Grid> */}
-            </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-            >
-              Lưu
-            </Button>
-            {/* <Grid container justify="flex-end">
-                <Grid item>
-                  <Link to="login" variant="body2">
-                    Nếu bạn đã có tài khoản? Vui lòng đăng nhập tại đây
-                  </Link>
-                </Grid>
-              </Grid> */}
-          </form>
-        </div>
-      </Container>
-    </div>
+    // <div className="py-5">
+    //   <Container component="main" maxWidth="xs">
+    //     <CssBaseline />
+    //     <div className={classes.paper}>
+    //       <Avatar className={classes.avatar}>
+    //         <LockOutlinedIcon />
+    //       </Avatar>
+    //       <Typography component="h1" variant="h5">
+    //         + Tạo tài khoản người dùng
+    //       </Typography>
+    //       {errorMessage}
+    //       <form className={classes.form} noValidate onSubmit={handleSubmit}>
+    //         <Grid container spacing={2}>
+    //           <Grid item xs={12} sm={6}>
+    //             <TextField
+    //               name="firstName"
+    //               variant="outlined"
+    //               required
+    //               fullWidth
+    //               value={username}
+    //               onChange={e => setUsername(e.target.value)}
+    //               label="Tên đăng nhập"
+    //               autoFocus
+    //             />
+    //           </Grid>
+    //           <Grid item xs={12} sm={6}>
+    //             <TextField
+    //               variant="outlined"
+    //               required
+    //               fullWidth
+    //               value={name}
+    //               label="tên đầy đủ"
+    //               onChange={e => setName(e.target.value)}
+    //             />
+    //           </Grid>
+    //           <Grid item xs={12} sm={6}>
+    //             <TextField
+    //               variant="outlined"
+    //               required
+    //               fullWidth
+    //               type="email"
+    //               label="Email"
+    //               onChange={e => setEmail(e.target.value)}
+    //             />
+    //           </Grid>
+    //           <Grid item xs={12} sm={6}>
+    //             <TextField
+    //               variant="outlined"
+    //               required
+    //               fullWidth
+    //               value={password}
+    //               type="password"
+    //               label="Mật khẩu"
+    //               onChange={e => setPassword(e.target.value)}
+    //             />
+    //           </Grid>
+    //           {/* <Grid item xs={12}>
+    //               <TextField
+    //                 variant="outlined"
+    //                 required
+    //                 multiline
+    //                 fullWidth
+    //                 rows="3"
+    //                 value={introContent}
+    //                 label="Thông tin giới thiệu về bạn..."
+    //                 onChange={e => setIntroContent(e.target.value)}
+    //               />
+    //             </Grid> */}
+    //         </Grid>
+    //         <Button
+    //           type="submit"
+    //           fullWidth
+    //           variant="contained"
+    //           color="primary"
+    //           className={classes.submit}
+    //         >
+    //           Lưu
+    //         </Button>
+    //         {/* <Grid container justify="flex-end">
+    //             <Grid item>
+    //               <Link to="login" variant="body2">
+    //                 Nếu bạn đã có tài khoản? Vui lòng đăng nhập tại đây
+    //               </Link>
+    //             </Grid>
+    //           </Grid> */}
+    //       </form>
+    //     </div>
+    //   </Container>
+    // </div>
   );
 };
 

@@ -1,5 +1,6 @@
 package com.storyart.storyservice.service;
 
+import com.github.javafaker.Faker;
 import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.story_suggestion.HistoryDTO;
 import com.storyart.storyservice.model.ReadingHistory;
@@ -17,12 +18,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 public interface HistoryService {
     List<Integer> jaccardCalculate(Integer id);
+    void createTempHistory();
 }
 
 @Service
@@ -39,6 +42,8 @@ class HistoryServiceIml implements HistoryService {
 
     @Autowired
     TagRepository tagRepository;
+
+
 
     @Override
     public   List<Integer> jaccardCalculate(Integer id) {
@@ -88,6 +93,18 @@ class HistoryServiceIml implements HistoryService {
         MostFitHistory.removeAll(currentUserH.getListStory());
 
         return MostFitHistory;
+    }
+
+    @Override
+    public void createTempHistory() {
+
+        Faker faker = new Faker();
+        for(int i = 0; i < 200; i++){
+            ReadingHistory rh = new ReadingHistory();
+            rh.setStoryId(faker.number().numberBetween(1, 300));
+            historyRepository.save(rh);
+        }
+
     }
 
 

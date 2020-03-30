@@ -49,5 +49,5 @@ public interface UserService {
 
 
 
-    ResultDto getUserPublicProfile(int userId);
+    ResultDto getUserProfile(int userId);
 }

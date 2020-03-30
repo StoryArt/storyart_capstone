@@ -25,6 +25,7 @@ import AddUser from './pages/common/AddUser';
 import DemoPage from './pages/common/DemoPage';
 
 import StoryManagementPage from './pages/admin/StoryManagementPage';
+import StoryAnalytic from './pages/admin/StoryAnalytic';
 import TagManagementPage from './pages/admin/TagManagementPage';
 import ReportManagementPage from './pages/admin/ReportManagementPage';
 import AdminManagementPage from './pages/admin/AdminManagementPage';
@@ -52,9 +53,8 @@ const styles = theme => ({
 
 let isSetupAuth = false;
 
-
 function App() {
-  
+
   if(!isSetupAuth){
     //get token from local storage when user access the website
     const token = getTokenFromLocal();
@@ -89,6 +89,7 @@ function App() {
             <Route exact path="/stories/details/:storyId" component={StoryDetailsPage}/>
             <Route exact path="/stories/read/:storyId" component={StoryReadingPage}/>
             <Route exact path="/user/profile/:userId" component={PublicUserProfilePage}/>
+            <Route exact path="/story/analystics/:storyId" component={StoryAnalytic}/>
 
             <PrivateRoute 
               exact 
@@ -101,19 +102,24 @@ function App() {
               path="/stories/edit/:storyId" 
               roleName={ROLE_NAMES.ROLE_USER} 
               component={CreateStoryPage}/>
-            
-            {/* <PrivateRoute 
-              exact 
-              path="/user/edit-profile" 
-              roleName={ROLE_NAMES.ROLE_USER}  
-              component={UserProfilePage}/> */}
 
-              {/*TA: chuyen qua edit proòile o trang nay */}
-               <PrivateRoute 
+            <PrivateRoute
               exact 
-              path="/user/edit-profile" 
-              roleName={ROLE_NAMES.ROLE_USER}  
-              component={EditUserProfilePage}/>
+              path="/user/my-profile/:storyId"
+              roleName={ROLE_NAMES.ROLE_USER}
+              component={CreateStoryPage}/>
+
+              <PrivateRoute
+                exact
+                path="/user/my-profile"
+                roleName={ROLE_NAMES.ROLE_USER}
+                component={UserProfilePage}/>
+
+              <PrivateRoute
+                exact
+                path="/user/edit-profile"
+                roleName={ROLE_NAMES.ROLE_USER}
+                component={EditUserProfilePage}/>
            
             <PrivateRoute 
               exact 
@@ -144,6 +150,7 @@ function App() {
       </Router>
     </GlobalContext>
   );
-}
+  }
+
 
 export default withStyles(styles)(App);

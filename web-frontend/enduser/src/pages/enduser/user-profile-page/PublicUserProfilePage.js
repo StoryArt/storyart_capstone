@@ -14,6 +14,7 @@ import { Pagination, Skeleton } from '@material-ui/lab';
 import UserProfileHeader from './UserProfileHeader';
 import NotFound from '../../../components/common/NotFound';
 import ValidationUtils from '../../../utils/validation';
+import MyBackdrop from '../../../components/common/MyBackdrop';
 
 
 let searchTimeout = null;
@@ -23,7 +24,9 @@ let searchTimeout = null;
 
     const [user, setUser] = useState({});
     const [isloadingUser, setLoadingUser] = useState(false);
+    const [openBackdrop, setOpenBackdrop] = useState(false);
     const [userNotfound, setUserNotfound] = useState(false);
+    const [userNotfoundMessage, setUserNotfoundMessage] = useState(false);
     const [stories, setStories] = useState([]);
     const [isLoadingStories, setIsLoadingStories] = useState(false);
     const [totalPages, setTotalPages] = useState(0);
@@ -38,28 +41,35 @@ let searchTimeout = null;
 
 
     React.useEffect(() => {
-        getUserInfo();
-        getTags();
-        getStories();
+       initData();
     }, []);
 
-  const getUserInfo = async () => {
-      setLoadingUser(true);
-     
-      try {
-          const res = await UserService.getUserPublicProfile(userId);
-          console.log(res);
-          const { data, success, errors } = res.data;
-          if(success){
-            setUser(data);
-          } else {
+    const initData = async () => {
+        await getUserInfo();
+        if(!userNotfound){
+            getTags();
+            getStories();
+        }
+    }
 
-          }
-      } catch (error) {
-        console.log(error);   
-      }
-      setLoadingUser(false);
-  }
+    const getUserInfo = async () => {
+        setOpenBackdrop(true)
+        setLoadingUser(true);
+        try {
+            const res = await UserService.getUserPublicProfile(userId);
+            const { data, success, errors } = res.data;
+            if(success){
+                setUser(data);
+            } else {
+                setUserNotfound(true);
+                setUserNotfoundMessage(Object.values(errors)[0]);
+            }
+        } catch (error) {
+            console.log(error);   
+        }
+        setLoadingUser(false);
+        setOpenBackdrop(false);
+    }
 
     const getTags = async () => {
         try {
@@ -76,7 +86,6 @@ let searchTimeout = null;
         try {
             const selectedTags = filters.tags.map(t => t.id);
             const res = await StoryService.searchStoriesByUserProfile({ ...filters, tags: selectedTags });
-            console.log(res);
             
             setTotalPages(res.data.totalPages);
             setStories(res.data.content);
@@ -111,7 +120,7 @@ let searchTimeout = null;
   return (
     <MainLayout>
         <div className="container-fluid" style={{ marginBottom: '200px' }}>
-            {isloadingUser && <MySpinner/>}
+            <MyBackdrop open={openBackdrop} setOpen={() => setOpenBackdrop(true)} />
 
             
             {(!isloadingUser && !userNotfound && !ValidationUtils.isEmpty(user)) && (
@@ -143,7 +152,7 @@ let searchTimeout = null;
                         </div>
                     </div>
                     <div className="row my-5">
-                        <div className="col-sm-9">
+                        <div className="col-sm-12">
                             <Pagination 
                                 style={{float: 'right'}}
                                 count={totalPages} 
@@ -153,8 +162,12 @@ let searchTimeout = null;
                                 <div className="clearfix"></div>
                         </div>
                     </div>
+
+                    {(isLoadingStories) && (
+                        <MySpinner/>  
+                    )}
                         
-                    {(!isLoadingStories) && (
+                    {(stories.length > 0) && (
                         <div className="row" style={{ marginBottom: '50px' }}>
                             {stories.map(story => (
                                 <div className="col-sm-6 col-md-4 col-lg-3 px-2" key={story.id}>
@@ -164,12 +177,14 @@ let searchTimeout = null;
                         </div>
                     )}
 
-                    {(isLoadingStories) && (
-                        <MySpinner/>  
+                    {(!isLoadingStories && stories.length == 0) && (
+                        <NotFound message="Không tìm thấy truyện nào" />
                     )}
 
+                    
+
                     <div className="row my-5">
-                <div className="col-sm-9">
+                <div className="col-sm-12">
                     <Pagination 
                         style={{float: 'right'}}
                         count={totalPages} 
@@ -181,8 +196,10 @@ let searchTimeout = null;
             </div>
                 </>
             )}
+
+
             
-            {userNotfound && (<NotFound message={'Không tìm thấy tài khoản này'} />)}
+            {userNotfound && (<NotFound message={userNotfoundMessage} />)}
             
 
                 

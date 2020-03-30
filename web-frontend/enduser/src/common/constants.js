@@ -108,10 +108,10 @@ export const getOrderBys = () => {
     const { AVG_RATE, READ, COMEMENT, SCREEN, RATING } = ORDER_BYS;
     return [
         { value: AVG_RATE, title: 'Đánh giá trung bình' },
-        { value: READ, title: 'Số lượt đọc' },
-        { value: COMEMENT, title: 'Số lượt bình luận' },
+        { value: READ, title: 'Lượt đọc' },
+        { value: COMEMENT, title: 'Lượt bình luận' },
         { value: SCREEN, title: 'Số màn hình' },
-        { value: RATING, title: 'Số lượt đánh giá' },
+        { value: RATING, title: 'Lượt đánh giá' },
     ]
 }
 

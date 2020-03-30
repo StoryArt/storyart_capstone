@@ -67,7 +67,7 @@ public class CommentController {
         return commentService.getCommentHistory(userId, pageNo, pageSize);
     }
 
-    @GetMapping("/getCommentStatistic")
+    @GetMapping("/public/getCommentStatistic")
     public StatisticResponse getCommentStatistic(
             @RequestParam(defaultValue = "0") Integer storyId,
             @RequestParam(defaultValue = "0") Integer userId,

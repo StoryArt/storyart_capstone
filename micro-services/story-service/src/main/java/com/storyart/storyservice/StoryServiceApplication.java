@@ -1,5 +1,6 @@
 package com.storyart.storyservice;
 
+import com.storyart.storyservice.service.HistoryService;
 import com.storyart.storyservice.service.StoryService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -16,10 +17,10 @@ public class StoryServiceApplication {
 	}
 
 	@Bean
-	public CommandLineRunner createTestStories(StoryService storyService){
+	public CommandLineRunner createTestStories(StoryService storyService, HistoryService historyService){
 		return args -> {
 			//storyService.createTempStories();
-
+			historyService.createTempHistory();
 		};
 	}
 }

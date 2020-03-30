@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { setAuthHeader, getTokenFromLocal } from '../config/auth';
 const base_url = 'http://localhost:8000/api/comment-service/api/v1/report';
-
+//const base_url = 'http://localhost:8004/api/v1/report';
 
 class ReportService {
     static async reportComment(reportRequest) {
@@ -16,9 +16,9 @@ class ReportService {
         return axios.post(url, reportRequest);
     }
 
-    static async getCommentReports(pageNo, isHandled) {
+    static async getCommentReports(searchString, pageNo, isHandled) {
         setAuthHeader(getTokenFromLocal());
-        const url = base_url.concat('/getCommentReports?pageSize=5&pageNo=').concat(pageNo).concat('&isHandled=').concat(isHandled);
+        const url = base_url.concat('/getCommentReports?pageSize=5&pageNo=').concat(pageNo).concat('&isHandled=').concat(isHandled).concat('&searchString=').concat(searchString);
         return axios.get(url);
 
     }
@@ -36,9 +36,9 @@ class ReportService {
         return axios.post(url, handleRequest);
     }
 
-    static async getStoryReports(pageNo, isHandled) {
+    static async getStoryReports(searchString, pageNo, isHandled) {
         setAuthHeader(getTokenFromLocal());
-        const url = base_url.concat('/getStoryReports?pageSize=5&pageNo=').concat(pageNo).concat('&isHandled=').concat(isHandled);
+        const url = base_url.concat('/getStoryReports?pageSize=5&pageNo=').concat(pageNo).concat('&isHandled=').concat(isHandled).concat('&searchString=').concat(searchString);
         return axios.get(url);
     }
 

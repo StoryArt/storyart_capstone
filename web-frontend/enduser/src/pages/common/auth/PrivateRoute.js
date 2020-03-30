@@ -18,6 +18,7 @@ const publicRoutes = [
 
 const userRoutes = [
     '/user/edit-profile',
+    '/user/my-profile',
     '/stories/create',
     '/stories/edit/',
     '/user/history',

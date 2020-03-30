@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import MainLayout from "../../../layouts/main-layout/MainLayout";
 import { MDBAlert, MDBBtn } from "mdbreact";
 import UserService from "../../../services/user.service";
-import { getAuthUserInfo, setAuthHeader } from "../../../config/auth";
+import { getAuthUserInfo, setAuthHeader, getTokenFromLocal } from "../../../config/auth";
 import MyAlert from "../../../components/common/MyAlert";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
@@ -56,6 +56,7 @@ const EditUserProfilePage = props => {
     type: "success",
     open: false
   });
+
   const [dialog, setDialog] = useState({ content: "", open: false });
   const user = getAuthUserInfo();
 
@@ -82,7 +83,6 @@ const EditUserProfilePage = props => {
         type: "success"
       });
     } catch (error) {
-      console.log(JSON.stringify(error));
 
       var err;
       if (typeof error.response.data.errors != "undefined") {
@@ -103,7 +103,7 @@ const EditUserProfilePage = props => {
 
   const getProfile = async () => {
     try {
-      setAuthHeader(localStorage.getItem("jwt-token"));
+      setAuthHeader(getTokenFromLocal());
       const res = await UserService.getMyProfile();
       console.log(res.data);
 
@@ -228,8 +228,9 @@ const EditUserProfilePage = props => {
       {profile.active ? "Active" : "Deactivated"}
     </MDBBtn>
   );
-  const closeAlert = () =>
-    window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
+
+
+  const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
 
   return (
     <MainLayout>
@@ -350,8 +351,6 @@ const EditUserProfilePage = props => {
             </form>
           </div>
         </div>
-
-
 
         <hr style={{ border: "1px solid #ccc" }} />
         <form style={mystyle} onSubmit={handleUpdateProfile}>

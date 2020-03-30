@@ -234,19 +234,19 @@ const UserHistoryPage = () => {
     return (
         <MainLayout>
             <div className="container-fluid">
-                <MDBNav className="nav-tabs" className="mb-4">
+                <MDBNav className="nav-tabs mb-3">
                     <MDBNavItem>
-                        <MDBNavLink to="#" active={activeItem === "1"} onClick={toggle("1")} role="tab" >
+                        <MDBNavLink link to="#" active={activeItem === "1"} onClick={toggle("1")} role="tab" >
                             Đọc truyện
                         </MDBNavLink>
                     </MDBNavItem>
                     <MDBNavItem>
-                        <MDBNavLink to="#" active={activeItem === "2"} onClick={toggle("2")} role="tab" >
+                        <MDBNavLink link to="#" active={activeItem === "2"} onClick={toggle("2")} role="tab" >
                             Bình luận
                         </MDBNavLink>
                     </MDBNavItem>
                     <MDBNavItem>
-                        <MDBNavLink to="#" active={activeItem === "3"} onClick={toggle("3")} role="tab" >
+                        <MDBNavLink link to="#" active={activeItem === "3"} onClick={toggle("3")} role="tab" >
                             Reaction
                         </MDBNavLink>
                     </MDBNavItem>
@@ -351,7 +351,7 @@ const UserHistoryPage = () => {
 
                         {reactions.map((reaction, index) => (
                             <div className="clearfix" key={reaction.id}>
-                                Bạn đã <strong>{reaction.type}</strong> bình luận của <strong>{reaction.commentOwnerName}</strong> trong truyện <Link target="_blank"
+                                Bạn đã <strong>{reaction.type}</strong> bình luận của <Link target="_blank" to={`/user/profile/${reaction.commentOwnerId}`}><strong>{reaction.commentOwnerName}</strong></Link> trong truyện <Link target="_blank"
                                     to={`/stories/details/${reaction.storyId}`}>
                                     <strong>{reaction.storyName}</strong>:</Link>
                                 <div>
