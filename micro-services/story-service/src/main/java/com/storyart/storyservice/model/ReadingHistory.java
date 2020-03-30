@@ -39,6 +39,8 @@ public class ReadingHistory extends DateAudit {
 
     private Date updatedAt;
 
+    boolean isReachingEnd;
+
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();
