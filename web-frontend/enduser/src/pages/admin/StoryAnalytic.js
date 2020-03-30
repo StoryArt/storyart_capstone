@@ -241,7 +241,7 @@ class Dashboard1 extends React.Component {
         <div className="pb-24 pt-7 px-8 bg-primary">
 
           <div className="card-title capitalize text-white mb-4
-           text-white-secondary">
+           text-white-secondary" style={{margin:"10 5 0 10", opacity:"80%"}}>
             Thống kê tương tác  <Button
                 variant="outlined"
                 color="inherit"
@@ -253,7 +253,7 @@ class Dashboard1 extends React.Component {
               </Button>
             <div>
              
-              <Menu
+              <Menu style={{borderRadius:  "8px"}}
                 id="simple-menu"
                 anchorEl={this.state.anchorEl}
                 open={Boolean(this.state.anchorEl)}

@@ -24,36 +24,54 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public interface StoryService {
     HashMap<String, String> validateStoryinfo(CreateStoryDto story);
+
     GetStoryDto getStoryDetails(int id);
+
     List<GetStoryDto> getStoriesByUserId(int userId);
+
     ResultDto getReadingStory(int storyId);
+
     ResultDto createStory(CreateStoryDto story, int userId);
+
     ResultDto updateStory(CreateStoryDto story, int userId);
+
     Page<GetStoryDto> searchStories(Set<Integer> tags, String keyword, boolean isActive,
-                              boolean isPublished, int page, int itemsPerPage);
+                                    boolean isPublished, int page, int itemsPerPage);
+
     Page<GetStoryDto> searchStoriesOfUserProfile(int userid, Set<Integer> tags, String keyword, int page, int itemsPerPage);
 
     List<GetStoryDto> getTrendingStories(int quantity);
+
     Page<Story> getNewReleaseStory(int quantity);
 
     void createTempStories();
+
     List<GetStoryDto> getAll();
 
     Page<GetStoryDto> getStoriesForAdmin(String keyword, String orderBy, boolean asc, int page, int itemsPerPage);
+
     Page<GetStoryDto> getStoriesForUser(int userId, String keyword, String orderBy, boolean asc, int page, int itemsPerPage);
+
     ResultDto updateByAdmin(int storyId, boolean disable);
 
     ResultDto deleteStory(int storyId, int userId);
+
     ResultDto changePublishedStatus(int storyId, int userId, boolean turnOnPublished);
+
     ResultDto increaseStoryRead(int storyId);
+
     ResultDto saveReadHistory(int storyId, int userId);
+
     ResultDto rateStory(int storyId, int userId, double stars);
+
     ResultDto getReadStatisticsByDateRangeOfUser(Date from, Date to, int userId);
 
     StorySummarizeResponse getStorySummarizeResponse(int sid);
@@ -64,7 +82,7 @@ public interface StoryService {
 }
 
 @Service
-class StoryServiceImpl implements StoryService{
+class StoryServiceImpl implements StoryService {
     @Autowired
     ScreenRepository screenRepository;
 
@@ -112,7 +130,7 @@ class StoryServiceImpl implements StoryService{
         HashMap<String, String> errors = new HashMap<>();
 
 
-        if(errors.size() > 0) return errors;
+        if (errors.size() > 0) return errors;
 
         return errors;
     }
@@ -120,7 +138,7 @@ class StoryServiceImpl implements StoryService{
     @Override
     public GetStoryDto getStoryDetails(int storyId) {
         Story story = storyRepository.findById(storyId).orElse(null);
-        if(story == null) return null;
+        if (story == null) return null;
 
         GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
 
@@ -141,23 +159,23 @@ class StoryServiceImpl implements StoryService{
         ResultDto result = new ResultDto();
         Optional<Story> story = storyRepository.findById(storyId);
         result.setSuccess(false);
-        if(!story.isPresent()) {
+        if (!story.isPresent()) {
             result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
         } else {
             Story s = story.get();
 
-            if(s.isDeactiveByAdmin()){
+            if (s.isDeactiveByAdmin()) {
                 result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa bởi admin");
-            } else if(!s.isActive()){
+            } else if (!s.isActive()) {
                 result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
-            } else if(userId != s.getUserId()){
+            } else if (userId != s.getUserId()) {
                 result.getErrors().put("NOT_OWN", "Truyện này không thuộc về bạn");
-            } else if(turnOnPublished && !s.isPublished()){
+            } else if (turnOnPublished && !s.isPublished()) {
                 s.setPublished(true);
                 result.setSuccess(true);
                 result.setData(s);
                 storyRepository.save(s);
-            } else if(!turnOnPublished && s.isPublished()){
+            } else if (!turnOnPublished && s.isPublished()) {
                 s.setPublished(false);
                 result.setSuccess(true);
                 result.setData(s);
@@ -174,7 +192,7 @@ class StoryServiceImpl implements StoryService{
         ResultDto result = new ResultDto();
         result.setSuccess(true);
         Story story = storyRepository.findById(storyId).orElse(null);
-        if(story != null){
+        if (story != null) {
             story.setNumOfRead(story.getNumOfRead() + 1);
             storyRepository.save(story);
         } else {
@@ -189,9 +207,9 @@ class StoryServiceImpl implements StoryService{
         ResultDto result = new ResultDto();
         result.setSuccess(false);
         Story story = storyRepository.findById(storyId).orElse(null);
-        if(story == null){
+        if (story == null) {
             result.getErrors().put("NOT_FOUND", "Truyện này không tồn tại");
-        } else if(!story.isActive() ||  story.isDeactiveByAdmin()){
+        } else if (!story.isActive() || story.isDeactiveByAdmin()) {
             result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
         } else {
 
@@ -204,13 +222,13 @@ class StoryServiceImpl implements StoryService{
         ResultDto result = new ResultDto();
         result.setSuccess(false);
         Story story = storyRepository.findById(storyId).orElse(null);
-        if(story == null){
+        if (story == null) {
             result.getErrors().put("NOT_FOUND", "Truyện này không tồn tại");
-        } else if(!story.isActive() ||  story.isDeactiveByAdmin()){
+        } else if (!story.isActive() || story.isDeactiveByAdmin()) {
             result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
         } else {
             Rating rating = ratingRepository.findById(storyId, userId);
-            if(rating == null){
+            if (rating == null) {
                 rating = new Rating();
                 rating.setStoryId(storyId);
                 rating.setUserId(userId);
@@ -246,15 +264,15 @@ class StoryServiceImpl implements StoryService{
         ResultDto result = new ResultDto();
         Optional<Story> story = storyRepository.findById(storyId);
         result.setSuccess(false);
-        if(!story.isPresent()){
+        if (!story.isPresent()) {
             result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
         } else {
             Story s = story.get();
-            if(!s.isActive()) {
+            if (!s.isActive()) {
                 result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
-            } else if(s.isDeactiveByAdmin()){
+            } else if (s.isDeactiveByAdmin()) {
                 result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa bới admin");
-            } else if(userId != s.getUserId()){
+            } else if (userId != s.getUserId()) {
                 result.getErrors().put("NOT_OWN", "Truyện này không thuộc về bạn");
             } else {
                 s.setActive(false);
@@ -285,9 +303,9 @@ class StoryServiceImpl implements StoryService{
         result.setData(null);
 
         Story story = storyRepository.findById(storyId).orElse(null);
-        if(story == null){
+        if (story == null) {
             result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
-        } else if(!story.isActive() || story.isDeactiveByAdmin()) {
+        } else if (!story.isActive() || story.isDeactiveByAdmin()) {
             result.getErrors().put("DELETED", "Truyện này đã bị xóa");
         } else {
             ReadStoryDto readStoryDto = modelMapper.map(story, ReadStoryDto.class);
@@ -309,7 +327,7 @@ class StoryServiceImpl implements StoryService{
             }).collect(Collectors.toList());
 
             List<String> informationIds = informations.stream().map(info -> info.getId())
-                                                .collect(Collectors.toList());
+                    .collect(Collectors.toList());
 
             List<InformationAction> informationActions = informationActionRepository.findAllByInformationIdIn(informationIds);
 
@@ -328,7 +346,7 @@ class StoryServiceImpl implements StoryService{
         return result;
     }
 
-    public void validateCreateStory(CreateStoryDto createStoryDto){
+    public void validateCreateStory(CreateStoryDto createStoryDto) {
         ResultDto result = new ResultDto();
         Story story = modelMapper.map(createStoryDto, Story.class);
         HashMap<String, String> screenIdsMap = new HashMap<>();
@@ -351,7 +369,7 @@ class StoryServiceImpl implements StoryService{
 
                 savedAction.setId(MyStringUtils.generateUniqueId());
                 savedAction.setScreenId(savedScreen.getId());
-                if(action.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())){
+                if (action.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())) {
                     savedAction.setValue(screenIdsMap.get(action.getValue()));
                 }
                 savedAction.setNextScreenId(screenIdsMap.get(action.getNextScreenId()));
@@ -409,7 +427,7 @@ class StoryServiceImpl implements StoryService{
 
                 savedAction.setId(MyStringUtils.generateUniqueId());
                 savedAction.setScreenId(savedScreen.getId());
-                if(action.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())){
+                if (action.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())) {
                     savedAction.setValue(screenIdsMap.get(action.getValue()));
                 }
                 savedAction.setNextScreenId(screenIdsMap.get(action.getNextScreenId()));
@@ -460,11 +478,11 @@ class StoryServiceImpl implements StoryService{
         ResultDto resultDto = new ResultDto();
         Story foundStory = storyRepository.findById(storyDto.getId()).orElse(null);
 
-        if(foundStory == null){
+        if (foundStory == null) {
             resultDto.getErrors().put("NOT_FOUND", "Truyện này không có trong hệ thống!");
-        } else if(!foundStory.isActive() || foundStory.isDeactiveByAdmin()){
+        } else if (!foundStory.isActive() || foundStory.isDeactiveByAdmin()) {
             resultDto.getErrors().put("DELETED", "Truyện đã bị xóa!");
-        }else if(userId != foundStory.getUserId()){
+        } else if (userId != foundStory.getUserId()) {
             resultDto.getErrors().put("NOT_OWN", "Truyện này không thuộc về bạn");
         } else {
             Story story = modelMapper.map(storyDto, Story.class);
@@ -517,7 +535,7 @@ class StoryServiceImpl implements StoryService{
 
                     savedAction.setId(MyStringUtils.generateUniqueId());
                     savedAction.setScreenId(savedScreen.getId());
-                    if(action.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())){
+                    if (action.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())) {
                         savedAction.setValue(screenIdsMap.get(action.getValue()));
                     }
                     savedAction.setNextScreenId(screenIdsMap.get(action.getNextScreenId()));
@@ -573,13 +591,13 @@ class StoryServiceImpl implements StoryService{
 
     @Override
     public Page<GetStoryDto> searchStories(Set<Integer> tags, String keyword, boolean isActive,
-                                     boolean isPublished, int page, int itemsPerPage) {
-        if(StringUtils.isEmpty(keyword)) keyword = "";
-        if(tags.size() == 0) {
+                                           boolean isPublished, int page, int itemsPerPage) {
+        if (StringUtils.isEmpty(keyword)) keyword = "";
+        if (tags.size() == 0) {
             tags = tagRepository.findAll().stream().map(t -> t.getId()).collect(Collectors.toSet());
         }
 
-        Pageable pageable =  PageRequest.of(page - 1, itemsPerPage, Sort.by("id").ascending());
+        Pageable pageable = PageRequest.of(page - 1, itemsPerPage, Sort.by("id").ascending());
         Page<Story> page1 = storyRepository.findAllBySearchCondition(keyword, tags, isActive, isPublished, pageable);
         Page<GetStoryDto> page2 = page1.map(new Function<Story, GetStoryDto>() {
             @Override
@@ -598,12 +616,12 @@ class StoryServiceImpl implements StoryService{
 
     @Override
     public Page<GetStoryDto> searchStoriesOfUserProfile(int userId, Set<Integer> tags, String keyword, int page, int itemsPerPage) {
-        if(StringUtils.isEmpty(keyword)) keyword = "";
-        if(tags.size() == 0) {
+        if (StringUtils.isEmpty(keyword)) keyword = "";
+        if (tags.size() == 0) {
             tags = tagRepository.findAll().stream().map(t -> t.getId()).collect(Collectors.toSet());
         }
 
-        Pageable pageable =  PageRequest.of(page - 1, itemsPerPage, Sort.by("id").descending());
+        Pageable pageable = PageRequest.of(page - 1, itemsPerPage, Sort.by("id").descending());
         Page<Story> page1 = storyRepository.findAllByUserProfile(userId, keyword, tags, pageable);
         Page<GetStoryDto> page2 = page1.map(new Function<Story, GetStoryDto>() {
             @Override
@@ -619,7 +637,7 @@ class StoryServiceImpl implements StoryService{
         return page2;
     }
 
-    GetStoryDto mapModelToDto(Story story){
+    GetStoryDto mapModelToDto(Story story) {
         List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
         GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
         dto.setTags(tagService.mapModelToDto(tagList));
@@ -628,7 +646,7 @@ class StoryServiceImpl implements StoryService{
 
     @Override
     public List<GetStoryDto> getTrendingStories(int quantity) {
-        Pageable pageable =  PageRequest.of(0, quantity, Sort.by("avgRate").descending());
+        Pageable pageable = PageRequest.of(0, quantity, Sort.by("avgRate").descending());
         List<Story> storyList = storyRepository.findAll(pageable).getContent();
         return storyList.stream().map(s -> {
             GetStoryDto dto = modelMapper.map(s, GetStoryDto.class);
@@ -640,7 +658,7 @@ class StoryServiceImpl implements StoryService{
 
     @Override
     public Page<Story> getNewReleaseStory(int quantity) {
-        Pageable pageable =  PageRequest.of(0, quantity, Sort.by("created_at").descending());
+        Pageable pageable = PageRequest.of(0, quantity, Sort.by("created_at").descending());
         return storyRepository.findStoryOrderByCreateAt(pageable);
 
     }
@@ -663,7 +681,7 @@ class StoryServiceImpl implements StoryService{
 
 
         List<Story> stories = new ArrayList<>();
-        for(int i = 0; i < 100; i++){
+        for (int i = 0; i < 100; i++) {
             Story story = new Story();
             story.setTitle(faker.book().title());
             story.setIntro(faker.lorem().paragraph(8));
@@ -690,7 +708,7 @@ class StoryServiceImpl implements StoryService{
 
         savedStories.stream().forEach(story -> {
             int quantity = faker.number().numberBetween(12, 100);
-            for(int i = 1; i <= quantity; i++){
+            for (int i = 1; i <= quantity; i++) {
                 Comment comment = new Comment();
                 comment.setStoryId(story.getId());
                 comment.setContent(faker.lorem().sentence(10, 100));
@@ -713,27 +731,27 @@ class StoryServiceImpl implements StoryService{
     @Override
     public Page<GetStoryDto> getStoriesForAdmin(String keyword, String orderBy, boolean asc, int page, int itemsPerPage) {
 
-        Pageable pageable =  PageRequest.of(page - 1, itemsPerPage);
+        Pageable pageable = PageRequest.of(page - 1, itemsPerPage);
         Page<Story> page1 = null;
-        switch (orderBy){
+        switch (orderBy) {
             case "avg_rate":
-                if(asc) page1 = storyRepository.findForAdminOrderByAvgRateASC(keyword, pageable);
+                if (asc) page1 = storyRepository.findForAdminOrderByAvgRateASC(keyword, pageable);
                 else page1 = storyRepository.findForAdminOrderByAvgRateDESC(keyword, pageable);
                 break;
             case "comment":
-                if(asc) page1 = storyRepository.findForAdminOrderByNumOfCommentASC(keyword, pageable);
+                if (asc) page1 = storyRepository.findForAdminOrderByNumOfCommentASC(keyword, pageable);
                 else page1 = storyRepository.findForAdminOrderByNumOfCommentDESC(keyword, pageable);
                 break;
             case "rating":
-                if(asc) page1 = storyRepository.findForAdminOrderByNumOfRatingASC(keyword, pageable);
+                if (asc) page1 = storyRepository.findForAdminOrderByNumOfRatingASC(keyword, pageable);
                 else page1 = storyRepository.findForAdminOrderByNumOfRatingDESC(keyword, pageable);
                 break;
             case "screen":
-                if(asc) page1 = storyRepository.findForAdminOrderByNumOfScreenASC(keyword, pageable);
+                if (asc) page1 = storyRepository.findForAdminOrderByNumOfScreenASC(keyword, pageable);
                 else page1 = storyRepository.findForAdminOrderByNumOfScreenDESC(keyword, pageable);
                 break;
             case "read":
-                if(asc) page1 = storyRepository.findForAdminOrderByNumOfReadASC(keyword, pageable);
+                if (asc) page1 = storyRepository.findForAdminOrderByNumOfReadASC(keyword, pageable);
                 else page1 = storyRepository.findForAdminOrderByNumOfReadDESC(keyword, pageable);
                 break;
             case "date":
@@ -742,7 +760,7 @@ class StoryServiceImpl implements StoryService{
                 break;
         }
 
-        if(page1 == null) return null;
+        if (page1 == null) return null;
 
         Page<GetStoryDto> page2 = page1.map(new Function<Story, GetStoryDto>() {
             @Override
@@ -753,7 +771,7 @@ class StoryServiceImpl implements StoryService{
         return page2;
     }
 
-    public GetStoryDto mapStoryModelToGetStoryDto(Story story){
+    public GetStoryDto mapStoryModelToGetStoryDto(Story story) {
         List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
         GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
         dto.setTags(tagService.mapModelToDto(tagList));
@@ -764,27 +782,27 @@ class StoryServiceImpl implements StoryService{
 
     @Override
     public Page<GetStoryDto> getStoriesForUser(int userId, String keyword, String orderBy, boolean asc, int page, int itemsPerPage) {
-        Pageable pageable =  PageRequest.of(page - 1, itemsPerPage);
+        Pageable pageable = PageRequest.of(page - 1, itemsPerPage);
         Page<Story> page1 = null;
-        switch (orderBy){
+        switch (orderBy) {
             case "avg_rate":
-                if(asc) page1 = storyRepository.findForUserOrderByAvgRateASC(userId, keyword, pageable);
+                if (asc) page1 = storyRepository.findForUserOrderByAvgRateASC(userId, keyword, pageable);
                 else page1 = storyRepository.findForUserOrderByAvgRateDESC(userId, keyword, pageable);
                 break;
             case "read":
-                if(asc) page1 = storyRepository.findForUserOrderByNumOfReadASC(userId, keyword, pageable);
+                if (asc) page1 = storyRepository.findForUserOrderByNumOfReadASC(userId, keyword, pageable);
                 else page1 = storyRepository.findForUserOrderByNumOfReadDESC(userId, keyword, pageable);
                 break;
             case "comment":
-                if(asc) page1 = storyRepository.findForUserOrderByNumOfCommentASC(userId, keyword, pageable);
+                if (asc) page1 = storyRepository.findForUserOrderByNumOfCommentASC(userId, keyword, pageable);
                 else page1 = storyRepository.findForUserOrderByNumOfCommentDESC(userId, keyword, pageable);
                 break;
             case "rating":
-                if(asc) page1 = storyRepository.findForUserOrderByNumOfRatingASC(userId, keyword, pageable);
+                if (asc) page1 = storyRepository.findForUserOrderByNumOfRatingASC(userId, keyword, pageable);
                 else page1 = storyRepository.findForUserOrderByNumOfRatingDESC(userId, keyword, pageable);
                 break;
             case "screen":
-                if(asc) page1 = storyRepository.findForUserOrderByNumOfScreenASC(userId, keyword,  pageable);
+                if (asc) page1 = storyRepository.findForUserOrderByNumOfScreenASC(userId, keyword, pageable);
                 else page1 = storyRepository.findForUserOrderByNumOfScreenDESC(userId, keyword, pageable);
                 break;
             case "date":
@@ -793,7 +811,7 @@ class StoryServiceImpl implements StoryService{
                 break;
         }
 
-        if(page1 == null) return null;
+        if (page1 == null) return null;
 
         Page<GetStoryDto> page2 = page1.map(new Function<Story, GetStoryDto>() {
             @Override
@@ -808,13 +826,13 @@ class StoryServiceImpl implements StoryService{
     public ResultDto updateByAdmin(int storyId, boolean disable) {
         ResultDto result = new ResultDto();
         Story story = storyRepository.findById(storyId).orElse(null);
-        if(story == null) {
+        if (story == null) {
             result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
             result.setSuccess(false);
         } else {
-            if(!story.isDeactiveByAdmin() && disable){
+            if (!story.isDeactiveByAdmin() && disable) {
                 story.setDeactiveByAdmin(true);
-            } else if(story.isDeactiveByAdmin() && !disable) {
+            } else if (story.isDeactiveByAdmin() && !disable) {
                 story.setDeactiveByAdmin(false);
             }
             storyRepository.save(story);
@@ -824,27 +842,25 @@ class StoryServiceImpl implements StoryService{
         return result;
     }
 
-    List<Integer> getRandomTags(int quantity){
+    List<Integer> getRandomTags(int quantity) {
         List<Tag> tagsList = tagRepository.findAll();
         int length = tagsList.size();
         List<Tag> list = new ArrayList<>();
         List<Integer> indexes = new ArrayList<>();
-        for(int i = 1; i <= quantity; i++){
+        for (int i = 1; i <= quantity; i++) {
             int index = new Random().nextInt(length);
-            if(indexes.contains(index)) continue;
+            if (indexes.contains(index)) continue;
             indexes.add(index);
             list.add(tagsList.get(index));
         }
         return list.stream().map(t -> t.getId()).collect(Collectors.toList());
     }
+
     @Override
     public StorySummarizeResponse getStorySummarizeResponse(int sid) {
         Story story = storyRepository.findById(sid).orElse(null);
         if (story != null) {
             StorySummarizeResponse storySummarizeResponse = modelMapper.map(story, StorySummarizeResponse.class);
-
-
-
 
 
             List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
@@ -871,31 +887,37 @@ class StoryServiceImpl implements StoryService{
 
     StoryReactByRange storyReactByRange = new StoryReactByRange();
 
-
+    @Autowired
+    HistoryService historyService;
     //lấy so lieu cho do thi reaction(share, view, click link, hitpoint, comment)
+
+
+    @Autowired
+    LinkClickService clickService;
+
     @Override
     public StoryReactByRange getReactStatisticInTimeRange(int sid, TimeRangeRequest timeRangeRequest) {
         List<NumberOfCommentByDate> commentByDay = commentService.getCommentListResponce(sid, 0, timeRangeRequest.getStart(), timeRangeRequest.getEnd()).getNumberOfCommentByDates();
 
         List<Integer> shareByDay = new ArrayList<>();
         List<Integer> hitPointByDay = new ArrayList<>();
-        List<Integer> clickLinkByDay = new ArrayList<>();
+        List<Integer> clickLinkByDay = clickService.findClickLinkRange
+                (sid, timeRangeRequest.getStart(), timeRangeRequest.getEnd());
 
-        //todo them ham goi api vao day
-        //random so lieu cau 3 yeu to hitpointm ckick link va share
-        for(int i=0; i< commentByDay.size(); i++){
+
+        //chua lam share
+        for (int i = 0; i < commentByDay.size(); i++) {
             shareByDay.add(new Random().nextInt(10));
         }
-        for(int i=0; i< commentByDay.size(); i++){
-            hitPointByDay.add(new Random().nextInt(100));
-        } for(int i=0; i< commentByDay.size(); i++){
-            clickLinkByDay.add(new Random().nextInt(20));
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            Date startDate = simpleDateFormat.parse(timeRangeRequest.getStart());
+            Date endDate = simpleDateFormat.parse(timeRangeRequest.getEnd());
+
+            hitPointByDay = historyService.findHitpointListByRange(sid, timeRangeRequest.getStart(), timeRangeRequest.getEnd());
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        //dulieu gia
-
-
-
-
 
         StoryReactByRange storyReactByRange = new StoryReactByRange();
         storyReactByRange.setNumOfClickLink(clickLinkByDay);
@@ -907,25 +929,25 @@ class StoryServiceImpl implements StoryService{
             storyReactByRange.getNumOfComment().add(new Random().nextInt(50));
             Calendar cal = Calendar.getInstance();
             cal.setTime(numberOfCommentByDate.getDate());
-            String time = cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.MONTH);
+            String time = cal.get(Calendar.DAY_OF_MONTH) + "/" + (cal.get(Calendar.MONTH)+1);
             storyReactByRange.getTimes().add(time);
             //click
         }
 
 //todo: xoa dong nay di
-        this.storyReactByRange=storyReactByRange;
+        this.storyReactByRange = storyReactByRange;
 
         return storyReactByRange;
 
 
     }
 
+
     @Override
     public List<IRatingClassify> getRatingClassify(int sid) {
         return ratingRepository.countStarByStoryId(sid);
 
     }
-
 
 
 }

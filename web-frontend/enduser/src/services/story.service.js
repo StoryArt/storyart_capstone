@@ -5,7 +5,7 @@ import { getAuthUserInfo } from "../config/auth";
 // const baseUrl = API_ENDPOINT_PREFIX + '/stories';
 const baseUrl = "http://localhost:8000/api/story-service/stories";
 
-const baseUrl2 = "http://localhost:8000/api/story-service";
+const baseUrl2 = "http://localhost:8003/";
 
 class StoryService {
   static async createStory(story) {

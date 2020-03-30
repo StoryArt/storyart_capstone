@@ -30,4 +30,7 @@ public interface HistoryRepository extends JpaRepository<ReadingHistory, Integer
             "and DATE(created_at) <= DATE(?2) and DATE(created_at) >= DATE(?1)) GROUP BY DATE(created_at)",
             nativeQuery = true)
     List<ReadStatisticDto> findReadingStatisticsByDateRangeOfUser(Date from, Date to, int userId);
+
+List<ReadingHistory> findAllByStoryIdAndIsReachingEndAndCreatedAtBetweenOrderByCreatedAtDesc(int storyId,boolean reachingEnd, Date startDate, Date endDate );
+
 }
