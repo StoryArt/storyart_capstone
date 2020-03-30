@@ -3,6 +3,7 @@ package com.storyart.storyservice.dto.create_story;
 import com.storyart.storyservice.common.constants.ANIMATION_TYPES;
 import lombok.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -39,8 +40,14 @@ public class CreateStoryDto implements Serializable {
 
     private boolean published;
 
+    @Valid
     private List<CreateStoryScreenDto> screens;
+
+    @Valid
     private List<CreateStoryInformationDto> informations;
+
+    @Valid
     private List<CreateStoryInformationActionDto> informationActions;
+
     private Set<Integer> tags;
 }

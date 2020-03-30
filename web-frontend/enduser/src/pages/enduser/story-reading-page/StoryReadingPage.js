@@ -57,8 +57,10 @@ const ReadStoryPage = (props) => {
         });
 
         return () => {
-            window.addEventListener('beforeunload', () => {});
-            saveHistoryBeforeLeavePage();
+            if(!notfound){
+                window.addEventListener('beforeunload', () => {});
+                saveHistoryBeforeLeavePage();
+            }
         };
 
     }, []);
