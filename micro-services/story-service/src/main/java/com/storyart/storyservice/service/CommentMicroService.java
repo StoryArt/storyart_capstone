@@ -15,9 +15,6 @@ public interface CommentMicroService {
                                              @RequestParam(defaultValue = "0") @Valid String start,
                                              @RequestParam(defaultValue = "0") @Valid String end);
 
-
-
-
 }
 
 

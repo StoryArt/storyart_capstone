@@ -14,6 +14,16 @@ import MySpinner from '../../../components/common/MySpinner';
 import NotFound from '../../../components/common/NotFound';
 import ScreenShow from '../../../components/common/ScreenShow';
 import SocialShare from '../../../components/common/SocialShare';
+import ReadingHistoryService from '../../../services/reading_history.service';
+
+
+let readingScreenDuration = 0;
+
+let interval = null;
+let listScreenId = [];
+let initialInformations;
+let isEndStory = false;
+let savedStoryId;
 
 const ReadStoryPage = (props) => {
 
@@ -27,24 +37,120 @@ const ReadStoryPage = (props) => {
 
     const [currentScreen, setCurrentScreen] = useState({});
     const [showScreen, setShowScreen] = useState(false);
-    const [selectedScreens, setSelectedScreens] = useState([]);
-    const [selectedActions, setSelectedActions] = useState([]);
-    const [userInformation, setUserInformation] = useState([]);
+    const [isEnd, setEnd] = useState(false);
+    
 
     useEffect(() => {
+       
         const { storyId } = props.match.params;
+        savedStoryId = storyId;
+        listScreenId = []
+        readingScreenDuration = 0;
+        interval = null;
+        initialInformations = [];
+        isEndStory = false;
+        
         getReadingStory(storyId);
+
+        window.addEventListener('beforeunload', () => {
+            saveHistoryBeforeLeavePage();
+        });
+
+        return () => {
+            window.addEventListener('beforeunload', () => {});
+            saveHistoryBeforeLeavePage();
+        };
+
     }, []);
+
+    const saveHistoryBeforeLeavePage = () => {
+        if(!isEndStory && listScreenId.length > 0){
+            const data = {
+                storyId: savedStoryId,
+                isReachingEnd: false,
+                listScreenId: listScreenId.toString()
+            }
+            saveReadingHistory(data);
+        }
+    }
+
+    const isEndScreen = (screen) => {
+        if(screen == null) return false;
+        if (screen.id === story.firstScreenId) return false;
+        
+        const haveNextScreenAction = ValidationUtils.isEmpty(screen.actions) ? false : screen.actions.some(a => a.type === ACTION_TYPES.NEXT_SCREEN || a.type === ACTION_TYPES.UPDATE_INFORMATION)
+        if(haveNextScreenAction) return false;
+        if(!ValidationUtils.isEmpty(screen.nextScreenId)) return false;
+        return true;
+    }
+
+    const saveScreenReadTime = async (data) => {
+        try {
+            const res = await ReadingHistoryService.saveScreenReadTime(data);
+            console.log(res);
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     const changeCurrentScreen = (screenId) => {
         setShowScreen(false);
         const screen = screens.find(scr => scr.id === screenId);
+        listScreenId.push(screen.id);
+
+        if(currentScreen != null && !isEndScreen(currentScreen)){
+            stopCountTimeReading();
+            saveScreenReadTime({ screenId: currentScreen.id, duration: readingScreenDuration });
+        }
+        
+
+        if(isEndScreen(screen)){
+            setEnd(true);
+            isEndStory = true;
+            stopCountTimeReading();
+            readingScreenDuration = 0;
+            const data = {
+                storyId: story.id,
+                isReachingEnd: true,
+                listScreenId: listScreenId.toString()
+            }
+            saveReadingHistory(data);
+        }
+
         setTimeout(() => {
             setCurrentScreen(screen)
-            setShowScreen(true)
+            setShowScreen(true);
+
+            countTimeReading();
         }, 1000);
-        
     }
+
+    const saveReadingHistory = async (data) => {
+        try {
+            const res = await ReadingHistoryService.saveReadingHistory(data);
+            console.log(res);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const countTimeReading = () => {
+        readingScreenDuration = 0;
+        interval = window.setInterval(() => {
+            readingScreenDuration++;
+
+            //if time is more than 5 min, set time for this screen and stop counter
+            if(readingScreenDuration > 60*60) {
+                stopCountTimeReading();
+            }
+        }, 1000);
+    }
+
+    const stopCountTimeReading = () => {
+        window.clearInterval(interval);
+    }
+
+   
   
     const getReadingStory = async (storyId) => {
         setIsLoading(true);
@@ -58,6 +164,8 @@ const ReadStoryPage = (props) => {
                 console.log(data)
                 setScreens(data.screens);
                 setInformations(data.informations);
+                initialInformations = JSON.parse(JSON.stringify(data.informations));
+
                 setInformationActions(data.informationActions);
                 
                 setStory({ ...data, screens: null, informations: null, informationActions: null });
@@ -121,10 +229,35 @@ const ReadStoryPage = (props) => {
             changeCurrentScreen(action.nextScreenId);
             
         } else if(action.type === ACTION_TYPES.REDIRECT){
+            //save link when user click
+            saveClickLink({ storyId: story.id, link: action.value });
+
             window.open(action.value, '_blank');
+           
         } else if (action.type === ACTION_TYPES.NEXT_SCREEN){
             changeCurrentScreen(action.value);
         } 
+    }
+
+
+    const saveClickLink = async (link) => {
+        console.log(link);
+        try {
+            const res = await ReadingHistoryService.saveCLickLink(link);
+            console.log(res);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const resetStory = () => {
+        setInformations([...initialInformations])
+        changeCurrentScreen(story.firstScreenId);
+        listScreenId = [];
+        readingScreenDuration = 0;
+        stopCountTimeReading();
+        setEnd(false);
+        isEndStory = false;
     }
 
     const startReading = () => {
@@ -164,6 +297,20 @@ const ReadStoryPage = (props) => {
                                 screen={currentScreen}
                                 onSelectAction={handleSelectAction}
                             />
+
+                            {isEnd && (
+                                <>
+                                    <button
+                                        onClick={() => resetStory()} 
+                                        style={{ background: '#fffbe8' }}
+                                        className="btn float-right mt-3">Đọc lại từ đâu</button>
+
+                                    <button
+                                        onClick={() => props.history.push('/stories/details/' + story.id)} 
+                                        style={{ background: '#fffbe8' }}
+                                        className="btn float-right mt-3">Quay lại trang chi tiết</button>
+                                </>
+                            )}
 
                             {ValidationUtils.isEmpty(currentScreen) && (
                                 <div className="">

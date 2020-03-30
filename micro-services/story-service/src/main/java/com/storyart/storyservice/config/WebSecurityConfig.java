@@ -80,6 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
                 authorizeRequests()
 
                 .antMatchers( "/stories/public/**").permitAll()
+                .antMatchers( "/reading_history/public/**").permitAll()
                 .antMatchers("/tags/public/**").permitAll()
                 .antMatchers("/suggestion/**").permitAll()
                 .anyRequest()

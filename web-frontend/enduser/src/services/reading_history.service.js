@@ -1,0 +1,34 @@
+import axios from 'axios';
+import { setAuthHeader, getTokenFromLocal } from '../config/auth';
+import ValidationUtils from '../utils/validation';
+
+const base_url = 'http://localhost:8000/api/story-service/reading_history';
+
+class ReadingHistoryService {
+
+    static async saveReadingHistory({ listScreenId, storyId, isReachingEnd }) {
+        const token = getTokenFromLocal();
+        let url = base_url;
+        if(ValidationUtils.isEmpty(token)){
+            url = base_url + '/public'
+        } else {
+            setAuthHeader(token);
+        }
+       
+        return axios.post(url, { listScreenId, storyId, reachingEnd: isReachingEnd });
+    }
+
+    static async saveCLickLink(data) {
+        const url = base_url + '/public/clicklink';
+        return axios.post(url, data);
+    }
+
+    static async saveScreenReadTime({ screenId, duration }) {
+        const url = base_url + '/public/screen_read_time';
+        return axios.post(url, { screenId, duration });
+    }
+   
+}
+
+
+export default ReadingHistoryService;

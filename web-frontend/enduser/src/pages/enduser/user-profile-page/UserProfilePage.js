@@ -13,8 +13,8 @@ import { getOrderBys } from '../../../common/constants';
 import DateTimeUtils from "../../../utils/datetime";
 import StoryService from "../../../services/story.service";
 import { FormControl, TextField, InputLabel, Select, MenuItem, TableContainer, 
-  Table, TableHead, TableRow, TableCell, TableBody, Divider, InputAdornment, Paper } from "@material-ui/core";
-import { Search as SearchIcon } from '@material-ui/icons';
+  Table, TableHead, TableRow, TableCell, TableBody, Divider, InputAdornment, Paper, IconButton, Tooltip } from "@material-ui/core";
+import { Search as SearchIcon, DataUsage as DataUsageIcon } from '@material-ui/icons';
 import { Pagination } from '@material-ui/lab';
 import TagList from '../../../components/common/TagList';
 import StringUtils from "../../../utils/string";
@@ -61,7 +61,6 @@ const UserProfilePage = (props) => {
   const [dialog, setDialog] = useState({ content: '', open: false });
 
   useEffect(() => {
-    getReadStatistic();
     initData();
   }, []);
 
@@ -69,6 +68,7 @@ const UserProfilePage = (props) => {
     await getUserInfo();
     if(!userNotfound){
       getStoriesByAuthor();
+      getReadStatistic();
     }
   }
 
@@ -321,8 +321,8 @@ const UserProfilePage = (props) => {
 
                   <div className="row mb-5">
                     <div className="col-12">
-                    <TableContainer component={Paper}>
-                        <Table aria-label="caption table">
+                    <TableContainer component={Paper} >
+                        <Table>
                           <caption>Tất cả truyện</caption>
                           <TableHead>
                             <TableRow>
@@ -337,6 +337,7 @@ const UserProfilePage = (props) => {
                               <TableCell align="center">Đánh giá trung bình</TableCell>
                               <TableCell align="center">Trạng thái</TableCell>
                               <TableCell align="center">Nhãn</TableCell>
+                              <TableCell align="center"></TableCell>
                               <TableCell align="center"></TableCell>
                             </TableRow>
                           </TableHead>
@@ -362,7 +363,20 @@ const UserProfilePage = (props) => {
                                     </small>
                                   </div>
                                 </TableCell>
+                                <TableCell>
+                                      <Tooltip title="Xem thống kê" style={{ display: 'inline-block' }}>
+                                        <IconButton
+                                          style={{ display: 'inline-block' }}
+                                          color="inherit"
+                                          onClick={() => { props.history.push('/story/analystics/' + story.id) }}
+                                        >
+                                          <DataUsageIcon />
+                                        </IconButton>
+                                      </Tooltip>
+                                </TableCell>
+                               
                                 <TableCell align="center">
+                                   
                                   <MyDropdownMenu>
                                     <MenuItem onClick={() => readStory(story)}>
                                       Đọc truyên

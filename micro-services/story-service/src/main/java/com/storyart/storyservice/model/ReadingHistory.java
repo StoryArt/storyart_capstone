@@ -23,7 +23,6 @@ import java.util.Date;
 @AllArgsConstructor
 public class ReadingHistory extends DateAudit {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -33,7 +32,8 @@ public class ReadingHistory extends DateAudit {
     @NotNull
     private Integer storyId;
 
-    private String listSectionId;
+    private String listScreenId;
+    private boolean isReachingEnd;
 
     private Date createdAt;
 

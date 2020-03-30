@@ -13,6 +13,7 @@ import ConfirmDialog from '../../components/common/ConfirmDialog';
 import TagList from '../../components/common/TagList';
 import MyAlert from '../../components/common/MyAlert';
 import ValidationUtils from '../../utils/validation';
+import DateTimeUtils from '../../utils/datetime';
 
 let searchTimeout = null;
 let currentStory = null;
@@ -221,7 +222,7 @@ const changePage = (e, value) => {
                     <TableCell>#</TableCell>
                     <TableCell align="center">Tiêu đề</TableCell>
                     <TableCell align="center">Ảnh</TableCell>
-                    {/* <TableCell align="center">Giới thiệu</TableCell> */}
+                    <TableCell align="center">Ngày tạo</TableCell>
                     <TableCell align="center">Số màn hình</TableCell>
                     <TableCell align="center">Lượt đọc</TableCell>
                     <TableCell align="center">Lượt bình luận</TableCell>
@@ -240,6 +241,9 @@ const changePage = (e, value) => {
                       <TableCell align="center">{ story.title }</TableCell>
                       <TableCell align="center">
                         <img style={{ width: '80px' }}  src={story.image}/>
+                      </TableCell>
+                      <TableCell align="center">
+                        {DateTimeUtils.getDate(story.createdAt)}
                       </TableCell>
                       <TableCell align="center">{story.numOfScreen}</TableCell>
                       <TableCell align="center">{story.numOfRead}</TableCell>

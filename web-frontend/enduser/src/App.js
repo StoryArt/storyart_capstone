@@ -89,7 +89,7 @@ function App() {
             <Route exact path="/stories/details/:storyId" component={StoryDetailsPage}/>
             <Route exact path="/stories/read/:storyId" component={StoryReadingPage}/>
             <Route exact path="/user/profile/:userId" component={PublicUserProfilePage}/>
-            <Route exact path="/story/analystics/:storyId" component={StoryAnalytic}/>
+            <PrivateRoute exact path="/story/analystics/:storyId" component={StoryAnalytic}/>
 
             <PrivateRoute 
               exact 

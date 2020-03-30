@@ -736,6 +736,10 @@ class StoryServiceImpl implements StoryService{
                 if(asc) page1 = storyRepository.findForAdminOrderByNumOfReadASC(keyword, pageable);
                 else page1 = storyRepository.findForAdminOrderByNumOfReadDESC(keyword, pageable);
                 break;
+            case "date":
+                if(asc) page1 = storyRepository.findForAdminOrderDateASC(keyword, pageable);
+                else page1 = storyRepository.findForAdminOrderDateDESC(keyword, pageable);
+                break;
         }
 
         if(page1 == null) return null;
@@ -782,6 +786,10 @@ class StoryServiceImpl implements StoryService{
             case "screen":
                 if(asc) page1 = storyRepository.findForUserOrderByNumOfScreenASC(userId, keyword,  pageable);
                 else page1 = storyRepository.findForUserOrderByNumOfScreenDESC(userId, keyword, pageable);
+                break;
+            case "date":
+                if(asc) page1 = storyRepository.findForUserOrderByDateASC(userId, keyword,  pageable);
+                else page1 = storyRepository.findForUserOrderByDateDESC(userId, keyword, pageable);
                 break;
         }
 

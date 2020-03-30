@@ -20,7 +20,7 @@ public class StoryServiceApplication {
 	public CommandLineRunner createTestStories(StoryService storyService, HistoryService historyService){
 		return args -> {
 			//storyService.createTempStories();
-			historyService.createTempHistory();
+//			historyService.createTempHistory();
 		};
 	}
 }

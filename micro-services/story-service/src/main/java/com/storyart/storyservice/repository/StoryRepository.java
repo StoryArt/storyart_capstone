@@ -39,6 +39,15 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
             nativeQuery = true)
     Page<Story> findAllByUserProfile(int userId, String title, Set<Integer> tagIds, Pageable pageable);
 
+    @Query(value = MyQueries. getStoriesForAdminOrderByDate+ " ASC",
+            countQuery = MyQueries.countStoriesByKeyword,
+            nativeQuery = true)
+    Page<Story> findForAdminOrderDateASC(String keyword, Pageable pageable);
+
+    @Query(value = MyQueries. getStoriesForAdminOrderByDate+ " DESC",
+            countQuery = MyQueries.countStoriesByKeyword,
+            nativeQuery = true)
+    Page<Story> findForAdminOrderDateDESC(String keyword, Pageable pageable);
 
     @Query(value = MyQueries.getStoriesForAdminOrderByComment + " ASC",
             countQuery = MyQueries.countStoriesByKeyword,
@@ -82,6 +91,12 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
     Page<Story> findForAdminOrderByNumOfReadDESC(String keyword, Pageable pageable);
 
     //for users
+    @Query(value = MyQueries.getStoriesForUserOrderByDate + " ASC", nativeQuery = true)
+    Page<Story> findForUserOrderByDateASC(int userId, String keyword, Pageable pageable);
+
+    @Query(value = MyQueries.getStoriesForUserOrderByDate + " DESC", nativeQuery = true)
+    Page<Story> findForUserOrderByDateDESC(int userId, String keyword, Pageable pageable);
+
     @Query(value = MyQueries.getStoriesForUserOrderByComment + " ASC", nativeQuery = true)
     Page<Story> findForUserOrderByNumOfCommentASC(int userId, String keyword, Pageable pageable);
 

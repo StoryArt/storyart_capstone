@@ -1,31 +1,29 @@
 package com.storyart.storyservice.service;
 
 import com.github.javafaker.Faker;
-import com.storyart.storyservice.dto.GetStoryDto;
+import com.storyart.storyservice.dto.create_reading_history.ClickLinkDto;
+import com.storyart.storyservice.dto.create_reading_history.ReadingHistoryDto;
+import com.storyart.storyservice.dto.ResultDto;
+import com.storyart.storyservice.dto.create_reading_history.ScreenReadTimeDto;
 import com.storyart.storyservice.dto.story_suggestion.HistoryDTO;
+import com.storyart.storyservice.model.ClickLink;
 import com.storyart.storyservice.model.ReadingHistory;
+import com.storyart.storyservice.model.ScreenReadingTime;
 import com.storyart.storyservice.model.Story;
-import com.storyart.storyservice.model.Tag;
-import com.storyart.storyservice.repository.HistoryRepository;
-import com.storyart.storyservice.repository.StoryRepository;
-import com.storyart.storyservice.repository.TagRepository;
+import com.storyart.storyservice.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 
 public interface HistoryService {
     List<Integer> jaccardCalculate(Integer id);
     void createTempHistory();
+    ResultDto saveReadHistory(ReadingHistoryDto readingHistoryDto, int userId);
+    ResultDto saveClickLink(ClickLinkDto clickLink);
+    ResultDto saveScreenReadTime(ScreenReadTimeDto screenReadTimeDto);
 }
 
 @Service
@@ -43,7 +41,44 @@ class HistoryServiceIml implements HistoryService {
     @Autowired
     TagRepository tagRepository;
 
+    @Autowired
+    ScreenReadingTimeRepository screenReadingTimeRepository;
 
+    @Autowired
+    ClickLinkRepository clickLinkRepository;
+
+    @Autowired
+    ModelMapper modelMapper;
+
+    @Override
+    public ResultDto saveClickLink(ClickLinkDto clickLink) {
+        ResultDto result = new ResultDto();
+        result.setSuccess(false);
+        Story story = storyRepository.findById(clickLink.getStoryId()).orElse(null);
+        if(story == null){
+            result.getErrors().put("NOT_FOUND", "Truyện này không tồn tại");
+        } else if(!story.isActive() ||  story.isDeactiveByAdmin()){
+            result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
+        } else {
+            ClickLink saved = modelMapper.map(clickLink, ClickLink.class);
+            saved = clickLinkRepository.save(saved);
+            result.setSuccess(true);
+            result.setData(saved);
+        }
+        return result;
+    }
+
+    @Override
+    public ResultDto saveScreenReadTime(ScreenReadTimeDto screenReadTimeDto) {
+        ResultDto result = new ResultDto();
+        System.out.println(screenReadTimeDto.getDuration());
+        ScreenReadingTime screenReadingTime = modelMapper.map(screenReadTimeDto, ScreenReadingTime.class);
+
+        screenReadingTime = screenReadingTimeRepository.save(screenReadingTime);
+        result.setSuccess(true);
+        result.setData(screenReadingTime);
+        return result;
+    }
 
     @Override
     public   List<Integer> jaccardCalculate(Integer id) {
@@ -105,6 +140,30 @@ class HistoryServiceIml implements HistoryService {
             historyRepository.save(rh);
         }
 
+    }
+
+    @Override
+    public ResultDto saveReadHistory(ReadingHistoryDto readingHistoryDto, int userId) {
+        ResultDto result = new ResultDto();
+        result.setSuccess(false);
+        Story story = storyRepository.findById(readingHistoryDto.getStoryId()).orElse(null);
+        if(story == null){
+            result.getErrors().put("NOT_FOUND", "Truyện này không tồn tại");
+        } else if(!story.isActive() ||  story.isDeactiveByAdmin()){
+            result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
+        } else {
+            ReadingHistory rh = modelMapper.map(readingHistoryDto, ReadingHistory.class);
+            rh.setUserId(userId);
+            rh = historyRepository.save(rh);
+            int id = rh.getId();
+
+
+
+            result.setSuccess(true);
+            result.setData(rh);
+
+        }
+        return result;
     }
 
 

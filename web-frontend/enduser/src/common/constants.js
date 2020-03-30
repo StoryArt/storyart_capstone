@@ -96,6 +96,7 @@ export const ORDER_BYS = {
     COMEMENT: 'comment',
     SCREEN: 'screen',
     RATING: 'rating',
+    DATE: 'date',
 }
 
 export const SCREEN_COLORS = {
@@ -105,13 +106,14 @@ export const SCREEN_COLORS = {
 }
 
 export const getOrderBys = () => {
-    const { AVG_RATE, READ, COMEMENT, SCREEN, RATING } = ORDER_BYS;
+    const { AVG_RATE, READ, COMEMENT, SCREEN, RATING, DATE } = ORDER_BYS;
     return [
         { value: AVG_RATE, title: 'Đánh giá trung bình' },
         { value: READ, title: 'Lượt đọc' },
         { value: COMEMENT, title: 'Lượt bình luận' },
         { value: SCREEN, title: 'Số màn hình' },
         { value: RATING, title: 'Lượt đánh giá' },
+        { value: DATE, title: 'Ngày tạo' },
     ]
 }
 
