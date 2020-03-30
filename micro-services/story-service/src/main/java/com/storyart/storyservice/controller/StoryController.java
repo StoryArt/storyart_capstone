@@ -193,9 +193,6 @@ public class StoryController {
     @PostMapping("story/{sid}/statistic/react")
     public ResponseEntity getReacts_Statistic(@PathVariable int sid, @RequestBody TimeRangeRequest timeRangeRequest){
         StoryReactByRange storyReactByRanges= storyService.getReactStatisticInTimeRange(sid,timeRangeRequest );
-
-
         return new ResponseEntity(storyReactByRanges, HttpStatus.OK);
     }
-
 }

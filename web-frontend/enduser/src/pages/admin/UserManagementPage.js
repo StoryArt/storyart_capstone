@@ -140,13 +140,13 @@ const UserManagementPage = () => {
   const data = {
     columns: [
       {
-        label: "Username",
-        field: "username",
+        label: "#",
+        field: "stt",
         sort: "asc",
         width: 150
       },
       {
-        label: "Name",
+        label: "",
         field: "name",
         sort: "asc",
         width: 270
