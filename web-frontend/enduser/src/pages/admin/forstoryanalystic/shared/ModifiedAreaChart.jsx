@@ -9,7 +9,7 @@ const defaultOption = {
     right: 16,
     bottom: 32
   },
-  legend: {},
+  legend: {textStyle:{color : "#fff"}},
   tooltip: {
     show: true,
     trigger: "axis",
@@ -88,11 +88,11 @@ const defaultOption = {
       colorStops: [
         {
           offset: 0,
-          color: "rgba(255,255,255,0.3)" // color at 0% position
+          color: "rgba(255,255,255,.1)" // color at 0% position
         },
         {
           offset: 1,
-          color: "rgba(255,255,255,0)" // color at 100% position
+          color: "rgba(255,255,255,0.5)" // color at 100% position
         }
       ],
       global: false // false by default
