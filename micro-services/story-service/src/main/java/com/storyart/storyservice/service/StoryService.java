@@ -233,7 +233,6 @@ class StoryServiceImpl implements StoryService {
                 rating.setStoryId(storyId);
                 rating.setUserId(userId);
                 rating.setUpdatedAt(new Date());
-                System.out.println("create");
             }
             rating.setStars(stars);
             ratingRepository.save(rating);
@@ -473,6 +472,7 @@ class StoryServiceImpl implements StoryService {
         return result;
     }
 
+
     @Override
     public ResultDto updateStory(CreateStoryDto storyDto, int userId) {
         ResultDto resultDto = new ResultDto();
@@ -491,12 +491,22 @@ class StoryServiceImpl implements StoryService {
             HashMap<String, String> informationIdsMap = new HashMap<>();
 
             //delete all old screens
+
+            List<String> screenIdList = storyDto.getScreens().stream().map(scr -> scr.getId()).collect(Collectors.toList());
             List<Screen> screenList = screenRepository.findByStoryId(story.getId());
-            screenRepository.deleteAll(screenList);
-//            screenRepository.deleteAllByStoryId(story.getId());
+            //delete unused screen
+            screenList.stream().forEach(screen -> {
+                if(!screenIdList.contains(screen.getId())){
+                    screenRepository.delete(screen);
+                }
+            });
 
             storyDto.getScreens().stream().forEach(screen -> {
-                screenIdsMap.put(screen.getId(), MyStringUtils.generateUniqueId());
+                if(screenRepository.existsById(screen.getId())){
+                    screenIdsMap.put(screen.getId(), screen.getId());
+                } else {
+                    screenIdsMap.put(screen.getId(), MyStringUtils.generateUniqueId());
+                }
             });
 
             story.setFirstScreenId(screenIdsMap.get(storyDto.getFirstScreenId()));
@@ -528,7 +538,8 @@ class StoryServiceImpl implements StoryService {
                 screenRepository.save(savedScreen);
 
                 //delete all actions
-
+                List<Action> actionList  = actionRepository.findAllByScreenId(savedScreen.getId());
+                actionRepository.deleteAll(actionList);
 
                 screen.getActions().stream().forEach(action -> {
                     Action savedAction = modelMapper.map(action, Action.class);
