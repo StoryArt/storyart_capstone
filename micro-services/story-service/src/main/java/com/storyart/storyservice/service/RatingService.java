@@ -332,15 +332,25 @@ class RatingServiceIml implements RatingService {
                 thirdtopid = secondtopid;
                 secondtopid = topid;
                         topid = dto.getStoryId();
+                        four = third;
+                        third = second;
+                        second = top;
+                        top = dto.getPoint();
             }else if(dto.getPoint() >= second){
                 fourtopid = thirdtopid;
                 thirdtopid = secondtopid;
                 secondtopid = dto.getStoryId();
+                four = third;
+                third = second;
+                second = dto.getPoint();
             }else if(dto.getPoint() >= third){
                 fourtopid = thirdtopid;
                 thirdtopid = dto.getStoryId();
+                four = third;
+                third = dto.getPoint();
             } else if(dto.getPoint() >= four){
-                four = dto.getStoryId();
+                fourtopid = dto.getStoryId();
+                four = dto.getPoint();
             }
         }
         listSuggestion.add(topid);
