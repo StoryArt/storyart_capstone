@@ -880,7 +880,10 @@ class StoryServiceImpl implements StoryService{
         }
         for(int i=0; i< commentByDay.size(); i++){
             hitPointByDay.add(new Random().nextInt(100));
-        } for(int i=0; i< commentByDay.size(); i++){
+        }
+
+
+        for(int i=0; i< commentByDay.size(); i++){
             clickLinkByDay.add(new Random().nextInt(20));
         }
         //dulieu gia
