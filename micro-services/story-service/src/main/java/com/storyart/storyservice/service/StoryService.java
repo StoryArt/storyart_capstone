@@ -24,6 +24,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -855,7 +857,8 @@ class StoryServiceImpl implements StoryService {
         }
         return list.stream().map(t -> t.getId()).collect(Collectors.toList());
     }
-
+@Autowired
+    EntityManager entityManager;
     @Override
     public StorySummarizeResponse getStorySummarizeResponse(int sid) {
         Story story = storyRepository.findById(sid).orElse(null);
@@ -868,11 +871,26 @@ class StoryServiceImpl implements StoryService {
             storySummarizeResponse.setNumOfComment(commentRepository.countCommentByStoryId(story.getId()));
             storySummarizeResponse.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
 
+            Query query1 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.click_link where story_id= :storyId");
+            Query query2 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.reading_history where story_id= :storyId");
+            Query query3 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.screen   where story_id= :storyId");
+
+
+
+            query1.setParameter("storyId", sid);
+            query2.setParameter("storyId", sid);
+            query3.setParameter("storyId", sid);
+
+            int clicklinkCount = ((Number) query1.getSingleResult()).intValue();
+            int hitpointCount = ((Number) query2.getSingleResult()).intValue();
+            int screenNumber = ((Number) query2.getSingleResult()).intValue();
+
+
             //todo:xoa dong nay
-            storySummarizeResponse.setNumOfComment(new Random().nextInt(1000));
-            storySummarizeResponse.setNumOfHitPoint(new Random().nextInt(300));
-            storySummarizeResponse.setNumOfClickLink(new Random().nextInt(200));
-            storySummarizeResponse.setNumOfShare(new Random().nextInt(400));
+            storySummarizeResponse.setNumOfHitPoint(hitpointCount);
+            storySummarizeResponse.setNumOfClickLink(clicklinkCount);
+            storySummarizeResponse.setNumOfScreen(screenNumber);
+            storySummarizeResponse.setNumOfShare(new Random().nextInt(300));
 
 
             return storySummarizeResponse;
