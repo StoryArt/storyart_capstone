@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
-@Table(name = "story")
+@Table(name = "screen_reading_time")
 @Setter
 @Getter
 @NoArgsConstructor
@@ -22,7 +22,7 @@ public class ScreenReadingTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-
+    Integer screenId;
     long duration;
     private Date createdAt;
 

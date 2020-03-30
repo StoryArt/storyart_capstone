@@ -1,5 +1,6 @@
 package com.storyart.storyservice.service;
 
+import com.storyart.storyservice.dto.LinkAndSidDTO;
 import com.storyart.storyservice.model.interactModel.ClickLink;
 import com.storyart.storyservice.repository.ClickLinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import java.util.*;
 public interface LinkClickService {
     List<Integer> findClickLinkRange(Integer storyId, String start, String end);
 
-    void save(Integer storyId);
+    void save(LinkAndSidDTO linkAndSidDTO);
 
 }
 
@@ -91,9 +92,10 @@ class LinkClickServiceImpl implements LinkClickService {
     }
 
     @Override
-    public void save(Integer sid) {
+    public void save(LinkAndSidDTO c) {
         ClickLink p= new ClickLink ();
-        p.setStoryId(sid);
+        p.setStoryId(c.getSid());
+        p.setLink(c.getLink());
         clickLinkRepository.save(p);
     }
 
