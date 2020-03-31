@@ -64,6 +64,11 @@ public class JwtAuthenticationController {
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+       User us= userRepository.findByUsername(loginRequest.getUsername()).orElse(null);
+       if(us!= null && us.isDeactiveByAdmin()){
+           throw new BadRequestException("Tài khoản đã bị khóa. Vui lòng liên hệ với quản trị viên!");
+       }
+
         Authentication authentication;
         try {
           authentication  = authenticationManager.authenticate(
@@ -76,6 +81,8 @@ public class JwtAuthenticationController {
             throw new BadRequestException("Sai tên đăng nhập hoặc mật khẩu!");
 
         }
+
+
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 

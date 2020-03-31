@@ -74,7 +74,7 @@ const StatCards = ({ classes, view, share, hitpoint, clicklink }) => {
           <div className="flex items-center">
             <Icon path={mdiFlagVariantOutline}  size={1.5} color="#ccc"></Icon>
             <div className="ml-3">
-              <h5 className="font-medium  text-muted">Đến đích</h5>
+              <h5 className="font-medium  text-muted">Hoàn thành</h5>
 
               <h6 className="m-0 mt-1 text-primary font-medium">
                 {hitpoint} lượt

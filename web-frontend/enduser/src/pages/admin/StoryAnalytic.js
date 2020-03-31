@@ -1,9 +1,7 @@
 import React, { Component, Fragment } from "react";
-import {
-  Grid
-} from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import MainLayout from "../../layouts/main-layout/MainLayout";
-import {  setAuthHeader  } from "../../config/auth";
+import { setAuthHeader } from "../../config/auth";
 
 import DoughnutChart from "./forstoryanalystic/charts/echarts/Doughnut";
 import ModifiedAreaChart from "./forstoryanalystic/shared/ModifiedAreaChart";
@@ -45,27 +43,49 @@ class Dashboard1 extends React.Component {
       story: {},
       anchorEl: null,
       daybeforelabel: "Chọn ngày",
-      tagString: ""
-      ,convertedList:[],
-      pageInfo:{
+      tagString: "",
+      convertedList: [],
+      pageInfo: {
         page: 1,
         size: 10,
         totalElement: 10,
         totalPages: 1,
         last: true
       },
-      pageNo:1,
-      // storyId: this.props.match.params.storyId
+      pageNo: 1,
+      datax: {
+        columns: [
+          {
+            label: "#",
+            field: "id",
+            sort: "asc",
+            width: 150
+          },
+          {
+            label: "Tiêu đề",
+            field: "title",
+            sort: "asc",
+            width: 270
+          },
+          {
+            label: "Thời lượng đọc",
+            field: "sumtime",
+            sort: "asc",
+            width: 200
+          }
+        ],
+        rows: []
+      }
 
+      // storyId: this.props.match.params.storyId
     };
     // this.handleLoadReactStatic= this.handleLoadReactStatic.bind(this,6);
-
   }
   // const [anchorEl, setAnchorEl] = React.useState(null);
 
   componentDidMount() {
     setAuthHeader(localStorage.getItem("jwt-token"));
-      
+
     console.log(
       "compoent did mount , get story summary set state and loading rating"
     );
@@ -81,34 +101,33 @@ class Dashboard1 extends React.Component {
 
   async getStorySummary() {
     const url = this.baseUrl + `/story/` + this.sid + `/summary`;
-    const res = await axios.get(url);
-    this.setState({ story: res.data });
-    console.log("summary");
-    console.log(this.state.story);
-    let tags = "";
-
-    this.state.story.tags.map(x => {
-      tags = tags + x.title + ",";
+    const res = await axios.get(url).then(res => {
+      this.setState({ story: res.data });
+      console.log("summary");
+      console.log(this.state.story);
+      let tags = "";
+      this.state.story.tags.map(x => {
+        tags = tags + x.title + ",";
+      });
+      this.setState({ tagString: tags });
     });
-    this.setState({ tagString: tags });
   }
   async loadRatingStatic() {
     const url = this.baseUrl + `/story/` + this.sid + `/statistic/rating`;
-    const res = await axios.get(url);
-    const starIcon = [];
-
-    this.setState({
-      rating: res.data.map(rate => ({
-        name: rate.star + " star",
-        value: rate.count
-      }))
+    const res = await axios.get(url).then(res => {
+      this.setState({
+        rating: res.data.map(rate => ({
+          name: rate.star + " star",
+          value: rate.count
+        }))
+      });
+      //cho nao bi rendeẻ lai
+      console.log("load rating");
+      console.log(this.state.rating);
     });
-    //cho nao bi rendeẻ lai
-    console.log("load rating");
-    console.log(this.state.rating);
   }
   baseUrl = "http://localhost:8000/api/story-service/stories";
-  sid =this.props.match.params.storyId;
+  sid = this.props.match.params.storyId;
   // sid= 34
 
   toddMMyyyy(date) {
@@ -127,6 +146,64 @@ class Dashboard1 extends React.Component {
     }
     return d + "/" + m + "/" + y;
   }
+  getScreenTime(url, timerange) {
+    axios.post(url, timerange).then(res => {
+      console.log("screen time");
+      console.log(res.data);
+      this.ConvertUserList(res.data);
+    });
+  }
+
+  //  changePage = async (event, value) => {
+  //   if (value !== pageNo) {
+  //     setPageNo(value);
+  //     try {
+  //       const res = await UserService.getUsersList(value, 10, "");
+  //       ConvertUserList(res.data);
+  //     } catch (error) {}
+  //   }
+  // };
+
+  ConvertUserList(data) {
+    var userList = data;
+    let rowsData = [];
+
+    for (var index = 0; index < userList.length; index++) {
+      let rowItem = {};
+      rowItem["id"] = userList[index].id;
+      rowItem["title"] = userList[index].title;
+      rowItem["sumtime"] = userList[index].sumtime;
+      rowsData.push(rowItem);
+    }
+
+    this.setState({
+      datax: {columns: [
+        {
+          label: "#",
+          field: "id",
+          sort: "asc",
+          width: 150
+        },
+        {
+          label: "Tiêu đề",
+          field: "title",
+          sort: "asc",
+          width: 270
+        },
+        {
+          label: "Thời lượng đọc",
+          field: "sumtime",
+          sort: "asc",
+          width: 200
+        }
+      ],
+        rows: rowsData
+      }
+    });
+console.log("datx:")
+    console.log(this.state.datax)
+  }
+
   handleLoadReactStatic(daybefore) {
     console.log(daybefore);
     let now = new Date();
@@ -167,41 +244,13 @@ class Dashboard1 extends React.Component {
       console.log("du lieu react:");
       console.log(this.state.reactStatic);
     });
+    let screenUrl =
+      "http://localhost:8000/api/story-service/interact/getScreenTime/" +
+      this.sid;
+    this.getScreenTime(screenUrl, timerange);
 
     // getReactStatic(23,event.target.value, "26/03/2020");
   }
-
-   data = {
-    columns: [
-      {
-        label: "#",
-        field: "No.",
-        sort: "asc",
-        width: 150
-      },
-      {
-        label: "Tên màn",
-        field: "title",
-        sort: "asc",
-        width: 270
-      },
-      {
-        label: "Thời lượng đọc trung bình",
-        field: "avgTime",
-        sort: "asc",
-        width: 200  
-      },
-
-      {
-        label: "Xem chi tiết",
-        field: "",
-        // sort: "asc",
-        width: 100
-      }
-    ],
-    // rows: this.state.convertedList
-    rows:[]
-  };    
 
   render() {
     const theme = {
@@ -235,14 +284,16 @@ class Dashboard1 extends React.Component {
     };
 
     return (
-        <MainLayout>
-      <Fragment>
-      
-        <div className="pb-24 pt-7 px-8 bg-primary">
-
-          <div className="card-title capitalize text-white mb-4
-           text-white-secondary" style={{margin:"10 5 0 10", opacity:"80%"}}>
-            Thống kê tương tác  <Button
+      <MainLayout>
+        <Fragment>
+          <div className="pb-24 pt-7 px-8 bg-primary">
+            <div
+              className="card-title capitalize text-white mb-4
+           text-white-secondary"
+              style={{ margin: "10 5 0 10", opacity: "80%" }}
+            >
+              Thống kê tương tác{" "}
+              <Button
                 variant="outlined"
                 color="inherit"
                 aria-owns={this.state.anchorEl ? "simple-menu" : undefined}
@@ -251,185 +302,191 @@ class Dashboard1 extends React.Component {
               >
                 {this.state.daybeforelabel}
               </Button>
-            <div>
-             
-              <Menu style={{borderRadius:  "8px"}}
-                id="simple-menu"
-                anchorEl={this.state.anchorEl}
-                open={Boolean(this.state.anchorEl)}
-                onClose={this.handleLoadReactStatic.bind(this, 1)}
-              >
-                <MenuItem onClick={this.handleLoadReactStatic.bind(this, 1)}>
-                  1 ngày trước
-                </MenuItem>
-                <MenuItem onClick={this.handleLoadReactStatic.bind(this, 5)}>
-                  5 ngày trước
-                </MenuItem>
-                <MenuItem onClick={this.handleLoadReactStatic.bind(this, 28)}>
-                  28 ngày trước
-                </MenuItem>
-              </Menu>
+              <div>
+                <Menu
+                  style={{ borderRadius: "8px" }}
+                  id="simple-menu"
+                  anchorEl={this.state.anchorEl}
+                  open={Boolean(this.state.anchorEl)}
+                  onClose={this.handleLoadReactStatic.bind(this, 1)}
+                >
+                  <MenuItem onClick={this.handleLoadReactStatic.bind(this, 1)}>
+                    1 ngày trước
+                  </MenuItem>
+                  <MenuItem onClick={this.handleLoadReactStatic.bind(this, 5)}>
+                    5 ngày trước
+                  </MenuItem>
+                  <MenuItem onClick={this.handleLoadReactStatic.bind(this, 28)}>
+                    28 ngày trước
+                  </MenuItem>
+                </Menu>
+              </div>
             </div>
+
+            <ModifiedAreaChart
+              height="280px"
+              option={{
+                series: [
+                  {
+                    data: this.state.reactStatic.commentStatic,
+                    // data: [34,12, 31, 45, 31, 43, 26, 43, 31, 45, 33, 40],
+                    name: "Bình luận",
+                    type: "line"
+                  },
+                  // ,{
+                  //   data: this.state.reactStatic.shareStatic,
+                  //   name:"Luợt xem",
+                  //   type: "line"
+                  // }
+                  {
+                    data: this.state.reactStatic.shareStatic,
+                    name: "Chia sẻ",
+                    type: "line"
+                  },
+                  {
+                    data: this.state.reactStatic.clickLinkStatic,
+                    name: "Click vào link",
+                    type: "line"
+                  },
+                  {
+                    data: this.state.reactStatic.hitPointStatic,
+                    name: "Hoàn thành",
+                    type: "line"
+                  }
+                ],
+                xAxis: {
+                  data: this.state.reactStatic.times
+                }
+              }}
+            ></ModifiedAreaChart>
           </div>
 
-          <ModifiedAreaChart
-            height="280px"
-            option={{
-              series: [
-                {
-                  data: this.state.reactStatic.commentStatic,
-                  // data: [34,12, 31, 45, 31, 43, 26, 43, 31, 45, 33, 40],
-                  name: "Bình luận",
-                  type: "line"
-                },
-                // ,{
-                //   data: this.state.reactStatic.shareStatic,
-                //   name:"Luợt xem",
-                //   type: "line"
-                // }
-                {
-                  data: this.state.reactStatic.shareStatic,
-                  name: "Chia sẻ",
-                  type: "line"
-                },
-                {
-                  data: this.state.reactStatic.clickLinkStatic,
-                  name: "Click vào link",
-                  type: "line"
-                },
-                {
-                  data: this.state.reactStatic.hitPointStatic,
-                  name: "Đến đích",
-                  type: "line"
-                }
-              ],
-              xAxis: {
-                data: this.state.reactStatic.times
-              }
-            }}
-          ></ModifiedAreaChart>
-        </div>
-
-        <div className="analytics m-sm-30 mt--18">
-          <Grid container spacing={3}>
-            <Grid item lg={4} md={4} sm={12} xs={12}>
-              {/* thong tin truyen */}
-              <Card className="px-6 py-4 mb-6" style={{marginBottom: 10}}>
-                <CardMedia
-                  component="img"
-                  alt="Ảnh bìa"
-                  height={300}
-                  image={this.state.story.image}
-                  title="Ảnh bìa"
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="h2">
-                    {this.state.story.title}
-                  </Typography>
-                  <medium className="border-radius-4 bg-secondary text-white px-2 py-2px ">
-                    {this.state.story.numOfScreen} màn 
-                  </medium>
-                  {this.state.story.published ? (
-                    <medium className="border-radius-4 bg-primary text-white px-2 py-2px ">
-                      Đã xuất bản
-                    </medium>
-                  ) : (
+          <div className="analytics m-sm-30 mt--18">
+            <Grid container spacing={3}>
+              <Grid item lg={4} md={4} sm={12} xs={12}>
+                {/* thong tin truyen */}
+                <Card className="px-6 py-4 mb-6" style={{ marginBottom: 10 }}>
+                  <CardMedia
+                    component="img"
+                    alt="Ảnh bìa"
+                    height={300}
+                    image={this.state.story.image}
+                    title="Ảnh bìa"
+                  />
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="h2">
+                      {this.state.story.title}
+                    </Typography>
                     <medium className="border-radius-4 bg-secondary text-white px-2 py-2px ">
-                      Chưa xuất bản
+                      {this.state.story.numOfScreen} màn
                     </medium>
-                  )}
-                  <Typography
-                    noWrap={false}
-                    variant="body2"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {this.state.story.intro}
-                  </Typography>
-                  {" "}
-                  tạo ngày:
-                  <Typography
-                    noWrap={false}
-                    variant="body2"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {this.state.story.createdAt}
-                  </Typography>
-                  {" "}
-                  tag:
-                  <Typography
-                    noWrap={false}
-                    variant="body2"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    {this.state.tagString}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button size="small" color="primary">
-                    Xem chi tiết
-                  </Button>
-                </CardActions>
-              </Card>
-              {/* danh gia */}
-              <Card className="px-6 py-4 mb-6">
-                <div className="card-title">
-                  <h5>Đánh giá</h5>{" "}
-                    <strong style={{ color: "#b0b0b0", fontSize: "18px" }}>{this.state.story.numOfRate}</strong>
-                </div>
-                <div className="card-title">
-                  {" "}
-                  <BeautyStars
-                    value={this.state.story.avgRate}
-                    gap="3px"
-                    size="18px"
-                    inactiveColor="#b0b0b0"
-                  ></BeautyStars>
-                  
-                </div>
+                    {this.state.story.published ? (
+                      <medium className="border-radius-4 bg-primary text-white px-2 py-2px ">
+                        Đã xuất bản
+                      </medium>
+                    ) : (
+                      <medium className="border-radius-4 bg-secondary text-white px-2 py-2px ">
+                        Chưa xuất bản
+                      </medium>
+                    )}
+                    <Typography
+                      noWrap={false}
+                      variant="body2"
+                      color="textSecondary"
+                      component="p"
+                    >
+                      {this.state.story.intro}
+                    </Typography>{" "}
+                    tạo ngày:
+                    <Typography
+                      noWrap={false}
+                      variant="body2"
+                      color="textSecondary"
+                      component="p"
+                    >
+                      {this.state.story.createdAt}
+                    </Typography>{" "}
+                    tag:
+                    <Typography
+                      noWrap={false}
+                      variant="body2"
+                      color="textSecondary"
+                      component="p"
+                    >
+                      {this.state.tagString}
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button size="small" color="primary">
+                      <a>Xem chi tiết</a>
+                    </Button>
+                  </CardActions>
+                </Card>
+                {/* danh gia */}
+                <Card className="px-6 py-4 mb-6">
+                  <div className="card-title" style={{paddingLeft: "10px"}}>
+                    <h5>Đánh giá <strong style={{ color: "#b0b0b0", fontSize: "20px" }}>
+                      {this.state.story.numOfRate}
+                    </strong> </h5>{" "}
+                    
+                  </div>
+                  <div className="card-title" style={{paddingLeft: "10px"}}>
+                    {" "}
+                    <BeautyStars
+                      value={this.state.story.avgRate}
+                      gap="3px"
+                      size="18px"
+                      inactiveColor="#b0b0b0"
+                    ></BeautyStars>
+                  </div>
 
-                <DoughnutChart
-                  height="350px"
-                  color={[
-                    theme.palette.primary.veryl,
-                    theme.palette.primary.light,
-                    theme.palette.primary.main2,
-                    theme.palette.primary.main,
-                    theme.palette.primary.dark
-                  ]}
-                  data1={this.state.rating}
+                  <DoughnutChart
+                    height="350px"
+                    color={[
+                      theme.palette.primary.veryl,
+                      theme.palette.primary.light,
+                      theme.palette.primary.main2,
+                      theme.palette.primary.main,
+                      theme.palette.primary.dark
+                    ]}
+                    data1={this.state.rating}
+                  />
+                </Card>
+
+                {/* <UpgradeCard /> */}
+
+                {/* <Campaigns /> */}
+              </Grid>
+              {/* // thong tin tong quan */}
+              <Grid item lg={8} md={8} sm={12} xs={12}>
+                <StatCards
+                  view={this.state.story.numOfRead}
+                  share={this.state.story.numOfShare}
+                  hitpoint={this.state.story.numOfHitPoint}
+                  clicklink={this.state.story.numOfClickLink}
                 />
-              </Card>
+                {/* <TableCard /> */}
 
-              {/* <UpgradeCard /> */}
-
-              {/* <Campaigns /> */}
+                <MDBDataTable
+                  striped
+                  bordered
+                  small searching={false}
+                  data={this.state.datax}
+                  entrieslabel={""}
+                  paging={false}
+                  displayEntries={false}
+                />
+                {/* <Pagination
+                  // count={pageInfo.totalPages}
+                  count={3}
+                  color="primary"
+                  boundaryCount={2}
+                  // onChange={changePage}
+                /> */}
+              </Grid>
             </Grid>
-            {/* // thong tin tong quan */}
-            <Grid item lg={8} md={8} sm={12} xs={12}>
-              <StatCards
-                view={this.state.story.numOfRead}
-                share={this.state.story.numOfShare}
-                hitpoint={this.state.story.numOfHitPoint}
-                clicklink={this.state.story.numOfClickLink}
-              />
-              {/* <TableCard /> */}
-
-              <MDBDataTable searchingLabel="Tìm kiếm"
-              striped bordered small data={this.data}  entrieslabel={""} paging={false}displayEntries={false}/>
-      <Pagination
-        // count={pageInfo.totalPages}
-        count={3}
-        color="primary"
-        boundaryCount={2}
-        // onChange={changePage}
-      />
-            </Grid>
-          </Grid>
-        </div>
-      </Fragment>
+          </div>
+        </Fragment>
       </MainLayout>
     );
   }
