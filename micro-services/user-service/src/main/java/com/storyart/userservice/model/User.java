@@ -50,7 +50,7 @@ public class User extends DateAudit {
     private String introContent;
     private boolean isActive;
 
-    @Email
+    @Email(message = "Vui lòng nhập lại email")
     @NotBlank(message = "Email không được để trống")
     private String email;
 
