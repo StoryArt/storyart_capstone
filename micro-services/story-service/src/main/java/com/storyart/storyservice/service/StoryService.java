@@ -6,6 +6,7 @@ import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.TagDto;
 import com.storyart.storyservice.dto.create_story.CreateStoryDto;
 import com.storyart.storyservice.dto.ResultDto;
+import com.storyart.storyservice.dto.history.ReadingHistoryResponse;
 import com.storyart.storyservice.dto.read_story.ReadStoryDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryInformationDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryScreenDto;
@@ -83,6 +84,7 @@ public interface StoryService {
     List<IRatingClassify> getRatingClassify(int sid);
 
     Rating getRatingByStoryAndUser(int storyId, int userId);
+
 }
 
 @Service
