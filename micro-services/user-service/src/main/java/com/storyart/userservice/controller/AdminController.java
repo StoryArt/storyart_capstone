@@ -140,7 +140,7 @@ public class AdminController {
 
 //        Role userRole
         Role userRole = roleRepository.findRoleByName(RoleName.ROLE_USER)
-                .orElseThrow(() -> new AppException("User Role not set."));
+                .orElseThrow(() -> new AppException("Hiện giờ chưa thể tạo tài khoản! Vui lòng quay lại sau!"));
 
         user.setRoleId(userRole.getId());
 
@@ -156,7 +156,7 @@ public class AdminController {
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("api/v1/user/username")
                 .buildAndExpand(savedUser.getUsername()).toUri();
-        return ResponseEntity.created(location).body(new ApiResponse(true, "User created successfully"));
+        return ResponseEntity.created(location).body(new ApiResponse(true, "Tạo tài khoản thành công!"));
 
     }
 }

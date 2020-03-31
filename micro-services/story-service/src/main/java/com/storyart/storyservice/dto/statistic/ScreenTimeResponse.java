@@ -14,9 +14,11 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScreenTimeResponse {
-    int id;
+    String id;
     private int storyId;
 
+    //tu oktu nha,
+    //id cua story la int, id cua screen la string nhoakok
     private String title;
 
     private String content;

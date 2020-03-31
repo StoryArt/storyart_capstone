@@ -129,7 +129,7 @@ function App() {
 
 
             {/* system admin routes */}
-            <PrivateRoute exact path="/admin/add" roleName={ROLE_NAMES.ROLE_SYSTEM_ADMIN}  component={AddAdmin}/>
+            <PrivateRoute exact path="/sysadmin/add" roleName={ROLE_NAMES.ROLE_SYSTEM_ADMIN}  component={AddAdmin}/>
             <PrivateRoute exact path="/sysadmin/admin" roleName={ROLE_NAMES.ROLE_SYSTEM_ADMIN} component={AdminManagementPage}/>
 
 

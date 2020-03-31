@@ -36,6 +36,8 @@ class ScreenReadingTimeImpl implements ScreenReadingTimeService {
     @Autowired
     EntityManager entityManager;
 
+    @Autowired
+    ScreenService screenService;
     @Override
     public List<ScreenTimeResponse> getListDurationOfEachSreenInTimeRangeByStoryId(Integer sid, String startDate, String endDate) {
         List<Screen> screensByStoryId = screenService.getScreensByStoryId(sid);
@@ -43,11 +45,11 @@ class ScreenReadingTimeImpl implements ScreenReadingTimeService {
         List<ScreenTimeResponse> list = new ArrayList<>();
         Query query = entityManager.createNativeQuery("select sum(duration) from storyart_db.screen_reading_time where screen_id= :screenId and (created_at between :startDate and :endDate)");
         for (Screen screen : screensByStoryId) {
-            int screenId = Integer.parseInt(screen.getId());
+            String screenId = screen.getId();
             query.setParameter("screenId", screenId);
             query.setParameter("startDate", startDate);
             query.setParameter("endDate", endDate);
-
+// ben t cung mat r , de tim lai troing history
             Object singleResult = query.getSingleResult();
             long sumtime=0;
             if(singleResult!= null){
@@ -65,10 +67,4 @@ class ScreenReadingTimeImpl implements ScreenReadingTimeService {
         }
         return list;
     }
-
-
-    @Autowired
-    ScreenService screenService;
-
-
 }
