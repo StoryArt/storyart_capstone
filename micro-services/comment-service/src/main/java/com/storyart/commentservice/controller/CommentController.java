@@ -83,8 +83,5 @@ public class CommentController {
         return commentService.getStatistic(storyId, userId, start, end);
     }
 
-
-    public static void main(String[] args) {
-        System.out.println(new Integer(2).equals(new Integer(2)));
-    }
+    //@GetMapping("")
 }

@@ -5,6 +5,7 @@ import com.storyart.storyservice.dto.create_reading_history.ClickLinkDto;
 import com.storyart.storyservice.dto.create_reading_history.ReadingHistoryDto;
 import com.storyart.storyservice.dto.ResultDto;
 import com.storyart.storyservice.dto.create_reading_history.ScreenReadTimeDto;
+import com.storyart.storyservice.dto.history.ReadingHistoryResponse;
 import com.storyart.storyservice.dto.story_suggestion.HistoryDTO;
 import com.storyart.storyservice.model.ClickLink;
 import com.storyart.storyservice.model.ReadingHistory;
@@ -16,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.storyart.storyservice.repository.HistoryRepository;
 import com.storyart.storyservice.repository.StoryRepository;
 import com.storyart.storyservice.repository.TagRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,6 +30,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 
 public interface HistoryService {
     List<Integer> jaccardCalculate(Integer id);
@@ -35,6 +40,7 @@ public interface HistoryService {
     ResultDto saveScreenReadTime(ScreenReadTimeDto screenReadTimeDto);
 
     List<Integer> findHitpointListByRange(Integer sid, String start, String end);
+    Page<ReadingHistoryResponse> getReadingHistory(int userId, int pageNo, int pageSize);
 }
 
 @Service
@@ -242,6 +248,48 @@ class HistoryServiceIml implements HistoryService {
             calendarStart.add(Calendar.DAY_OF_MONTH, 1);
         }
         return integerList;
+    }
+
+    @Override
+    public Page<ReadingHistoryResponse> getReadingHistory(int userId, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        Page<ReadingHistory> historyPage = historyRepository.findAllWithUserId(userId, pageable);
+
+        Page<ReadingHistoryResponse> responsePage = historyPage.map(new Function<ReadingHistory, ReadingHistoryResponse>() {
+            @Override
+            public ReadingHistoryResponse apply(ReadingHistory readingHistory) {
+                ModelMapper mm = new ModelMapper();
+                ReadingHistoryResponse readingHistoryResponse =mm.map(readingHistory, ReadingHistoryResponse.class);
+                return  readingHistoryResponse;
+            }
+        });
+
+        List<ReadingHistoryResponse> responseList = responsePage.getContent();
+
+        List<Integer> storyIds = new ArrayList<>();
+
+        for (ReadingHistoryResponse response: responseList) {
+            storyIds.add(response.getStoryId());
+        }
+
+        List<Story> stories = storyRepository.findAllById(storyIds);
+
+        for (ReadingHistoryResponse response: responseList) {
+            for (Story story: stories) {
+                System.out.println(response.getStoryId());
+                System.out.println(story.getId());
+                int sid = story.getId();
+                int rsid = response.getStoryId();
+                if(sid == rsid){
+                    response.setStoryName(story.getTitle());
+                    response.setStoryContent(story.getIntro());
+                    response.setStoryImageUrl(story.getImage());
+                }
+            }
+        }
+
+        return responsePage;
     }
 
 }

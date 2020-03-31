@@ -6,6 +6,7 @@ import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.TagDto;
 import com.storyart.storyservice.dto.create_story.CreateStoryDto;
 import com.storyart.storyservice.dto.ResultDto;
+import com.storyart.storyservice.dto.history.ReadingHistoryResponse;
 import com.storyart.storyservice.dto.read_story.ReadStoryDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryInformationDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryScreenDto;
@@ -81,6 +82,7 @@ public interface StoryService {
     StoryReactByRange getReactStatisticInTimeRange(int sid, TimeRangeRequest timeRangeRequest);
 
     List<IRatingClassify> getRatingClassify(int sid);
+
 }
 
 @Service
