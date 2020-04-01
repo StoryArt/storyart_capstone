@@ -1,15 +1,19 @@
 import React, { useContext } from 'react';
-import { Link, withRouter }  from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { UserContext } from '../../context/user.context';
 import { isUserAuth, getAuthUserInfo, isAdminAuth, isSysAdminAuth } from '../../config/auth';
 import clsx from 'clsx';
 
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { Drawer, CssBaseline, AppBar, Toolbar, List, Typography, Divider, IconButton, 
-  ListItem, ListItemIcon, ListItemText, Menu, MenuItem, Button } from '@material-ui/core';
-import { Home as HomeIcon, AccountCircle, ChevronRight as ChevronRightIcon, 
-  Menu as MenuIcon, MoveToInbox as InboxIcon, Mail as MailIcon, ChevronLeft as ChevronLeftIcon, 
-MenuBook as MenuBookIcon, History as HistoryIcon, AddBox as AddBoxIcon } from '@material-ui/icons';
+import {
+  Drawer, CssBaseline, AppBar, Toolbar, List, Typography, Divider, IconButton,
+  ListItem, ListItemIcon, ListItemText, Menu, MenuItem, Button
+} from '@material-ui/core';
+import {
+  Home as HomeIcon, AccountCircle, ChevronRight as ChevronRightIcon,
+  Menu as MenuIcon, MoveToInbox as InboxIcon, Mail as MailIcon, ChevronLeft as ChevronLeftIcon,
+  MenuBook as MenuBookIcon, History as HistoryIcon, AddBox as AddBoxIcon
+} from '@material-ui/icons';
 
 import UserService from '../../services/user.service';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
@@ -44,7 +48,7 @@ const useStyles = makeStyles(theme => ({
   hide: {
     display: 'none',
   },
- 
+
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
@@ -66,129 +70,130 @@ const useStyles = makeStyles(theme => ({
 
 
 const AppNavbar = (props) => {
-    const { openSidebar, handleSidebarOpen } = props;
+  const { openSidebar, handleSidebarOpen } = props;
 
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const [openDialog, setOpenDialog] = React.useState(false);
-    const [dialogContent, setDialogContent] = React.useState('');
-    const openAccountMenu = Boolean(anchorEl);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [dialogContent, setDialogContent] = React.useState('');
+  const openAccountMenu = Boolean(anchorEl);
 
-    const user = getAuthUserInfo();
-    const classes = useStyles();
+  const user = getAuthUserInfo();
+  const classes = useStyles();
 
-    const currentRoute = props.location.pathname;
-    const isRouteAdmin = currentRoute.indexOf('/admin') === 0;
+  const currentRoute = props.location.pathname;
+  const isRouteAdmin = currentRoute.indexOf('/admin') === 0;
 
-    const handleMenu = event => {
-      setAnchorEl(event.currentTarget);
-    };
-  
-    const handleCloseMenu = () => {
-      setAnchorEl(null);
-    };
+  const handleMenu = event => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    const navigateRoute = (route) => {
-      props.history.push(route);
-    }
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
 
-    const logout = () => {
-      UserService.logout();
-    }
+  const navigateRoute = (route) => {
+    props.history.push(route);
+  }
 
-    const handleLogout = () => {
-      setDialogContent('Bạn có chắc chắn muốn đăng xuất khỏi ứng dụng không?');
-      setOpenDialog(true);
-    }
+  const logout = () => {
+    UserService.logout();
+  }
 
-    return (
-      <>
-           <AppBar
-              position="fixed"
-              className={clsx(classes.appBar, {
-                [classes.appBarShift]: openSidebar,
-              })}
+  const handleLogout = () => {
+    setDialogContent('Bạn có chắc chắn muốn đăng xuất khỏi ứng dụng không?');
+    setOpenDialog(true);
+  }
+
+  return (
+    <>
+      <AppBar
+        position="fixed"
+        className={clsx(classes.appBar, {
+          [classes.appBarShift]: openSidebar,
+        })}
+      >
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleSidebarOpen}
+            edge="start"
+            className={clsx(classes.menuButton, openSidebar && classes.hide)}
           >
-            <Toolbar>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleSidebarOpen}
-                edge="start"
-                className={clsx(classes.menuButton, openSidebar && classes.hide)}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Typography style={{ flexGrow: 1 }} edge="end" variant="h6" noWrap>
-                StoryArt
-              </Typography>
-                
-                {(!isRouteAdmin && !isUserAuth(user) && !isAdminAuth(user) && !isSysAdminAuth(user)) && (
-                    <>
-                        <Button 
-                          onClick={() => navigateRoute('/login')} 
-                          edge="end" 
-                          color="inherit">Đăng nhập</Button>
-                        <Button 
-                          onClick={() => navigateRoute('/register')} 
-                            edge="end" 
-                            color="inherit">Đăng ký</Button>
-                    </>
-                )}
-              
-                {(isUserAuth(user) || isAdminAuth(user) || isSysAdminAuth(user)) && (
-                    <>
-                        <Button 
-                          onClick={handleLogout}
-                          color="inherit">Đăng xuất</Button>
-                        <Button 
-                          onClick={() => { navigateRoute('/user/my-profile') }}
-                          color="inherit">{ user.username }</Button>
-                        <div>
-                            <IconButton
-                                aria-label="account of current user"
-                                aria-controls="menu-appbar"
-                                aria-haspopup="true"
-                                onClick={handleMenu}
-                                color="inherit"
-                            >
-                                <AccountCircle />
-                            </IconButton>
-                            <Menu
-                                id="menu-appbar"
-                                anchorEl={anchorEl}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                open={openAccountMenu}
-                                onClose={handleCloseMenu}
-                            >
-                                <MenuItem onClick={() => { navigateRoute('/user/edit-profile') }}>Tài khoản</MenuItem>
-                            </Menu>
-                        </div>
-                    </>
-                )}
-                
-            </Toolbar>
-          
-          </AppBar>
+            <MenuIcon />
+          </IconButton>
+          <Typography style={{ flexGrow: 1 }} edge="end" variant="h6" noWrap>
+            <img src="/assets/img/logo5.png" height="40px" />
+          </Typography>
 
-        <ConfirmDialog
-            openDialog={openDialog}
-            cancel={() => setOpenDialog(false)}
-            ok={logout}
-            setOpenDialog={setOpenDialog}
-            content={dialogContent}
-        />
-      </>
-       
-      
-    );
+
+          {(!isRouteAdmin && !isUserAuth(user) && !isAdminAuth(user) && !isSysAdminAuth(user)) && (
+            <>
+              <Button
+                onClick={() => navigateRoute('/login')}
+                edge="end"
+                color="inherit">Đăng nhập</Button>
+              <Button
+                onClick={() => navigateRoute('/register')}
+                edge="end"
+                color="inherit">Đăng ký</Button>
+            </>
+          )}
+
+          {(isUserAuth(user) || isAdminAuth(user) || isSysAdminAuth(user)) && (
+            <>
+              <Button
+                onClick={handleLogout}
+                color="inherit">Đăng xuất</Button>
+              <Button
+                onClick={() => { navigateRoute('/user/my-profile') }}
+                color="inherit">{user.username}</Button>
+              <div>
+                <IconButton
+                  aria-label="account of current user"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  onClick={handleMenu}
+                  color="inherit"
+                >
+                  <AccountCircle />
+                </IconButton>
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={anchorEl}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  open={openAccountMenu}
+                  onClose={handleCloseMenu}
+                >
+                  <MenuItem onClick={() => { navigateRoute('/user/edit-profile') }}>Tài khoản</MenuItem>
+                </Menu>
+              </div>
+            </>
+          )}
+
+        </Toolbar>
+
+      </AppBar>
+
+      <ConfirmDialog
+        openDialog={openDialog}
+        cancel={() => setOpenDialog(false)}
+        ok={logout}
+        setOpenDialog={setOpenDialog}
+        content={dialogContent}
+      />
+    </>
+
+
+  );
 };
 
 
