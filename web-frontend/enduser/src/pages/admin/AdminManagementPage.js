@@ -46,7 +46,7 @@ const AdminManagementPage = props => {
   };
   
   function addAdmin() {
-    props.history.push("/admin/add");
+    props.history.push("/sysadmin/add");
   }
 
   // ham nay nhan 2 tham so va 1 doi tuong goi la:

@@ -338,16 +338,17 @@ console.log("datx:")
                   //   name:"Luợt xem",
                   //   type: "line"
                   // }
-                  {
-                    data: this.state.reactStatic.shareStatic,
-                    name: "Chia sẻ",
-                    type: "line"
-                  },
+                  // {
+                  //   data: this.state.reactStatic.shareStatic,
+                  //   name: "Chia sẻ",
+                  //   type: "line"
+                  // },
                   {
                     data: this.state.reactStatic.clickLinkStatic,
                     name: "Click vào link",
                     type: "line"
-                  },
+                  }
+                  ,
                   {
                     data: this.state.reactStatic.hitPointStatic,
                     name: "Hoàn thành",

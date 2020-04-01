@@ -7,6 +7,7 @@ import com.storyart.storyservice.dto.statistic.IRatingClassify;
 import com.storyart.storyservice.dto.statistic.StoryReactByRange;
 import com.storyart.storyservice.dto.statistic.StorySummarizeResponse;
 import com.storyart.storyservice.dto.statistic.TimeRangeRequest;
+import com.storyart.storyservice.model.Rating;
 import com.storyart.storyservice.security.CurrentUser;
 import com.storyart.storyservice.security.UserPrincipal;
 import com.storyart.storyservice.service.StoryService;
@@ -76,6 +77,12 @@ public class StoryController {
         return new ResponseEntity(stories, HttpStatus.OK);
     }
 
+    @GetMapping("rate/{storyId}")
+    public ResponseEntity getRating(@CurrentUser UserPrincipal user, @PathVariable int storyId){
+        Rating rating = storyService.getRatingByStoryAndUser(storyId, user.getId());
+        return new ResponseEntity(rating, HttpStatus.OK);
+    }
+
     @PutMapping("public/increase-read")
     public ResponseEntity increaseStoryRead(@RequestParam int storyId){
         ResultDto result = storyService.increaseStoryRead(storyId);
@@ -83,7 +90,9 @@ public class StoryController {
     }
 
     @PutMapping("rate")
-    public ResponseEntity rateStory(@RequestParam int storyId, @RequestParam double stars, @CurrentUser UserPrincipal userPrincipal){
+    public ResponseEntity rateStory(@RequestParam int storyId,
+                                    @RequestParam double stars,
+                                    @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.rateStory(storyId, userPrincipal.getId(), stars);
         return new ResponseEntity(result, HttpStatus.OK);
     }
@@ -155,7 +164,8 @@ public class StoryController {
     }
 
     @PostMapping("")
-    public ResponseEntity addStory(@Valid @RequestBody CreateStoryDto story, @CurrentUser UserPrincipal userPrincipal){
+    public ResponseEntity addStory(@Valid @RequestBody CreateStoryDto story,
+                                   @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.createStory(story, userPrincipal.getId());
         return new ResponseEntity(result, HttpStatus.OK);
     }

@@ -83,6 +83,8 @@ public interface StoryService {
 
     List<IRatingClassify> getRatingClassify(int sid);
 
+    Rating getRatingByStoryAndUser(int storyId, int userId);
+
 }
 
 @Service
@@ -137,6 +139,12 @@ class StoryServiceImpl implements StoryService {
         if (errors.size() > 0) return errors;
 
         return errors;
+    }
+
+    @Override
+    public Rating getRatingByStoryAndUser(int storyId, int userId) {
+        Rating rating = ratingRepository.findById(storyId, userId);
+        return rating;
     }
 
     @Override
@@ -244,7 +252,6 @@ class StoryServiceImpl implements StoryService {
             double avgStars = ratingRepository.findAvgStarsByStoryId(storyId);
             story.setAvgRate(avgStars);
             storyRepository.save(story);
-
             result.setData(rating);
             result.setSuccess(true);
         }

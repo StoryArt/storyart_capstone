@@ -35,7 +35,7 @@ const StatCards = ({ classes, view, share, hitpoint, clicklink }) => {
           </Tooltip> */}
         </Card>
       </Grid>
-      <Grid item xs={12} md={6}>
+      {/* <Grid item xs={12} md={6}>
         <Card className="play-card p-sm-24 bg-paper" elevation={6}>
           <div className="flex items-center">
             <Icon path={mdiShareOutline} color="#ccc" size={1.5} />
@@ -49,7 +49,7 @@ const StatCards = ({ classes, view, share, hitpoint, clicklink }) => {
           </div>
         
         </Card>
-      </Grid>
+      </Grid> */}
       <Grid item xs={12} md={6}>
         <Card className="play-card p-sm-24 bg-paper" elevation={6}>
           <div className="flex items-center">
