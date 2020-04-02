@@ -318,77 +318,47 @@ class StoryServiceImpl implements StoryService {
         } else if (!story.isActive() || story.isDeactiveByAdmin()) {
             result.getErrors().put("DELETED", "Truyện này đã bị xóa");
         } else {
-            ReadStoryDto readStoryDto = modelMapper.map(story, ReadStoryDto.class);
-            List<Screen> screens = screenRepository.findByStoryId(storyId);
+            User user = userRepository.findById(story.getUserId()).orElse(null);
+            if(user == null || (!user.isActive() || user.isDeactiveByAdmin())){
+                result.getErrors().put("DELETED", "Truyện này đã bị xóa");
+            } else {
+                ReadStoryDto readStoryDto = modelMapper.map(story, ReadStoryDto.class);
+                List<Screen> screens = screenRepository.findByStoryId(storyId);
 
-            List<ReadStoryScreenDto> screenDtoList = screens.stream().map(screen -> {
-                ReadStoryScreenDto screenDto = modelMapper.map(screen, ReadStoryScreenDto.class);
-                screenDto.setActions(actionRepository.findAllByScreenId(screen.getId()));
-                return screenDto;
-            }).collect(Collectors.toList());
+                List<ReadStoryScreenDto> screenDtoList = screens.stream().map(screen -> {
+                    ReadStoryScreenDto screenDto = modelMapper.map(screen, ReadStoryScreenDto.class);
+                    screenDto.setActions(actionRepository.findAllByScreenId(screen.getId()));
+                    return screenDto;
+                }).collect(Collectors.toList());
 
-            List<Information> informations = informationRepository.findAllByStoryId(storyId);
+                List<Information> informations = informationRepository.findAllByStoryId(storyId);
 
-            List<ReadStoryInformationDto> informationDtos = informations.stream().map(info -> {
-                ReadStoryInformationDto informationDto = modelMapper.map(info, ReadStoryInformationDto.class);
-                List<InfoCondition> conditions = infoConditionRepository.findAllByInformationId(informationDto.getId());
-                informationDto.setConditions(conditions);
-                return informationDto;
-            }).collect(Collectors.toList());
+                List<ReadStoryInformationDto> informationDtos = informations.stream().map(info -> {
+                    ReadStoryInformationDto informationDto = modelMapper.map(info, ReadStoryInformationDto.class);
+                    List<InfoCondition> conditions = infoConditionRepository.findAllByInformationId(informationDto.getId());
+                    informationDto.setConditions(conditions);
+                    return informationDto;
+                }).collect(Collectors.toList());
 
-            List<String> informationIds = informations.stream().map(info -> info.getId())
-                    .collect(Collectors.toList());
+                List<String> informationIds = informations.stream().map(info -> info.getId())
+                        .collect(Collectors.toList());
 
-            List<InformationAction> informationActions = informationActionRepository.findAllByInformationIdIn(informationIds);
+                List<InformationAction> informationActions = informationActionRepository.findAllByInformationIdIn(informationIds);
 
-            List<Tag> tagList = tagRepository.findAllByStoryId(storyId);
-            System.out.println("tags: " + tagList.size());
-            List<ReadStoryTagDto> readStoryTagDtoList = tagList.stream().map(t -> modelMapper.map(t, ReadStoryTagDto.class)).collect(Collectors.toList());
+                List<Tag> tagList = tagRepository.findAllByStoryId(storyId);
+                System.out.println("tags: " + tagList.size());
+                List<ReadStoryTagDto> readStoryTagDtoList = tagList.stream().map(t -> modelMapper.map(t, ReadStoryTagDto.class)).collect(Collectors.toList());
 
-            readStoryDto.setInformationActions(informationActions);
-            readStoryDto.setScreens(screenDtoList);
-            readStoryDto.setInformations(informationDtos);
-            readStoryDto.setTags(readStoryTagDtoList);
+                readStoryDto.setInformationActions(informationActions);
+                readStoryDto.setScreens(screenDtoList);
+                readStoryDto.setInformations(informationDtos);
+                readStoryDto.setTags(readStoryTagDtoList);
 
-            result.setData(readStoryDto);
-            result.setSuccess(true);
+                result.setData(readStoryDto);
+                result.setSuccess(true);
+            }
         }
         return result;
-    }
-
-    public void validateCreateStory(CreateStoryDto createStoryDto) {
-        ResultDto result = new ResultDto();
-        Story story = modelMapper.map(createStoryDto, Story.class);
-        HashMap<String, String> screenIdsMap = new HashMap<>();
-        HashMap<String, String> actionIdsMap = new HashMap<>();
-        HashMap<String, String> informationIdsMap = new HashMap<>();
-        createStoryDto.getScreens().stream().forEach(screen -> {
-            screenIdsMap.put(screen.getId(), MyStringUtils.generateUniqueId());
-        });
-
-        //check all screens
-        createStoryDto.getScreens().stream().forEach(screen -> {
-            Screen savedScreen = modelMapper.map(screen, Screen.class);
-
-            savedScreen.setId(screenIdsMap.get(screen.getId()));
-            savedScreen.setNextScreenId(screenIdsMap.get(screen.getNextScreenId()));
-            screenRepository.save(savedScreen);
-
-            screen.getActions().stream().forEach(action -> {
-                Action savedAction = modelMapper.map(action, Action.class);
-
-                savedAction.setId(MyStringUtils.generateUniqueId());
-                savedAction.setScreenId(savedScreen.getId());
-                if (action.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())) {
-                    savedAction.setValue(screenIdsMap.get(action.getValue()));
-                }
-                savedAction.setNextScreenId(screenIdsMap.get(action.getNextScreenId()));
-
-                actionRepository.save(savedAction);
-                actionIdsMap.put(action.getId(), savedAction.getId());
-            });
-        });
-
     }
 
     @Override
@@ -396,6 +366,12 @@ class StoryServiceImpl implements StoryService {
 
         ResultDto result = new ResultDto();
         Story story = modelMapper.map(createStoryDto, Story.class);
+
+        if(createStoryDto.getTags().size() == 0){
+            result.setSuccess(false);
+            result.getErrors().put("TAGS", "Chưa gắn thẻ cho truyện");
+            return result;
+        }
 
         HashMap<String, String> screenIdsMap = new HashMap<>();
         HashMap<String, String> actionIdsMap = new HashMap<>();
@@ -482,7 +458,6 @@ class StoryServiceImpl implements StoryService {
 
         return result;
     }
-
 
     @Override
     public ResultDto updateStory(CreateStoryDto storyDto, int userId) {

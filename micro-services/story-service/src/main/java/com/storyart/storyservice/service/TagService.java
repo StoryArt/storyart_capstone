@@ -39,7 +39,7 @@ class TagServiceImpl implements TagService{
 
     @Override
     public List<TagDto> getTags() {
-        List<Tag> tags = tagRepository.findAll();
+        List<Tag> tags = tagRepository.findAllByActive(true);
         return tags.stream().map(tag -> {
             TagDto t = modelMapper.map(tag, TagDto.class);
             return t;
@@ -87,7 +87,6 @@ class TagServiceImpl implements TagService{
         }
         return tag;
     }
-
 
     @Override
     public Page<Tag> findAll() {

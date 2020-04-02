@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import { withStyles } from "@material-ui/core/styles";
 import './App.css';
 
@@ -94,53 +94,46 @@ function App() {
             <PrivateRoute 
               exact 
               path="/stories/create" 
-              roleName={ROLE_NAMES.ROLE_USER} 
               component={CreateStoryPage}/>
 
             <PrivateRoute 
               exact 
               path="/stories/edit/:storyId" 
-              roleName={ROLE_NAMES.ROLE_USER} 
               component={CreateStoryPage}/>
 
             <PrivateRoute
               exact 
               path="/user/my-profile/:storyId"
-              roleName={ROLE_NAMES.ROLE_USER}
               component={CreateStoryPage}/>
 
-              <PrivateRoute
-                exact
-                path="/user/my-profile"
-                roleName={ROLE_NAMES.ROLE_USER}
-                component={UserProfilePage}/>
+            <PrivateRoute
+              exact
+              path="/user/my-profile"
+              component={UserProfilePage}/>
 
-              <PrivateRoute
-                exact
-                path="/user/edit-profile"
-                roleName={ROLE_NAMES.ROLE_USER}
-                component={EditUserProfilePage}/>
+            <PrivateRoute
+              exact
+              path="/user/edit-profile"
+              component={EditUserProfilePage}/>
            
             <PrivateRoute 
               exact 
               path="/user/history" 
-              roleName={ROLE_NAMES.ROLE_USER} 
               component={UserHistoryPage}/>
 
 
             {/* system admin routes */}
-            <PrivateRoute exact path="/sysadmin/add" roleName={ROLE_NAMES.ROLE_SYSTEM_ADMIN}  component={AddAdmin}/>
-            <PrivateRoute exact path="/sysadmin/admin" roleName={ROLE_NAMES.ROLE_SYSTEM_ADMIN} component={AdminManagementPage}/>
+            <PrivateRoute exact path="/sysadmin/add"  component={AddAdmin}/>
+            <PrivateRoute exact path="/sysadmin/admin" component={AdminManagementPage}/>
 
 
             {/* admin routes */}            
-            <PrivateRoute exact path="/admin" roleName={ROLE_NAMES.ROLE_ADMIN} component={DashboardPage}/>
-            <PrivateRoute exact path="/admin/users/add" roleName={ROLE_NAMES.ROLE_ADMIN} component={AddUser}/>
-            <PrivateRoute exact path="/admin/dashboard" roleName={ROLE_NAMES.ROLE_ADMIN} component={DashboardPage}/>
-            <PrivateRoute exact path="/admin/users" roleName={ROLE_NAMES.ROLE_ADMIN} component={UserManagementPage}/>
-            <PrivateRoute exact path="/admin/stories" roleName={ROLE_NAMES.ROLE_ADMIN} component={StoryManagementPage}/>
-            <PrivateRoute exact path="/admin/tags" roleName={ROLE_NAMES.ROLE_ADMIN} component={TagManagementPage}/>
-            <PrivateRoute exact path="/admin/reports" roleName={ROLE_NAMES.ROLE_ADMIN} component={ReportManagementPage}/>
+            <Route exact path="/admin" render={() => <Redirect to="/admin/users" /> } />
+            <PrivateRoute exact path="/admin/users/add" component={AddUser}/>
+            <PrivateRoute exact path="/admin/users" component={UserManagementPage}/>
+            <PrivateRoute exact path="/admin/stories" component={StoryManagementPage}/>
+            <PrivateRoute exact path="/admin/tags" component={TagManagementPage}/>
+            <PrivateRoute exact path="/admin/reports" component={ReportManagementPage}/>
             
 
             {/* other routes */}
