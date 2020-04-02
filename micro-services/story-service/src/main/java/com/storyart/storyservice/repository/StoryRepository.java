@@ -12,16 +12,17 @@ import java.util.List;
 import java.util.Set;
 
 public interface StoryRepository extends JpaRepository<Story, Integer> {
-    @Query(value = "select * from story s WHERE " +
-            "(s.active = true and s.published = true and s.deactive_by_admin = false) " +
+    @Query(value = "select * from story s " +
+            "left join user u ON s.user_id = u.id " +
+            "WHERE (s.active = true and s.published = true and s.deactive_by_admin = false) " +
             "and (s.title like %?1% or s.intro like %?1% or " +
-            "(select u.name from user u where u.id = s.user_id) like %?1%) " +
+            "u.name like %?1%) and u.is_active = true and u.is_deactive_by_admin = false " +
             "and s.id in (select distinct story_id from story_tag st where st.tag_id in ?2)",
 
-            countQuery = "select count(*) from story s WHERE " +
+            countQuery = "select count(*) from story s left join user u ON s.user_id = u.id WHERE " +
                     "(s.active = true and s.published = true and s.deactive_by_admin = false) " +
                     "and (s.title like %?1% or s.intro like %?1% or " +
-                    "(select u.name from user u where u.id = s.user_id) like %?1%) " +
+                    "u.name like %?1%) and u.is_active = true and u.is_deactive_by_admin = false " +
                     "and s.id in (select distinct story_id from story_tag st where st.tag_id in ?2)",
 
             nativeQuery = true)

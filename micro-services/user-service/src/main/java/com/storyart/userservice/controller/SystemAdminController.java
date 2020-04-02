@@ -32,7 +32,6 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/api/v1/systemad")
-
 @CrossOrigin
 @Secured({"ROLE_SYSTEM_ADMIN"})
 public class SystemAdminController {
@@ -58,9 +57,7 @@ public class SystemAdminController {
             throw new BadRequestException("Tên đăng nhập này đã đã được đăng ký bởi ai đó!");
         }
         if (userService.findByEmail(signUpRequest.getEmail()) != null) {
-
             throw new BadRequestException("Email này đã được đăng ký bởi ai đó!");
-
         }
         User user = new User();
         user.setActive(true);

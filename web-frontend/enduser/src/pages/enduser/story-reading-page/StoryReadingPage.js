@@ -98,26 +98,30 @@ const ReadStoryPage = (props) => {
     const changeCurrentScreen = (screenId) => {
         setShowScreen(false);
         const screen = screens.find(scr => scr.id === screenId);
-        listScreenId.push(screen.id);
+        if(!ValidationUtils.isEmpty(screen)){
+            
+            listScreenId.push(screen.id);
 
-        if(currentScreen != null && !isEndScreen(currentScreen)){
-            stopCountTimeReading();
-            saveScreenReadTime({ screenId: currentScreen.id, duration: readingScreenDuration });
-        }
-        
-
-        if(isEndScreen(screen)){
-            setEnd(true);
-            isEndStory = true;
-            stopCountTimeReading();
-            readingScreenDuration = 0;
-            const data = {
-                storyId: story.id,
-                isReachingEnd: true,
-                listScreenId: listScreenId.toString()
+            if(currentScreen != null && !isEndScreen(currentScreen)){
+                stopCountTimeReading();
+                saveScreenReadTime({ screenId: currentScreen.id, duration: readingScreenDuration });
             }
-            saveReadingHistory(data);
+            
+
+            if(isEndScreen(screen)){
+                setEnd(true);
+                isEndStory = true;
+                stopCountTimeReading();
+                readingScreenDuration = 0;
+                const data = {
+                    storyId: story.id,
+                    isReachingEnd: true,
+                    listScreenId: listScreenId.toString()
+                }
+                saveReadingHistory(data);
+            }
         }
+
 
         setTimeout(() => {
             setCurrentScreen(screen)

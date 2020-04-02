@@ -99,15 +99,6 @@ const Sidebar = (props) => {
         {/* admin routes navigation */}
         {(isRouteAdmin && isAdminAuth(user)) && (
               <List>
-                <ListItem 
-                  button 
-                  onClick={() => navigateRoute('/admin/dashboard')} 
-                  selected={ isRouteMatch('/admin/dashboard') }>
-                    <ListItemIcon>
-                      <HistoryIcon className={classes.icon} />
-                      </ListItemIcon>
-                    <ListItemText primary="Quản trị" />
-                  </ListItem>
                   <ListItem 
                     button 
                     onClick={() => navigateRoute('/admin/users')} 

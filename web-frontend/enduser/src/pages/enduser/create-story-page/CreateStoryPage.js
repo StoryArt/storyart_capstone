@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { Prompt } from 'react-router-dom';
 import { TextField, Tooltip, Fab, Checkbox, FormControlLabel, Button } from '@material-ui/core';
 import { Pagination } from '@material-ui/lab';
 import { Add as AddIcon } from '@material-ui/icons';
@@ -28,6 +29,7 @@ import StoryService from '../../../services/story.service';
 import TagService from '../../../services/tag.service';
 import ValidationUtils from '../../../utils/validation';
 import StringUtils from '../../../utils/string';
+import { getAuthUserInfo } from '../../../config/auth';
 
 const parameters = getParameters();
 
@@ -47,6 +49,7 @@ const CreateStoryPage = (props) => {
 
     const [isLoadingStory, setLoadingStory] = useState(false);
     const [notfoundStory, setNotfoundStory] = useState(false);
+    const [isSaveStory, setSaveStory] = useState(true);
 
     const [screens, setScreens] = useState([]);
     const [storyParameters, setStoryParameters] = useState([]);
@@ -63,13 +66,30 @@ const CreateStoryPage = (props) => {
     let canChangeScreenContent = true;
 
     React.useEffect(() => {
-        getTags()
+        getTags();
+
         if(isEditPage){
             getStoryDetails();
         } else {
             handleAddScreen();
         }
+        // window.onbeforeunload = confirmBeforeLeavePage;
+        
+       
     }, []);
+
+    const confirmBeforeLeavePage = (e) => {
+        if(!e) e = window.event;
+        //e.cancelBubble is supported by IE - this will kill the bubbling process.
+        e.cancelBubble = true;
+        e.returnValue = 'Có thể bạn cần lưu lại những thay đổi trên câu truyện. \nBạn có chắc muốn rời khỏi trang này hay không?'; //This is displayed on the dialog
+    
+        //e.stopPropagation works in Firefox.
+        if (e.stopPropagation) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+    }
 
     const getTags = async () => {
         try {
@@ -88,6 +108,16 @@ const CreateStoryPage = (props) => {
             const res = await StoryService.getReadingStory(storyId);
             console.log(res);
             if(!ValidationUtils.isEmpty(res.data.data)){
+                
+                if(isEditPage){
+                    const user = getAuthUserInfo();
+                    if(user.id !== res.data.data.userId){
+                        return props.history.push('/stories/details/' + storyId);
+                    } else {
+                        setSaveStory(false);
+                    }
+                }
+
                 let { screens, informations, informationActions, tags } = res.data.data;
 
                 if(informations.length > 0){
@@ -284,7 +314,12 @@ const CreateStoryPage = (props) => {
                 setAlert({ content: Object.values(errors), type:'error', open: true });
             }
         } catch (error) {
-            setAlert({ content: Object.values(error.response.data)[0], type:'error', open: true });
+            if(!ValidationUtils.isEmpty(error.response)){
+                setAlert({ content: Object.values(error.response.data)[0], type:'error', open: true });
+            } else {
+                setAlert({ content: 'Không thể lưu truyện', type:'error', open: true });
+            }
+           
         }
         setOpenBackdrop(false);
         closeAlert();
@@ -323,6 +358,13 @@ const CreateStoryPage = (props) => {
 
             <MyBackdrop open={openBackdrop} setOpen={setOpenBackdrop}/>
             {/* <MySpinner/> */}
+
+            <Prompt
+                when={!isSaveStory}
+                message={location => {
+                    return `Có thể bạn cần lưu lại những thay đổi trên câu truyện!! \nBạn có chắc muốn rời khỏi trang này hay không?`
+                }}
+            />
            
 
             {(!isLoadingStory && !notfoundStory && !ValidationUtils.isEmpty(story)) && (
