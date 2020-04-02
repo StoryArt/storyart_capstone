@@ -29,6 +29,7 @@ import StoryService from '../../../services/story.service';
 import TagService from '../../../services/tag.service';
 import ValidationUtils from '../../../utils/validation';
 import StringUtils from '../../../utils/string';
+import { getAuthUserInfo } from '../../../config/auth';
 
 const parameters = getParameters();
 
@@ -48,7 +49,7 @@ const CreateStoryPage = (props) => {
 
     const [isLoadingStory, setLoadingStory] = useState(false);
     const [notfoundStory, setNotfoundStory] = useState(false);
-    const [isSaveStory, setSaveStory] = useState(false);
+    const [isSaveStory, setSaveStory] = useState(true);
 
     const [screens, setScreens] = useState([]);
     const [storyParameters, setStoryParameters] = useState([]);
@@ -65,7 +66,8 @@ const CreateStoryPage = (props) => {
     let canChangeScreenContent = true;
 
     React.useEffect(() => {
-        getTags()
+        getTags();
+
         if(isEditPage){
             getStoryDetails();
         } else {
@@ -106,6 +108,16 @@ const CreateStoryPage = (props) => {
             const res = await StoryService.getReadingStory(storyId);
             console.log(res);
             if(!ValidationUtils.isEmpty(res.data.data)){
+                
+                if(isEditPage){
+                    const user = getAuthUserInfo();
+                    if(user.id !== res.data.data.userId){
+                        return props.history.push('/stories/details/' + storyId);
+                    } else {
+                        setSaveStory(false);
+                    }
+                }
+
                 let { screens, informations, informationActions, tags } = res.data.data;
 
                 if(informations.length > 0){

@@ -12,11 +12,6 @@ import { setAuthHeader } from "../../config/auth";
 import Pagination from "@material-ui/lab/Pagination";
 import DateTimeUtils from "../../utils/datetime";
 
-
-
-
-
-
 const UserManagementPage = () => {
   const [convertedList, setConvertedList] = useState([]);
   const [pageInfo, setPageInfo] = useState({
@@ -70,10 +65,8 @@ const UserManagementPage = () => {
     });
     // setPageLenght(res.data.totalPages)
     ConvertUserList(res.data);
-
-   
-
   }
+
   const getMyProfile = async () => {
     try {
       const res = await UserService.getMyProfile();
