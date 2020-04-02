@@ -162,7 +162,7 @@ const EditUserProfilePage = props => {
           }
           setAlert({
             open: true,
-            content: "Đã cập nhật avatar!",
+            content: "Đã cập nhật ảnh!",
             type: "success"
           });
           window.setTimeout(() => {

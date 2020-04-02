@@ -64,12 +64,9 @@ public class JwtAuthenticationController {
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-       User us= userRepository.findByUsername(loginRequest.getUsername()).orElse(null);
-       if(us!= null && us.isDeactiveByAdmin()){
-           throw new BadRequestException("Tài khoản đã bị khóa. Vui lòng liên hệ với quản trị viên!");
-       }
 
         Authentication authentication;
+
         try {
           authentication  = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -79,10 +76,12 @@ public class JwtAuthenticationController {
             );
         } catch (BadCredentialsException e) {
             throw new BadRequestException("Sai tên đăng nhập hoặc mật khẩu!");
-
         }
 
-
+        User us= userRepository.findByUsername(loginRequest.getUsername()).orElse(null);
+        if(us!= null && us.isDeactiveByAdmin()){
+            throw new BadRequestException("Tài khoản đã bị khóa. Vui lòng liên hệ với quản trị viên!");
+        }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -112,8 +111,7 @@ public class JwtAuthenticationController {
 
 //        Role userRole
         Role userRole = roleRepository.findRoleByName(RoleName.ROLE_USER)
-                .orElseThrow(() -> new AppException("User Role not set."));
-
+                .orElseThrow(() -> new AppException("Hiện tại chưa thể đăng ký! Vui lòng quay lại sau!"));
         user.setRoleId(userRole.getId());
 
 
@@ -127,7 +125,7 @@ public class JwtAuthenticationController {
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("api/v1/user/username")
                 .buildAndExpand(savedUser.getUsername()).toUri();
-        return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
+        return ResponseEntity.created(location).body(new ApiResponse(true, "Đăng ký thành công!"));
 
     }
 
