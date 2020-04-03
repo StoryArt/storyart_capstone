@@ -6,7 +6,8 @@ import MyDropdownMenu from '../../../components/common/MyDropdownMenu';
 import { ACTION_TYPES } from '../../../common/constants';
 
 const ActionsList = (props) => {
-    const { actions, onRemoveAction, onChangeActions, actionsList, screens, currentParam, screen } = props;
+    const { actions, onRemoveAction, onChangeActions, 
+        actionsList, screens, currentParam, screen } = props;
     return (
         <div>
             {actions.map((action, index) => (
@@ -18,7 +19,7 @@ const ActionsList = (props) => {
                             <TextField 
                                 size="small"
                                 style={{ width: '100%' }}
-                                label="Noi dung..."
+                                label="Hành động..."
                                 variant="outlined"
                                 value={action.content} 
                                 onChange={(e) => onChangeActions('content', e.target.value, screen, index)}
@@ -55,14 +56,14 @@ const ActionsList = (props) => {
                                         size="small"
                                         style={{ width: '100%' }}
                                         variant="outlined"
-                                        label="Gia tri tac dong..."
+                                        label="Giá trị tác động..."
                                         value={action.value} 
                                         onChange={(e) => onChangeActions('value', e.target.value, screen, index)}
                                     />
                                 </div>
                                 <div className="col-sm-4">
                                     <ScreensSelect
-                                        placeholder={'Di toi man hinh'}
+                                        placeholder={'Chọn màn kế tiếp'}
                                         screens={screens}
                                         value={action.nextScreenId}
                                         onChange={(e) => onChangeActions('nextScreenId', e.target.value, screen, index)}/>
@@ -73,7 +74,7 @@ const ActionsList = (props) => {
                         {action.type === ACTION_TYPES.NEXT_SCREEN && (
                             <div className="col-sm-6">
                                 <ScreensSelect
-                                    placeholder={'Di toi man hinh'}
+                                    placeholder={'Chọn màn kế tiếp'}
                                     screens={screens}
                                     value={action.value}
                                     onChange={(e) => onChangeActions('value', e.target.value, screen, index)}
@@ -87,7 +88,7 @@ const ActionsList = (props) => {
                                         size="small"
                                         style={{ width: '100%' }}
                                         variant="outlined"
-                                        label="Duong dan..."
+                                        label="Đường dẫn..."
                                         value={action.value} 
                                         onChange={(e) => onChangeActions('value', e.target.value, screen, index)}
                                     />

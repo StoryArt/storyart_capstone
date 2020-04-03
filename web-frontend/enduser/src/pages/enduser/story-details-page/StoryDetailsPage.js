@@ -27,8 +27,6 @@ import { Person as PersonIcon } from '@material-ui/icons';
 
 const StoryDetailsPage = (props) => {
 
-    //const userContext = useContext(UserContext);
-    //const { user } = userContext;
     const userInfo = getAuthUserInfo();
 
     const [story, setStory] = useState({});
@@ -45,6 +43,7 @@ const StoryDetailsPage = (props) => {
         isLoggedInModal: false,
         reportStoryModal: false
     });
+
     const [commentIndex, setCommentIndex] = useState(-1);
 
     const [deleteRequest, setDeleteRequest] = useState({
@@ -506,7 +505,7 @@ const StoryDetailsPage = (props) => {
                                 }
 
                                 <div>
-                                    <SocialShare shareUrl={'http://youtube.com'} />
+                                    <SocialShare shareUrl={`${window.location.href}`} />
                                 </div>
                             </div>
                             <div className="col-sm-9">
@@ -524,6 +523,7 @@ const StoryDetailsPage = (props) => {
                                 <strong>Tags:</strong> <TagList tags={story.tags} />
                                 <div className="my-3">
                                     <strong>Đánh giá truyện:</strong>
+                                    <br/>
                                     {ValidationUtils.isEmpty(rating) && (
                                         <small>Hãy để lại đánh giá để chúng tôi biết thêm về sở thích đọc truyện của bạn nhé</small>
                                     )}

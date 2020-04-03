@@ -1,5 +1,6 @@
 import React from 'react';
 import { UserProvider } from './user.context';
+import { LayoutProvider } from './layout.context';
 
 function ProviderComposer({ contexts, children }) {
     return contexts.reduceRight((kids, parent) => (
@@ -12,6 +13,7 @@ function ProviderComposer({ contexts, children }) {
 const GlobalContext = (props) => {
     const contexts = [ 
         <UserProvider/>,
+        <LayoutProvider/>
     ];
     
     return (
