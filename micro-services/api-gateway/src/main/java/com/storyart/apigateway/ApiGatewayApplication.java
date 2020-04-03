@@ -1,8 +1,5 @@
 package com.storyart.apigateway;
 
-import com.storyart.apigateway.filter.ErrorFilter;
-import com.storyart.apigateway.filter.PostFilter;
-import com.storyart.apigateway.filter.PreFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
