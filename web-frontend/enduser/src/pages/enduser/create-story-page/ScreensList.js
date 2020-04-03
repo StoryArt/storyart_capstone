@@ -53,14 +53,14 @@ const ScreensList = (props) => {
                                     value={currentScreen.title} 
                                     onChange={(e) => onChangeScreen('title', e.target.value, currentScreen)} />
                             </div>
-                            <div className="col-sm-6">
+                            {/* <div className="col-sm-6">
                                 <ScreensSelect
                                     placeholder={'Màn hình kế tiếp'}
                                     screens={screens}
                                     value={currentScreen.nextScreenId}
                                     onChange={(e) => onChangeScreen('nextScreenId', e.target.value, currentScreen)} 
                                 />
-                            </div>
+                            </div> */}
                         </div>
                     </div>
 

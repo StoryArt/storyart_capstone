@@ -14,7 +14,7 @@ const StoryParameters = (props) => {
         <div>
             {storyParameters.length > 0 && (
                 <div>
-                    <strong className="">Thông tin truyện (tham sỐ)</strong>
+                    <strong className="">Thông tin truyện (tham số)</strong>
                     <div className="card card-body mt-3">
                         {storyParameters.map((param, index) => {
                             const conditions = parameters.find(p => param.type === p.type).conditions;
@@ -107,7 +107,7 @@ const StoryParameters = (props) => {
                                             </div>
                                             <div className="col-sm-4 px-1">
                                                 <ScreensSelect
-                                                    placeholder={'Di toi man hinh'}
+                                                    placeholder={'Đi tới màn kế tiếp'}
                                                     screens={screens}
                                                     value={cond.nextScreenId}
                                                     onChange={(e) => onChangeParamConditions('nextScreenId', e.target.value, index, param)} 

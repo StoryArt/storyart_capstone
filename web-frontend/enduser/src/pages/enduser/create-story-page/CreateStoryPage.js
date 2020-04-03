@@ -20,6 +20,7 @@ import StoryPreview from './StoryPreview';
 import ScreenPreview from './ScreenPreview';
 import AnimationSelect from './AnimationSelect';
 import StoryTabs from './StoryTabs';
+import { LayoutContext } from '../../../context/layout.context';
 
 
 import { getParameters, getActions, ANIMATIONS, ACTION_TYPES, INFORMATION_TYPES, SCREEN_COLORS  }  from '../../../common/constants';
@@ -38,6 +39,8 @@ const actions = getActions();
 const CreateStoryPage = (props) => {
    
     let isEditPage = props.location.pathname !== '/stories/create';
+    const layoutContext = useContext(LayoutContext)
+    const { setOpenSidebar } = layoutContext
 
     const [story, setStory] = useState({
         title: '',
@@ -73,6 +76,11 @@ const CreateStoryPage = (props) => {
         } else {
             handleAddScreen();
             setSaveStory(false);
+        }
+        setOpenSidebar(false);
+
+        return () => {
+            setOpenSidebar(true);
         }
         // window.onbeforeunload = confirmBeforeLeavePage;
         
@@ -353,7 +361,6 @@ const CreateStoryPage = (props) => {
                 {!isEditPage ? 'Tạo truyện cho riêng bạn' : 'Cập nhật truyện'}
             </h3>
             
-
             <MyBackdrop open={openBackdrop} setOpen={setOpenBackdrop}/>
             {/* <MySpinner/> */}
 

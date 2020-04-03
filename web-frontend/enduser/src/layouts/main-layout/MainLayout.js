@@ -1,15 +1,11 @@
 import React, { useContext } from 'react';
 import { Link, withRouter }  from 'react-router-dom';
-import { UserContext } from '../../context/user.context';
-import { isUserAuth, getAuthUserInfo, isAdminAuth, isSysAdminAuth } from '../../config/auth';
+import { LayoutContext } from '../../context/layout.context';
 import clsx from 'clsx';
 
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { Drawer, CssBaseline, AppBar, Toolbar, List, Typography, Divider, IconButton, 
-  ListItem, ListItemIcon, ListItemText, Menu, MenuItem, Button } from '@material-ui/core';
-import { Home as HomeIcon, AccountCircle, ChevronRight as ChevronRightIcon, 
-  Menu as MenuIcon, MoveToInbox as InboxIcon, Mail as MailIcon, ChevronLeft as ChevronLeftIcon, 
-MenuBook as MenuBookIcon, History as HistoryIcon, AddBox as AddBoxIcon } from '@material-ui/icons';
+import { CssBaseline } from '@material-ui/core';
+
 
 import UserService from '../../services/user.service';
 
@@ -80,31 +76,24 @@ const useStyles = makeStyles(theme => ({
 const MainLayout = (props) => {
 
     const classes = useStyles();
-    const [open, setOpen] = React.useState(true);
-
-    props.history.listen(location => {
-      console.log(location.pathname)
-      if(location.pathname.indexOf('/stories/create') === 0 
-      || location.pathname.indexOf('/stories/edit/') === 0 
-      || location.pathname.indexOf('/stories/read') === 0) {
-        setOpen(false);
-      }
-    })
+    const layoutContext = useContext(LayoutContext)
+    const { openSidebar, setOpenSidebar } = layoutContext;
+  
    
     return (
         <div className={classes.root}>
           <CssBaseline />
           <AppNavbar
-             openSidebar={open} 
-             handleSidebarOpen={() => setOpen(true)}
+             openSidebar={openSidebar} 
+             handleSidebarOpen={() => setOpenSidebar(true)}
           />
           <Sidebar
-            openSidebar={open} 
-            handleSidebarClose={() => setOpen(false)}
+            openSidebar={openSidebar} 
+            handleSidebarClose={() => setOpenSidebar(false)}
           />
           <main
             className={clsx(classes.content, {
-              [classes.contentShift]: open,
+              [classes.contentShift]: openSidebar,
             })}
           >
             <div className={classes.drawerHeader} />

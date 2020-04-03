@@ -52,7 +52,6 @@ const DialogActions = withStyles(theme => ({
 
 const StoryPreview = (props) => {
     const { open, onClose, story, screens, setCurrentScreen } = props;
-    
 
     const edges = [];
     screens.forEach((s, i) => {
@@ -60,6 +59,7 @@ const StoryPreview = (props) => {
         s.ending = false;
         
         const haveNextScreenAction = s.actions.some(a => a.type === ACTION_TYPES.NEXT_SCREEN || a.type === ACTION_TYPES.UPDATE_INFORMATION)
+        
         if(haveNextScreenAction){
             s.actions.forEach((a, i) => {
                 if(a.type === ACTION_TYPES.NEXT_SCREEN){
@@ -74,15 +74,12 @@ const StoryPreview = (props) => {
                     })
                 } 
             })
-        } else if(!ValidationUtils.isEmpty(s.nextScreenId)) {
-            edges.push({
-                from: s.id,
-                to: s.nextScreenId
-            })
-        } else if(s.id === story.firstScreenId) {
-            s.first = true;
         } else {
           s.ending = true;
+        }
+
+        if(s.id === story.firstScreenId) {
+          s.first = true;
         }
     })
 
