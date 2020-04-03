@@ -81,6 +81,15 @@ const MainLayout = (props) => {
 
     const classes = useStyles();
     const [open, setOpen] = React.useState(true);
+
+    props.history.listen(location => {
+      console.log(location.pathname)
+      if(location.pathname.indexOf('/stories/create') === 0 
+      || location.pathname.indexOf('/stories/edit/') === 0 
+      || location.pathname.indexOf('/stories/read') === 0) {
+        setOpen(false);
+      }
+    })
    
     return (
         <div className={classes.root}>

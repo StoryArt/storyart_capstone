@@ -72,6 +72,7 @@ const CreateStoryPage = (props) => {
             getStoryDetails();
         } else {
             handleAddScreen();
+            setSaveStory(false);
         }
         // window.onbeforeunload = confirmBeforeLeavePage;
         
@@ -108,14 +109,11 @@ const CreateStoryPage = (props) => {
             const res = await StoryService.getReadingStory(storyId);
             console.log(res);
             if(!ValidationUtils.isEmpty(res.data.data)){
-                
-                if(isEditPage){
-                    const user = getAuthUserInfo();
-                    if(user.id !== res.data.data.userId){
-                        return props.history.push('/stories/details/' + storyId);
-                    } else {
-                        setSaveStory(false);
-                    }
+                const user = getAuthUserInfo();
+                if(user.id !== res.data.data.userId){
+                    return props.history.push('/stories/details/' + storyId);
+                } else {
+                    setSaveStory(false);
                 }
 
                 let { screens, informations, informationActions, tags } = res.data.data;

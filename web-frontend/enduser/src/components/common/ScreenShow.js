@@ -41,13 +41,15 @@ const ScreenShow = (props) => {
                             <h5 className="text-center">{ StringUtils.getObjTitle(screen) }</h5>
                         </div>
                         <div className="screen-card-body" style={props}>
-                            <div className="text-center">
+                            <div className="">
                                { StringUtils.parseHtml(screen.content) }
                             </div>
                             <br/>
                             <div className="row">
                                 {screen.actions.map(action => (
-                                    <div className="col-6" key={action.id}>
+                                    <div 
+                                        className={`${screen.actions.length > 1 ? 'col-sm-6' : 'col-12'}`} 
+                                        key={action.id}>
                                         <div 
                                             style={{ fontSize: '1.2em' }}
                                             onClick={() => onSelectAction(action)}

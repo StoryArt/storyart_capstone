@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { MenuItem, TextField, Tooltip, Fab } from '@material-ui/core';
+import { MenuItem, TextField, Tooltip, Fab, Paper } from '@material-ui/core';
 import { Visibility as VisibilityIcon } from '@material-ui/icons';
 
 import ScreensSelect from './ScreensSelect';
@@ -27,7 +27,8 @@ const ScreensList = (props) => {
     return (
         <div>
             {(!ValidationUtils.isEmpty(currentScreen)) && (
-                <div className="card screen-card mb-5">
+                // <div className="card screen-card mb-5">
+                <Paper>
                     <div className="card-header">
                         <h5 className="mb-4">
                             <span className="mr-3">#{ index }</span>
@@ -72,7 +73,7 @@ const ScreensList = (props) => {
                             placeholder="Nội dung màn hình..."
                         />
 
-                        {currentScreen.actions.length > 0 && <strong className="mt-3 d-block">Hành động</strong>}
+                        {currentScreen.actions.length > 0 && <strong className="my-3 d-block">Hành động</strong>}
                         
                         <ActionsList
                             actions={currentScreen.actions}
@@ -92,7 +93,8 @@ const ScreensList = (props) => {
                             </MyDropdownMenu>
                         </div>
                     </div>
-                </div>
+                </Paper>
+                // </div>
             )}
         </div>
     );

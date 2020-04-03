@@ -39,15 +39,11 @@ const PrivateRoute = ({ component: Component, roleNames, location, ...rest }) =>
     const adminAuth = isAdminAuth(user);
     const sysAdminAuth = isSysAdminAuth(user);
 
-    console.log('routes', location);
-    
-
     const currentRoute = location.pathname;
     const isAdminRoute = currentRoute.indexOf('/admin') === 0;
     const isSysAdminRoute = currentRoute.indexOf('/sysadmin') === 0;
     const isUserRoute = userRoutes.some(r => currentRoute.indexOf(r) === 0);
     
-   
     return (
         <Route
             {...rest}
@@ -62,7 +58,6 @@ const PrivateRoute = ({ component: Component, roleNames, location, ...rest }) =>
                 } else if((isUserRoute && (!userAuth && !adminAuth && !sysAdminAuth))){
                     return <Redirect to="/home" />;
                 }
-                
             }}
         />
     )
