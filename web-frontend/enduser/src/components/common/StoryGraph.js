@@ -4,29 +4,29 @@ import Graph from "react-graph-vis";
 
 
 let options = { 
-    physics: { enabled: true, stabilization: { iterations: 5000 } }, 
+    physics: { enabled: false, stabilization: { iterations: 5000 } }, 
     clickToUse: true,
     layout: { hierarchical: true }, 
     nodes : { shape : 'square' }, 
     autoResize: false,
     height: '500px', 
-    physics: {
-        forceAtlas2Based: {
-            gravitationalConstant: -26,
-            centralGravity: 0.005,
-            springLength: 230,
-            springConstant: 0.18,
-            avoidOverlap: 1.5
-        },
-        maxVelocity: 146,
-        solver: 'forceAtlas2Based',
-        timestep: 0.35,
-        stabilization: {
-            enabled: true,
-            iterations: 1000,
-            updateInterval: 25
-        }
-    },
+    // physics: {
+    //     forceAtlas2Based: {
+    //         gravitationalConstant: -26,
+    //         centralGravity: 0.005,
+    //         springLength: 230,
+    //         springConstant: 0.18,
+    //         avoidOverlap: 1.5
+    //     },
+    //     maxVelocity: 146,
+    //     solver: 'forceAtlas2Based',
+    //     timestep: 0.35,
+    //     stabilization: {
+    //         enabled: false,
+    //         iterations: 1000,
+    //         updateInterval: 25
+    //     }
+    // },
     edges: { 
         smooth: false, 
         color: '#000000', 

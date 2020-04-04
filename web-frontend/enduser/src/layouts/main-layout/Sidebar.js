@@ -26,7 +26,8 @@ const useStyles = makeStyles(theme => ({
     width: drawerWidth,
     // backgroundColor: '#F0F0C5',
     // backgroundColor: '#d6c494',
-    backgroundColor: '#b09c63',
+    // backgroundColor: '#b09c63',
+    backgroundColor: '#877aa3',
   },
   drawerHeader: {
     display: 'flex',
