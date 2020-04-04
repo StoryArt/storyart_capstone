@@ -8,6 +8,8 @@ import StringUtils from '../../../utils/string';
 import ValidationUtils from '../../../utils/validation';
 import ScreenShow from '../../../components/common/ScreenShow';
 import AnimationSelect from './AnimationSelect';
+import MyFullScreenShowWrapper from '../../../components/common/MyFullScreenShowWrapper';
+
 
 const styles = theme => ({
   root: {
@@ -86,20 +88,18 @@ const ScreenPreview = (props) => {
                         { StringUtils.getObjTitle(screen) }
                     </DialogTitle>
                     <DialogContent 
-                      style={{ minHeight: '200px' }}
+                      style={{ minHeight: '100vh', padding: 0, backgroundColor: 'red' }}
                       dividers>
-                        <div className="container" style={{ height: '100%' }}>
-                          <div className="row" style={{ height: '100%' }}>
-                            <div className="col-sm-8 mx-auto screen-show" style={{ height: '100%' }}>
-                                <ScreenShow 
+                        <MyFullScreenShowWrapper>
+                            <ScreenShow 
                                   animation={animation}
                                   showScreen={showScreen}
                                   screen={screen}
                                   onSelectAction={() => {}}
                               />
-                            </div>
-                          </div>
-                        </div>
+                              <div className="clearfix"></div>
+                        </MyFullScreenShowWrapper>
+                        
                     </DialogContent>
                     <DialogActions>
                         <div className="float-right" style={{ width: '200px' }}>
