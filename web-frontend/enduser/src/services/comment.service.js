@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { setAuthHeader, getTokenFromLocal } from '../config/auth';
+import { API_URL } from '../config/api';
 
-const base_url = 'http://localhost:8000/api/comment-service/api/v1/comment';
+const base_url = API_URL + '/api/comment-service/api/v1/comment';
 
 class CommentService {
     static async addComment(comment) {

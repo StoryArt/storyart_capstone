@@ -508,7 +508,7 @@ const CreateStoryPage = (props) => {
                                         onRemoveScreen={id => handleRemoveScreen(findScreenById(id))}
                                     /> */}
                                     <StoryPreview
-                                        story={story}
+                                        firstScreenId={story.firstScreenId}
                                         setCurrentScreen={(id) => {
                                             canChangeScreenContent = false;
                                             setCurrentScreen(findScreenById(id));
