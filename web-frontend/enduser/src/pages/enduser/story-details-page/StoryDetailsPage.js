@@ -516,6 +516,12 @@ const StoryDetailsPage = (props) => {
                                     </h4>
                                 )}
                                 <strong style={{ fontSize: '1.2em', color: 'orange' }}>Điểm trung bình: {story.avgRate}</strong>
+                                <div>
+                                    <strong>Lượt đánh giá: </strong>{story.numOfRate}
+                                </div>
+                                <div>
+                                    <strong>Lượt đọc: </strong>{story.numOfRead}
+                                </div>
                                 <div className="my-3">
                                     <strong>Giới thiệu</strong>
                                     <p>{StringUtils.parseHtml(story.intro)}</p>

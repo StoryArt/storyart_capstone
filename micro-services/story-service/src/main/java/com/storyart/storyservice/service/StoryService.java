@@ -163,6 +163,8 @@ class StoryServiceImpl implements StoryService {
         //get user rating
         Rating rating = ratingRepository.findById(storyId, story.getUserId());
         dto.setRating(rating);
+
+        dto.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
         return dto;
     }
 
