@@ -16,6 +16,7 @@ import MyEditor from '../../../components/common/MyEditor';
 import NotFound from '../../../components/common/NotFound';
 import MyBackdrop from '../../../components/common/MyBackdrop';
 import TagsSelect from '../../../components/common/TagsSelect';
+import MyUploadImage from '../../../components/common/MyUploadImage';
 import StoryPreview from './StoryPreview';
 import ScreenPreview from './ScreenPreview';
 import AnimationSelect from './AnimationSelect';
@@ -65,6 +66,7 @@ const CreateStoryPage = (props) => {
     const [tags, setTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
     const [storyTab, setStoryTab] = useState(0);
+    const [image, setImage] = useState(null);
 
     let canChangeScreenContent = true;
 
@@ -446,17 +448,16 @@ const CreateStoryPage = (props) => {
                                                         onClick={addParameter}
                                                         color="primary"
                                                         varient="outlined">Thêm thông tin</Button>
-                                                    {/* <MyDropdownMenu >
-                                                        <MenuItem onClick={addParameter} >Thêm thông tin</MenuItem>
-                                                    </MyDropdownMenu> */}
                                                 </div>
                                             </div>
                                         </div>
+                                        <div className="row">
+                                            <div className="col-8 mx-auto">
+                                                <MyUploadImage/>
+                                            </div>
+                                        </div>
                                         <div className="mb-5">
-                                            {/* <button 
-                                                className="btn btn-default float-right" 
-                                                onClick={() => viewStoryStructure()}>
-                                                Xem cấu trúc truyện</button> */}
+                                          
 
                                             <FormControlLabel
                                                 control={<Checkbox
@@ -493,7 +494,7 @@ const CreateStoryPage = (props) => {
                                     {/* <Pagination 
                                         count={numOfPageScreenSnapshots} 
                                         page={screenSnapshotsPage.page}
-                                        color="default" 
+                                        color="primary" 
                                         onChange={(e, value) => setScreenSnapshotsPage({ page: value })} 
                                         size="small" />
 

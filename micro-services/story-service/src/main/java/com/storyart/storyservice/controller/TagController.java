@@ -15,13 +15,12 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/tags")
 @CrossOrigin(origins = "*")
-
 public class TagController {
 
     @Autowired
     TagService tagService;
 
-    @GetMapping("/public/all")
+    @GetMapping("public/all")
     public ResponseEntity getTags(){
         return ResponseEntity.ok(tagService.getTags());
     }
