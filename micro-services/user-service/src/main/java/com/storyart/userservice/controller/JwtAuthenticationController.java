@@ -20,6 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -77,11 +78,12 @@ public class JwtAuthenticationController {
         } catch (BadCredentialsException e) {
             throw new BadRequestException("Sai tên đăng nhập hoặc mật khẩu!");
         }
-
         User us= userRepository.findByUsername(loginRequest.getUsername()).orElse(null);
         if(us!= null && us.isDeactiveByAdmin()){
             throw new BadRequestException("Tài khoản đã bị khóa. Vui lòng liên hệ với quản trị viên!");
         }
+
+
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 

@@ -1,57 +1,233 @@
 import React from "react";
 import MainLayout from "../../layouts/main-layout/MainLayout";
-
+import Button from "@material-ui/core/Button";
 import UserService from "../../services/user.service";
 import { MDBDataTable } from "mdbreact";
 import { useState, useEffect } from "react";
+import Tooltip from "@material-ui/core/Tooltip";
 import { MDBBtn } from "mdbreact";
 ///hoi ve chuyen trang va validation
-
+import { makeStyles } from "@material-ui/core/styles";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
+import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import NotFoundPage from "../../pages/common/NotFoundPage";
 import { setAuthHeader } from "../../config/auth";
 import Pagination from "@material-ui/lab/Pagination";
 import DateTimeUtils from "../../utils/datetime";
+import MyAlert from "../../components/common/MyAlert";
 
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import { MDBInput, MDBAlert } from "mdbreact";
+import SearchIcon from "@material-ui/icons/Search";
+import OutlinedInput from "@material-ui/core/OutlinedInput";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import IconButton from "@material-ui/core/IconButton";
+const useStyles = makeStyles((theme) => ({
+  paging: {
+    magrin: "0px 0px 30px 0px",
+  },
+  button: {
+    fontFamily: ["Roboto", "Helvetica", "Arial"],
+    backgroundColor: "#719e7c",
+    color: "white",
+    marginLeft: "10px",
+    paddingRight: "0px",
+
+    "&:hover": {
+      backgroundColor: "#53825e",
+      boxShadow: "none",
+    },
+  },
+
+  h3: {
+    fontWeight: "500",
+    margin: "0px 0px 20px 0px",
+  },
+  active: {
+    fontFamily: ["Roboto", "Helvetica", "Arial"],
+    backgroundColor: "#42e6a4",
+    color: "white",
+
+    "&:hover": {
+      backgroundColor: "#53825e",
+      boxShadow: "none",
+    },
+  },
+  deactive: {
+    fontFamily: ["Roboto", "Helvetica", "Arial"],
+    backgroundColor: "#d7385e",
+    color: "white",
+
+    "&:hover": {
+      backgroundColor: "#ab1d3f",
+      boxShadow: "none",
+    },
+  },
+}));
 const UserManagementPage = () => {
+  const classes = useStyles();
+
   const [convertedList, setConvertedList] = useState([]);
   const [pageInfo, setPageInfo] = useState({
     page: 1,
     size: 10,
     totalElement: 10,
     totalPages: 1,
-    last: true
+    last: true,
   });
   const [pageNo, setPageNo] = useState(1);
+  const [openDialog, setStatusOpenDialog] = useState({
+    isOpen: false,
+    id: 0,
+    status: false,
+    content: "",
+  });
+  const [searchtxt, setSearchTxt] = useState("");
+
+  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [intro_content, setIntro_content] = useState("");
+  const [addAccountMessage, setAddAccountMessage] = useState("");
+  const [alert, setAlert] = useState({
+    open: false,
+    type: "success",
+    content: "",
+  });
   useEffect(() => {
     getMyProfile();
-    LoadUsersByPage();
-  
+    FirstLoadUsers();
   }, []);
 
+  const [open, setOpen] = useState(false);
+  const openDialogAddAccount = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-  function addUser() {
-    window.location.href = "/admin/users/add";
-  }
+  const data = {
+    columns: [
+      {
+        label: "ID",
+        field: "stt",
+        sort: "asc",
+        width: 150,
+      },
+      {
+        label: "Tên",
+        field: "name",
+        sort: "asc",
+        width: 270,
+      },
+      {
+        label: "Vai trò",
+        field: "role",
+        sort: "asc",
+        width: 200,
+      },
 
-  // ham nay nhan 2 tham so va 1 doi tuong goi la:
-  async function HandleSetStatus(userId, callElement) {
-    callElement.preventDefault();
-    let url = "http://localhost:8002/api/v1/admin/users/" + userId;
-    let status = callElement.target.value;
-    if (status == "true") {
-      url += "?setActive=false";
-      callElement.target.innerText = "Deactivated";
+      {
+        label: "Ngày tạo",
+        field: "jointAt",
+        sort: "asc",
+        width: 100,
+      },
+      {
+        label: "Trạng thái",
+        field: "deactiveByAdmin",
+        sort: "asc",
+        width: 100,
+      },
+      {
+        label: "Email",
+        field: "email",
+        sort: "asc",
+        width: 100,
+      },
+    ],
+    rows: convertedList,
+  };
 
-      //TODO: cannot change inner text of button
-    } else if (status == "false") {
-      url += "?setActive=true";
-      callElement.target.innerText = "Active";
+  function loadDataToTable(data) {
+    var userList = data.content;
+    let rowsData = [];
+
+    for (var index = 0; index < userList.length; index++) {
+      let rowItem = {};
+
+      rowItem["stt"] = userList[index].id;
+      rowItem["username"] = userList[index].username;
+      rowItem["username"] = (
+        <a href={`/user/profile/${userList[index].id}`}>
+          {rowItem["username"]}
+        </a>
+      );
+      const id = userList[index].id;
+      rowItem["name"] = userList[index].username;
+      rowItem["role"] = userList[index].role;
+      rowItem["deactiveByAdmin"] =
+        userList[index].deactiveByAdmin == false ? (
+          <Button
+            className={classes.active}
+            value="true"
+            onClick={(e) =>
+              setStatusOpenDialog({
+                isOpen: true,
+                id: id,
+                status: false,
+                content: "Khóa tài khoản?",
+              })
+            }
+          >
+            Đang hoạt động
+          </Button>
+        ) : (
+          <Button
+            className={classes.deactive}
+            onClick={(e) =>
+              setStatusOpenDialog({
+                isOpen: true,
+                id: id,
+                status: true,
+                content: "Mở tài khoản?",
+              })
+            }
+          >
+            Đã khóa
+          </Button>
+        );
+      rowItem["email"] = userList[index].email;
+      rowItem["jointAt"] = DateTimeUtils.getDateTime(userList[index].jointAt);
+
+      rowsData.push(rowItem);
     }
 
-    const res = await UserService.setStatusUser(url);
+    setConvertedList(rowsData);
+  }
+  async function handleSetStatus(callElement) {
+    callElement.preventDefault();
+
+    setStatusOpenDialog({ openDialog: false });
+    let userId = openDialog.id;
+    let status = openDialog.status;
+    let url =
+      "http://localhost:8000/api/user-service/api/v1/admin/users/" +
+      userId +
+      "?setActive=" +
+      status;
+
+    const res = await UserService.setStatusUser(url).then((res) => {
+      reloadTable();
+    });
   }
 
-  async function LoadUsersByPage(event) {
+  async function FirstLoadUsers(event) {
     setAuthHeader(localStorage.getItem("jwt-token"));
 
     const res = await UserService.getUsersList(1, 10, "");
@@ -61,10 +237,9 @@ const UserManagementPage = () => {
       size: Number(res.data.size),
       totalElement: Number(res.data.totalElement),
       totalPages: Number(res.data.totalPages),
-      last: Boolean(res.data.last)
+      last: Boolean(res.data.last),
     });
-    // setPageLenght(res.data.totalPages)
-    ConvertUserList(res.data);
+    loadDataToTable(res.data);
   }
 
   const getMyProfile = async () => {
@@ -81,109 +256,231 @@ const UserManagementPage = () => {
     if (value !== pageNo) {
       setPageNo(value);
       try {
-        const res = await UserService.getUsersList(value, 10, "");
-        ConvertUserList(res.data);
+        const res = await UserService.getUsersList(value, 10, searchtxt);
+        setPageInfo({
+          ...pageInfo,
+          page: Number(res.data.page),
+          size: Number(res.data.size),
+          totalElement: Number(res.data.totalElement),
+          totalPages: Number(res.data.totalPages),
+          last: Boolean(res.data.last),
+        });
+        loadDataToTable(res.data);
       } catch (error) {}
     }
   };
-
-  function ConvertUserList(data) {
-    var userList = data.content;
-    let rowsData = [];
-   
-
-    for (var index = 0; index < userList.length; index++) {
-      let rowItem = {};
-      rowItem["username"] = userList[index].username;
-      rowItem["username"] = (
-        <a href={`/user/profile/${userList[index].id}`}>
-          {rowItem["username"]}
-        </a>
-      );
-      const id = userList[index].id;
-      rowItem["name"] = userList[index].username;
-      rowItem["role"] = userList[index].role;
-      rowItem["active"] =
-        userList[index].active == true ? (
-          <MDBBtn
-            color="success"
-            value="true"
-            onClick={e => HandleSetStatus(id, e)}
-          >
-            Active
-          </MDBBtn>
-        ) : (
-          <MDBBtn
-            color="deep-orange"
-            value="false"
-            onClick={e => HandleSetStatus(id, e)}
-          >
-            Deactivated
-          </MDBBtn>
-        );
-      rowItem["email"] = userList[index].email;
-      rowItem["jointAt"] = DateTimeUtils.getDateTime(userList[index].jointAt);
-
-      rowsData.push(rowItem);
-    }
-
-    setConvertedList(rowsData);
-  }
-
- 
-  const data = {
-    columns: [
-      {
-        label: "#",
-        field: "stt",
-        sort: "asc",
-        width: 150
-      },
-      {
-        label: "Tên",
-        field: "name",
-        sort: "asc",
-        width: 270
-      },
-      {
-        label: "Vai trò",
-        field: "role",
-        sort: "asc",
-        width: 200
-      },
-
-      {
-        label: "Ngày tạo",
-        field: "jointAt",
-        sort: "asc",
-        width: 100
-      },
-      {
-        label: "Trạng thái",
-        field: "active",
-        sort: "asc",
-        width: 200
-      },
-      {
-        label: "Email",
-        field: "email",
-        sort: "asc",
-        width: 100
-      }
-    ],
-    rows: convertedList
+  const reloadTable = async () => {
+    try {
+      const res = await UserService.getUsersList(pageNo, 10, searchtxt);
+      loadDataToTable(res.data);
+    } catch (error) {}
   };
+  async function handleAddAccountUser(event) {
+    event.preventDefault();
+    let user = {
+      username: username,
+      password: password,
+      intro_content: intro_content,
+      email: email,
+      name: name,
+    };
+    try {
+      const res = await UserService.addUser(user);
+      if (res.data.success == true) {
+        setAddAccountMessage(
+          <MDBAlert color="success">{res.data.message}</MDBAlert>
+        );
+        window.setTimeout(function () {
+          handleClose();
+          reloadTable();
+          setAddAccountMessage("");
+        }, 2000);
+      }
+    } catch (error) {
+      console.log(JSON.stringify(error));
+
+      var err;
+      if (typeof error.response.data.errors != "undefined") {
+        err = error.response.data.errors[0].defaultMessage;
+      } else if (typeof error.response.data.message == "string") {
+        err = error.response.data.message;
+      }
+
+      setAddAccountMessage(<MDBAlert color="danger">{err}</MDBAlert>);
+    }
+  }
+  const closeAlert = () =>
+    window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
+
+  async function handleSearchAccount(event) {
+    console.log(event.target.tagName);
+    if (event.keyCode == 13 || event.target.tagName == "svg") {
+      setAuthHeader(localStorage.getItem("jwt-token"));
+      let searchValue = "";
+      if (event.keyCode == 13) {
+        searchValue = event.target.value;
+      }
+      if (event.target.tagName == "svg") {
+        searchValue = searchtxt;
+      }
+      const res = await UserService.getUsersList(pageNo, 10, searchValue);
+      setPageInfo({
+        ...pageInfo,
+        page: Number(res.data.page),
+        size: Number(res.data.size),
+        totalElement: Number(res.data.totalElement),
+        totalPages: Number(res.data.totalPages),
+        last: Boolean(res.data.last),
+      });
+      // setPageLenght(res.data.totalPages)
+      loadDataToTable(res.data);
+      setAlert({
+        open: true,
+        content: "Tìm thấy " + res.data.totalElement + " kết quả",
+        type: "success",
+      });
+      closeAlert();
+    }
+  }
 
   return (
     <MainLayout>
-      <h3 className="text-cenetr">Quản lý người dùng</h3>
-      <input type="button" value="+ Account" onClick={addUser} />
-      <MDBDataTable striped bordered small data={data}  entrieslabel={""} paging={false}displayEntries={false}/>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">
+          Tạo tài khoản người dùng
+        </DialogTitle>
+        <form onSubmit={handleAddAccountUser}>
+          <DialogContent>
+            <div className="row">
+              <div className="col-sm-6">
+                <MDBInput
+                  value={username}
+                  label="Tên đăng nhập"
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+              <div className="col-sm-6">
+                <MDBInput
+                  value={name}
+                  label="Tên đầy đủ"
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div className="col-sm-6">
+                <MDBInput
+                  value={email}
+                  type="email"
+                  label="Email"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="col-sm-6">
+                <MDBInput
+                  value={password}
+                  type="password"
+                  label="Mật khẩu"
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <div className="col-12">
+                <MDBInput
+                  type="textarea"
+                  rows="3"
+                  value={intro_content}
+                  label="Thông tin giới thiệu"
+                  onChange={(e) => setIntro_content(e.target.value)}
+                />
+              </div>
+            </div>
+            {/* <div className="clearfix"></div> */}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              Thoát
+            </Button>
+            <Button className={classes.button} type="submit">
+              Lưu
+            </Button>
+            {/* <Button onClick={handleClose} color="primary">
+            Lưu
+          </Button> */}
+          </DialogActions>
+        </form>
+      </Dialog>
+
+      <ConfirmDialog
+        openDialog={openDialog.isOpen}
+        cancel={() => setStatusOpenDialog(false)}
+        ok={handleSetStatus}
+        setOpenDialog={setStatusOpenDialog}
+        content={openDialog.content}
+      />
+      <h3 className={classes.h3}>
+        Quản lý người dùng
+        <Tooltip title="Thêm người dùng" aria-label="add">
+          <Button
+            className={classes.button}
+            startIcon={<PersonAddIcon />}
+            onClick={openDialogAddAccount}
+          ></Button>
+        </Tooltip>
+        <Tooltip title="theo tên đăng nhập và email " aria-label="add">
+          <OutlinedInput
+          placeholder="Tìm kiếm"
+          className="float-right"
+            id="outlined-search"
+            onKeyDown={handleSearchAccount}
+            type="search"
+            variant="outlined"
+            value={searchtxt}
+            onChange={(e) => setSearchTxt(e.target.value)}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  // aria-label="toggle password visibility"
+                  // onClick={handleSearchAccount}
+                  edge="end"
+                >
+                  <SearchIcon onClick={handleSearchAccount} />
+                </IconButton>
+              </InputAdornment>
+            }
+          />
+        </Tooltip>
+      </h3>
       <Pagination
         count={pageInfo.totalPages}
-        color="primary"
         boundaryCount={2}
+        showFirstButton
+        showLastButton
+        color="primary"
         onChange={changePage}
+        // onClick={changePage}
+        variant="outlined"
+        className={classes.paging}
+      />
+
+      <MDBDataTable
+        noBottomColumns={true}
+        entries={pageInfo.totalElement}
+        bordered
+        small
+        data={data}
+        entriesLabel
+        infoLabel
+        searching={false}
+        paging={false}
+      />
+
+      <MyAlert
+        open={alert.open}
+        setOpen={() => setAlert({ ...alert, open: true })}
+        type={alert.type}
+        content={alert.content}
       />
     </MainLayout>
   );

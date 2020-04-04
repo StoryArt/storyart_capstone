@@ -19,15 +19,14 @@ public interface UserService {
 
     void delete(Integer id);
 
-    void deActive(Integer id, boolean deadmin);
+    void setStatus(boolean status,int id);
+    void setStatusByAdmin(boolean status, int uid);
 
     List<User> findAll();
 
     User findById(Integer id);
 
     User findByUsername(String username);
-
-    void active(Integer uid);
 
     User findByEmail(String email);
 

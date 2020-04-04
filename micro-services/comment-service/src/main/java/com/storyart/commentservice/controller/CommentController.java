@@ -73,6 +73,13 @@ public class CommentController {
             @RequestParam(defaultValue = "0") Integer userId,
             @RequestParam(defaultValue = "0") String start,
             @RequestParam(defaultValue = "0") String end){
+
+
+
+
+        Integer i= 2;
+        int b= 2;
+        System.out.println(i==b);
         return commentService.getStatistic(storyId, userId, start, end);
     }
 

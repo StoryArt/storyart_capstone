@@ -138,15 +138,16 @@ const AppNavbar = (props) => {
               <Button
                 onClick={() => navigateRoute('/register')}
                 edge="end"
-                color="inherit">Đăng ký</Button>
+                style={{backgroundColor: "#719e7c", color: "white"}}
+                >Đăng ký</Button>
             </>
           )}
 
           {(isUserAuth(user) || isAdminAuth(user) || isSysAdminAuth(user)) && (
             <>
-              <Button
+              {/* <Button
                 onClick={handleLogout}
-                color="inherit">Đăng xuất</Button>
+                color="inherit">Đăng xuất</Button> */}
               <Button
                 onClick={() => { navigateRoute('/user/my-profile') }}
                 color="inherit">{user.username}</Button>
@@ -176,6 +177,10 @@ const AppNavbar = (props) => {
                   onClose={handleCloseMenu}
                 >
                   <MenuItem onClick={() => { navigateRoute('/user/edit-profile') }}>Tài khoản</MenuItem>
+                  <MenuItem onClick={() => { handleLogout() }}>Đăng xuất</MenuItem>
+              
+               
+              
                 </Menu>
               </div>
             </>

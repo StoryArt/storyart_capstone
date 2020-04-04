@@ -69,15 +69,15 @@ public class AdminController {
             throw new UnauthorizedException("Bạn không thể chỉnh sửa nội dung này!");
         }
         if (!setActive) {
-            userService.deActive(uid, true);
+            userService.setStatusByAdmin( false,uid);
         } else {
-            userService.active(uid);
+            userService.setStatusByAdmin(true,uid);
         }
         User byId = userService.findById(uid);
-        boolean afterSetStatus = byId.isActive();
+        boolean status = byId.isDeactiveByAdmin();
 
         //todo thieu set deactive by admin account record
-        if (afterSetStatus) {
+        if (!status) {
             return new ResponseEntity<>(new ApiResponse(true, "Mở tài khoản '"+byId.getUsername()+"' thành công!"), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(new ApiResponse(true, "Đã khóa tài khoản '"+byId.getUsername()+"'"), HttpStatus.OK);

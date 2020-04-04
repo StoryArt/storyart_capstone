@@ -938,8 +938,8 @@ class StoryServiceImpl implements StoryService {
         storyReactByRange.setNumOfHitPoint(hitPointByDay);
         for (NumberOfCommentByDate numberOfCommentByDate : commentByDay) {
             Integer comment = numberOfCommentByDate.getNumberOfComment();
-//            storyReactByRange.getNumOfComment().add(comment);
-            storyReactByRange.getNumOfComment().add(new Random().nextInt(50));
+            storyReactByRange.getNumOfComment().add(comment);
+//            storyReactByRange.getNumOfComment().add(new Random().nextInt(50));
             Calendar cal = Calendar.getInstance();
             cal.setTime(numberOfCommentByDate.getDate());
             String time = cal.get(Calendar.DAY_OF_MONTH) + "/" + (cal.get(Calendar.MONTH)+1);

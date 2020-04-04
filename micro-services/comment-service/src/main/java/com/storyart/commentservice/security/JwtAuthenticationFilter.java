@@ -1,5 +1,7 @@
 package com.storyart.commentservice.security;
 
+import com.storyart.commentservice.model.User;
+import com.storyart.commentservice.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+    @Autowired
+    UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -48,6 +52,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 //decode token and take userid from it
                 Integer uid = jwtTokenProvider.getUserIdFromToken(jwt);
                 UserDetails userDetails = userDetailsService.loadUserById(uid);
+
+                User us= userRepository.findByUsername(userDetails.getUsername());
+                if(us!= null && us.isDeactiveByAdmin()){
+                    throw new BadRequestException("Tài khoản đã bị khóa. Vui lòng liên hệ với quản trị viên!");
+                }
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails,
                                 null,
