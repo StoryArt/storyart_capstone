@@ -2,10 +2,12 @@ import React, { Component, Fragment } from "react";
 import { Grid } from "@material-ui/core";
 import MainLayout from "../../layouts/main-layout/MainLayout";
 import { setAuthHeader } from "../../config/auth";
+import Icon from "@mdi/react";
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 
 import DoughnutChart from "./forstoryanalystic/charts/echarts/Doughnut";
 import ModifiedAreaChart from "./forstoryanalystic/shared/ModifiedAreaChart";
-
+import { mdiAccountMultiple } from '@mdi/js';
 import BeautyStars from "beauty-stars";
 import StatCards from "./forstoryanalystic/shared/StatCards";
 import TableCard from "./forstoryanalystic/shared/TableCard";
@@ -42,7 +44,9 @@ class Dashboard1 extends React.Component {
       ratinguser: 0,
       story: {},
       anchorEl: null,
+      anchorE2: null,
       daybeforelabel: "Chọn ngày",
+      daybeforelabel2: "Chọn ngày",
       tagString: "",
       convertedList: [],
       pageInfo: {
@@ -52,6 +56,7 @@ class Dashboard1 extends React.Component {
         totalPages: 1,
         last: true
       },
+      timelable2:"",
       pageNo: 1,
       datax: {
         columns: [
@@ -92,15 +97,23 @@ class Dashboard1 extends React.Component {
     const storyInfo = this.getStorySummary(this.sid);
     this.loadRatingStatic();
     this.handleLoadReactStatic(1);
-  }
+   this. handleLoadScreenTime(1)
+    }
   handleClick = event => {
     this.setState({
       anchorEl: event.currentTarget
     });
   };
+  handleClick2 = event => {
+    this.setState({
+      anchorE2: event.currentTarget
+    });
+  };
 
   async getStorySummary() {
     const url = this.baseUrl + `/story/` + this.sid + `/summary`;
+    setAuthHeader(localStorage.getItem("jwt-token"));
+
     const res = await axios.get(url).then(res => {
       this.setState({ story: res.data });
       console.log("summary");
@@ -114,6 +127,8 @@ class Dashboard1 extends React.Component {
   }
   async loadRatingStatic() {
     const url = this.baseUrl + `/story/` + this.sid + `/statistic/rating`;
+
+
     const res = await axios.get(url).then(res => {
       this.setState({
         rating: res.data.map(rate => ({
@@ -146,7 +161,24 @@ class Dashboard1 extends React.Component {
     }
     return d + "/" + m + "/" + y;
   }
+  toyyyyMMdd(date) {
+    if (Object.prototype.toString.call(date) !== "[object Date]") {
+      return this.toddMMyyyy(new Date());
+    }
+    let m = date.getMonth() + 1;
+    let d = date.getDate();
+    let y = date.getFullYear();
+    if (m < 10) {
+      m = "0" + m;
+    }
+
+    if (d < 10) {
+      d = "0" + d;
+    }
+    return y+"/"+ m + "/" +d ;
+  }
   getScreenTime(url, timerange) {
+    setAuthHeader(localStorage.getItem("jwt-token"));
     axios.post(url, timerange).then(res => {
       console.log("screen time");
       console.log(res.data);
@@ -182,19 +214,19 @@ class Dashboard1 extends React.Component {
           label: "#",
           field: "id",
           sort: "asc",
-          width: 150
+          width: 50
         },
         {
           label: "Tiêu đề",
           field: "title",
           sort: "asc",
-          width: 270
+          width: 100
         },
         {
-          label: "Thời lượng đọc",
+          label: "Thời lượng đọc (giây)",
           field: "sumtime",
           sort: "asc",
-          width: 200
+          width: 100
         }
       ],
         rows: rowsData
@@ -207,25 +239,28 @@ console.log("datx:")
   handleLoadReactStatic(daybefore) {
     console.log(daybefore);
     let now = new Date();
-    let nowStr = this.toddMMyyyy(now);
+    let toDate= new Date();
+    toDate.setDate(now.getDate()-1);
+    let to = this.toddMMyyyy(toDate);
     console.log("hom nay: ");
-    console.log(nowStr);
-    let past = new Date();
-    let pastStr = "";
+    console.log(to);
+    let fromDate = new Date();
+    let from = "";
     this.setState({ anchorEl: null });
     this.setState({ daybeforelabel: daybefore + " ngày truớc" });
-    past.setDate(now.getDate() - daybefore);
+    fromDate.setDate(now.getDate() - daybefore);
 
-    pastStr = this.toddMMyyyy(past);
+    from = this.toddMMyyyy(fromDate);
 
     // let baseUrl="http://localhost:8003/stories";
     console.log("da chon ngay");
-    console.log(pastStr);
+    console.log(from);
     const timerange = {
-      start: pastStr,
-      end: nowStr
+      start: from,
+      end: to
     };
     const url = this.baseUrl + `/story/` + this.sid + `/statistic/react`;
+    setAuthHeader(localStorage.getItem("jwt-token"));
 
     axios.post(url, timerange).then(res => {
       this.setState({
@@ -244,12 +279,32 @@ console.log("datx:")
       console.log("du lieu react:");
       console.log(this.state.reactStatic);
     });
-    let screenUrl =
-      "http://localhost:8000/api/story-service/interact/getScreenTime/" +
-      this.sid;
-    this.getScreenTime(screenUrl, timerange);
+  
 
     // getReactStatic(23,event.target.value, "26/03/2020");
+  }
+
+  handleLoadScreenTime(daybefore){
+    this.setState({ anchorE2: null });
+    this.setState({ daybeforelabel2: daybefore + " ngày truớc" });
+    let now = new Date();
+    let fromDate = new Date();
+    let toDate = new Date();
+// toDate.setDate(now.getDate()-1);
+    let to = this.toyyyyMMdd(toDate);
+    let from = "";
+    fromDate.setDate(now.getDate() - daybefore);
+
+    from = this.toyyyyMMdd(fromDate);
+    this.setState({timelable2:"Kết quả từ ngày "+from+" đến "+ " ngày hôm nay "+ to })
+
+    const timerange = {
+      start: from,
+      end: to
+    };
+    let screenUrl =
+    "http://localhost:8000/api/story-service/interact/getScreenTime/" + this.sid;
+  this.getScreenTime(screenUrl, timerange);
   }
 
   render() {
@@ -284,89 +339,102 @@ console.log("datx:")
     };
 
     return (
-      <MainLayout>
-        <Fragment>
-          <div className="pb-24 pt-7 px-8 bg-primary">
-            <div
-              className="card-title capitalize text-white mb-4
-           text-white-secondary"
-              style={{ margin: "10 5 0 10", opacity: "80%" }}
+      
+   
+      <MainLayout style={{ padding: "0px 0px", opacity: "80%" }}>
+         <Fragment > 
+         <div
+      //  className="pb-24 pt-7 px-8 " 
+      style={{padding:"24px", backgroundColor:"rgb(51, 51, 51)"}}>
+        <div
+          className="card-title capitalize  mb-4
+       "
+          style={{ margin: "0 5 0 0", opacity: "80%" }}
+        >
+           <Typography  style={{color: "rgb(221, 107, 102)"}}gutterBottom variant="h5" component="h2">
+                  {this.state.story.title}
+                </Typography>{" "}
+          <Button
+            variant="outlined"
+            style={{color: "white", outlineColor: "white"}}
+            aria-owns={this.state.anchorEl ? "simple-menu" : undefined}
+            aria-haspopup="true"
+            onClick={this.handleClick}
+          >
+            {this.state.daybeforelabel}
+          </Button>
+          <div>
+            <Menu
+              style={{ borderRadius: "8px" }}
+              id="simple-menu"
+              anchorEl={this.state.anchorEl}
+              open={Boolean(this.state.anchorEl)}
+              onClose={this.handleLoadReactStatic.bind(this, 1)}
             >
-              Thống kê tương tác{" "}
-              <Button
-                variant="outlined"
-                color="inherit"
-                aria-owns={this.state.anchorEl ? "simple-menu" : undefined}
-                aria-haspopup="true"
-                onClick={this.handleClick}
-              >
-                {this.state.daybeforelabel}
-              </Button>
-              <div>
-                <Menu
-                  style={{ borderRadius: "8px" }}
-                  id="simple-menu"
-                  anchorEl={this.state.anchorEl}
-                  open={Boolean(this.state.anchorEl)}
-                  onClose={this.handleLoadReactStatic.bind(this, 1)}
-                >
-                  <MenuItem onClick={this.handleLoadReactStatic.bind(this, 1)}>
-                    1 ngày trước
-                  </MenuItem>
-                  <MenuItem onClick={this.handleLoadReactStatic.bind(this, 5)}>
-                    5 ngày trước
-                  </MenuItem>
-                  <MenuItem onClick={this.handleLoadReactStatic.bind(this, 28)}>
-                    28 ngày trước
-                  </MenuItem>
-                </Menu>
-              </div>
-            </div>
-
-            <ModifiedAreaChart
-              height="280px"
-              option={{
-                series: [
-                  {
-                    data: this.state.reactStatic.commentStatic,
-                    // data: [34,12, 31, 45, 31, 43, 26, 43, 31, 45, 33, 40],
-                    name: "Bình luận",
-                    type: "line"
-                  },
-                  // ,{
-                  //   data: this.state.reactStatic.shareStatic,
-                  //   name:"Luợt xem",
-                  //   type: "line"
-                  // }
-                  // {
-                  //   data: this.state.reactStatic.shareStatic,
-                  //   name: "Chia sẻ",
-                  //   type: "line"
-                  // },
-                  {
-                    data: this.state.reactStatic.clickLinkStatic,
-                    name: "Click vào link",
-                    type: "line"
-                  }
-                  ,
-                  {
-                    data: this.state.reactStatic.hitPointStatic,
-                    name: "Hoàn thành",
-                    type: "line"
-                  }
-                ],
-                xAxis: {
-                  data: this.state.reactStatic.times
-                }
-              }}
-            ></ModifiedAreaChart>
+              <MenuItem onClick={this.handleLoadReactStatic.bind(this, 1)}>
+                1 ngày trước
+              </MenuItem>
+              <MenuItem onClick={this.handleLoadReactStatic.bind(this, 5)}>
+                5 ngày trước
+              </MenuItem>
+              <MenuItem onClick={this.handleLoadReactStatic.bind(this, 28)}>
+                28 ngày trước
+              </MenuItem>
+            </Menu>
           </div>
+        </div>
 
-          <div className="analytics m-sm-30 mt--18">
+        <ModifiedAreaChart
+          height="280px"
+          option={{
+            series: [
+              {
+                data: this.state.reactStatic.commentStatic,
+                // data: [34,12, 31, 45, 31, 43, 26, 43, 31, 45, 33, 40],
+                name: "Bình luận",
+                type: "line",
+                itemStyle:{color:"#c23531"}
+              },
+              // ,{
+              //   data: this.state.reactStatic.shareStatic,
+              //   name:"Luợt xem",
+              //   type: "line"
+              // }
+              // {
+              //   data: this.state.reactStatic.shareStatic,
+              //   name: "Chia sẻ",
+              //   type: "line"
+              // },
+              {
+                data: this.state.reactStatic.clickLinkStatic,
+                name: "Click vào link",
+                type: "line",
+                itemStyle:{
+                  color: "#759aa0"
+                }
+              }
+              ,
+              {
+                data: this.state.reactStatic.hitPointStatic,
+                name: "Hoàn thành",
+                type: "line",
+                itemStyle:{
+                  color: "#ca8622db"
+                }
+              }
+            ],
+            xAxis: {
+              data: this.state.reactStatic.times
+            }
+          }}
+        ></ModifiedAreaChart>
+      </div>
+   
+          <div className=" m-sm-30 mt--18">
             <Grid container spacing={3}>
               <Grid item lg={4} md={4} sm={12} xs={12}>
                 {/* thong tin truyen */}
-                <Card className="px-6 py-4 mb-6" style={{ marginBottom: 10 }}>
+                <Card  style={{ marginBottom: 10 , padding:"0px" }}>
                   <CardMedia
                     component="img"
                     alt="Ảnh bìa"
@@ -426,7 +494,13 @@ console.log("datx:")
                 {/* danh gia */}
                 <Card className="px-6 py-4 mb-6">
                   <div className="card-title" style={{paddingLeft: "10px"}}>
-                    <h5>Đánh giá <strong style={{ color: "#b0b0b0", fontSize: "20px" }}>
+
+                    
+           
+                    <h5>Đánh giá {"  "} 
+                      
+                    <Icon path={mdiAccountMultiple} size={1} color="#ccc"  style={{paddingBottom:"2px"}}></Icon>
+                    <strong style={{ color: "#b0b0b0", fontSize: "20px" }}>
                       {this.state.story.numOfRate}
                     </strong> </h5>{" "}
                     
@@ -467,7 +541,40 @@ console.log("datx:")
                   clicklink={this.state.story.numOfClickLink}
                 />
                 {/* <TableCard /> */}
-
+                <h4>Tổng thời gian đọc {"  "} </h4>
+                <div>
+                  <Button
+                variant="outlined"
+                endIcon={< ArrowDropDownIcon/>}
+                aria-owns={this.state.anchorE2 ? "simple-menu" : undefined}
+                aria-haspopup="true"
+                
+                style={{marginBottom: "10px", color:"rgba(0, 0, 0, 0.54)" , 
+                outlineColor: "#dee2e6" ,marginRight:"10px"}}
+                onClick={this.handleClick2}
+              >
+                {this.state.daybeforelabel}
+              </Button>
+                <Menu
+                  style={{ borderRadius: "8px" }}
+                  id="simple-menu"
+                  anchorEl={this.state.anchorE2}
+                  open={Boolean(this.state.anchorE2)}
+                  onClose={this.handleLoadScreenTime.bind(this, 1)}
+                >
+                  <MenuItem onClick={this.handleLoadScreenTime.bind(this, 1)}>
+                    1 ngày trước
+                  </MenuItem>
+                  <MenuItem onClick={this.handleLoadScreenTime.bind(this, 5)}>
+                    5 ngày trước
+                  </MenuItem>
+                  <MenuItem onClick={this.handleLoadScreenTime.bind(this, 28)}>
+                    28 ngày trước
+                  </MenuItem>
+                </Menu>
+                <span style={{color: "#ccc", fontSize:"14px"}} >
+                   {this.state.timelable2}</span>
+              </div>
                 <MDBDataTable
                   striped
                   bordered
@@ -488,7 +595,8 @@ console.log("datx:")
             </Grid>
           </div>
         </Fragment>
-      </MainLayout>
+         </MainLayout>
+
     );
   }
 }

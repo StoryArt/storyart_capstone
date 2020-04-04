@@ -136,6 +136,7 @@ const LoginPage = () => {
                 fullWidth
                 value={user.username}
                 label="Tên đăng nhập"
+                type="usename"
                 onChange={e => changeUser("username", e.target.value)}
                 autoFocus
               />

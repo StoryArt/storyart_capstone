@@ -55,7 +55,7 @@
 }
 
 .m-sm-30 {
-  margin: 30px;
+   margin-top: 30px;
   @include media(767px) {
     margin: 16px;
   }

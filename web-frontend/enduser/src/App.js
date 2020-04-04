@@ -21,7 +21,6 @@ import RegisterPage from './pages/common/RegisterPage';
 import DashboardPage from './pages/admin/DashboardPage';
 import UserManagementPage from './pages/admin/UserManagementPage';
 
-import AddUser from './pages/common/AddUser';
 import DemoPage from './pages/common/DemoPage';
 
 import StoryManagementPage from './pages/admin/StoryManagementPage';
@@ -31,7 +30,6 @@ import ReportManagementPage from './pages/admin/ReportManagementPage';
 import AdminManagementPage from './pages/admin/AdminManagementPage';
 import NotFoundPage from './pages/common/NotFoundPage';
 
-import AddAdmin from './pages/common/AddAdmin';
 
 import PrivateRoute from './pages/common/auth/PrivateRoute';
 
@@ -123,13 +121,11 @@ function App() {
 
 
             {/* system admin routes */}
-            <PrivateRoute exact path="/sysadmin/add"  component={AddAdmin}/>
             <PrivateRoute exact path="/sysadmin/admin" component={AdminManagementPage}/>
 
 
             {/* admin routes */}            
             <Route exact path="/admin" render={() => <Redirect to="/admin/users" /> } />
-            <PrivateRoute exact path="/admin/users/add" component={AddUser}/>
             <PrivateRoute exact path="/admin/users" component={UserManagementPage}/>
             <PrivateRoute exact path="/admin/stories" component={StoryManagementPage}/>
             <PrivateRoute exact path="/admin/tags" component={TagManagementPage}/>

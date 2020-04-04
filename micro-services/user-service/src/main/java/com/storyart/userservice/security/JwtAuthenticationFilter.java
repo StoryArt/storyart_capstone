@@ -1,5 +1,8 @@
 package com.storyart.userservice.security;
 
+import com.storyart.userservice.exception.BadRequestException;
+import com.storyart.userservice.model.User;
+import com.storyart.userservice.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,17 +40,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
-
+@Autowired
+    UserRepository userRepository;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String jwt = getJwtTokenFromRequest(request);
             System.out.println("jwt: " + jwt);
+
+
             if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
 
                 //decode token and take userid from it
                 Integer uid = jwtTokenProvider.getUserIdFromToken(jwt);
                 UserDetails userDetails = userDetailsService.loadUserById(uid);
+                User us= userRepository.findByUsername(userDetails.getUsername()).orElse(null);
+                if(us!= null && us.isDeactiveByAdmin()){
+                    throw new BadRequestException("Tài khoản đã bị khóa. Vui lòng liên hệ với quản trị viên!");
+                }
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails,
                                 null,

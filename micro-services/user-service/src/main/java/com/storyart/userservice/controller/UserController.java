@@ -133,14 +133,14 @@ public class UserController {
         }
 
         if (!setActive) {
-            userService.deActive(uid, false);
+            userService.setStatus(false ,uid );
             return new ResponseEntity<>(new ApiResponse(true, "Đã khóa tài khoản!"), HttpStatus.OK);
         } else {
             //user khong the tu mo tai khoan bi khoa boi admin
             if (userService.findById(currentUser.getId()).isDeactiveByAdmin()) {
                 return new ResponseEntity<>(new ApiResponse(false, "Không thể mở tài khoản! Vui lòng liên lạc với quản trị viên!"), HttpStatus.FORBIDDEN);
             } else {
-                userService.active(uid);
+                userService.setStatus(true,uid);
                 return new ResponseEntity<>(new ApiResponse(true, "Mở khóa tài khoản thành công!"), HttpStatus.OK);
             }
         }

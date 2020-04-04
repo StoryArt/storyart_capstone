@@ -3,13 +3,11 @@ package com.storyart.storyservice.controller;
 import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.create_story.CreateStoryDto;
 import com.storyart.storyservice.dto.ResultDto;
-import com.storyart.storyservice.dto.statistic.IRatingClassify;
-import com.storyart.storyservice.dto.statistic.StoryReactByRange;
-import com.storyart.storyservice.dto.statistic.StorySummarizeResponse;
-import com.storyart.storyservice.dto.statistic.TimeRangeRequest;
+import com.storyart.storyservice.dto.statistic.*;
 import com.storyart.storyservice.model.Rating;
 import com.storyart.storyservice.security.CurrentUser;
 import com.storyart.storyservice.security.UserPrincipal;
+import com.storyart.storyservice.service.ScreenReadingTimeService;
 import com.storyart.storyservice.service.StoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -198,11 +196,13 @@ public class StoryController {
         return new ResponseEntity(storySummarizeResponse, HttpStatus.OK);
     }
 
+
+    @Autowired
+    ScreenReadingTimeService screenReadingTimeService;
     // tam thoi de null
-// dùng cho biểu đổ tròn về màn hình (bao gồm thời gian đọc, và tổng thời gian đọc)
     @GetMapping("story/{sid}/statistic/screen")
-    public ResponseEntity getStoryScreenStatistic(@PathVariable int sid){
-        Object storySummarizeResponse=null;
+    public ResponseEntity getStoryScreenStatistic(@PathVariable int sid,@RequestBody TimeRangeRequest timeRangeRequest){
+        List<ScreenTimeResponse> storySummarizeResponse= screenReadingTimeService.getListDurationOfEachSreenInTimeRangeByStoryId(sid, timeRangeRequest.getStart(), timeRangeRequest.getEnd());
 
         return new ResponseEntity(storySummarizeResponse, HttpStatus.OK);
     }

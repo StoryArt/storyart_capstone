@@ -1,5 +1,8 @@
 package com.storyart.storyservice.security;
 
+import com.storyart.storyservice.exception.BadRequestException;
+import com.storyart.storyservice.model.User;
+import com.storyart.storyservice.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+    @Autowired
+    UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -47,6 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 //decode token and take userid from it
                 Integer uid = jwtTokenProvider.getUserIdFromToken(jwt);
                 UserDetails userDetails = userDetailsService.loadUserById(uid);
+
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails,
                                 null,

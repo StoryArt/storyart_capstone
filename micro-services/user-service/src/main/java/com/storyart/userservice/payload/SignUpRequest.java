@@ -28,7 +28,7 @@ public class SignUpRequest {
     @Column(length = 40)
     private String name;
 
-    @Email
+    @Email(message = "Email không đúng định dạng!")
     @NaturalId
     @NotBlank(message = "Email không được để trống")
     private String email;

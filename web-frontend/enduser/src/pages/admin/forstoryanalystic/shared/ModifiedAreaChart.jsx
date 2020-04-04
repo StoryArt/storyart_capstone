@@ -3,13 +3,23 @@ import ReactEcharts from "echarts-for-react";
 import { merge } from "lodash";
 
 const defaultOption = {
+  backgroundColor: "rgb(51, 51, 51)",
+
   grid: {
     top: 16,
     left: 36,
     right: 16,
-    bottom: 32
+    bottom: 32,
+    show: true,
+    backgroundColor: "rgb(51, 51, 51)",
   },
-  legend: {textStyle:{color : "#fff"}},
+  lineStyle:{color: "rgb(221, 107, 102)"},
+  legend: { 
+    backgroundColor: "rgb(51, 51, 51)",
+    textStyle: { color: "#fff" },
+    height: "50px",
+    top: "20px",
+    data:['Bình luận','Click vào link','Hoàn thành']   },
   tooltip: {
     show: true,
     trigger: "axis",
@@ -17,25 +27,24 @@ const defaultOption = {
     axisPointer: {
       type: "cross",
       lineStyle: {
-        opacity: 0
+        opacity: 0,
       },
     },
     crossStyle: {
       //color cua -0- va chon ngay
-      color: "#FFFFFF"
-      
-    }
+      color: "#FFFFFF",
+    },
   },
   series: [
     {
-      areaStyle: {
-      },
+      areaStyle: {},
       smooth: false,
       lineStyle: {
         width: 3,
-        color: "#FFFFFF"
-      }
-    }
+        // color: "rgb(221, 107, 102)",
+      },
+      
+    },
   ],
   xAxis: {
     show: true,
@@ -44,39 +53,40 @@ const defaultOption = {
     boundaryGap: false,
     axisLabel: {
       color: "#FFFFFF",
-      margin: 20
+      margin: 20,
     },
     axisLine: {
-      show: false
+      show: false,
     },
     axisTick: {
-      show: false
-    }
+      show: false,
+    },
   },
   yAxis: {
     type: "value",
     // min: 10,
-    min:0,
+    min: 0,
     // max: 60,
     axisLabel: {
       color: "#ccc",
-      margin: 20,
+      // margin: 20,
       fontSize: 13,
       fontFamily: "roboto",
+      padding: 10,
     },
     splitLine: {
       show: true,
       lineStyle: {
-        color: "rgba(255, 255, 255, .1)"
-      }
+        color: "rgba(255, 255, 255, .1)",
+      },
     },
-    
+
     axisLine: {
-      show: false
+      show: false,
     },
     axisTick: {
-      show: false
-    }
+      show: false,
+    },
   },
   color: [
     {
@@ -88,16 +98,16 @@ const defaultOption = {
       colorStops: [
         {
           offset: 0,
-          color: "rgba(255,255,255,.1)" // color at 0% position
+          color: "rgba(255,255,255,.1)", // color at 0% position
         },
         {
           offset: 1,
-          color: "rgba(255,255,255,0.5)" // color at 100% position
-        }
+          color: "rgba(255,255,255,0.5)", // color at 100% position
+        },
       ],
-      global: false // false by default
+      global: false, // false by default
     }
-  ]
+  ],
 };
 
 const ModifiedAreaChart = ({ height, option }) => {
