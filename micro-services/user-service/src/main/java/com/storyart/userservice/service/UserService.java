@@ -5,6 +5,7 @@ import com.storyart.userservice.dto.UserProfileDto;
 import com.storyart.userservice.model.Story;
 import com.storyart.userservice.model.User;
 import com.storyart.userservice.payload.PagedResponse;
+import com.storyart.userservice.payload.PasswordChangeRequest;
 import com.storyart.userservice.payload.UserInManagementResponse;
 import com.storyart.userservice.payload.UserProfileUpdateRequest;
 import com.storyart.userservice.security.UserPrincipal;
@@ -49,4 +50,6 @@ public interface UserService {
 
 
     ResultDto getUserProfile(int userId);
+
+    boolean changePassword(PasswordChangeRequest passwordChangeRequest, int userId);
 }

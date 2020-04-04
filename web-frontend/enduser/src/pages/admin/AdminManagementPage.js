@@ -178,12 +178,8 @@ const AdminManagementPage = (props) => {
     setOpenDialog({ openDialog: false });
     let userId = openDialog.id;
     let status = openDialog.status;
-    let url =
-      "http://localhost:8002/api/v1/systemad/admins/" +
-      userId +
-      "?setActive=" +
-      status;
-    const res = await UserService.setStatusAdmin(url).then((res) => {
+   
+    const res = await UserService.setStatusAdmin(userId, status).then((res) => {
       reloadTable();
     });
   }

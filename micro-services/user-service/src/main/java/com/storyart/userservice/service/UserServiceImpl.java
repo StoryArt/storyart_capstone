@@ -8,6 +8,7 @@ import com.storyart.userservice.model.Role;
 import com.storyart.userservice.model.Story;
 import com.storyart.userservice.model.User;
 import com.storyart.userservice.payload.PagedResponse;
+import com.storyart.userservice.payload.PasswordChangeRequest;
 import com.storyart.userservice.payload.UserInManagementResponse;
 import com.storyart.userservice.payload.UserProfileUpdateRequest;
 import com.storyart.userservice.repository.RoleRepository;
@@ -74,7 +75,7 @@ public class UserServiceImpl implements UserService {
         if (byId.isPresent()) {
             User user = byId.get();
 
-            if(user.isDeactiveByAdmin()){
+            if (user.isDeactiveByAdmin()) {
                 return;
             }
             user.setActive(status);
@@ -88,9 +89,9 @@ public class UserServiceImpl implements UserService {
         if (byId.isPresent()) {
             User us = byId.get();
             // neu setStatusByAdmin(true) then turn oin account by set deactive = false
-            if(status== true){
+            if (status == true) {
                 us.setDeactiveByAdmin(false);
-            }else{
+            } else {
                 us.setDeactiveByAdmin(true);
             }
             userRepository.save(us);
@@ -265,6 +266,18 @@ public class UserServiceImpl implements UserService {
             result.setData(userProfileDto);
         }
         return result;
+    }
+
+    @Override
+    public boolean changePassword(PasswordChangeRequest passwordChangeRequest, int userId) {
+        try {
+            User us = findById(userId);
+            us.setPassword(passwordEncoder.encode(passwordChangeRequest.getPassword()));
+            userRepository.save(us);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     private void validatePageNumberAndSize(int page, int size) {

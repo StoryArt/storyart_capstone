@@ -32,8 +32,8 @@ public class UserServiceApplication {
     @Bean
     public CommandLineRunner createTestStories(RoleService roleService, UserService userService){
         return args -> {
-            roleService.createDefaultRoles();
-            userService.createDefaultSysAdmin();
+//            roleService.createDefaultRoles();
+//            userService.createDefaultSysAdmin();
         };
     }
 }

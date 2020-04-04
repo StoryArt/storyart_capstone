@@ -216,13 +216,9 @@ const UserManagementPage = () => {
     setStatusOpenDialog({ openDialog: false });
     let userId = openDialog.id;
     let status = openDialog.status;
-    let url =
-      "http://localhost:8000/api/user-service/api/v1/admin/users/" +
-      userId +
-      "?setActive=" +
-      status;
+   
 
-    const res = await UserService.setStatusUser(url).then((res) => {
+    const res = await UserService.setStatusUser(userId, status).then((res) => {
       reloadTable();
     });
   }

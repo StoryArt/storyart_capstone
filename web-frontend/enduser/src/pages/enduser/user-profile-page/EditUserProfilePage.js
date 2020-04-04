@@ -82,6 +82,9 @@ const EditUserProfilePage = props => {
         content: "Lưu thành công",
         type: "success"
       });
+      window.setTimeout(() => {
+        closeAlert();
+      }, 3000);
     } catch (error) {
 
       var err;
@@ -92,7 +95,7 @@ const EditUserProfilePage = props => {
       }
       setAlert({
         open: true,
-        content: { err },
+        content: err,
         type: "error"
       });
       window.setTimeout(() => {
@@ -155,19 +158,30 @@ const EditUserProfilePage = props => {
         try {
 
           if(flag ==="avatar"){
-            const r2 = await UserService.saveToDatabase(id, linkImgur);
+            const r2 = await UserService.saveToDatabase(id, linkImgur).then(()=>{
+              setSaveAvatarBt("disabled");
+              setAlert({
+                open: true,
+                content: "Đã cập nhật ảnh!",
+                type: "success"
+              });
+            });
           }else if (flag = "image"){
 
-            const r2 = await UserService.saveToDatabaseProfileImage(id, linkImgur);
+            const r2 = await UserService.saveToDatabaseProfileImage(id, linkImgur).then(()=>{
+              setSaveBannerBt("disabled")
+              setAlert({
+                open: true,
+                content: "Đã cập nhật ảnh!",
+                type: "success"
+              });
+            });
           }
-          setAlert({
-            open: true,
-            content: "Đã cập nhật ảnh!",
-            type: "success"
-          });
+         
           window.setTimeout(() => {
             closeAlert();
           }, 3000);
+
         } catch (error) {
           setAlert({
             open: true,
@@ -187,7 +201,7 @@ const EditUserProfilePage = props => {
       });
       window.setTimeout(() => {
         closeAlert();
-      }, 3000);
+      }, 1000);
     }
   };
 
@@ -251,13 +265,13 @@ const EditUserProfilePage = props => {
             <form
               style={mystyle}
               onSubmit={handleUpload}
-              enctype="multipart/form-data"
+              encType="multipart/form-data"
             >
               <div className="row">
                 {/* //avatar */}
                 <div className="form-group field banner">
                   <div className="banner-container">
-                    <label htmlFor="banner1">hình nền</label>
+                   
                     <div className="banner-600">
                       <img
                         id="banner1"
@@ -274,7 +288,7 @@ const EditUserProfilePage = props => {
                       accept=".jpg, .gif, .png"
                       onChange={e => onChangeBanner(e.target.files[0])}
                     />
-                    <p className="tips">JPG, GIF or PNG, Max size: 10MB</p>
+                    <p className="tips" style={{marginBottom: "6px"}}>JPG, GIF or PNG, Max size: 10MB</p>
                     <div className="form-group">
                       <Button
                         color="primary"
@@ -366,7 +380,6 @@ const EditUserProfilePage = props => {
                   margin="normal"
                   fullWidth
                   label="Tên của bạn"
-                  autoFocus
                   value={name}
                   onChange={e => setName(e.target.value)}
                 />
@@ -390,7 +403,6 @@ const EditUserProfilePage = props => {
                   margin="normal"
                   fullWidth
                   label="Tên đăng nhập"
-                  autoFocus
                   value={us}
                   onChange={e => setUs(e.target.value)}
                 />
@@ -414,20 +426,19 @@ const EditUserProfilePage = props => {
                   margin="normal"
                   fullWidth
                   label="Email"
-                  autoFocus
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="intro_content">
+                {/* <label htmlFor="intro_content">
                   Giới thiệu cho mọi người về bạn
-                </label>
+                </label> */}
                 <textarea
                   id="intro_content"
                   value={intro_content == null ? "" : intro_content}
                   outline
-                  autoFocus
+                  label="Giới thiệu cho mọi người về bạn"
                   className="form-control text-area"
                   onChange={e => setIntro_content(e.target.value)}
                 />

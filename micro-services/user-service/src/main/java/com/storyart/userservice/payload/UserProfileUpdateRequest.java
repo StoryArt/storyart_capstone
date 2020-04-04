@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.Column;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -25,6 +26,11 @@ public class UserProfileUpdateRequest {
     @NotBlank(message = "Email không được để trống!")
     @NaturalId
     String email;
+
+    @NotBlank(message = "Tên đăng nhập không được trống")
+    @Size(min=3,max = 15, message = "Tên đăng nhập phải có từ 3 đến 15 ký tự")
+    @Column(unique = true)
+    private String username;
     @Size(max = 300, message = "Thông tin giới thiệu có độ dài tối đa là 300 ký tự!")
     String intro_content;
 

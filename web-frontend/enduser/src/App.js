@@ -14,6 +14,7 @@ import UserProfilePage from './pages/enduser/user-profile-page/UserProfilePage';
 import PublicUserProfilePage from './pages/enduser/user-profile-page/PublicUserProfilePage';
 import UserHistoryPage from './pages/enduser/user-history-page/UserHistoryPage';
 import EditUserProfilePage from './pages/enduser/user-profile-page/EditUserProfilePage';
+import ChangePasswordPage from './pages/enduser/user-profile-page/ChangePasswordPage';
 
 import LoginPage from './pages/common/LoginPage';
 import RegisterPage from './pages/common/RegisterPage';
@@ -29,7 +30,6 @@ import TagManagementPage from './pages/admin/TagManagementPage';
 import ReportManagementPage from './pages/admin/ReportManagementPage';
 import AdminManagementPage from './pages/admin/AdminManagementPage';
 import NotFoundPage from './pages/common/NotFoundPage';
-
 
 import PrivateRoute from './pages/common/auth/PrivateRoute';
 
@@ -88,7 +88,10 @@ function App() {
             <Route exact path="/stories/read/:storyId" component={StoryReadingPage}/>
             <Route exact path="/user/profile/:userId" component={PublicUserProfilePage}/>
             <Route exact path="/story/analystics/:storyId" component={StoryAnalytic}/>
-
+            <Route 
+              exact 
+              path="/user/settings/password" 
+              component={ChangePasswordPage}/>
             <PrivateRoute 
               exact 
               path="/stories/create" 
@@ -118,6 +121,7 @@ function App() {
               exact 
               path="/user/history" 
               component={UserHistoryPage}/>
+
 
 
             {/* system admin routes */}
