@@ -4,6 +4,7 @@ import { MDBAlert, MDBBtn } from "mdbreact";
 import UserService from "../../../services/user.service";
 import { getAuthUserInfo, setAuthHeader, getTokenFromLocal } from "../../../config/auth";
 import MyAlert from "../../../components/common/MyAlert";
+import UploadImage from "../../../components/common/UploadImage";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
@@ -247,109 +248,16 @@ const EditUserProfilePage = props => {
           Tài khoản
         </Typography>
         <div className="col-sm-12">
-          <div  style={mystyleRight}>
-            <form
-              style={mystyle}
-              onSubmit={handleUpload}
-              enctype="multipart/form-data"
-            >
-              <div className="row">
-                {/* //avatar */}
-                <div className="form-group field banner">
-                  <div className="banner-container">
-                    <label htmlFor="banner1">hình nền</label>
-                    <div className="banner-600">
-                      <img
-                        id="banner1"
-                        name="banner1"
-                        src={banner}
-                        width="200"
-                      />
-                    </div>
-                  </div>
-                  <div className="control">
-                    <input
-                      type="file"
-                      name="image"
-                      accept=".jpg, .gif, .png"
-                      onChange={e => onChangeBanner(e.target.files[0])}
-                    />
-                    <p className="tips">JPG, GIF or PNG, Max size: 10MB</p>
-                    <div className="form-group">
-                      <Button
-                        color="primary"
-                        variant="contained"
-                        type="submit"
-                        disabled={saveBannerBt}
-                      >
-                        <CloudUploadIcon />
-                        <span className="pl-2 capitalize">Lưu Hình Nền</span>
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
 
 
-          <div  style={mystyleLeft}>
-            <form
-              style={mystyle}
-              onSubmit={handleUpload}
-              enctype="multipart/form-data"
-            >
-              <div className="row">
-                {/* //avatar */}
-                <div style={mystyle} className="form-group field avatar">
-                  <div className="avatar-container">
-                    <label htmlFor="avatar1">Avatar</label>
-                    <div className="avatar-80">
-                      <img
-                        id="avatar1"
-                        name="avatar1"
-                        src={avatar}
-                        width="80"
-                      />
-                    </div>
-                  </div>
-                  <div className="control">
-                    <input
-                      type="file"
-                      name="image"
-                      accept=".jpg, .gif, .png"
-                      onChange={e => onChangeAvatar(e.target.files[0])}
-                    />
-                    <p className="tips">JPG, GIF or PNG, Max size: 10MB</p>
-                    <div className="form-group">
-                      <Button
-                        color="primary"
-                        variant="contained"
-                        type="submit"
-                        disabled={saveAvatarBt}
-                      >
-                        <CloudUploadIcon />
-                        <span className="pl-2 capitalize">Lưu avatar</span>
-                      </Button>
-                      {/* <button
-                        disabled={saveAvatarBt}
-                        className="btn float-left"
-                        style={{
-                          clear: "both",
-                          fontSize: "1.1em",
-                          margin: 0,
-                          color: "#fff",
-                          backgroundColor: "#007bff"
-                        }}
-                      >
-                        Lưu avatar
-                      </button> */}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
+         <UploadImage 
+         isBanner = 'banner'
+         Idis ={id}
+         />
+         <UploadImage 
+         isBanner = 'avatar'
+         Idis ={id}
+         />
         </div>
 
         <hr style={{ border: "1px solid #ccc" }} />
