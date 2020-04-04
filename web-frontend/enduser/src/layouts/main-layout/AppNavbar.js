@@ -176,7 +176,8 @@ const AppNavbar = (props) => {
                   open={openAccountMenu}
                   onClose={handleCloseMenu}
                 >
-                  <MenuItem onClick={() => { navigateRoute('/user/edit-profile') }}>Tài khoản</MenuItem>
+                  <MenuItem onClick={() => { navigateRoute('/user/edit-profile') }}>Cài đặt</MenuItem>
+                  <MenuItem onClick={() => { navigateRoute('/user/settings/password') }}>Đổi mật khẩu</MenuItem>
                   <MenuItem onClick={() => { handleLogout() }}>Đăng xuất</MenuItem>
               
                

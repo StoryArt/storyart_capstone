@@ -14,7 +14,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * ref from usercontroller
@@ -98,12 +101,17 @@ public class UserController {
         //nếu tìm được user khác user hiện tại, có email trùng thì báo lõi trùng email
         User user1 = userService.findByEmail(user.getEmail());
         if (user1 != null) {
-
             if (user1.getId() != userPrincipal.getId()) {
                 throw new BadRequestException("Email đã được đăng ký bởi ai đó!");
             }
         }
+        User userServiceByUsername = userService.findByUsername(user.getUsername());
 
+        if (userServiceByUsername != null) {
+            if (userServiceByUsername.getId() != userPrincipal.getId()) {
+                throw new BadRequestException("Tên đăng nhập đã tồn tại!");
+            }
+        }
         User userById = userService.findById(uid);
         if (userById == null) {
             throw new ResourceNotFoundException("User", "id", uid);
@@ -163,5 +171,20 @@ public class UserController {
         userService.updateProfileImage(uid, avatarUpdateRequest.getLink());
         return new ResponseEntity<>(new ApiResponse(true, "Lưu thành công!"), HttpStatus.OK);
     }
+
+    @PostMapping(value="/{uid}/password")
+    public ResponseEntity<?> changePassword(@PathVariable("uid") int userId,@Valid  @RequestBody PasswordChangeRequest passwordChangeRequest){
+
+
+
+       boolean isChanged= userService.changePassword(passwordChangeRequest, userId);
+
+
+
+        return isChanged? new ResponseEntity<>(new ApiResponse(true, "Đổi mật khẩu thành công!"), HttpStatus.OK):new ResponseEntity<>(new ApiResponse(false, "Đổi mật khẩu thất bại thử lại!"), HttpStatus.BAD_REQUEST) ;
+
+    }
+
+
 
 }

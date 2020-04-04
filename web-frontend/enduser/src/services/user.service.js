@@ -60,11 +60,23 @@ class UserService {
     return axios.get(url);
   }
 
-  static async setStatusUser(url) {
+  static async setStatusUser(userId, status) {
+
+    let url =
+    baseUrl+"/admin/users/" +
+    userId +
+    "?setActive=" +
+    status;
     return axios.delete(url);
   }
 
-  static async setStatusAdmin(url) {
+  static async setStatusAdmin(userId, status) {
+
+
+    let url =
+    baseUrl+"/systemad/admins/" +userId+
+    "?setActive=" +
+    status;
     return axios.delete(url);
   }
 
@@ -158,6 +170,14 @@ class UserService {
 
     return axios.put(url1, user);
   
+   }
+
+   static async changePassword(pass, uid){
+    let url1 = baseUrl + "/user/" + uid+"/password";
+    let data={
+      password: pass
+    }
+    return axios.post(url1, data);
    }
 
    
