@@ -21,8 +21,6 @@ import RegisterPage from './pages/common/RegisterPage';
 import DashboardPage from './pages/admin/DashboardPage';
 import UserManagementPage from './pages/admin/UserManagementPage';
 
-import DemoPage from './pages/common/DemoPage';
-
 import StoryManagementPage from './pages/admin/StoryManagementPage';
 import StoryAnalytic from './pages/admin/StoryAnalytic';
 import TagManagementPage from './pages/admin/TagManagementPage';
