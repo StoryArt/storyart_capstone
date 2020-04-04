@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { setAuthHeader, getTokenFromLocal } from '../config/auth';
 import ValidationUtils from '../utils/validation';
+import { API_URL } from '../config/api';
 
-const base_url = 'http://localhost:8000/api/story-service/reading_history';
+const base_url = API_URL + '/api/story-service/reading_history';
 
 class ReadingHistoryService {
 
