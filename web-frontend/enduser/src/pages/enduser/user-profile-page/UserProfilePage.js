@@ -116,7 +116,7 @@ const UserProfilePage = (props) => {
         console.log(res);
         const { data, success, errors } = res.data;
         if(success){
-          setUser(res.data);
+          setUser(data);
         } else {
           setUserNotfound(true);
           setUserNotfoundMessage(Object.values(errors)[0]);

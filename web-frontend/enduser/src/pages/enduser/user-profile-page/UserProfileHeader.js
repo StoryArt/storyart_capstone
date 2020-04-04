@@ -29,6 +29,8 @@ const useStyles = makeStyles({
 const UserProfileHeader = (props) => {
     const classes = useStyles();
     const { user, canEdit } = props;
+    console.log('user');
+    console.log(user);
 
     const navigateRoute = (route) => props.history.push(route);
 
