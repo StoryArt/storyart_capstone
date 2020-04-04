@@ -9,12 +9,12 @@ class ReadingHistoryService {
     static async saveReadingHistory({ listScreenId, storyId, isReachingEnd }) {
         const token = getTokenFromLocal();
         let url = base_url;
-        if(ValidationUtils.isEmpty(token)){
+        if (ValidationUtils.isEmpty(token)) {
             url = base_url + '/public'
         } else {
             setAuthHeader(token);
         }
-       
+
         return axios.post(url, { listScreenId, storyId, reachingEnd: isReachingEnd });
     }
 
@@ -27,7 +27,13 @@ class ReadingHistoryService {
         const url = base_url + '/public/screen_read_time';
         return axios.post(url, { screenId, duration });
     }
-   
+
+    static async getReadingHistory(userId, pageNo) {
+        setAuthHeader(getTokenFromLocal());
+        const url = base_url.concat('/getReadingHistory?pageSize=5&pageNo=').concat(pageNo).concat('&userId=').concat(userId);
+        return axios.get(url);
+    }
+
 }
 
 

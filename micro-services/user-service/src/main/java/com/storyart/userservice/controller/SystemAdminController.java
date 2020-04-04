@@ -32,7 +32,6 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/api/v1/systemad")
-
 @CrossOrigin
 @Secured({"ROLE_SYSTEM_ADMIN"})
 public class SystemAdminController {
@@ -58,9 +57,7 @@ public class SystemAdminController {
             throw new BadRequestException("Tên đăng nhập này đã đã được đăng ký bởi ai đó!");
         }
         if (userService.findByEmail(signUpRequest.getEmail()) != null) {
-
             throw new BadRequestException("Email này đã được đăng ký bởi ai đó!");
-
         }
         User user = new User();
         user.setActive(true);
@@ -71,12 +68,12 @@ public class SystemAdminController {
 //        Role userRole
         //todo : missing role of a user
         Role userRole = roleRepository.findRoleByName(RoleName.ROLE_ADMIN)
-                .orElseThrow(() -> new AppException("User Role not set."));
+                .orElseThrow(() -> new AppException("Hiện giờ chưa thể tạo tài khoản! Vui lòng quay lại sau!"));
         user.setRoleId(userRole.getId());
         User savedUser = userRepository.save(user);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("api/v1/user/username")
                 .buildAndExpand(savedUser.getUsername()).toUri();
-        return ResponseEntity.created(location).body(new ApiResponse(true, "Administrator created successfully"));
+        return ResponseEntity.created(location).body(new ApiResponse(true, "Tạo tài khoản thành công!"));
     }
 
     // todo; not allow admin to set active of sysadmin

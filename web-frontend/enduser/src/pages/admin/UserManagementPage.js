@@ -10,11 +10,7 @@ import { MDBBtn } from "mdbreact";
 import NotFoundPage from "../../pages/common/NotFoundPage";
 import { setAuthHeader } from "../../config/auth";
 import Pagination from "@material-ui/lab/Pagination";
-
-
-
-
-
+import DateTimeUtils from "../../utils/datetime";
 
 const UserManagementPage = () => {
   const [convertedList, setConvertedList] = useState([]);
@@ -69,10 +65,8 @@ const UserManagementPage = () => {
     });
     // setPageLenght(res.data.totalPages)
     ConvertUserList(res.data);
-
-   
-
   }
+
   const getMyProfile = async () => {
     try {
       const res = await UserService.getMyProfile();
@@ -128,7 +122,7 @@ const UserManagementPage = () => {
           </MDBBtn>
         );
       rowItem["email"] = userList[index].email;
-      rowItem["jointAt"] = userList[index].jointAt;
+      rowItem["jointAt"] = DateTimeUtils.getDateTime(userList[index].jointAt);
 
       rowsData.push(rowItem);
     }
@@ -146,26 +140,26 @@ const UserManagementPage = () => {
         width: 150
       },
       {
-        label: "",
+        label: "Tên",
         field: "name",
         sort: "asc",
         width: 270
       },
       {
-        label: "Role",
+        label: "Vai trò",
         field: "role",
         sort: "asc",
         width: 200
       },
 
       {
-        label: "Joint At",
+        label: "Ngày tạo",
         field: "jointAt",
         sort: "asc",
         width: 100
       },
       {
-        label: "Status",
+        label: "Trạng thái",
         field: "active",
         sort: "asc",
         width: 200
@@ -182,7 +176,7 @@ const UserManagementPage = () => {
 
   return (
     <MainLayout>
-      <h3> UserManagementPage </h3>
+      <h3 className="text-cenetr">Quản lý người dùng</h3>
       <input type="button" value="+ Account" onClick={addUser} />
       <MDBDataTable striped bordered small data={data}  entrieslabel={""} paging={false}displayEntries={false}/>
       <Pagination

@@ -6,6 +6,7 @@ import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.TagDto;
 import com.storyart.storyservice.dto.create_story.CreateStoryDto;
 import com.storyart.storyservice.dto.ResultDto;
+import com.storyart.storyservice.dto.history.ReadingHistoryResponse;
 import com.storyart.storyservice.dto.read_story.ReadStoryDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryInformationDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryScreenDto;
@@ -24,6 +25,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -79,6 +82,9 @@ public interface StoryService {
     StoryReactByRange getReactStatisticInTimeRange(int sid, TimeRangeRequest timeRangeRequest);
 
     List<IRatingClassify> getRatingClassify(int sid);
+
+    Rating getRatingByStoryAndUser(int storyId, int userId);
+
 }
 
 @Service
@@ -133,6 +139,12 @@ class StoryServiceImpl implements StoryService {
         if (errors.size() > 0) return errors;
 
         return errors;
+    }
+
+    @Override
+    public Rating getRatingByStoryAndUser(int storyId, int userId) {
+        Rating rating = ratingRepository.findById(storyId, userId);
+        return rating;
     }
 
     @Override
@@ -233,7 +245,6 @@ class StoryServiceImpl implements StoryService {
                 rating.setStoryId(storyId);
                 rating.setUserId(userId);
                 rating.setUpdatedAt(new Date());
-                System.out.println("create");
             }
             rating.setStars(stars);
             ratingRepository.save(rating);
@@ -241,7 +252,6 @@ class StoryServiceImpl implements StoryService {
             double avgStars = ratingRepository.findAvgStarsByStoryId(storyId);
             story.setAvgRate(avgStars);
             storyRepository.save(story);
-
             result.setData(rating);
             result.setSuccess(true);
         }
@@ -308,77 +318,47 @@ class StoryServiceImpl implements StoryService {
         } else if (!story.isActive() || story.isDeactiveByAdmin()) {
             result.getErrors().put("DELETED", "Truyện này đã bị xóa");
         } else {
-            ReadStoryDto readStoryDto = modelMapper.map(story, ReadStoryDto.class);
-            List<Screen> screens = screenRepository.findByStoryId(storyId);
+            User user = userRepository.findById(story.getUserId()).orElse(null);
+            if(user == null || (!user.isActive() || user.isDeactiveByAdmin())){
+                result.getErrors().put("DELETED", "Truyện này đã bị xóa");
+            } else {
+                ReadStoryDto readStoryDto = modelMapper.map(story, ReadStoryDto.class);
+                List<Screen> screens = screenRepository.findByStoryId(storyId);
 
-            List<ReadStoryScreenDto> screenDtoList = screens.stream().map(screen -> {
-                ReadStoryScreenDto screenDto = modelMapper.map(screen, ReadStoryScreenDto.class);
-                screenDto.setActions(actionRepository.findAllByScreenId(screen.getId()));
-                return screenDto;
-            }).collect(Collectors.toList());
+                List<ReadStoryScreenDto> screenDtoList = screens.stream().map(screen -> {
+                    ReadStoryScreenDto screenDto = modelMapper.map(screen, ReadStoryScreenDto.class);
+                    screenDto.setActions(actionRepository.findAllByScreenId(screen.getId()));
+                    return screenDto;
+                }).collect(Collectors.toList());
 
-            List<Information> informations = informationRepository.findAllByStoryId(storyId);
+                List<Information> informations = informationRepository.findAllByStoryId(storyId);
 
-            List<ReadStoryInformationDto> informationDtos = informations.stream().map(info -> {
-                ReadStoryInformationDto informationDto = modelMapper.map(info, ReadStoryInformationDto.class);
-                List<InfoCondition> conditions = infoConditionRepository.findAllByInformationId(informationDto.getId());
-                informationDto.setConditions(conditions);
-                return informationDto;
-            }).collect(Collectors.toList());
+                List<ReadStoryInformationDto> informationDtos = informations.stream().map(info -> {
+                    ReadStoryInformationDto informationDto = modelMapper.map(info, ReadStoryInformationDto.class);
+                    List<InfoCondition> conditions = infoConditionRepository.findAllByInformationId(informationDto.getId());
+                    informationDto.setConditions(conditions);
+                    return informationDto;
+                }).collect(Collectors.toList());
 
-            List<String> informationIds = informations.stream().map(info -> info.getId())
-                    .collect(Collectors.toList());
+                List<String> informationIds = informations.stream().map(info -> info.getId())
+                        .collect(Collectors.toList());
 
-            List<InformationAction> informationActions = informationActionRepository.findAllByInformationIdIn(informationIds);
+                List<InformationAction> informationActions = informationActionRepository.findAllByInformationIdIn(informationIds);
 
-            List<Tag> tagList = tagRepository.findAllByStoryId(storyId);
-            System.out.println("tags: " + tagList.size());
-            List<ReadStoryTagDto> readStoryTagDtoList = tagList.stream().map(t -> modelMapper.map(t, ReadStoryTagDto.class)).collect(Collectors.toList());
+                List<Tag> tagList = tagRepository.findAllByStoryId(storyId);
+                System.out.println("tags: " + tagList.size());
+                List<ReadStoryTagDto> readStoryTagDtoList = tagList.stream().map(t -> modelMapper.map(t, ReadStoryTagDto.class)).collect(Collectors.toList());
 
-            readStoryDto.setInformationActions(informationActions);
-            readStoryDto.setScreens(screenDtoList);
-            readStoryDto.setInformations(informationDtos);
-            readStoryDto.setTags(readStoryTagDtoList);
+                readStoryDto.setInformationActions(informationActions);
+                readStoryDto.setScreens(screenDtoList);
+                readStoryDto.setInformations(informationDtos);
+                readStoryDto.setTags(readStoryTagDtoList);
 
-            result.setData(readStoryDto);
-            result.setSuccess(true);
+                result.setData(readStoryDto);
+                result.setSuccess(true);
+            }
         }
         return result;
-    }
-
-    public void validateCreateStory(CreateStoryDto createStoryDto) {
-        ResultDto result = new ResultDto();
-        Story story = modelMapper.map(createStoryDto, Story.class);
-        HashMap<String, String> screenIdsMap = new HashMap<>();
-        HashMap<String, String> actionIdsMap = new HashMap<>();
-        HashMap<String, String> informationIdsMap = new HashMap<>();
-        createStoryDto.getScreens().stream().forEach(screen -> {
-            screenIdsMap.put(screen.getId(), MyStringUtils.generateUniqueId());
-        });
-
-        //check all screens
-        createStoryDto.getScreens().stream().forEach(screen -> {
-            Screen savedScreen = modelMapper.map(screen, Screen.class);
-
-            savedScreen.setId(screenIdsMap.get(screen.getId()));
-            savedScreen.setNextScreenId(screenIdsMap.get(screen.getNextScreenId()));
-            screenRepository.save(savedScreen);
-
-            screen.getActions().stream().forEach(action -> {
-                Action savedAction = modelMapper.map(action, Action.class);
-
-                savedAction.setId(MyStringUtils.generateUniqueId());
-                savedAction.setScreenId(savedScreen.getId());
-                if (action.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())) {
-                    savedAction.setValue(screenIdsMap.get(action.getValue()));
-                }
-                savedAction.setNextScreenId(screenIdsMap.get(action.getNextScreenId()));
-
-                actionRepository.save(savedAction);
-                actionIdsMap.put(action.getId(), savedAction.getId());
-            });
-        });
-
     }
 
     @Override
@@ -386,6 +366,12 @@ class StoryServiceImpl implements StoryService {
 
         ResultDto result = new ResultDto();
         Story story = modelMapper.map(createStoryDto, Story.class);
+
+        if(createStoryDto.getTags().size() == 0){
+            result.setSuccess(false);
+            result.getErrors().put("TAGS", "Chưa gắn thẻ cho truyện");
+            return result;
+        }
 
         HashMap<String, String> screenIdsMap = new HashMap<>();
         HashMap<String, String> actionIdsMap = new HashMap<>();
@@ -491,12 +477,22 @@ class StoryServiceImpl implements StoryService {
             HashMap<String, String> informationIdsMap = new HashMap<>();
 
             //delete all old screens
+
+            List<String> screenIdList = storyDto.getScreens().stream().map(scr -> scr.getId()).collect(Collectors.toList());
             List<Screen> screenList = screenRepository.findByStoryId(story.getId());
-            screenRepository.deleteAll(screenList);
-//            screenRepository.deleteAllByStoryId(story.getId());
+            //delete unused screen
+            screenList.stream().forEach(screen -> {
+                if(!screenIdList.contains(screen.getId())){
+                    screenRepository.delete(screen);
+                }
+            });
 
             storyDto.getScreens().stream().forEach(screen -> {
-                screenIdsMap.put(screen.getId(), MyStringUtils.generateUniqueId());
+                if(screenRepository.existsById(screen.getId())){
+                    screenIdsMap.put(screen.getId(), screen.getId());
+                } else {
+                    screenIdsMap.put(screen.getId(), MyStringUtils.generateUniqueId());
+                }
             });
 
             story.setFirstScreenId(screenIdsMap.get(storyDto.getFirstScreenId()));
@@ -528,7 +524,8 @@ class StoryServiceImpl implements StoryService {
                 screenRepository.save(savedScreen);
 
                 //delete all actions
-
+                List<Action> actionList  = actionRepository.findAllByScreenId(savedScreen.getId());
+                actionRepository.deleteAll(actionList);
 
                 screen.getActions().stream().forEach(action -> {
                     Action savedAction = modelMapper.map(action, Action.class);
@@ -855,7 +852,8 @@ class StoryServiceImpl implements StoryService {
         }
         return list.stream().map(t -> t.getId()).collect(Collectors.toList());
     }
-
+@Autowired
+    EntityManager entityManager;
     @Override
     public StorySummarizeResponse getStorySummarizeResponse(int sid) {
         Story story = storyRepository.findById(sid).orElse(null);
@@ -868,11 +866,26 @@ class StoryServiceImpl implements StoryService {
             storySummarizeResponse.setNumOfComment(commentRepository.countCommentByStoryId(story.getId()));
             storySummarizeResponse.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
 
+            Query query1 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.click_link where story_id= :storyId");
+            Query query2 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.reading_history where story_id= :storyId");
+            Query query3 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.screen   where story_id= :storyId");
+
+
+
+            query1.setParameter("storyId", sid);
+            query2.setParameter("storyId", sid);
+            query3.setParameter("storyId", sid);
+
+            int clicklinkCount = ((Number) query1.getSingleResult()).intValue();
+            int hitpointCount = ((Number) query2.getSingleResult()).intValue();
+            int screenNumber = ((Number) query2.getSingleResult()).intValue();
+
+
             //todo:xoa dong nay
-            storySummarizeResponse.setNumOfComment(new Random().nextInt(1000));
-            storySummarizeResponse.setNumOfHitPoint(new Random().nextInt(300));
-            storySummarizeResponse.setNumOfClickLink(new Random().nextInt(200));
-            storySummarizeResponse.setNumOfShare(new Random().nextInt(400));
+            storySummarizeResponse.setNumOfHitPoint(hitpointCount);
+            storySummarizeResponse.setNumOfClickLink(clicklinkCount);
+            storySummarizeResponse.setNumOfScreen(screenNumber);
+            storySummarizeResponse.setNumOfShare(new Random().nextInt(300));
 
 
             return storySummarizeResponse;

@@ -1,8 +1,5 @@
 package com.storyart.apigateway;
 
-import com.storyart.apigateway.filter.ErrorFilter;
-import com.storyart.apigateway.filter.PostFilter;
-import com.storyart.apigateway.filter.PreFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
@@ -36,21 +33,5 @@ public class ApiGatewayApplication implements WebMvcConfigurer {
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
-    }
-
-
-    @Bean
-    PreFilter preFilter() {
-        return new PreFilter();
-    }
-
-    @Bean
-    PostFilter postFilter() {
-        return new PostFilter();
-    }
-
-    @Bean
-    ErrorFilter errorFilter() {
-        return new ErrorFilter();
     }
 }

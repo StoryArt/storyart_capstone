@@ -34,6 +34,7 @@ const ReadStoryPage = (props) => {
     const [isLoading, setIsLoading] = useState(false);
     const [notfound, setNotfound] = useState(false);
     const [isFullScreen, setFullScreen] = useState(false);
+    const [isPublished, setPublished] = useState(true);
 
     const [currentScreen, setCurrentScreen] = useState({});
     const [showScreen, setShowScreen] = useState(false);
@@ -57,8 +58,10 @@ const ReadStoryPage = (props) => {
         });
 
         return () => {
-            window.addEventListener('beforeunload', () => {});
-            saveHistoryBeforeLeavePage();
+            if(!notfound){
+                window.addEventListener('beforeunload', () => {});
+                saveHistoryBeforeLeavePage();
+            }
         };
 
     }, []);
@@ -96,26 +99,30 @@ const ReadStoryPage = (props) => {
     const changeCurrentScreen = (screenId) => {
         setShowScreen(false);
         const screen = screens.find(scr => scr.id === screenId);
-        listScreenId.push(screen.id);
+        if(!ValidationUtils.isEmpty(screen)){
+            
+            listScreenId.push(screen.id);
 
-        if(currentScreen != null && !isEndScreen(currentScreen)){
-            stopCountTimeReading();
-            saveScreenReadTime({ screenId: currentScreen.id, duration: readingScreenDuration });
-        }
-        
-
-        if(isEndScreen(screen)){
-            setEnd(true);
-            isEndStory = true;
-            stopCountTimeReading();
-            readingScreenDuration = 0;
-            const data = {
-                storyId: story.id,
-                isReachingEnd: true,
-                listScreenId: listScreenId.toString()
+            if(currentScreen != null && !isEndScreen(currentScreen)){
+                stopCountTimeReading();
+                saveScreenReadTime({ screenId: currentScreen.id, duration: readingScreenDuration });
             }
-            saveReadingHistory(data);
+            
+
+            if(isEndScreen(screen)){
+                setEnd(true);
+                isEndStory = true;
+                stopCountTimeReading();
+                readingScreenDuration = 0;
+                const data = {
+                    storyId: story.id,
+                    isReachingEnd: true,
+                    listScreenId: listScreenId.toString()
+                }
+                saveReadingHistory(data);
+            }
         }
+
 
         setTimeout(() => {
             setCurrentScreen(screen)
@@ -150,8 +157,6 @@ const ReadStoryPage = (props) => {
         window.clearInterval(interval);
     }
 
-   
-  
     const getReadingStory = async (storyId) => {
         setIsLoading(true);
         try {
@@ -161,14 +166,18 @@ const ReadStoryPage = (props) => {
             if(ValidationUtils.isEmpty(data)){
                 setNotfound(true);
             } else {
-                console.log(data)
-                setScreens(data.screens);
-                setInformations(data.informations);
-                initialInformations = JSON.parse(JSON.stringify(data.informations));
-
-                setInformationActions(data.informationActions);
-                
-                setStory({ ...data, screens: null, informations: null, informationActions: null });
+                console.log(data);
+                if(!data.published){
+                    setPublished(false);
+                } else {
+                    setScreens(data.screens);
+                    setInformations(data.informations);
+                    initialInformations = JSON.parse(JSON.stringify(data.informations));
+    
+                    setInformationActions(data.informationActions);
+                    
+                    setStory({ ...data, screens: null, informations: null, informationActions: null });
+                }
             }
            
         } catch (error) {
@@ -239,7 +248,6 @@ const ReadStoryPage = (props) => {
         } 
     }
 
-
     const saveClickLink = async (link) => {
         console.log(link);
         try {
@@ -251,7 +259,7 @@ const ReadStoryPage = (props) => {
     }
 
     const resetStory = () => {
-        setInformations([...initialInformations])
+        setInformations(JSON.parse(JSON.stringify(initialInformations)));
         changeCurrentScreen(story.firstScreenId);
         listScreenId = [];
         readingScreenDuration = 0;
@@ -265,76 +273,94 @@ const ReadStoryPage = (props) => {
     }
 
     return (        
-        <MainLayout>
+        <>
             {notfound && (<NotFound message={'Không tìm tháy truyện này'} />)}
-            
-            <Fullscreen
-                enabled={isFullScreen}
-                onChange={isFull => setFullScreen(isFull)}
-            >
-            
-            <div id="fullscreen" style={{ position: 'relative' }}>
-            <Tooltip title="Toàn màn hình">
-                <IconButton 
-                    style={{ position: 'absolute', top: 0, right: 0 }}
-                    aria-label="delete" onClick={() => setFullScreen(!isFullScreen)}>
-                    <FullscreenIcon />
-                </IconButton>
-            </Tooltip>
-              
-                {(!isLoading && !notfound && !ValidationUtils.isEmpty(story)) && (
-                    <div className="container" >
+
+            {!isPublished && (<NotFound message={'Truyện này chưa được xuất bản! Vui lòng quay lại sau'} />)}
+
+            {(!isLoading && !notfound && isPublished && !ValidationUtils.isEmpty(story)) && (
+                 <Fullscreen
+                    enabled={isFullScreen}
+                    onChange={isFull => setFullScreen(isFull)}
+                >
+                    <div id="fullscreen" className="" style={{ 
+                        position: 'relative', 
+                        minHeight: '100vh', 
+                        width: '100%' ,
+                        height: '100%',
+                        // backgroundColor: 'red',
+                        backgroundColor: '#4E4464',
+                        color: '#fff'
+                        // background: 'url("https://cafebiz.cafebizcdn.vn/thumb_w/600/2018/7/5/photo1530752949506-153075294950728877230.gif") no-repeat fixed center',
+                        // backgroundSize: '100% 100%'
+                        
+                    }}>
+                        <Tooltip title="Toàn màn hình">
+                            <IconButton 
+                                style={{ position: 'absolute', top: 20, right: 20 }}
+                                aria-label="delete" onClick={() => setFullScreen(!isFullScreen)}>
+                                <FullscreenIcon />
+                            </IconButton>
+                        </Tooltip>
+
                         {informations.map(information => (
                             <div  
                                 className="text-bold"
-                                style={{ fontSize: '1.2em' }} 
+                                style={{ fontSize: '1.2em', position: 'absolute', top: 20, left: 20 }} 
                                 key={information.id}>{ information.name }: { information.value }</div>
                         ))}
-                        <div className="col-lg-8 col-md-10 mx-auto">
-                            <ScreenShow 
-                                animation={ANIMATIONS.GROW}
-                                showScreen={showScreen}
-                                screen={currentScreen}
-                                onSelectAction={handleSelectAction}
-                            />
+                
+                        <div className="container-fluid text-center py-5" style={{ height: '100%' }} >
+                           
+                            <div className="col-lg-8 col-md-10 mx-auto">
+                                <ScreenShow 
+                                    animation={ANIMATIONS.GROW}
+                                    showScreen={showScreen}
+                                    screen={currentScreen}
+                                    onSelectAction={handleSelectAction}
+                                />
+    
+                                {isEnd && (
+                                    <>
+                                        <button
+                                            onClick={() => resetStory()} 
+                                            style={{ background: '#fffbe8',  color: '#000' }}
+                                            className="btn float-right mt-3">Đọc lại từ đâu</button>
+    
+                                        <button
+                                            onClick={() => props.history.push('/stories/details/' + story.id)} 
+                                            style={{ background: '#fffbe8',  color: '#000' }}
+                                            className="btn float-right mt-3">Quay lại trang chi tiết</button>
 
-                            {isEnd && (
-                                <>
-                                    <button
-                                        onClick={() => resetStory()} 
-                                        style={{ background: '#fffbe8' }}
-                                        className="btn float-right mt-3">Đọc lại từ đâu</button>
-
-                                    <button
-                                        onClick={() => props.history.push('/stories/details/' + story.id)} 
-                                        style={{ background: '#fffbe8' }}
-                                        className="btn float-right mt-3">Quay lại trang chi tiết</button>
-                                </>
-                            )}
-
-                            {ValidationUtils.isEmpty(currentScreen) && (
-                                <div className="">
-                                    <h3 className="screen-card-header text-bold text-center"> {story.title}</h3>
-                                    <p 
-                                        className="">
-                                        {StringUtils.parseHtml(story.intro)}
-                                    </p>
-                                    <button
-                                        onClick={startReading} 
-                                        style={{ background: '#fffbe8' }}
-                                        className="btn float-right mt-3">Bắt đầu đọc truyện</button>
-                                </div>
-                            ) }
+                                         <SocialShare shareUrl={window.location.href} />
+                                    </>
+                                )}
+    
+                                {ValidationUtils.isEmpty(currentScreen) && (
+                                    <div className="">
+                                        <h3 className="screen-card-header text-bold text-center"> {story.title}</h3>
+                                        <p 
+                                            className="">
+                                            {StringUtils.parseHtml(story.intro)}
+                                        </p>
+                                        <button
+                                            onClick={startReading} 
+                                            
+                                            style={{ background: '#fffbe8', color: '#000' }}
+                                            className="btn float-right mt-3">Bắt đầu đọc truyện</button>
+                                    </div>
+                                ) }
+                            </div>
                         </div>
                     </div>
-                )}
-            </div>
-            {/* <SocialShare shareUrl={window.location.href} /> */}
-            </Fullscreen>
+                
+                </Fullscreen>
+            
+            )}
            
            { isLoading && <MySpinner/> }
         
-        </MainLayout>
+        </>
     );
 };
 

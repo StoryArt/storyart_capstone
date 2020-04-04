@@ -48,7 +48,7 @@ const Sidebar = (props) => {
 
     const currentRoute = props.location.pathname;
     const isRouteMatch = (route) => route === currentRoute; 
-    const isRouteAdmin = currentRoute.indexOf('/admin') === 0;
+    const isRouteAdmin = currentRoute.indexOf('/admin') === 0 || currentRoute.indexOf('/sysadmin') === 0;
 
     const classes = useStyles();
     const theme = useTheme();
@@ -99,15 +99,6 @@ const Sidebar = (props) => {
         {/* admin routes navigation */}
         {(isRouteAdmin && isAdminAuth(user)) && (
               <List>
-                <ListItem 
-                  button 
-                  onClick={() => navigateRoute('/admin/dashboard')} 
-                  selected={ isRouteMatch('/admin/dashboard') }>
-                    <ListItemIcon>
-                      <HistoryIcon className={classes.icon} />
-                      </ListItemIcon>
-                    <ListItemText primary="Quản trị" />
-                  </ListItem>
                   <ListItem 
                     button 
                     onClick={() => navigateRoute('/admin/users')} 

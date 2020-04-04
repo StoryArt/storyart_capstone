@@ -12,6 +12,11 @@ class StoryService {
     const url = baseUrl;
     return axios.post(url, story);
   }
+  
+  static async getRatingByStoryAndUser(storyId) {
+    const url = baseUrl + '/rate/' + storyId;
+    return axios.get(url);
+  }
 
   static async updateStory(story) {
     const url = baseUrl;

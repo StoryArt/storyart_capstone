@@ -7,8 +7,10 @@ import {
 import { Link } from 'react-router-dom';
 import CommentService from '../../../services/comment.service';
 import ReactionService from '../../../services/reaction.service';
+import ReadingHistoryService from '../../../services/reading_history.service';
 import moment from 'moment';
 import { getAuthUserInfo } from '../../../config/auth';
+import StringUtils from '../../../utils/string';
 
 import MyAlert from '../../../components/common/MyAlert';
 
@@ -39,6 +41,36 @@ const UserHistoryPage = () => {
     useEffect(() => {
         getReactionHistory();
     }, []);
+    useEffect(() => {
+        getReadingHistory();
+    }, []);
+
+    const [histories, setHistories] = useState([]);
+    const [historyPageNo, setHistoryPageNo] = useState(1);
+    const [isLastHistoryPage, setIsLastHistoryPage] = useState(true);
+    const getReadingHistory = async () => {
+        if (userInfo !== null) {
+            try {
+                var array = [...histories];
+                if (array.length > 1) {
+                    setHistoryPageNo(historyPageNo + 1);
+                    const res = await ReadingHistoryService.getReadingHistory(userInfo.id, commentPageNo + 1);
+
+                    res.data.content.forEach(element => {
+                        setHistories(histories => [...histories, element]);
+                    });
+                    setIsLastHistoryPage(res.data.last);
+                }
+                else {
+                    setHistoryPageNo(1);
+                    const res = await ReadingHistoryService.getReadingHistory(userInfo.id, 1);
+                    setHistories(res.data.content);
+                    setIsLastHistoryPage(res.data.last);
+                }
+            } catch (error) {
+            }
+        }
+    }
     const deleteComment = async () => {
         if (userInfo !== null) {
             try {
@@ -254,19 +286,22 @@ const UserHistoryPage = () => {
                 <MDBTabContent activeItem={activeItem} >
                     <MDBTabPane tabId="1" role="tabpanel">
                         <div className="row">
-                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(item => (
+                            {histories.map((history, index) => (
                                 <div className="col-8">
                                     <div className="card mb-3">
                                         <div className="row no-gutters">
                                             <div className="col-md-4">
-                                                <img src="https://mdbootstrap.com/img/Photos/Others/images/43.jpg" className="card-img" />
+                                                <img src={history.storyImageUrl} className="card-img" />
                                             </div>
                                             <div className="col-md-8">
                                                 <div className="card-body">
-                                                    <h5 className="card-title">Truyen ma nua dem</h5>
-                                                    <p className="card-text">This is a story inro content ...</p>
+                                                    <h5 className="card-title">{history.storyName}</h5>
+                                                    <p className="card-text" >{StringUtils.truncate(StringUtils.removeHtml(history.storyContent), 60)}</p>
                                                     <div>
-                                                        <button className="btn btn-warning float-right">Doc truyen</button>
+                                                        <Link target="_blank"
+                                                            to={`/stories/details/${history.storyId}`}>
+                                                            <button className="btn btn-warning float-right">Đọc truyện</button></Link>
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -274,7 +309,22 @@ const UserHistoryPage = () => {
                                     </div>
                                 </div>
                             ))}
+
                         </div>
+                        {histories.length < 1 &&
+                            <div className="text-center">
+                                <small>Không có lịch sử đọc truyện.</small>
+                            </div>
+                        }
+                        <br>
+
+                        </br>
+
+                        {!isLastHistoryPage > 0 &&
+                            <div className="text-center">
+                                <button className="btn btn-secondary" onClick={getReadingHistory}>Xem thêm</button>
+                            </div>
+                        }
                     </MDBTabPane>
                     <MDBTabPane tabId="2" role="tabpanel">
 

@@ -139,13 +139,7 @@ const changePage = (e, value) => {
     <MainLayout>
       <h3 className="text-center">Quản lý truyện</h3>
       <div className="container">
-        <div className="row">
-          <div className="col-12">
-            <h3 className="">Thống kê</h3>
-            <hr style={{ border: '1px solid #ccc' }} />
-              data will stay here
-          </div>
-        </div>
+      
         <div className="row mt-5">
           <div className="col-12">
           <h3 className="">Tất cả truyện</h3>

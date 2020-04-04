@@ -35,7 +35,7 @@ const StatCards = ({ classes, view, share, hitpoint, clicklink }) => {
           </Tooltip> */}
         </Card>
       </Grid>
-      <Grid item xs={12} md={6}>
+      {/* <Grid item xs={12} md={6}>
         <Card className="play-card p-sm-24 bg-paper" elevation={6}>
           <div className="flex items-center">
             <Icon path={mdiShareOutline} color="#ccc" size={1.5} />
@@ -49,7 +49,7 @@ const StatCards = ({ classes, view, share, hitpoint, clicklink }) => {
           </div>
         
         </Card>
-      </Grid>
+      </Grid> */}
       <Grid item xs={12} md={6}>
         <Card className="play-card p-sm-24 bg-paper" elevation={6}>
           <div className="flex items-center">
@@ -74,7 +74,7 @@ const StatCards = ({ classes, view, share, hitpoint, clicklink }) => {
           <div className="flex items-center">
             <Icon path={mdiFlagVariantOutline}  size={1.5} color="#ccc"></Icon>
             <div className="ml-3">
-              <h5 className="font-medium  text-muted">Đến đích</h5>
+              <h5 className="font-medium  text-muted">Hoàn thành</h5>
 
               <h6 className="m-0 mt-1 text-primary font-medium">
                 {hitpoint} lượt

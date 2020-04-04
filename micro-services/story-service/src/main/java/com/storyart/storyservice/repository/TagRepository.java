@@ -14,6 +14,9 @@ public interface TagRepository extends JpaRepository<Tag, Integer> {
             "(select st.tag_id from story_tag st where st.story_id = ?1)", nativeQuery = true)
     List<Tag> findAllByStoryId(int storyId);
 
+    @Query(value = "SELECT * FROM tag t where t.is_active = ?1", nativeQuery = true)
+    List<Tag> findAllByActive(boolean active);
+
     Tag findByTitle(String title);
 
     Page<Tag> findAll(Pageable sort);

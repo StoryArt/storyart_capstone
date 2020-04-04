@@ -7,6 +7,7 @@ import com.storyart.storyservice.dto.statistic.IRatingClassify;
 import com.storyart.storyservice.dto.statistic.StoryReactByRange;
 import com.storyart.storyservice.dto.statistic.StorySummarizeResponse;
 import com.storyart.storyservice.dto.statistic.TimeRangeRequest;
+import com.storyart.storyservice.model.Rating;
 import com.storyart.storyservice.security.CurrentUser;
 import com.storyart.storyservice.security.UserPrincipal;
 import com.storyart.storyservice.service.StoryService;
@@ -16,10 +17,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -29,6 +34,19 @@ public class StoryController {
 
     @Autowired
     StoryService storyService;
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
+    }
 
     @GetMapping("public/search")
     public ResponseEntity searchStory(
@@ -59,6 +77,12 @@ public class StoryController {
         return new ResponseEntity(stories, HttpStatus.OK);
     }
 
+    @GetMapping("rate/{storyId}")
+    public ResponseEntity getRating(@CurrentUser UserPrincipal user, @PathVariable int storyId){
+        Rating rating = storyService.getRatingByStoryAndUser(storyId, user.getId());
+        return new ResponseEntity(rating, HttpStatus.OK);
+    }
+
     @PutMapping("public/increase-read")
     public ResponseEntity increaseStoryRead(@RequestParam int storyId){
         ResultDto result = storyService.increaseStoryRead(storyId);
@@ -66,7 +90,9 @@ public class StoryController {
     }
 
     @PutMapping("rate")
-    public ResponseEntity rateStory(@RequestParam int storyId, @RequestParam double stars, @CurrentUser UserPrincipal userPrincipal){
+    public ResponseEntity rateStory(@RequestParam int storyId,
+                                    @RequestParam double stars,
+                                    @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.rateStory(storyId, userPrincipal.getId(), stars);
         return new ResponseEntity(result, HttpStatus.OK);
     }
@@ -138,7 +164,8 @@ public class StoryController {
     }
 
     @PostMapping("")
-    public ResponseEntity addStory(@Valid @RequestBody CreateStoryDto story, @CurrentUser UserPrincipal userPrincipal){
+    public ResponseEntity addStory(@Valid @RequestBody CreateStoryDto story,
+                                   @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.createStory(story, userPrincipal.getId());
         return new ResponseEntity(result, HttpStatus.OK);
     }

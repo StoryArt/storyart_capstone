@@ -18,7 +18,7 @@ public class CreateStoryActionDto{
     private String id;
 
     @NotBlank(message = "Chưa có nội dung cho hành động")
-    @Size(max = 10, message = "Nội dung màn hình có tối đa 100 kí tự")
+    @Size(max = 255, message = "Nội dung hành động có tối đa 255 kí tự")
     private String content;
 
     @Pattern(regexp = "UPDATE_INFORMATION|NEXT_SCREEN|REDIRECT", message = "Kiểu hành động chỉ 1 trong UPDATE_INFORMATION|NEXT_SCREEN|REDIRECT")
