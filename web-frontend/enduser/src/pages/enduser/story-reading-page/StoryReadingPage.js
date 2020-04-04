@@ -273,7 +273,7 @@ const ReadStoryPage = (props) => {
     }
 
     return (        
-        <MainLayout>
+        <>
             {notfound && (<NotFound message={'Không tìm tháy truyện này'} />)}
 
             {!isPublished && (<NotFound message={'Truyện này chưa được xuất bản! Vui lòng quay lại sau'} />)}
@@ -283,7 +283,18 @@ const ReadStoryPage = (props) => {
                     enabled={isFullScreen}
                     onChange={isFull => setFullScreen(isFull)}
                 >
-                    <div id="fullscreen" style={{ position: 'relative', minHeight: '100vh', width: '100%' }}>
+                    <div id="fullscreen" className="" style={{ 
+                        position: 'relative', 
+                        minHeight: '100vh', 
+                        width: '100%' ,
+                        height: '100%',
+                        // backgroundColor: 'red',
+                        backgroundColor: '#4E4464',
+                        color: '#fff'
+                        // background: 'url("https://cafebiz.cafebizcdn.vn/thumb_w/600/2018/7/5/photo1530752949506-153075294950728877230.gif") no-repeat fixed center',
+                        // backgroundSize: '100% 100%'
+                        
+                    }}>
                         <Tooltip title="Toàn màn hình">
                             <IconButton 
                                 style={{ position: 'absolute', top: 20, right: 20 }}
@@ -299,7 +310,7 @@ const ReadStoryPage = (props) => {
                                 key={information.id}>{ information.name }: { information.value }</div>
                         ))}
                 
-                        <div className="container-fluid" style={{ height: '100%' }} >
+                        <div className="container-fluid text-center py-5" style={{ height: '100%' }} >
                            
                             <div className="col-lg-8 col-md-10 mx-auto">
                                 <ScreenShow 
@@ -313,12 +324,12 @@ const ReadStoryPage = (props) => {
                                     <>
                                         <button
                                             onClick={() => resetStory()} 
-                                            style={{ background: '#fffbe8' }}
+                                            style={{ background: '#fffbe8',  color: '#000' }}
                                             className="btn float-right mt-3">Đọc lại từ đâu</button>
     
                                         <button
                                             onClick={() => props.history.push('/stories/details/' + story.id)} 
-                                            style={{ background: '#fffbe8' }}
+                                            style={{ background: '#fffbe8',  color: '#000' }}
                                             className="btn float-right mt-3">Quay lại trang chi tiết</button>
 
                                          <SocialShare shareUrl={window.location.href} />
@@ -334,21 +345,22 @@ const ReadStoryPage = (props) => {
                                         </p>
                                         <button
                                             onClick={startReading} 
-                                            style={{ background: '#fffbe8' }}
+                                            
+                                            style={{ background: '#fffbe8', color: '#000' }}
                                             className="btn float-right mt-3">Bắt đầu đọc truyện</button>
                                     </div>
                                 ) }
                             </div>
                         </div>
                     </div>
-            
-             </Fullscreen>
+                
+                </Fullscreen>
             
             )}
            
            { isLoading && <MySpinner/> }
         
-        </MainLayout>
+        </>
     );
 };
 
