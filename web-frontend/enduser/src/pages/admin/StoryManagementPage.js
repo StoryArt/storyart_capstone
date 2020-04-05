@@ -14,6 +14,7 @@ import TagList from '../../components/common/TagList';
 import MyAlert from '../../components/common/MyAlert';
 import ValidationUtils from '../../utils/validation';
 import DateTimeUtils from '../../utils/datetime';
+import { Link } from 'react-router-dom';
 
 let searchTimeout = null;
 let currentStory = null;
@@ -246,8 +247,8 @@ const changePage = (e, value) => {
                       <TableCell align="center">{story.avgRate}</TableCell>
                       <TableCell align="center">{story.deactiveByAdmin ? <span className="text-danger">ĐÃ BỊ KHÓA</span> : <span className="text-success">CHƯA KHÓA</span>}</TableCell>
                       <TableCell align="center">
-                        {ValidationUtils.isEmpty(story.user) ? '' : story.user.name}
-                        </TableCell>
+                        {ValidationUtils.isEmpty(story.user) ? '' : <a href={`/user/profile/${story.user.id}`} target="_blank">{story.user.name}</a>}
+                      </TableCell>
                       <TableCell align="center">
                         <div style={{ maxWidth: '150px' }}>
                           <small>

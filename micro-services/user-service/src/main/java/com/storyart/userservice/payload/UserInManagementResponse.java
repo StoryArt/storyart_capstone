@@ -23,6 +23,7 @@ public class UserInManagementResponse {
     private RoleName role;
 
     private boolean isActive;
+    private boolean isDeactiveByAdmin;
     private String email;
     private Date jointAt;
 
@@ -38,5 +39,6 @@ public class UserInManagementResponse {
         this.username= u.getUsername();
         this.role = BeanUtil.getBean(RoleService.class).findRoleById(u.getRoleId()).getName();
         this.jointAt = u.getCreatedAt();
+        this.isDeactiveByAdmin = u.isDeactiveByAdmin();
     }
 }

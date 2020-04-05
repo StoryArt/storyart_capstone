@@ -14,6 +14,7 @@ import UserProfilePage from './pages/enduser/user-profile-page/UserProfilePage';
 import PublicUserProfilePage from './pages/enduser/user-profile-page/PublicUserProfilePage';
 import UserHistoryPage from './pages/enduser/user-history-page/UserHistoryPage';
 import EditUserProfilePage from './pages/enduser/user-profile-page/EditUserProfilePage';
+import ChangePasswordPage from './pages/enduser/user-profile-page/ChangePasswordPage';
 
 import LoginPage from './pages/common/LoginPage';
 import RegisterPage from './pages/common/RegisterPage';
@@ -21,17 +22,12 @@ import RegisterPage from './pages/common/RegisterPage';
 import DashboardPage from './pages/admin/DashboardPage';
 import UserManagementPage from './pages/admin/UserManagementPage';
 
-import AddUser from './pages/common/AddUser';
-import DemoPage from './pages/common/DemoPage';
-
 import StoryManagementPage from './pages/admin/StoryManagementPage';
 import StoryAnalytic from './pages/admin/StoryAnalytic';
 import TagManagementPage from './pages/admin/TagManagementPage';
 import ReportManagementPage from './pages/admin/ReportManagementPage';
 import AdminManagementPage from './pages/admin/AdminManagementPage';
 import NotFoundPage from './pages/common/NotFoundPage';
-
-import AddAdmin from './pages/common/AddAdmin';
 
 import PrivateRoute from './pages/common/auth/PrivateRoute';
 
@@ -90,7 +86,10 @@ function App() {
             <Route exact path="/stories/read/:storyId" component={StoryReadingPage}/>
             <Route exact path="/user/profile/:userId" component={PublicUserProfilePage}/>
             <Route exact path="/story/analystics/:storyId" component={StoryAnalytic}/>
-
+            <Route 
+              exact 
+              path="/user/settings/password" 
+              component={ChangePasswordPage}/>
             <PrivateRoute 
               exact 
               path="/stories/create" 
@@ -122,14 +121,13 @@ function App() {
               component={UserHistoryPage}/>
 
 
+
             {/* system admin routes */}
-            <PrivateRoute exact path="/sysadmin/add"  component={AddAdmin}/>
             <PrivateRoute exact path="/sysadmin/admin" component={AdminManagementPage}/>
 
 
             {/* admin routes */}            
             <Route exact path="/admin" render={() => <Redirect to="/admin/users" /> } />
-            <PrivateRoute exact path="/admin/users/add" component={AddUser}/>
             <PrivateRoute exact path="/admin/users" component={UserManagementPage}/>
             <PrivateRoute exact path="/admin/stories" component={StoryManagementPage}/>
             <PrivateRoute exact path="/admin/tags" component={TagManagementPage}/>

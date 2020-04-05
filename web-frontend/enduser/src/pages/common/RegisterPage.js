@@ -48,6 +48,7 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [introContent, setIntroContent] = useState("");
+  const [alert, setAlert] = useState({ open: false, type: 'success', content: '' });
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -88,6 +89,7 @@ const RegisterPage = () => {
       setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>);
     }
   }
+  const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
 
   return (
     // <div className="signup flex justify-center w-full h-full-screen">
@@ -203,6 +205,7 @@ const RegisterPage = () => {
                     variant="outlined"
                     required
                     fullWidth
+                    type="username"
                     value={username}
                     onChange={e => setUsername(e.target.value)}
                     label="Tên đăng nhập"

@@ -74,7 +74,7 @@ const HomePage = () => {
                 {!suggestedStoriesLoading && (
                      <div className="row">
                         {suggestedStories.map(story => (
-                            <div className="col-sm-3 px-2">
+                            <div className="col-sm-3 px-2" key={story.id}>
                                 <StoryCard story={story} />
                             </div>
                         ))}

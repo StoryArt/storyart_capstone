@@ -34,7 +34,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         if (user != null) {
             return UserPrincipal.create(user);
         } else {
-            throw new UsernameNotFoundException("Username not found with userId: " + id);
+            throw new UsernameNotFoundException("Không tồn tại người dùng với id: " + id);
         }
     }
 }

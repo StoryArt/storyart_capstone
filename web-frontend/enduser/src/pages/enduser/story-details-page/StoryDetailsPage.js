@@ -454,7 +454,7 @@ const StoryDetailsPage = (props) => {
             console.log(res);
             const { success, errors, data } = res.data;
             if (success) {
-                setRating({ ...rating, stars: stars  })
+                setRating({ ...rating, stars: stars })
                 setAlert({
                     open: true,
                     type: 'success',
@@ -495,7 +495,7 @@ const StoryDetailsPage = (props) => {
                                 <div className="text-center">
                                     <Link
                                         className="btn btn-success btn-block mt-2"
-                                        to={`/stories/read/${story.id}`}>Dọc truyện</Link>
+                                        to={`/stories/read/${story.id}`}>Đọc truyện</Link>
                                     {/* <Link className="btn btn-warning" to={`/stories/edit/${story.id}`}>Sua truyen</Link> */}
                                 </div>
                                 {userId !== story.user.id &&
@@ -512,10 +512,19 @@ const StoryDetailsPage = (props) => {
                                 <h3 className="font-weight-bold">{story.title}</h3>
                                 {!ValidationUtils.isEmpty(story.user) && (
                                     <h4>
-                                        <Link to={`/user/profile/${story.user.id}`}><PersonIcon /> {story.user.name}</Link>
+                                        <Link to={`/user/profile/${story.user.id}`}>
+                                            <PersonIcon />  <img src={story.user.avatar} style={{ width: '50px', height: '50px' }}/>
+                                             {' ' + story.user.name}
+                                        </Link>
                                     </h4>
                                 )}
                                 <strong style={{ fontSize: '1.2em', color: 'orange' }}>Điểm trung bình: {story.avgRate}</strong>
+                                <div>
+                                    <strong>Lượt đánh giá: </strong>{story.numOfRate}
+                                </div>
+                                <div>
+                                    <strong>Lượt đọc: </strong>{story.numOfRead}
+                                </div>
                                 <div className="my-3">
                                     <strong>Giới thiệu</strong>
                                     <p>{StringUtils.parseHtml(story.intro)}</p>
@@ -523,7 +532,7 @@ const StoryDetailsPage = (props) => {
                                 <strong>Tags:</strong> <TagList tags={story.tags} />
                                 <div className="my-3">
                                     <strong>Đánh giá truyện:</strong>
-                                    <br/>
+                                    <br />
                                     {ValidationUtils.isEmpty(rating) && (
                                         <small>Hãy để lại đánh giá để chúng tôi biết thêm về sở thích đọc truyện của bạn nhé</small>
                                     )}

@@ -11,6 +11,7 @@ import ReadingHistoryService from '../../../services/reading_history.service';
 import moment from 'moment';
 import { getAuthUserInfo } from '../../../config/auth';
 import StringUtils from '../../../utils/string';
+import MySpinner from '../../../components/common/MySpinner';
 
 import MyAlert from '../../../components/common/MyAlert';
 
@@ -33,7 +34,7 @@ const UserHistoryPage = () => {
     });
     const [alert, setAlert] = useState({ content: '', type: 'success', open: false });
     const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
-
+    const [historyLoading, setHistoryLoading] = useState(false);
 
     useEffect(() => {
         getCommentHistory();
@@ -50,6 +51,7 @@ const UserHistoryPage = () => {
     const [isLastHistoryPage, setIsLastHistoryPage] = useState(true);
     const getReadingHistory = async () => {
         if (userInfo !== null) {
+            setHistoryLoading(true);
             try {
                 var array = [...histories];
                 if (array.length > 1) {
@@ -69,6 +71,7 @@ const UserHistoryPage = () => {
                 }
             } catch (error) {
             }
+            setHistoryLoading(false);
         }
     }
     const deleteComment = async () => {
@@ -291,7 +294,7 @@ const UserHistoryPage = () => {
                                     <div className="card mb-3">
                                         <div className="row no-gutters">
                                             <div className="col-md-4">
-                                                <img src={history.storyImageUrl} className="card-img" />
+                                                <img src={history.storyImageUrl === null ? '/assets/img/no_image.jpeg' : history.storyImageUrl} className="card-img" />
                                             </div>
                                             <div className="col-md-8">
                                                 <div className="card-body">
@@ -311,7 +314,9 @@ const UserHistoryPage = () => {
                             ))}
 
                         </div>
-                        {histories.length < 1 &&
+                        {historyLoading && <MySpinner />}
+
+                        {(histories.length < 1 && !historyLoading) &&
                             <div className="text-center">
                                 <small>Không có lịch sử đọc truyện.</small>
                             </div>

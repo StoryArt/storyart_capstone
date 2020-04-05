@@ -173,7 +173,6 @@ class HistoryServiceIml implements HistoryService {
             rh.setUserId(userId);
             rh = historyRepository.save(rh);
             int id = rh.getId();
-            story.setNumOfRead(story.getNumOfRead() + 1);
             storyRepository.save(story);
 
             result.setSuccess(true);

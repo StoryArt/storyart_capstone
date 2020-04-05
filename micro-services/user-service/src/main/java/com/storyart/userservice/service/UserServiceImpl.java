@@ -8,6 +8,7 @@ import com.storyart.userservice.model.Role;
 import com.storyart.userservice.model.Story;
 import com.storyart.userservice.model.User;
 import com.storyart.userservice.payload.PagedResponse;
+import com.storyart.userservice.payload.PasswordChangeRequest;
 import com.storyart.userservice.payload.UserInManagementResponse;
 import com.storyart.userservice.payload.UserProfileUpdateRequest;
 import com.storyart.userservice.repository.RoleRepository;
@@ -65,7 +66,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deActive(Integer id, boolean deadmin) {
+    public void setStatus(boolean status, int id) {
 
 
         Optional<User> byId = userRepository.findById(id);
@@ -73,22 +74,32 @@ public class UserServiceImpl implements UserService {
 
         if (byId.isPresent()) {
             User user = byId.get();
-            user.setDeactiveByAdmin(deadmin);
-            user.setActive(false);
+
+            if (user.isDeactiveByAdmin()) {
+                return;
+            }
+            user.setActive(status);
             userRepository.save(user);
         }
     }
 
     @Override
-    public void active(Integer uid) {
+    public void setStatusByAdmin(boolean status, int uid) {
         Optional<User> byId = userRepository.findById(uid);
         if (byId.isPresent()) {
-            User user = byId.get();
-            user.setDeactiveByAdmin(false);
-            user.setActive(true);
-            userRepository.save(user);
+            User us = byId.get();
+            // neu setStatusByAdmin(true) then turn oin account by set deactive = false
+            if (status == true) {
+                us.setDeactiveByAdmin(false);
+            } else {
+                us.setDeactiveByAdmin(true);
+            }
+            userRepository.save(us);
         }
+
+
     }
+
 
     //this used for search user of admin and sysadmin.
     // data responsed depend on T of PageResponse
@@ -130,7 +141,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public PagedResponse<UserInManagementResponse> findByUsernameOrEmail(int page, int size, String search) {
         validatePageNumberAndSize(page, size);
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("created_at").descending());
         Page<User> userPage = userRepository.findByUsernameLike(search, pageable);
         List<User> usersList = userPage.toList();
 
@@ -166,10 +177,10 @@ public class UserServiceImpl implements UserService {
     public PagedResponse<UserInManagementResponse> findAdminbyUsernameOrEmail(int page, int size, String search) {
         page = page - 1;
         validatePageNumberAndSize(page, size);
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("created_at").descending());
 
 
-        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(search,RoleName.ROLE_ADMIN.toString(), pageable);
+        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(search, RoleName.ROLE_ADMIN.toString(), pageable);
         List<User> usersList = userPage.toList();
 
         List<UserInManagementResponse> users = convertUserlist(usersList);
@@ -191,13 +202,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public PagedResponse<UserInManagementResponse> findOnlyUserByUsernameOrEmail(int page, int size, String searchtxt) {
-page=page-1;
+        page = page - 1;
         validatePageNumberAndSize(page, size);
-        Pageable pageable = PageRequest.of(page, size);
-        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(searchtxt,RoleName.ROLE_USER.toString(), pageable);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("created_at").descending());
+        Page<User> userPage = userRepository.findByRoleNameUsernameOrEmail(searchtxt, RoleName.ROLE_USER.toString(), pageable);
         List<User> usersList = userPage.toList();
         List<UserInManagementResponse> users = convertUserlist(usersList);
-        return new PagedResponse<UserInManagementResponse>(users, 1+userPage.getNumber(), userPage.getSize(),
+        return new PagedResponse<UserInManagementResponse>(users, 1 + userPage.getNumber(), userPage.getSize(),
                 userPage.getTotalElements(),
                 userPage.getTotalPages(), userPage.isLast());
     }
@@ -222,15 +233,16 @@ page=page-1;
     }
 
     @Override
-    public void updateAvatar(Integer uid,String link) {
-        User user= findById(uid);
+    public void updateAvatar(Integer uid, String link) {
+        User user = findById(uid);
         user.setAvatar(link);
         userRepository.save(user);
 
     }
+
     @Override
-    public void updateProfileImage(Integer uid,String link) {
-        User user= findById(uid);
+    public void updateProfileImage(Integer uid, String link) {
+        User user = findById(uid);
         user.setProfileImage(link);
         userRepository.save(user);
 
@@ -241,9 +253,9 @@ page=page-1;
         ResultDto result = new ResultDto();
         result.setSuccess(false);
         User user = userRepository.findById(userId).orElse(null);
-        if(user == null){
+        if (user == null) {
             result.getErrors().put("NOT_FOUND", "Không tìm thấy tài khoản này trong hệ thống");
-        } else if(!user.isActive() || user.isDeactiveByAdmin()){
+        } else if (!user.isActive() || user.isDeactiveByAdmin()) {
             result.getErrors().put("DELETED", "Tài khoản này đã bị xóa");
         } else {
             user.setPassword(null);
@@ -254,6 +266,18 @@ page=page-1;
             result.setData(userProfileDto);
         }
         return result;
+    }
+
+    @Override
+    public boolean changePassword(PasswordChangeRequest passwordChangeRequest, int userId) {
+        try {
+            User us = findById(userId);
+            us.setPassword(passwordEncoder.encode(passwordChangeRequest.getPassword()));
+            userRepository.save(us);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     private void validatePageNumberAndSize(int page, int size) {

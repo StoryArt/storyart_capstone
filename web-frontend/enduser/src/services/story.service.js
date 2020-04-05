@@ -1,11 +1,12 @@
 import axios from "axios";
 import { API_ENDPOINT_PREFIX } from "../config/api";
 import { getAuthUserInfo } from "../config/auth";
+import { API_URL } from '../config/api';
 
 // const baseUrl = API_ENDPOINT_PREFIX + '/stories';
-const baseUrl = "http://localhost:8000/api/story-service/stories";
+const baseUrl = API_URL + "/api/story-service/stories";
 
-const baseUrl2 = "http://localhost:8000/api/story-service";
+const baseUrl2 = API_URL + "/api/story-service";
 
 class StoryService {
   static async createStory(story) {
@@ -71,9 +72,8 @@ class StoryService {
     return axios.get(url);
   }
 
-  static async getTrendStories(quantity) {
-    if (!quantity) quantity = 12;
-    const url = baseUrl + "/public/trend?quantity=" + quantity;
+  static async getTrendStories() {
+    const url = baseUrl + "/public/trend";
     return axios.get(url);
   }
 

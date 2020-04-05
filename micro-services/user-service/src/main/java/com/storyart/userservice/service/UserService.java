@@ -5,6 +5,7 @@ import com.storyart.userservice.dto.UserProfileDto;
 import com.storyart.userservice.model.Story;
 import com.storyart.userservice.model.User;
 import com.storyart.userservice.payload.PagedResponse;
+import com.storyart.userservice.payload.PasswordChangeRequest;
 import com.storyart.userservice.payload.UserInManagementResponse;
 import com.storyart.userservice.payload.UserProfileUpdateRequest;
 import com.storyart.userservice.security.UserPrincipal;
@@ -19,15 +20,14 @@ public interface UserService {
 
     void delete(Integer id);
 
-    void deActive(Integer id, boolean deadmin);
+    void setStatus(boolean status,int id);
+    void setStatusByAdmin(boolean status, int uid);
 
     List<User> findAll();
 
     User findById(Integer id);
 
     User findByUsername(String username);
-
-    void active(Integer uid);
 
     User findByEmail(String email);
 
@@ -50,4 +50,6 @@ public interface UserService {
 
 
     ResultDto getUserProfile(int userId);
+
+    boolean changePassword(PasswordChangeRequest passwordChangeRequest, int userId);
 }

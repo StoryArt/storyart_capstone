@@ -26,14 +26,16 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
   },
   appBar: {
-    backgroundColor: '#d6c494',
+    // backgroundColor: '#d6c494',
+    backgroundColor: '#766994',
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
-    }),
+    })
   },
   appBarShift: {
-    backgroundColor: '#d6c494',
+    // backgroundColor: '#d6c494',
+    backgroundColor: '#766994',
     // backgroundColor: '#b09c63',
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: drawerWidth,
@@ -76,12 +78,17 @@ const AppNavbar = (props) => {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [dialogContent, setDialogContent] = React.useState('');
   const openAccountMenu = Boolean(anchorEl);
+  
 
   const user = getAuthUserInfo();
   const classes = useStyles();
 
   const currentRoute = props.location.pathname;
   const isRouteAdmin = currentRoute.indexOf('/admin') === 0;
+  const isRouteSysAdmin = currentRoute.indexOf('/sysadmin') === 0;
+  const isShowGoToAdmin  = (!isRouteAdmin && !isRouteSysAdmin) && isAdminAuth(user);
+  const isShowGoToSysAdmin  = (!isRouteAdmin && !isRouteSysAdmin) && isSysAdminAuth(user);
+  const isShowGoToHomePage =  (isRouteAdmin || isRouteSysAdmin);
 
   const handleMenu = event => {
     setAnchorEl(event.currentTarget);
@@ -103,6 +110,7 @@ const AppNavbar = (props) => {
     setDialogContent('Bạn có chắc chắn muốn đăng xuất khỏi ứng dụng không?');
     setOpenDialog(true);
   }
+
 
   return (
     <>
@@ -136,15 +144,40 @@ const AppNavbar = (props) => {
               <Button
                 onClick={() => navigateRoute('/register')}
                 edge="end"
-                color="inherit">Đăng ký</Button>
+                style={{backgroundColor: "#719e7c", color: "white"}}
+                >Đăng ký</Button>
+            </>
+          )}
+
+        {isShowGoToAdmin && (
+            <>
+              <Button
+                onClick={() => navigateRoute('/admin/users')}
+                edge="end"
+                color="inherit">Đi tới trang quản lý</Button>
+            </>
+          )}
+          
+          {isShowGoToHomePage && (
+            <>
+              <Button
+                onClick={() => navigateRoute('/home')}
+                edge="end"
+                color="inherit">Đi tới trang truyện</Button>
+            </>
+          )}
+
+        {isShowGoToSysAdmin && (
+            <>
+              <Button
+                onClick={() => navigateRoute('/sysadmin/admin')}
+                edge="end"
+                color="inherit">Đi tới trang quản lý hệ thống</Button>
             </>
           )}
 
           {(isUserAuth(user) || isAdminAuth(user) || isSysAdminAuth(user)) && (
             <>
-              <Button
-                onClick={handleLogout}
-                color="inherit">Đăng xuất</Button>
               <Button
                 onClick={() => { navigateRoute('/user/my-profile') }}
                 color="inherit">{user.username}</Button>
@@ -173,7 +206,10 @@ const AppNavbar = (props) => {
                   open={openAccountMenu}
                   onClose={handleCloseMenu}
                 >
-                  <MenuItem onClick={() => { navigateRoute('/user/edit-profile') }}>Tài khoản</MenuItem>
+                  <MenuItem onClick={() => { navigateRoute('/user/edit-profile') }}>Cài đặt</MenuItem>
+                  <MenuItem onClick={() => { navigateRoute('/user/settings/password') }}>Đổi mật khẩu</MenuItem>
+                  <MenuItem onClick={() => { handleLogout() }}>Đăng xuất</MenuItem>
+              
                 </Menu>
               </div>
             </>

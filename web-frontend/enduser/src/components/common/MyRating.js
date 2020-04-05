@@ -52,7 +52,7 @@ const MyRating = (props) => {
             borderColor="transparent">
             <Rating
                 name="customized-empty"
-                defaultValue={value}
+                value={value}
                 precision={0.5}
                 onChange={(e, value) => {
                     onChange(value);

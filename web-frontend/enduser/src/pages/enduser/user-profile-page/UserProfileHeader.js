@@ -7,6 +7,7 @@ import { Favorite as FavoriteIcon, MoreVert as MoreVertIcon } from '@material-ui
 
 import { Skeleton } from '@material-ui/lab';
 import DateTimeUtils from '../../../utils/datetime';
+import ValidationUtils from '../../../utils/validation';
 
 const useStyles = makeStyles({
     root: {
@@ -28,6 +29,8 @@ const useStyles = makeStyles({
 const UserProfileHeader = (props) => {
     const classes = useStyles();
     const { user, canEdit } = props;
+    console.log('user');
+    console.log(user);
 
     const navigateRoute = (route) => props.history.push(route);
 
@@ -36,16 +39,16 @@ const UserProfileHeader = (props) => {
             <CardActionArea>
                 <CardMedia
                 component="img"
-                alt="Contemplative Reptile"
-                height="140"
-                image="https://picsum.photos/200/300"
-                title="Contemplative Reptile"
+                alt={user.name}
+                height="300"
+                image={ValidationUtils.isEmpty(user.profileImage) ? '/assets/img/no_cover.jpeg' : user.profileImage}
+                title={user.name}
                 />
                 <CardContent>
                     <CardHeader
                         avatar={
                             <Avatar className={classes.avatar} aria-label="recipe" >
-                                { user.avatar }
+                                { ValidationUtils.isEmpty(user.avatar) ? '/assets/img/no_image.jpeg' : user.avatar }
                             </Avatar>
                         }
                         // action={
@@ -62,9 +65,9 @@ const UserProfileHeader = (props) => {
                 </CardContent>
             </CardActionArea>
             <CardActions className={classes.actions}>
-                <Button style={{ float: 'right' }} className={classes.button} size="small" color="primary">
+                {/* <Button style={{ float: 'right' }} className={classes.button} size="small" color="primary">
                      Chia sẻ
-                </Button>
+                </Button> */}
                {canEdit && (
                 <Button onClick={() => navigateRoute('/user/edit-profile')} size="small" color="secondary">
                     Cập nhât 

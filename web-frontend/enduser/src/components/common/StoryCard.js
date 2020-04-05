@@ -18,8 +18,8 @@ const useStyles = makeStyles({
 });
 
 const StoryCard = (props) => {
-    const classes = useStyles();
-    const { story } = props;
+  const classes = useStyles();
+  const { story } = props;
 
     const viewDetails = () => props.history.push('/stories/details/' + story.id);
     const readStory = () => props.history.push('/stories/read/' + story.id);
@@ -31,7 +31,7 @@ const StoryCard = (props) => {
             component="img"
             alt={story.title}
             height="140"
-            image={story.image}
+            image={ValidationUtils.isEmpty(story.image) ? '/assets/img/no_image.jpeg' : story.image}
             title={story.title}
           />
           <CardContent>
@@ -47,28 +47,27 @@ const StoryCard = (props) => {
               </span>
             </Typography>
            
-            <div className="mb-3">{ StringUtils.truncate(StringUtils.removeHtml(story.intro), 60) }</div>
+            {/* <div className="mb-3">{ StringUtils.truncate(StringUtils.removeHtml(story.intro), 60) }</div> */}
+            <div className="mb-3">Lượt đọc: { story.numOfRead }</div>
             <div>
               {DateTimeUtils.getDate(story.createdAt)}
             </div>
-            
 
             <div className="clearfix"></div>
             <TagList tags={story.tags} />
             
-           
           </CardContent>
         </CardActionArea>
         <CardActions>
           <Button size="small" color="primary" onClick={readStory}>
             Dọc truyện
           </Button>
-          <Button size="small" color="secondary" onClick={viewDetails}>
-            Chi tiết
+        <Button size="small" color="secondary" onClick={viewDetails}>
+          Chi tiết
           </Button>
-        </CardActions>
-      </Card>
-    );
+      </CardActions>
+    </Card>
+  );
 };
 
 

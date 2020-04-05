@@ -5,14 +5,9 @@ import {
   setAuthHeader
 } from "../config/auth";
 import { ROLE_NAMES } from "../common/constants";
-//url qua gateway
-// const baseUrl = 'http://localhost:8001/api/user-service/api/v1';
-// const baseUrl = 'http://localhost:8001/api/v1';
+import { API_URL } from '../config/api';
 
-//url khong qua gateway
-// const baseUrl = "http://localhost:8002/api/v1";
-// const baseUrl = "http://localhost:8002/api/v1";
-const baseUrl = 'http://localhost:8000/api/user-service/api/v1';
+const baseUrl = API_URL + '/api/user-service/api/v1';
 
 class UserService {
 
@@ -65,11 +60,23 @@ class UserService {
     return axios.get(url);
   }
 
-  static async setStatusUser(url) {
+  static async setStatusUser(userId, status) {
+
+    let url =
+    baseUrl+"/admin/users/" +
+    userId +
+    "?setActive=" +
+    status;
     return axios.delete(url);
   }
 
-  static async setStatusAdmin(url) {
+  static async setStatusAdmin(userId, status) {
+
+
+    let url =
+    baseUrl+"/systemad/admins/" +userId+
+    "?setActive=" +
+    status;
     return axios.delete(url);
   }
 
@@ -163,6 +170,14 @@ class UserService {
 
     return axios.put(url1, user);
   
+   }
+
+   static async changePassword(pass, uid){
+    let url1 = baseUrl + "/user/" + uid+"/password";
+    let data={
+      password: pass
+    }
+    return axios.post(url1, data);
    }
 
    

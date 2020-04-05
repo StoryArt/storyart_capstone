@@ -8,4 +8,6 @@ import java.util.List;
 public interface ScreenRepository extends JpaRepository<Screen, String> {
     List<Screen> findByStoryId(int storyId);
     void deleteAllByStoryId(int storyId);
+
+    int countAllByStoryId(int storyId);
 }

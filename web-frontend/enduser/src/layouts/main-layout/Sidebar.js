@@ -10,8 +10,13 @@ import { Drawer, CssBaseline, AppBar, Toolbar, List, Typography, Divider, IconBu
 import { Home as HomeIcon, AccountCircle, ChevronRight as ChevronRightIcon, 
   Menu as MenuIcon, MoveToInbox as InboxIcon, Mail as MailIcon, ChevronLeft as ChevronLeftIcon, 
 MenuBook as MenuBookIcon, History as HistoryIcon, AddBox as AddBoxIcon } from '@material-ui/icons';
-
+import PeopleIcon from '@material-ui/icons/People';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
+import AnnouncementIcon from '@material-ui/icons/Announcement';
+import AmpStoriesIcon from '@material-ui/icons/AmpStories';
 import UserService from '../../services/user.service';
+import SupervisedUserCircleIcon from '@material-ui/icons/SupervisedUserCircle';
+
 
 const drawerWidth = 240;
 
@@ -26,7 +31,8 @@ const useStyles = makeStyles(theme => ({
     width: drawerWidth,
     // backgroundColor: '#F0F0C5',
     // backgroundColor: '#d6c494',
-    backgroundColor: '#b09c63',
+    // backgroundColor: '#b09c63',
+    backgroundColor: '#877aa3',
   },
   drawerHeader: {
     display: 'flex',
@@ -104,7 +110,7 @@ const Sidebar = (props) => {
                     onClick={() => navigateRoute('/admin/users')} 
                     selected={ isRouteMatch('/admin/users') }>
                     <ListItemIcon>
-                      <HistoryIcon className={classes.icon} />
+                      <PeopleIcon className={classes.icon} />
                       </ListItemIcon>
                     <ListItemText primary="Quản lý người dùng" />
                   </ListItem>
@@ -113,7 +119,7 @@ const Sidebar = (props) => {
                     onClick={() => navigateRoute('/admin/stories')} 
                     selected={ isRouteMatch('/admin/stories') }>
                     <ListItemIcon>
-                      <HistoryIcon className={classes.icon} />
+                      <AmpStoriesIcon className={classes.icon} />
                       </ListItemIcon>
                     <ListItemText primary="Quản lý truyện" />
                   </ListItem>
@@ -122,7 +128,7 @@ const Sidebar = (props) => {
                     onClick={() => navigateRoute('/admin/reports')} 
                     selected={ isRouteMatch('/admin/reports') }>
                     <ListItemIcon>
-                      <HistoryIcon className={classes.icon} />
+                      <AnnouncementIcon className={classes.icon} />
                       </ListItemIcon>
                     <ListItemText primary="Quản lý báo xấu" />
                   </ListItem>
@@ -131,7 +137,7 @@ const Sidebar = (props) => {
                     onClick={() => navigateRoute('/admin/tags')} 
                     selected={ isRouteMatch('/admin/tags') }>
                     <ListItemIcon>
-                      <HistoryIcon className={classes.icon} />
+                      <LocalOfferIcon className={classes.icon} />
                       </ListItemIcon>
                     <ListItemText primary="Quản lý thẻ" />
                   </ListItem>
@@ -146,9 +152,9 @@ const Sidebar = (props) => {
                 onClick={() => navigateRoute('/sysadmin/admin')} 
                 selected={ isRouteMatch('/sysadmin/admin') }>
                 <ListItemIcon>
-                    <HistoryIcon className={classes.icon} />
+                    <SupervisedUserCircleIcon className={classes.icon} />
                     </ListItemIcon>
-                <ListItemText primary="Quản lý tài khoản admin" />
+                <ListItemText primary="Quản lý quản trị viên " />
                 </ListItem>
             </List>
         )}

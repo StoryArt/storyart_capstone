@@ -51,7 +51,7 @@ public interface StoryService {
 
     Page<GetStoryDto> searchStoriesOfUserProfile(int userid, Set<Integer> tags, String keyword, int page, int itemsPerPage);
 
-    List<GetStoryDto> getTrendingStories(int quantity);
+    List<GetStoryDto> getTheMostReadingStories();
 
     Page<Story> getNewReleaseStory(int quantity);
 
@@ -163,6 +163,10 @@ class StoryServiceImpl implements StoryService {
         //get user rating
         Rating rating = ratingRepository.findById(storyId, story.getUserId());
         dto.setRating(rating);
+
+        dto.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
+
+        dto.setNumOfRead(historyRepository.countAllByStoryId(storyId));
         return dto;
     }
 
@@ -205,7 +209,6 @@ class StoryServiceImpl implements StoryService {
         result.setSuccess(true);
         Story story = storyRepository.findById(storyId).orElse(null);
         if (story != null) {
-            story.setNumOfRead(story.getNumOfRead() + 1);
             storyRepository.save(story);
         } else {
             result.setSuccess(false);
@@ -302,6 +305,7 @@ class StoryServiceImpl implements StoryService {
             List<Tag> tags = tagRepository.findAllByStoryId(dto.getId());
             List<TagDto> tagDtoList = tagService.mapModelToDto(tags);
             dto.setTags(tagDtoList);
+            dto.setNumOfRead(historyRepository.countAllByStoryId(s.getId()));
             return dto;
         }).collect(Collectors.toList());
     }
@@ -602,7 +606,10 @@ class StoryServiceImpl implements StoryService {
                 List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
                 GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
                 dto.setTags(tagService.mapModelToDto(tagList));
-                dto.setUser(userRepository.findById(story.getUserId()).orElse(null));
+                User user = userRepository.findById(story.getUserId()).orElse(null);
+                if (user != null) user.setPassword(null);
+                dto.setUser(user);
+                dto.setNumOfRead(historyRepository.countAllByStoryId(story.getId()));
                 return dto;
             }
         });
@@ -625,8 +632,11 @@ class StoryServiceImpl implements StoryService {
             public GetStoryDto apply(Story story) {
                 List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
                 GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
-                dto.setUser(userRepository.findById(story.getUserId()).orElse(null));
+                User user = userRepository.findById(story.getUserId()).orElse(null);
+                if(user != null) user.setPassword(null);
+                dto.setUser(user);
                 dto.setTags(tagService.mapModelToDto(tagList));
+                dto.setNumOfRead(historyRepository.countAllByStoryId(story.getId()));
                 return dto;
             }
         });
@@ -638,17 +648,19 @@ class StoryServiceImpl implements StoryService {
         List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
         GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
         dto.setTags(tagService.mapModelToDto(tagList));
+        dto.setNumOfRead(historyRepository.countAllByStoryId(story.getId()));
         return dto;
     }
 
     @Override
-    public List<GetStoryDto> getTrendingStories(int quantity) {
-        Pageable pageable = PageRequest.of(0, quantity, Sort.by("avgRate").descending());
-        List<Story> storyList = storyRepository.findAll(pageable).getContent();
+    public List<GetStoryDto> getTheMostReadingStories() {
+        List<Story> storyList = storyRepository.findTheMostReadingStories();
         return storyList.stream().map(s -> {
             GetStoryDto dto = modelMapper.map(s, GetStoryDto.class);
             List<Tag> tags = tagRepository.findAllByStoryId(s.getId());
             dto.setTags(tagService.mapModelToDto(tags));
+            dto.setUser(userRepository.findById(s.getUserId()).orElse(null));
+            dto.setNumOfRead(historyRepository.countAllByStoryId(s.getId()));
             return dto;
         }).collect(Collectors.toList());
     }
@@ -684,7 +696,6 @@ class StoryServiceImpl implements StoryService {
             story.setIntro(faker.lorem().paragraph(8));
             story.setAvgRate(faker.number().randomDouble(2, 0, 5));
             int reads = new Random().nextInt(100) + 10;
-            story.setNumOfRead(faker.number().numberBetween(10, 1000));
             story.setImage("http://lorempixel.com/400/200");
             story.setActive(true);
             story.setUserId(1);
@@ -773,7 +784,12 @@ class StoryServiceImpl implements StoryService {
         GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
         dto.setTags(tagService.mapModelToDto(tagList));
         dto.setNumOfComment(commentRepository.countCommentByStoryId(story.getId()));
+        dto.setNumOfScreen(screenRepository.countAllByStoryId(story.getId()));
         dto.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
+        User user = userRepository.findById(story.getUserId()).orElse(null);
+        if(user != null) user.setPassword(null);
+        dto.setUser(user);
+        dto.setNumOfRead(historyRepository.countAllByStoryId(story.getId()));
         return dto;
     }
 
@@ -867,10 +883,8 @@ class StoryServiceImpl implements StoryService {
             storySummarizeResponse.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
 
             Query query1 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.click_link where story_id= :storyId");
-            Query query2 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.reading_history where story_id= :storyId");
+            Query query2 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.reading_history where story_id= :storyId and and is_reaching_end=1");
             Query query3 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.screen   where story_id= :storyId");
-
-
 
             query1.setParameter("storyId", sid);
             query2.setParameter("storyId", sid);
@@ -938,8 +952,8 @@ class StoryServiceImpl implements StoryService {
         storyReactByRange.setNumOfHitPoint(hitPointByDay);
         for (NumberOfCommentByDate numberOfCommentByDate : commentByDay) {
             Integer comment = numberOfCommentByDate.getNumberOfComment();
-//            storyReactByRange.getNumOfComment().add(comment);
-            storyReactByRange.getNumOfComment().add(new Random().nextInt(50));
+            storyReactByRange.getNumOfComment().add(comment);
+//            storyReactByRange.getNumOfComment().add(new Random().nextInt(50));
             Calendar cal = Calendar.getInstance();
             cal.setTime(numberOfCommentByDate.getDate());
             String time = cal.get(Calendar.DAY_OF_MONTH) + "/" + (cal.get(Calendar.MONTH)+1);

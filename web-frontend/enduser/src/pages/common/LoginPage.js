@@ -57,138 +57,139 @@ const LoginPage = () => {
   const classes = useStyles();
   const [errorMessage, setErrorMessage] = useState("");
 
-    const [user, setUser] = useState({ username: '', password: '' });
-    const [alert, setAlert] = useState({ open: false, type: 'success', content: '' });
+  const [user, setUser] = useState({ username: '', password: '' });
+  const [alert, setAlert] = useState({ open: false, type: 'success', content: '' });
 
-    const changeUser = (prop, value) => setUser({ ...user, [prop]: value });
+  const changeUser = (prop, value) => setUser({ ...user, [prop]: value });
 
-    const clearForm = () => setUser({ username: '', password: '' });
+  const clearForm = () => setUser({ username: '', password: '' });
 
-    const login = async (e) => {
-        e.preventDefault();
-        try {
-          const res = await UserService.login(user);
-    
-          console.log(res.data);
-          if (res.data.accessToken != null) {
-            const { tokenType, accessToken } = res.data;
-            const token = tokenType + " " + accessToken;
-            saveTokenToLocal(token);
-            setAuthHeader(token);
+  const login = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await UserService.login(user);
 
-            setAlert({
-              open: true,
-              content: 'Dăng nhập thành công',
-              type: 'success'
-            });
-            const userInfo = getAuthUserInfo();
-            
-            let url = '/home';
-            if(userInfo.role === ROLE_NAMES.ROLE_ADMIN){
-              url = '/admin/users'
-            } else if(userInfo.role === ROLE_NAMES.ROLE_SYSTEM_ADMIN){
-              url = '/sysadmin/admin';
-            }
-            //wait for 400 miliseconds to redirect
-            window.setTimeout(() => {
-                window.location.href = url;
-            }, 400);
-          } else if(!res.data.success){
-              setAlert({
-                  open: true,
-                  content: 'Dăng nhập không thành công',
-                  type: 'error'
-              });
-          }
-        } catch (error) {
-          if(error.response){
-            setAlert({
-              type: 'error',
-              content: error.response.data.message,
-              open: true
-            });
-          } else {
-            console.log(error); 
-          }
+      console.log(res.data);
+      if (res.data.accessToken != null) {
+        const { tokenType, accessToken } = res.data;
+        const token = tokenType + " " + accessToken;
+        saveTokenToLocal(token);
+        setAuthHeader(token);
+
+        setAlert({
+          open: true,
+          content: 'Đăng nhập thành công',
+          type: 'success'
+        });
+        const userInfo = getAuthUserInfo();
+
+        let url = '/home';
+        if (userInfo.role === ROLE_NAMES.ROLE_ADMIN) {
+          url = '/admin/users'
+        } else if (userInfo.role === ROLE_NAMES.ROLE_SYSTEM_ADMIN) {
+          url = '/sysadmin/admin';
         }
-        closeAlert();
+        //wait for 400 miliseconds to redirect
+        window.setTimeout(() => {
+          window.location.href = url;
+        }, 400);
+      } else if (!res.data.success) {
+        setAlert({
+          open: true,
+          content: 'Dăng nhập không thành công',
+          type: 'error'
+        });
+      }
+    } catch (error) {
+      if (error.response) {
+        setAlert({
+          type: 'error',
+          content: error.response.data.message,
+          open: true
+        });
+      } else {
+        console.log(error);
+      }
     }
+    closeAlert();
+  }
 
-    const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
+  const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
 
-    return (
-      <div className="pt-5">
-        {/* <h3 className="text-center text-bold">D</h3> */}
-        <Container component="main" maxWidth="xs">
-          <CssBaseline />
-          <div className={classes.paper}>
-            <Avatar className={classes.avatar}>
-              <LockOutlinedIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              Đăng nhập tài khoản
+  return (
+    <div className="pt-5">
+      {/* <h3 className="text-center text-bold">D</h3> */}
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <div className={classes.paper}>
+          <Avatar className={classes.avatar}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Đăng nhập tài khoản
             </Typography>
-            <div> {errorMessage}</div>
-            <form className={classes.form} noValidate onSubmit={login}>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                value={user.username}
-                label="Tên đăng nhập"
-                onChange={e => changeUser("username", e.target.value)}
-                autoFocus
-              />
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                value={user.password}
-                label="Mật khẩu"
-                type="password"
-                onChange={e => changeUser("password", e.target.value)}
-                type="password"
-                autoComplete="current-password"
-              />
-              {/* <FormControlLabel
+          <div> {errorMessage}</div>
+          <form className={classes.form} noValidate onSubmit={login}>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              value={user.username}
+              label="Tên đăng nhập"
+              type="usename"
+              onChange={e => changeUser("username", e.target.value)}
+              autoFocus
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              value={user.password}
+              label="Mật khẩu"
+              type="password"
+              onChange={e => changeUser("password", e.target.value)}
+              type="password"
+              autoComplete="current-password"
+            />
+            {/* <FormControlLabel
                   control={<Checkbox value="remember" color="primary" />}
                   label="Remember me"
                 /> */}
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-              >
-                Đăng nhập
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+            >
+              Đăng nhập
               </Button>
-              <Grid container>
-                <Grid item xs>
-                  <Link href="#" variant="body2">
-                    Quên mật khẩu
+            <Grid container>
+              <Grid item xs>
+                <Link href="#" variant="body2">
+                  Quên mật khẩu
                   </Link>
-                </Grid>
-                <Grid item>
-                  <Link to="/register" variant="body2">
-                    {"Nếu bạn chưa có tài khoản, hãy đăng kí nhé!"}
-                  </Link>
-                </Grid>
               </Grid>
-            </form>
-          </div>
-        </Container>
+              <Grid item>
+                <Link to="/register" variant="body2">
+                  {"Nếu bạn chưa có tài khoản, hãy đăng kí nhé!"}
+                </Link>
+              </Grid>
+            </Grid>
+          </form>
+        </div>
+      </Container>
 
-        <MyAlert
-          open={alert.open}
-          setOpen={() => setAlert({ ...alert, open: true })}
-          type={alert.type}
-          content={alert.content}
-        />
-      </div>
-    );
+      <MyAlert
+        open={alert.open}
+        setOpen={() => setAlert({ ...alert, open: true })}
+        type={alert.type}
+        content={alert.content}
+      />
+    </div>
+  );
 };
 
 

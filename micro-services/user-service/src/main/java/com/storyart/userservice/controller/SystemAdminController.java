@@ -114,11 +114,11 @@ public class SystemAdminController {
         }
         if (!setActive) {
             // todo add them ly do deactive cho ca hai
-            userService.deActive(uid, true);
+            userService.setStatusByAdmin( false, uid);
             return new ResponseEntity<>(new ApiResponse(false, "Đã khóa tài khoản '"+adminById.getUsername()+"'"), HttpStatus.OK);
         } else {
 
-            userService.active(uid);
+            userService.setStatusByAdmin(true,uid);
             return new ResponseEntity<>(new ApiResponse(true, "Mở tài khoản '"+adminById.getUsername()+"' thành công!"), HttpStatus.OK);
 
         }
