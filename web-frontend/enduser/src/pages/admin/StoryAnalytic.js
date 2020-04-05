@@ -4,7 +4,7 @@ import MainLayout from "../../layouts/main-layout/MainLayout";
 import { setAuthHeader } from "../../config/auth";
 import Icon from "@mdi/react";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
-
+import MyRating from "../../components/common/MyRating";
 import DoughnutChart from "./forstoryanalystic/charts/echarts/Doughnut";
 import ModifiedAreaChart from "./forstoryanalystic/shared/ModifiedAreaChart";
 import { mdiAccountMultiple } from "@mdi/js";
@@ -13,7 +13,7 @@ import StatCards from "./forstoryanalystic/shared/StatCards";
 import TableCard from "./forstoryanalystic/shared/TableCard";
 // import RowCards from "./forstoryanalystic/shared/RowCards";
 import { withStyles } from "@material-ui/styles";
-import Statistic from '../../services/statistic.service';
+import Statistic from "../../services/statistic.service";
 
 import axios from "axios";
 import Button from "@material-ui/core/Button";
@@ -44,6 +44,7 @@ class Dashboard1 extends React.Component {
       rating: [],
       ratinguser: 0,
       story: {},
+      avgRate: 0,
       anchorEl: null,
       anchorE2: null,
       anchorE3: null,
@@ -64,12 +65,12 @@ class Dashboard1 extends React.Component {
       pageNo: 1,
       datax: {
         columns: [
-          {
-            label: "#",
-            field: "id",
-            sort: "asc",
-            width: 150,
-          },
+          // {
+          //   label: "#",
+          //   field: "id",
+          //   sort: "asc",
+          //   width: 150,
+          // },
           {
             label: "Tiêu đề",
             field: "title",
@@ -84,14 +85,10 @@ class Dashboard1 extends React.Component {
           },
         ],
         rows: [],
-      }
-      
-      
-      
-      ,
+      },
+
       clickData: {
         columns: [
-       
           {
             label: "Link",
             field: "link",
@@ -106,11 +103,7 @@ class Dashboard1 extends React.Component {
           },
         ],
         rows: [],
-      }
-      
-      
-      
-      ,
+      },
 
       // storyId: this.props.match.params.storyId
     };
@@ -127,8 +120,8 @@ class Dashboard1 extends React.Component {
     const storyInfo = this.getStorySummary(this.sid);
     this.loadRatingStatic();
     this.handleLoadReactStatic(1);
-    this.handleLoadScreenTime(1);
-    this.handleLoadClickLink(1);
+    // this.handleLoadScreenTime(1);
+    // this.handleLoadClickLink(1);
   }
   handleClick = (event) => {
     this.setState({
@@ -147,10 +140,7 @@ class Dashboard1 extends React.Component {
   };
 
   async getStorySummary() {
-    const url = this.baseUrl + `/story/` + this.sid + `/summary`;
-    setAuthHeader(localStorage.getItem("jwt-token"));
-
-    const res = await axios.get(url).then((res) => {
+    const res = await Statistic.getStorySummary(this.sid).then((res) => {
       this.setState({ story: res.data });
       console.log("summary");
       console.log(this.state.story);
@@ -162,23 +152,35 @@ class Dashboard1 extends React.Component {
     });
   }
   async loadRatingStatic() {
-    const url = this.baseUrl + `/story/` + this.sid + `/statistic/rating`;
-
-    const res = await axios.get(url).then((res) => {
+    const res = await Statistic.getRatingStatic(this.sid).then((res) => {
       this.setState({
         rating: res.data.map((rate) => ({
           name: rate.star + " star",
           value: rate.count,
         })),
       });
+      let avgrate = 0;
+      let totalStar = 0;
+      let totalRateTurn = 0;
+      for (let i = 0; i < res.data.length; i++) {
+        let obj = res.data[i];
+        try {
+          totalStar = totalStar + parseInt(obj.count) * parseInt(obj.star);
+          totalRateTurn = totalRateTurn + parseInt(obj.count);
+        } catch (error) {}
+      }
+      console.log(totalStar / totalRateTurn);
+      if (totalRateTurn != 0) {
+        this.setState( { avgRate: totalStar / totalRateTurn } );
+      }
+
       //cho nao bi rendeẻ lai
       console.log("load rating");
       console.log(this.state.rating);
     });
   }
-  baseUrl = "http://localhost:8000/api/story-service/stories";
+
   sid = this.props.match.params.storyId;
-  // sid= 34
 
   toddMMyyyy(date) {
     if (Object.prototype.toString.call(date) !== "[object Date]") {
@@ -221,17 +223,14 @@ class Dashboard1 extends React.Component {
     });
   }
 
-  async getLinkClick
-(timeRange){
-  setAuthHeader(localStorage.getItem("jwt-token"));
-  await Statistic.getLinkClickData(this.sid, timeRange).then((res) => {
-    console.log("clickLink");
-    console.log(res.data);
-    this.convertToClickList(res.data);
-  });
-}
-
-
+  async getLinkClick(timeRange) {
+    setAuthHeader(localStorage.getItem("jwt-token"));
+    await Statistic.getLinkClickData(this.sid, timeRange).then((res) => {
+      console.log("clickLink");
+      console.log(res.data);
+      this.convertToClickList(res.data);
+    });
+  }
 
   convertToScreenTimeList(data) {
     var userList = data;
@@ -251,12 +250,12 @@ class Dashboard1 extends React.Component {
     this.setState({
       datax: {
         columns: [
-          {
-            label: "ID",
-            field: "id",
-            sort: "asc",
-            width: 50,
-          },
+          // {
+          //   label: "ID",
+          //   field: "id",
+          //   sort: "asc",
+          //   width: 50,
+          // },
           {
             label: "Tiêu đề",
             field: "title",
@@ -283,7 +282,7 @@ class Dashboard1 extends React.Component {
 
     for (var index = 0; index < userList.length; index++) {
       let rowItem = {};
-      
+
       rowItem["link"] = userList[index].link;
       rowItem["count"] = userList[index].count;
       rowsData.push(rowItem);
@@ -292,7 +291,6 @@ class Dashboard1 extends React.Component {
     this.setState({
       clickData: {
         columns: [
-        
           {
             label: "Link",
             field: "link",
@@ -311,7 +309,7 @@ class Dashboard1 extends React.Component {
     });
   }
 
-  handleLoadReactStatic(daybefore) {
+  async handleLoadReactStatic(daybefore) {
     console.log(daybefore);
     let now = new Date();
     let toDate = new Date();
@@ -327,17 +325,14 @@ class Dashboard1 extends React.Component {
 
     from = this.toddMMyyyy(fromDate);
 
-    // let baseUrl="http://localhost:8003/stories";
     console.log("da chon ngay");
     console.log(from);
     const timerange = {
       start: from,
       end: to,
     };
-    const url = this.baseUrl + `/story/` + this.sid + `/statistic/react`;
-    setAuthHeader(localStorage.getItem("jwt-token"));
 
-    axios.post(url, timerange).then((res) => {
+    await Statistic.getReactStatic(this.sid, timerange).then((res) => {
       this.setState({
         reactStatic: {
           times: res.data.times,
@@ -387,7 +382,7 @@ class Dashboard1 extends React.Component {
       start: from,
       end: to,
     };
-   
+
     this.getScreenTime(timerange);
   }
   handleLoadClickLink(daybefore) {
@@ -419,25 +414,21 @@ class Dashboard1 extends React.Component {
       start: from,
       end: to,
     };
- 
+
     this.getLinkClick(timerange);
   }
-
-
-
-
-
 
   render() {
     const theme = {
       palette: {
         primary: {
-          main: "#0277bd",
-          light: "#03a9f4",
-          dark: "#01579b",
-          main2: "#0288d1",
-          veryl: "#81d4fa",
-          white: "#FFFFFF",
+          /*         					 				*/
+          dark: "#721b65",
+          main: "#b80d57",
+          main2: "#f8615a",
+          light: "#f8615a",
+          veryl: "#ffd868",
+          white: "#f1db9e",
         },
         secondary: {
           main: "#ffb300",
@@ -521,7 +512,7 @@ class Dashboard1 extends React.Component {
                     itemStyle: { color: "#c23531" },
                     smooth: true,
                   },
-                 
+
                   {
                     data: this.state.reactStatic.clickLinkStatic,
                     name: "Click vào link",
@@ -631,21 +622,23 @@ class Dashboard1 extends React.Component {
                   <div className="card-title" style={{ paddingLeft: "10px" }}>
                     {" "}
                     <BeautyStars
-                      value={this.state.story.avgRate}
+                      value={this.state.avgRate}
                       gap="3px"
                       size="18px"
                       inactiveColor="#b0b0b0"
                     ></BeautyStars>
+                    {/* <MyRating value={this.state.story.avgRate} /> */}
                   </div>
 
                   <DoughnutChart
                     height="350px"
                     color={[
-                      theme.palette.primary.veryl,
-                      theme.palette.primary.light,
-                      theme.palette.primary.main2,
-                      theme.palette.primary.main,
                       theme.palette.primary.dark,
+                      theme.palette.primary.main,
+                      theme.palette.primary.main2,
+                      theme.palette.primary.light,
+                      theme.palette.primary.veryl,
+                      
                     ]}
                     data1={this.state.rating}
                   />
@@ -700,7 +693,9 @@ class Dashboard1 extends React.Component {
                       28 ngày qua
                     </MenuItem>
                   </Menu>
-                  <span style={{ color: "#ccc", fontSize: "14px" }}>
+                  <span
+                    style={{ color: "rgb(162, 144, 144)", fontSize: "14px" }}
+                  >
                     {this.state.timelable2}
                   </span>
                 </div>
@@ -743,13 +738,13 @@ class Dashboard1 extends React.Component {
                     <MenuItem onClick={this.handleLoadClickLink.bind(this, 5)}>
                       5 ngày qua
                     </MenuItem>
-                    <MenuItem
-                      onClick={this.handleLoadClickLink.bind(this, 28)}
-                    >
+                    <MenuItem onClick={this.handleLoadClickLink.bind(this, 28)}>
                       28 ngày qua
                     </MenuItem>
                   </Menu>
-                  <span style={{ color: "#ccc", fontSize: "14px" }}>
+                  <span
+                    style={{ color: "rgb(162, 144, 144)", fontSize: "14px" }}
+                  >
                     {this.state.timelable3}
                   </span>
                 </div>
