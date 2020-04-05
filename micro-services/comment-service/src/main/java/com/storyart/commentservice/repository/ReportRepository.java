@@ -18,6 +18,7 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
     Optional<Report> findReportByUserIdAndStoryId(int userId, int storyId);
 
     @Query("select r from Report r where r.storyId is null and r.isHandled=?1 group by r.commentId order by count(r.commentId) desc ")
+
     Page<Report> findReportComment(boolean isHandled, Pageable pageable);
 
     @Query("select r from Report r where r.storyId is null and r.isHandled=?1 and r.commentId in ?2 group by r.commentId order by count(r.commentId) desc ")
@@ -28,7 +29,8 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
     @Query("select r from Report r where r.commentId = ?1 and r.isHandled=?2")
     Page<Report> getReportsByCommentId(int commentId, boolean isHandled, Pageable pageable);
 
-    @Query("select r from Report r where  r.commentId in (:commentIds) and r.isHandled=(:isHandled)")
+    @Query("select r from Report r where  r.commentId in (:commentIds) " +
+            "and r.isHandled=(:isHandled)")
     List<Report> findFullInformationReport(List<Integer> commentIds, boolean isHandled);
 
     @Query("select r from Report r where r.commentId is null and r.isHandled=?1 group by r.storyId order by count(r.storyId) desc ")

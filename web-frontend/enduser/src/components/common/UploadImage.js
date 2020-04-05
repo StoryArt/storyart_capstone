@@ -143,7 +143,7 @@ const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
             {/* //avatar */}
             <div className="form-group field banner">
               <div className="banner-container">
-                <label htmlFor="banner1">hình nền</label>
+                {/* <label htmlFor="banner1">hình nền</label> */}
                 <div className="banner-600">
                   <img id="banner1" name="banner1" src={banner2!=""?banner2:imageBanner} width="200" />
                 </div>

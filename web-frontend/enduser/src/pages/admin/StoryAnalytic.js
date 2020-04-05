@@ -29,6 +29,7 @@ import Typography from "@material-ui/core/Typography";
 import Pagination from "@material-ui/lab/Pagination";
 
 import { MDBDataTable } from "mdbreact";
+import DateTimeUtils from "../../utils/datetime";
 
 class Dashboard1 extends React.Component {
   constructor(props) {
@@ -585,7 +586,7 @@ class Dashboard1 extends React.Component {
                       color="textSecondary"
                       component="p"
                     >
-                      {this.state.story.createdAt}
+                      {DateTimeUtils.getDateTime(this.state.story.createdAt)}
                     </Typography>{" "}
                     tag:
                     <Typography

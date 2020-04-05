@@ -77,7 +77,8 @@ const UserProfilePage = (props) => {
     }
   }
 
-  const getReadStatistic = async () => {
+  const getReadStatistic = async (dateRange) => {
+    if(ValidationUtils.isEmpty(dateRange)) dateRange = { from: getDateAgo(7), to: new Date() };
     let { from, to } = dateRange;
     
     from = from.toLocaleDateString();
@@ -219,9 +220,7 @@ const UserProfilePage = (props) => {
 
   const changeDateRange = (prop, value) => {
     setDateRange({ ...dateRange, [prop]: value });
-    window.setTimeout(() => {
-      getReadStatistic();
-    }, 300);
+    getReadStatistic({ ...dateRange, [prop]: value });
   }
 
   return (
@@ -235,7 +234,7 @@ const UserProfilePage = (props) => {
                 </div> 
               </div>
 
-                <h3 className="text-bold">Thống kê lượt đọc tát cả các truyện</h3> 
+                <h3 className="text-bold">Thống kê lượt đọc tất cả các truyện</h3> 
                 <hr style={{ border: "1px solid #ccc" }} /> 
                 <div className="row my-5">
                   <div className="col-12">
@@ -251,7 +250,7 @@ const UserProfilePage = (props) => {
                       label="Đến ngày"
                     />
                     <UserReadingChart
-                      data={readingStatisticData}
+                      data={readingStatisticData.map(item => ({ ...item, name: 'Lượt đọc' }))}
                       dataKeyName="dateCreated"
                       dataKeyArea="readCount"
                     />
