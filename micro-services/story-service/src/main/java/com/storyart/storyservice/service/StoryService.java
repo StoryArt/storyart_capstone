@@ -386,7 +386,7 @@ class StoryServiceImpl implements StoryService {
             screenIdsMap.put(screen.getId(), MyStringUtils.generateUniqueId());
         });
 
-        story.setFirstScreenId(screenIdsMap.get(createStoryDto.getFirstScreenId()));
+        story.setFirstScreenId(null);
         story.setActive(true);
         story.setPublished(createStoryDto.isPublished());
         story.setDeactiveByAdmin(false);
@@ -428,6 +428,8 @@ class StoryServiceImpl implements StoryService {
             });
         });
 
+        story.setFirstScreenId(screenIdsMap.get(createStoryDto.getFirstScreenId()));
+        storyRepository.save(story);
         //save all informations
         createStoryDto.getInformations().stream().forEach(information -> {
             Information savedInformation = modelMapper.map(information, Information.class);
