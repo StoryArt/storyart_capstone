@@ -4,11 +4,13 @@ import { MDBAlert, MDBBtn } from "mdbreact";
 import UserService from "../../../services/user.service";
 import { getAuthUserInfo, setAuthHeader, getTokenFromLocal } from "../../../config/auth";
 import MyAlert from "../../../components/common/MyAlert";
+import UploadImage from "../../../components/common/UploadImage";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
+
 import SendIcon from "@material-ui/icons/Send";
 
 const useStyles = makeStyles(theme => ({
@@ -42,9 +44,9 @@ const EditUserProfilePage = props => {
   const [jointAt, setJointAt] = useState("");
   const [is_active, setIsActive] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [avatar, setAvatar] = useState(null);
+  const [avatar, setAvatar] = useState("");
   const [upfile, setUploadFile] = useState(null);
-  const [banner, setBanner] = useState(null);
+  const [banner, setBanner] = useState("");
   const [upfileBanner, setUploadFileBanner] = useState(null);
   const [saveAvatarBt, setSaveAvatarBt] = useState("disabled");
   const [saveBannerBt, setSaveBannerBt] = useState("disabled");
@@ -81,9 +83,6 @@ const EditUserProfilePage = props => {
         content: "Lưu thành công",
         type: "success"
       });
-      window.setTimeout(() => {
-        closeAlert();
-      }, 3000);
     } catch (error) {
 
       var err;
@@ -94,7 +93,7 @@ const EditUserProfilePage = props => {
       }
       setAlert({
         open: true,
-        content: err,
+        content: { err },
         type: "error"
       });
       window.setTimeout(() => {
@@ -112,6 +111,7 @@ const EditUserProfilePage = props => {
       setProfile(res.data);
       setEmail(res.data.email);
       setAvatar(res.data.avatar);
+      console.log(avatar);
       setId(res.data.id);
       setName(res.data.name);
       setUs(res.data.username);
@@ -125,117 +125,10 @@ const EditUserProfilePage = props => {
       console.log(error);
     }
   };
-
-  const onChangeAvatar = async file => {
-    setUploadFile(file);
-
-    var reader = new FileReader();
-
-    reader.onload = function(e) {
-      setAvatar(e.target.result);
-    };
-    if(file!= null){
-
-    reader.readAsDataURL(file);
-    setSaveAvatarBt("");
-    }
-  };
-
-  const handleUpload = async event => {
-    event.preventDefault();
-    try {
-      let res = null;
-      let flag = "";
-      if(upfile != null){
-        res = await UserService.uploadAvatar(upfile);
-        flag = "avatar";
-        console.log(res);
-      }else if (upfileBanner != null){
-        res = await UserService.uploadProfileImage(upfileBanner);
-        flag = "image";
-        console.log(res);
-      }
-      if (res.data.status == 200) {
-        let linkImgur = res.data.data.link;
-        try {
-          if(flag ==="avatar"){
-            const r2 = await UserService.saveToDatabase(id, linkImgur).then(()=>{
-              setSaveAvatarBt("disabled");
-              setAlert({
-                open: true,
-                content: "Đã cập nhật ảnh!",
-                type: "success"
-              });
-            });
-          }else if (flag = "image"){
-            const r2 = await UserService.saveToDatabaseProfileImage(id, linkImgur).then(()=>{
-              setSaveBannerBt("disabled")
-              setAlert({
-                open: true,
-                content: "Đã cập nhật ảnh!",
-                type: "success"
-              });
-            });
-          }
-         
-          window.setTimeout(() => {
-            closeAlert();
-          }, 3000);
-
-        } catch (error) {
-          setAlert({
-            open: true,
-            content: "Lưu thất bại. Thử lại!",
-            type: "error"
-          });
-          window.setTimeout(() => {
-            closeAlert();
-          }, 3000);
-        }
-
-      }
-    } catch (error) {
-      setAlert({
-        open: true,
-        content: "Upload thất bại. Thử lại!",
-        type: "error"
-      });
-      window.setTimeout(() => {
-        closeAlert();
-      }, 1000);
-    }
-  };
-
-  const onChangeBanner = async file => {
-    setUploadFileBanner(file);
-
-    var reader = new FileReader();
-
-    reader.onload = function(e) {
-      setBanner(e.target.result);
-    };
-    if(file!= null){
-
-  reader.readAsDataURL(file);
-  setSaveBannerBt("");
-}
-  };
-
   const mystyle = {
     textAlign: "center",
     margin: "0 auto"
   };
-  const mystyleLeft = {
-    textAlign: "left",
-    paddingTop: "200px",
-    margin: "0 auto"
-  };
-  const mystyleRight = {
-    textAlign: "right",
-    margin: "0 auto"
-  };
-
-  
   const statusButton = [];
   statusButton.push(
     <MDBBtn
@@ -245,10 +138,7 @@ const EditUserProfilePage = props => {
       {profile.active ? "Active" : "Deactivated"}
     </MDBBtn>
   );
-
-
   const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
-
   return (
     <MainLayout>
       <MyAlert
@@ -264,110 +154,21 @@ const EditUserProfilePage = props => {
           Tài khoản
         </Typography>
         <div className="col-sm-12">
-          <div  style={mystyleRight}>
-            <form
-              style={mystyle}
-              onSubmit={handleUpload}
-              encType="multipart/form-data"
-            >
-              <div className="row">
-                {/* //avatar */}
-                <div className="form-group field banner">
-                  <div className="banner-container">
-                   
-                    <div className="banner-600">
-                      <img
-                        id="banner1"
-                        name="banner1"
-                        src={banner}
-                        width="200"
-                      />
-                    </div>
-                  </div>
-                  <div className="control">
-                    <input
-                      type="file"
-                      name="image"
-                      accept=".jpg, .gif, .png"
-                      onChange={e => onChangeBanner(e.target.files[0])}
-                    />
-                    <p className="tips" style={{marginBottom: "6px"}}>JPG, GIF or PNG, Max size: 10MB</p>
-                    <div className="form-group">
-                      <Button
-                        color="primary"
-                        variant="contained"
-                        type="submit"
-                        disabled={saveBannerBt}
-                      >
-                        <CloudUploadIcon />
-                        <span className="pl-2 capitalize">Lưu Hình Nền</span>
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
+     
+         <UploadImage 
+         isBanner = 'banner'
+         Idis ={id}
+         imageBanner={banner}
+         imageAvatar= ''
+         />
+ 
 
-
-          <div  style={mystyleLeft}>
-            <form
-              style={mystyle}
-              onSubmit={handleUpload}
-              enctype="multipart/form-data"
-            >
-              <div className="row">
-                {/* //avatar */}
-                <div style={mystyle} className="form-group field avatar">
-                  <div className="avatar-container">
-                    <label htmlFor="avatar1">Avatar</label>
-                    <div className="avatar-80">
-                      <img
-                        id="avatar1"
-                        name="avatar1"
-                        src={avatar}
-                        width="80"
-                      />
-                    </div>
-                  </div>
-                  <div className="control">
-                    <input
-                      type="file"
-                      name="image"
-                      accept=".jpg, .gif, .png"
-                      onChange={e => onChangeAvatar(e.target.files[0])}
-                    />
-                    <p className="tips">JPG, GIF or PNG, Max size: 10MB</p>
-                    <div className="form-group">
-                      <Button
-                        color="primary"
-                        variant="contained"
-                        type="submit"
-                        disabled={saveAvatarBt}
-                      >
-                        <CloudUploadIcon />
-                        <span className="pl-2 capitalize">Lưu avatar</span>
-                      </Button>
-                      {/* <button
-                        disabled={saveAvatarBt}
-                        className="btn float-left"
-                        style={{
-                          clear: "both",
-                          fontSize: "1.1em",
-                          margin: 0,
-                          color: "#fff",
-                          backgroundColor: "#007bff"
-                        }}
-                      >
-                        Lưu avatar
-                      </button> */}
-                    </div>
-                  </div>
-                
-                </div>
-              </div>
-            </form>
-          </div>
+         <UploadImage 
+         isBanner = 'avatar'
+         Idis ={id}
+         imageAvatar={avatar}
+         imageBanner= ''
+         />
         </div>
 
         <hr style={{ border: "1px solid #ccc" }} />
@@ -384,6 +185,7 @@ const EditUserProfilePage = props => {
                   margin="normal"
                   fullWidth
                   label="Tên của bạn"
+                  autoFocus
                   value={name}
                   onChange={e => setName(e.target.value)}
                 />
@@ -407,6 +209,7 @@ const EditUserProfilePage = props => {
                   margin="normal"
                   fullWidth
                   label="Tên đăng nhập"
+                  autoFocus
                   value={us}
                   onChange={e => setUs(e.target.value)}
                 />
@@ -430,19 +233,20 @@ const EditUserProfilePage = props => {
                   margin="normal"
                   fullWidth
                   label="Email"
+                  autoFocus
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                 />
               </div>
               <div className="form-group">
-                {/* <label htmlFor="intro_content">
+                <label htmlFor="intro_content">
                   Giới thiệu cho mọi người về bạn
-                </label> */}
+                </label>
                 <textarea
                   id="intro_content"
                   value={intro_content == null ? "" : intro_content}
                   outline
-                  label="Giới thiệu cho mọi người về bạn"
+                  autoFocus
                   className="form-control text-area"
                   onChange={e => setIntro_content(e.target.value)}
                 />
