@@ -15,12 +15,4 @@ public class StoryServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(StoryServiceApplication.class, args);
 	}
-
-	@Bean
-	public CommandLineRunner createTestStories(StoryService storyService, HistoryService historyService){
-		return args -> {
-//			storyService.createTempStories();
-//			historyService.createTempHistory();
-		};
-	}
 }

@@ -30,7 +30,7 @@ class TagManagementPage extends React.Component {
     title: "",
     loading: false,
 
-    open: true,
+    open: false,
     content: '',
     type: ''
     
@@ -78,6 +78,7 @@ class TagManagementPage extends React.Component {
    TagService.getAllTag().then(res => {
       this.setState({ data: res.data.content });
       this.setState({ loading: true });
+      this.wait();
     }).catch(error => {
       console.log(error);
     });
