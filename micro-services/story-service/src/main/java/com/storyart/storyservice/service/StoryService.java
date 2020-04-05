@@ -503,6 +503,8 @@ class StoryServiceImpl implements StoryService {
             story.setCreatedAt(foundStory.getCreatedAt());
             story.setActive(true);
             story.setDeactiveByAdmin(foundStory.isDeactiveByAdmin());
+            story.setAvgRate(foundStory.getAvgRate());
+            story.setUserId(foundStory.getUserId());
             storyRepository.save(story);
             int storyId = story.getId();
 

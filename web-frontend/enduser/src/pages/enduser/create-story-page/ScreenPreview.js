@@ -88,7 +88,7 @@ const ScreenPreview = (props) => {
                         { StringUtils.getObjTitle(screen) }
                     </DialogTitle>
                     <DialogContent 
-                      style={{ minHeight: '100vh', padding: 0, backgroundColor: 'red' }}
+                      style={{ minHeight: '100vh', padding: 0, fontSize: 'inherit' }}
                       dividers>
                         <MyFullScreenShowWrapper>
                             <ScreenShow 
