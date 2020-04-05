@@ -18,8 +18,8 @@ const useStyles = makeStyles({
 });
 
 const StoryCard = (props) => {
-    const classes = useStyles();
-    const { story } = props;
+  const classes = useStyles();
+  const { story } = props;
 
     const viewDetails = () => props.history.push('/stories/details/' + story.id);
     const readStory = () => props.history.push('/stories/read/' + story.id);
@@ -62,12 +62,12 @@ const StoryCard = (props) => {
           <Button size="small" color="primary" onClick={readStory}>
             Dọc truyện
           </Button>
-          <Button size="small" color="secondary" onClick={viewDetails}>
-            Chi tiết
+        <Button size="small" color="secondary" onClick={viewDetails}>
+          Chi tiết
           </Button>
-        </CardActions>
-      </Card>
-    );
+      </CardActions>
+    </Card>
+  );
 };
 
 
