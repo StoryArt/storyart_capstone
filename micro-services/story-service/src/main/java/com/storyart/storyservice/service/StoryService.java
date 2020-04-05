@@ -886,8 +886,6 @@ class StoryServiceImpl implements StoryService {
             Query query2 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.reading_history where story_id= :storyId and and is_reaching_end=1");
             Query query3 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.screen   where story_id= :storyId");
 
-
-
             query1.setParameter("storyId", sid);
             query2.setParameter("storyId", sid);
             query3.setParameter("storyId", sid);

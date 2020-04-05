@@ -80,7 +80,7 @@ const UserProfilePage = (props) => {
     console.log(from);
     console.log(to);
     try {
-      const res = await StatisticService.getReadStatisticsOfUser(to, to);
+      const res = await StatisticService.getReadStatisticsOfUser(from, to);
       const { data, success, errors } = res.data;
       
       if(success){
@@ -214,7 +214,9 @@ const UserProfilePage = (props) => {
 
   const changeDateRange = (prop, value) => {
     setDateRange({ ...dateRange, [prop]: value });
-    getReadStatistic();
+    window.setTimeout(() => {
+      getReadStatistic();
+    }, 300);
   }
 
   return (
@@ -228,7 +230,7 @@ const UserProfilePage = (props) => {
                 </div> 
               </div>
 
-                <h3 className="text-bold"> Thống kê </h3> 
+                <h3 className="text-bold">Thống kê lượt đọc tát cả các truyện</h3> 
                 <hr style={{ border: "1px solid #ccc" }} /> 
                 <div className="row my-5">
                   <div className="col-12">

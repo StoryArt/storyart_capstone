@@ -512,7 +512,10 @@ const StoryDetailsPage = (props) => {
                                 <h3 className="font-weight-bold">{story.title}</h3>
                                 {!ValidationUtils.isEmpty(story.user) && (
                                     <h4>
-                                        <Link to={`/user/profile/${story.user.id}`}><PersonIcon /> {story.user.name}</Link>
+                                        <Link to={`/user/profile/${story.user.id}`}>
+                                            <PersonIcon />  <img src={story.user.avatar} style={{ width: '50px', height: '50px' }}/>
+                                             {' ' + story.user.name}
+                                        </Link>
                                     </h4>
                                 )}
                                 <strong style={{ fontSize: '1.2em', color: 'orange' }}>Điểm trung bình: {story.avgRate}</strong>

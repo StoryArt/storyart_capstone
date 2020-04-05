@@ -12,7 +12,7 @@ public class MyQueries {
     public static final String orderByDate = "order by s.created_at";
     public static final String orderByComment = "order by (select count(c.id) from comment c where c.story_id = s.id)";
     public static final String orderByRating = "order by (select count(*) from rating r where r.story_id = s.id)";
-    public static final String orderByRead = "order by s.num_of_read";
+    public static final String orderByRead = "order by (select count(*) from reading_history rd where rd.story_id = s.id)";
     public static final String orderByAvgRate = "order by s.avg_rate";
     public static final String orderByScreen = "order by (select count(sc.id) from screen sc where sc.story_id = s.id)";
 

@@ -32,7 +32,7 @@ const ReadingStatisticsChart = (props) => {
 
     return (
         <AreaChart
-        width={500}
+        width={1000}
         height={400}
         data={data}
         margin={{
