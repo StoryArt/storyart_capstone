@@ -60,9 +60,9 @@ public class User extends DateAudit {
 
     boolean isDeactiveByAdmin;
 
-  private   String token;
-
-  Date expiredDate;
+//  private   String token;
+//
+//  Date expiredDate;
 
 
     @PrePersist
