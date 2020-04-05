@@ -36,6 +36,11 @@ const orderBys = getOrderBys();
 
 let searchTimeout;
 
+const getDateAgo = (numOfDays) => {
+  const d = new Date();
+  return new Date(d.setDate(d.getDate() - numOfDays));
+}
+
 const UserProfilePage = (props) => {
 
   const [user, setUser] = useState({});
@@ -47,7 +52,7 @@ const UserProfilePage = (props) => {
   const [story, setStory] = useState(null);
   const [isLoadingstories, setIsLoadingStories] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
-  const [dateRange, setDateRange] = useState({ from: new Date(), to: new Date() });
+  const [dateRange, setDateRange] = useState({ from: getDateAgo(7), to: new Date() });
   const [readingStatisticData, setReadingStatisticData] = useState([]);
   const [filters, setFilters] = useState({
     keyword: '',
