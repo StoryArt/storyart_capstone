@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public interface TagService {
-    List<TagDto> getTags();
+    List<Tag> getTags();
     List<TagDto> mapModelToDto(List<Tag> tags);
     Tag create(AddTagDTO tag);
 
@@ -38,12 +38,9 @@ class TagServiceImpl implements TagService{
     ModelMapper modelMapper;
 
     @Override
-    public List<TagDto> getTags() {
+    public List<Tag> getTags() {
         List<Tag> tags = tagRepository.findAllByActive(true);
-        return tags.stream().map(tag -> {
-            TagDto t = modelMapper.map(tag, TagDto.class);
-            return t;
-        }).collect(Collectors.toList());
+        return tags;
     }
 
     @Override

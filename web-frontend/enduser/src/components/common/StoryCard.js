@@ -31,7 +31,7 @@ const StoryCard = (props) => {
             component="img"
             alt={story.title}
             height="140"
-            image={story.image}
+            image={ValidationUtils.isEmpty(story.image) ? '/assets/img/no_image.jpeg' : story.image}
             title={story.title}
           />
           <CardContent>
@@ -47,7 +47,7 @@ const StoryCard = (props) => {
               </span>
             </Typography>
            
-            <div className="mb-3">{ StringUtils.truncate(StringUtils.removeHtml(story.intro), 60) }</div>
+            {/* <div className="mb-3">{ StringUtils.truncate(StringUtils.removeHtml(story.intro), 60) }</div> */}
             <div>
               {DateTimeUtils.getDate(story.createdAt)}
             </div>

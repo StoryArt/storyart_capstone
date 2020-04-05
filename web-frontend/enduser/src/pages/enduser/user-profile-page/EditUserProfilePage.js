@@ -9,7 +9,6 @@ import Button from "@material-ui/core/Button";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
-
 import SendIcon from "@material-ui/icons/Send";
 
 const useStyles = makeStyles(theme => ({
@@ -141,6 +140,7 @@ const EditUserProfilePage = props => {
     setSaveAvatarBt("");
     }
   };
+
   const handleUpload = async event => {
     event.preventDefault();
     try {
@@ -158,7 +158,6 @@ const EditUserProfilePage = props => {
       if (res.data.status == 200) {
         let linkImgur = res.data.data.link;
         try {
-
           if(flag ==="avatar"){
             const r2 = await UserService.saveToDatabase(id, linkImgur).then(()=>{
               setSaveAvatarBt("disabled");
@@ -169,7 +168,6 @@ const EditUserProfilePage = props => {
               });
             });
           }else if (flag = "image"){
-
             const r2 = await UserService.saveToDatabaseProfileImage(id, linkImgur).then(()=>{
               setSaveBannerBt("disabled")
               setAlert({
@@ -194,6 +192,7 @@ const EditUserProfilePage = props => {
             closeAlert();
           }, 3000);
         }
+
       }
     } catch (error) {
       setAlert({
@@ -364,6 +363,7 @@ const EditUserProfilePage = props => {
                       </button> */}
                     </div>
                   </div>
+                
                 </div>
               </div>
             </form>

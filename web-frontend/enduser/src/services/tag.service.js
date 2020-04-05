@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { API_URL } from '../config/api';
 
-const baseUrl = API_URL + '/tags';
+const baseUrl = API_URL + '/story-service/tags';
 
 class TagService {
     static async getTags(){

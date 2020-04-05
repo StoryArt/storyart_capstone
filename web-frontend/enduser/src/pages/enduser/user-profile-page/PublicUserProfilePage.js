@@ -59,7 +59,7 @@ let searchTimeout = null;
             const res = await UserService.getUserPublicProfile(userId);
             const { data, success, errors } = res.data;
             if(success){
-                setUser(data);
+                setUser(res.data.data);
             } else {
                 setUserNotfound(true);
                 setUserNotfoundMessage(Object.values(errors)[0]);
@@ -157,7 +157,7 @@ let searchTimeout = null;
                                 style={{float: 'right'}}
                                 count={totalPages} 
                                 page={filters.page}
-                                color="success" 
+                                color="primary" 
                                 onChange={changePage} />
                                 <div className="clearfix"></div>
                         </div>
