@@ -867,7 +867,7 @@ class StoryServiceImpl implements StoryService {
             storySummarizeResponse.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
 
             Query query1 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.click_link where story_id= :storyId");
-            Query query2 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.reading_history where story_id= :storyId");
+            Query query2 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.reading_history where story_id= :storyId and and is_reaching_end=1");
             Query query3 = entityManager.createNativeQuery("SELECT count(*) FROM storyart_db.screen   where story_id= :storyId");
 
 

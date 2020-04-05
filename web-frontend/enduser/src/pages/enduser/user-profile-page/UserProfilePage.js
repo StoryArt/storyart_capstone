@@ -112,21 +112,25 @@ const UserProfilePage = (props) => {
     setOpenBackdrop(true);
     try {
         const token = getTokenFromLocal();
-        const res = await UserService.getCurrentUser(token);
-        console.log(res);
-        const { data, success, errors } = res.data;
-        if(success){
-          setUser(res.data);
-        } else {
-          setUserNotfound(true);
-          setUserNotfoundMessage(Object.values(errors)[0]);
-        }
+        const res = await UserService.getCurrentUser(token).then((res)=>{
+          console.log(res);
+          const { data, success, errors } = res.data;
+          if(success){
+            setUser(res.data);
+          } else {
+            setUserNotfound(true);
+            setUserNotfoundMessage(Object.values(errors)[0]);
+          }
+          setLoadingUser(false);
+          setOpenBackdrop(false);
+
+        });
+      
     } catch (error) {
       setUserNotfound(true);
       console.log(error);   
     }
-    setLoadingUser(false);
-    setOpenBackdrop(false);
+  
   }
 
   const changeFilters = (prop, value) => {
