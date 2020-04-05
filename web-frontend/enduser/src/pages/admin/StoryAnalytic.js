@@ -704,6 +704,8 @@ class Dashboard1 extends React.Component {
                   striped
                   bordered
                   small
+                  noRecordsFoundLabel="Chưa có dữ liệu"
+
                   searching={false}
                   data={this.state.datax}
                   entrieslabel={""}
@@ -753,6 +755,7 @@ class Dashboard1 extends React.Component {
                   striped
                   bordered
                   small
+                  noRecordsFoundLabel="Chưa có dữ liệu"
                   searching={false}
                   data={this.state.clickData}
                   entrieslabel={""}

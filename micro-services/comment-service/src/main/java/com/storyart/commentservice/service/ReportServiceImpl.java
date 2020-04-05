@@ -155,7 +155,7 @@ public class ReportServiceImpl implements ReportService {
         for (ReportCommentResponseDTO response : responseList) {
             List<Integer> reportIds = new ArrayList<>();
             for (Report report: fullInfoReport) {
-                if(report.getCommentId() == response.getCommentId()){
+                if(report.getCommentId().equals(response.getCommentId())){
                     reportIds.add(report.getId());
                 }
             }
@@ -277,7 +277,7 @@ public class ReportServiceImpl implements ReportService {
         for (StoryReportResponse response : responseList) {
             List<Integer> reportIds = new ArrayList<>();
             for (Report report: fullInfoReport) {
-                if(report.getStoryId() == response.getStoryId()){
+                if(report.getStoryId().equals(response.getStoryId())){
                     reportIds.add(report.getId());
                 }
             }

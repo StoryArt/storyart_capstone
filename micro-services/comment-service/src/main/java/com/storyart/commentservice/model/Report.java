@@ -5,13 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
 import java.util.Date;
 
 @Entity
@@ -25,11 +22,11 @@ public class Report extends DateAudit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private int userId;
+    private Integer userId;
 
-    private int storyId;
+    private Integer storyId;
 
-    private int commentId;
+    private Integer commentId;
 
     @Column(length = 1000)
     @Size(max = 1000)
