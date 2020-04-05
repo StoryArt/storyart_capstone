@@ -3,22 +3,23 @@ import { Grid } from "@material-ui/core";
 import MainLayout from "../../layouts/main-layout/MainLayout";
 import { setAuthHeader } from "../../config/auth";
 import Icon from "@mdi/react";
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 
 import DoughnutChart from "./forstoryanalystic/charts/echarts/Doughnut";
 import ModifiedAreaChart from "./forstoryanalystic/shared/ModifiedAreaChart";
-import { mdiAccountMultiple } from '@mdi/js';
+import { mdiAccountMultiple } from "@mdi/js";
 import BeautyStars from "beauty-stars";
 import StatCards from "./forstoryanalystic/shared/StatCards";
 import TableCard from "./forstoryanalystic/shared/TableCard";
 // import RowCards from "./forstoryanalystic/shared/RowCards";
 import { withStyles } from "@material-ui/styles";
+import Statistic from '../../services/statistic.service';
 
 import axios from "axios";
 import Button from "@material-ui/core/Button";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import StringUtils from "../../utils/string"
+import StringUtils from "../../utils/string";
 //
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
@@ -38,15 +39,17 @@ class Dashboard1 extends React.Component {
         commentStatic: [],
         shareStatic: [],
         hitPointStatic: [],
-        clickLinkStatic: []
+        clickLinkStatic: [],
       },
       rating: [],
       ratinguser: 0,
       story: {},
       anchorEl: null,
       anchorE2: null,
+      anchorE3: null,
       daybeforelabel: "Chọn ngày",
       daybeforelabel2: "Chọn ngày",
+      daybeforelabel3: "Chọn ngày",
       tagString: "",
       convertedList: [],
       pageInfo: {
@@ -54,9 +57,10 @@ class Dashboard1 extends React.Component {
         size: 10,
         totalElement: 10,
         totalPages: 1,
-        last: true
+        last: true,
       },
-      timelable2:"",
+      timelable2: "",
+      timelable3: "",
       pageNo: 1,
       datax: {
         columns: [
@@ -64,23 +68,49 @@ class Dashboard1 extends React.Component {
             label: "#",
             field: "id",
             sort: "asc",
-            width: 150
+            width: 150,
           },
           {
             label: "Tiêu đề",
             field: "title",
             sort: "asc",
-            width: 270
+            width: 270,
           },
           {
             label: "Thời lượng đọc",
             field: "sumtime",
             sort: "asc",
-            width: 200
-          }
+            width: 200,
+          },
         ],
-        rows: []
+        rows: [],
       }
+      
+      
+      
+      ,
+      clickData: {
+        columns: [
+       
+          {
+            label: "Link",
+            field: "link",
+            sort: "asc",
+            width: 270,
+          },
+          {
+            label: "Lượt click",
+            field: "count",
+            sort: "asc",
+            width: 200,
+          },
+        ],
+        rows: [],
+      }
+      
+      
+      
+      ,
 
       // storyId: this.props.match.params.storyId
     };
@@ -97,16 +127,22 @@ class Dashboard1 extends React.Component {
     const storyInfo = this.getStorySummary(this.sid);
     this.loadRatingStatic();
     this.handleLoadReactStatic(1);
-   this. handleLoadScreenTime(1)
-    }
-  handleClick = event => {
+    this.handleLoadScreenTime(1);
+    this.handleLoadClickLink(1);
+  }
+  handleClick = (event) => {
     this.setState({
-      anchorEl: event.currentTarget
+      anchorEl: event.currentTarget,
     });
   };
-  handleClick2 = event => {
+  handleClick2 = (event) => {
     this.setState({
-      anchorE2: event.currentTarget
+      anchorE2: event.currentTarget,
+    });
+  };
+  handleClick3 = (event) => {
+    this.setState({
+      anchorE3: event.currentTarget,
     });
   };
 
@@ -114,12 +150,12 @@ class Dashboard1 extends React.Component {
     const url = this.baseUrl + `/story/` + this.sid + `/summary`;
     setAuthHeader(localStorage.getItem("jwt-token"));
 
-    const res = await axios.get(url).then(res => {
+    const res = await axios.get(url).then((res) => {
       this.setState({ story: res.data });
       console.log("summary");
       console.log(this.state.story);
       let tags = "";
-      this.state.story.tags.map(x => {
+      this.state.story.tags.map((x) => {
         tags = tags + x.title + ",";
       });
       this.setState({ tagString: tags });
@@ -128,13 +164,12 @@ class Dashboard1 extends React.Component {
   async loadRatingStatic() {
     const url = this.baseUrl + `/story/` + this.sid + `/statistic/rating`;
 
-
-    const res = await axios.get(url).then(res => {
+    const res = await axios.get(url).then((res) => {
       this.setState({
-        rating: res.data.map(rate => ({
+        rating: res.data.map((rate) => ({
           name: rate.star + " star",
-          value: rate.count
-        }))
+          value: rate.count,
+        })),
       });
       //cho nao bi rendeẻ lai
       console.log("load rating");
@@ -175,71 +210,111 @@ class Dashboard1 extends React.Component {
     if (d < 10) {
       d = "0" + d;
     }
-    return y+"/"+ m + "/" +d ;
+    return y + "/" + m + "/" + d;
   }
-  getScreenTime(url, timerange) {
+  async getScreenTime(timeRange) {
     setAuthHeader(localStorage.getItem("jwt-token"));
-    axios.post(url, timerange).then(res => {
+    await Statistic.getScreenTimeData(this.sid, timeRange).then((res) => {
       console.log("screen time");
       console.log(res.data);
-      this.ConvertUserList(res.data);
+      this.convertToScreenTimeList(res.data);
     });
   }
 
-  //  changePage = async (event, value) => {
-  //   if (value !== pageNo) {
-  //     setPageNo(value);
-  //     try {
-  //       const res = await UserService.getUsersList(value, 10, "");
-  //       ConvertUserList(res.data);
-  //     } catch (error) {}
-  //   }
-  // };
+  async getLinkClick
+(timeRange){
+  setAuthHeader(localStorage.getItem("jwt-token"));
+  await Statistic.getLinkClickData(this.sid, timeRange).then((res) => {
+    console.log("clickLink");
+    console.log(res.data);
+    this.convertToClickList(res.data);
+  });
+}
 
-  ConvertUserList(data) {
+
+
+  convertToScreenTimeList(data) {
     var userList = data;
     let rowsData = [];
 
     for (var index = 0; index < userList.length; index++) {
       let rowItem = {};
-      rowItem["id"] = StringUtils.truncate(StringUtils.removeHtml(userList[index].id), 8) ;
+      rowItem["id"] = StringUtils.truncate(
+        StringUtils.removeHtml(userList[index].id),
+        8
+      );
       rowItem["title"] = userList[index].title;
       rowItem["sumtime"] = userList[index].sumtime;
       rowsData.push(rowItem);
     }
 
     this.setState({
-      datax: {columns: [
-        {
-          label: "ID",
-          field: "id",
-          sort: "asc",
-          width: 50
-        },
-        {
-          label: "Tiêu đề",
-          field: "title",
-          sort: "asc",
-          width: 100
-        },
-        {
-          label: "Thời lượng đọc (giây)",
-          field: "sumtime",
-          sort: "asc",
-          width: 100
-        }
-      ],
-        rows: rowsData
-      }
+      datax: {
+        columns: [
+          {
+            label: "ID",
+            field: "id",
+            sort: "asc",
+            width: 50,
+          },
+          {
+            label: "Tiêu đề",
+            field: "title",
+            sort: "asc",
+            width: 100,
+          },
+          {
+            label: "Thời lượng đọc (giây)",
+            field: "sumtime",
+            sort: "asc",
+            width: 100,
+          },
+        ],
+        rows: rowsData,
+      },
     });
-console.log("datx:")
-    console.log(this.state.datax)
+    console.log("datx:");
+    console.log(this.state.datax);
+  }
+
+  convertToClickList(data) {
+    var userList = data;
+    let rowsData = [];
+
+    for (var index = 0; index < userList.length; index++) {
+      let rowItem = {};
+      
+      rowItem["link"] = userList[index].link;
+      rowItem["count"] = userList[index].count;
+      rowsData.push(rowItem);
+    }
+
+    this.setState({
+      clickData: {
+        columns: [
+        
+          {
+            label: "Link",
+            field: "link",
+            sort: "asc",
+            width: 100,
+          },
+          {
+            label: "Lượt click",
+            field: "count",
+            sort: "asc",
+            width: 100,
+          },
+        ],
+        rows: rowsData,
+      },
+    });
   }
 
   handleLoadReactStatic(daybefore) {
     console.log(daybefore);
     let now = new Date();
-    let toDate= new Date();
+    let toDate = new Date();
     toDate.setDate(now.getDate());
     let to = this.toddMMyyyy(toDate);
     console.log("hom nay: ");
@@ -257,20 +332,20 @@ console.log("datx:")
     console.log(from);
     const timerange = {
       start: from,
-      end: to
+      end: to,
     };
     const url = this.baseUrl + `/story/` + this.sid + `/statistic/react`;
     setAuthHeader(localStorage.getItem("jwt-token"));
 
-    axios.post(url, timerange).then(res => {
+    axios.post(url, timerange).then((res) => {
       this.setState({
         reactStatic: {
           times: res.data.times,
           commentStatic: res.data.numOfComment,
           hitPointStatic: res.data.numOfHitPoint,
           shareStatic: res.data.numOfShare,
-          clickLinkStatic: res.data.numOfClickLink
-        }
+          clickLinkStatic: res.data.numOfClickLink,
+        },
       });
 
       // this.setState(...reactStatic);
@@ -279,36 +354,78 @@ console.log("datx:")
       console.log("du lieu react:");
       console.log(this.state.reactStatic);
     });
-  
 
     // getReactStatic(23,event.target.value, "26/03/2020");
   }
 
-  handleLoadScreenTime(daybefore){
+  handleLoadScreenTime(daybefore) {
     this.setState({ anchorE2: null });
     this.setState({ daybeforelabel2: daybefore + " ngày qua" });
     let now = new Date();
     let fromDate = new Date();
     let toDate = new Date();
-    toDate.setDate(toDate.getDate()+1)
-// toDate.setDate(now.getDate()-1);
+    toDate.setDate(toDate.getDate() + 1);
+    // toDate.setDate(now.getDate()-1);
     let to = this.toyyyyMMdd(toDate);
     let from = "";
     fromDate.setDate(now.getDate() - daybefore);
 
     from = this.toyyyyMMdd(fromDate);
 
-let time = now.getHours() + "h" + now.getMinutes() + "p"
-    this.setState({timelable2:"Kết quả từ 0h0p ngày "+from+" đến "+ time+" ngày hôm nay "+ this.toyyyyMMdd(now) })
+    let time = now.getHours() + "h" + now.getMinutes() + "p";
+    this.setState({
+      timelable2:
+        "Kết quả từ 0h0p ngày " +
+        from +
+        " đến " +
+        time +
+        " ngày hôm nay " +
+        this.toyyyyMMdd(now),
+    });
 
     const timerange = {
       start: from,
-      end: to
+      end: to,
     };
-    let screenUrl =
-    "http://localhost:8000/api/story-service/interact/getScreenTime/" + this.sid;
-  this.getScreenTime(screenUrl, timerange);
+   
+    this.getScreenTime(timerange);
   }
+  handleLoadClickLink(daybefore) {
+    this.setState({ anchorE3: null });
+    this.setState({ daybeforelabel3: daybefore + " ngày qua" });
+    let now = new Date();
+    let fromDate = new Date();
+    let toDate = new Date();
+    toDate.setDate(toDate.getDate() + 1);
+    // toDate.setDate(now.getDate()-1);
+    let to = this.toyyyyMMdd(toDate);
+    let from = "";
+    fromDate.setDate(now.getDate() - daybefore);
+
+    from = this.toyyyyMMdd(fromDate);
+
+    let time = now.getHours() + "h" + now.getMinutes() + "p";
+    this.setState({
+      timelable2:
+        "Kết quả từ 0h0p ngày " +
+        from +
+        " đến " +
+        time +
+        " ngày hôm nay " +
+        this.toyyyyMMdd(now),
+    });
+
+    const timerange = {
+      start: from,
+      end: to,
+    };
+ 
+    this.getLinkClick(timerange);
+  }
+
+
+
+
 
 
   render() {
@@ -320,125 +437,128 @@ let time = now.getHours() + "h" + now.getMinutes() + "p"
           dark: "#01579b",
           main2: "#0288d1",
           veryl: "#81d4fa",
-          white: "#FFFFFF"
+          white: "#FFFFFF",
         },
         secondary: {
           main: "#ffb300",
           light: "#ffd54f",
           dark: "#ff6f00",
           main2: "#ff8f00",
-          veryl: "#ffecb3"
-        }
+          veryl: "#ffecb3",
+        },
       },
       root: {
-        maxWidth: 345
+        maxWidth: 345,
       },
       media: {
         height: 340,
-        paddingTop: "56.25%"
+        paddingTop: "56.25%",
       },
       buttondate: {
-        color: "#FFFFFF"
-      }
+        color: "#FFFFFF",
+      },
     };
 
     return (
-      
-   
       <MainLayout style={{ padding: "0px 0px", opacity: "80%" }}>
-         <Fragment > 
-         <div
-      //  className="pb-24 pt-7 px-8 " 
-      style={{padding:"24px", backgroundColor:"rgb(51, 51, 51)"}}>
-        <div
-          className="card-title capitalize  mb-4
-       "
-          style={{ margin: "0 5 0 0", opacity: "80%" }}
-        >
-           <Typography  style={{color: "rgb(221, 107, 102)"}}gutterBottom variant="h5" component="h2">
-                  {this.state.story.title}
-                </Typography>{" "}
-          <Button
-            variant="outlined"
-            style={{color: "white", outlineColor: "white"}}
-            aria-owns={this.state.anchorEl ? "simple-menu" : undefined}
-            aria-haspopup="true"
-            onClick={this.handleClick}
+        <Fragment>
+          <div
+            //  className="pb-24 pt-7 px-8 "
+            style={{ padding: "24px", backgroundColor: "rgb(51, 51, 51)" }}
           >
-            {this.state.daybeforelabel}
-          </Button>
-          <div>
-            <Menu
-              style={{ borderRadius: "8px" }}
-              id="simple-menu"
-              anchorEl={this.state.anchorEl}
-              open={Boolean(this.state.anchorEl)}
-              onClose={this.handleLoadReactStatic.bind(this, 1)}
+            <div
+              className="card-title capitalize  mb-4
+       "
+              style={{ margin: "0 5 0 0", opacity: "80%" }}
             >
-              <MenuItem onClick={this.handleLoadReactStatic.bind(this, 1)}>
-                1 ngày qua
-              </MenuItem>
-              <MenuItem onClick={this.handleLoadReactStatic.bind(this, 5)}>
-                5 ngày qua
-              </MenuItem>
-              <MenuItem onClick={this.handleLoadReactStatic.bind(this, 28)}>
-                28 ngày qua
-              </MenuItem>
-            </Menu>
-          </div>
-        </div>
+              <Typography
+                style={{ color: "rgb(221, 107, 102)" }}
+                gutterBottom
+                variant="h5"
+                component="h2"
+              >
+                {this.state.story.title}
+              </Typography>{" "}
+              <Button
+                variant="outlined"
+                style={{ color: "white", outlineColor: "#FFFFF" }}
+                aria-owns={this.state.anchorEl ? "simple-menu" : undefined}
+                aria-haspopup="true"
+                onClick={this.handleClick}
+              >
+                {this.state.daybeforelabel}
+              </Button>
+              <div>
+                <Menu
+                  style={{ borderRadius: "8px" }}
+                  id="simple-menu"
+                  anchorEl={this.state.anchorEl}
+                  open={Boolean(this.state.anchorEl)}
+                  onClose={this.handleLoadReactStatic.bind(this, 1)}
+                >
+                  <MenuItem onClick={this.handleLoadReactStatic.bind(this, 1)}>
+                    1 ngày qua
+                  </MenuItem>
+                  <MenuItem onClick={this.handleLoadReactStatic.bind(this, 5)}>
+                    5 ngày qua
+                  </MenuItem>
+                  <MenuItem onClick={this.handleLoadReactStatic.bind(this, 28)}>
+                    28 ngày qua
+                  </MenuItem>
+                </Menu>
+              </div>
+            </div>
 
-        <ModifiedAreaChart
-          height="280px"
-          option={{
-            series: [
-              {
-                data: this.state.reactStatic.commentStatic,
-                // data: [34,12, 31, 45, 31, 43, 26, 43, 31, 45, 33, 40],
-                name: "Bình luận",
-                type: "line",
-                itemStyle:{color:"#c23531"}
-              },
-              // ,{
-              //   data: this.state.reactStatic.shareStatic,
-              //   name:"Luợt xem",
-              //   type: "line"
-              // }
-              // {
-              //   data: this.state.reactStatic.shareStatic,
-              //   name: "Chia sẻ",
-              //   type: "line"
-              // },
-              {
-                data: this.state.reactStatic.clickLinkStatic,
-                name: "Click vào link",
-                type: "line",
-                itemStyle:{
-                  color: "#759aa0"
-                }
-              }
-              ,
-              {
-                data: this.state.reactStatic.hitPointStatic,
-                name: "Hoàn thành",
-                type: "line",
-                itemStyle:{
-                  color: "#ca8622db"
-                }
-              }
-            ],
-            xAxis: {
-              data: this.state.reactStatic.times
-            }
-          }}
-        ></ModifiedAreaChart>
-      </div>
-   
+            <ModifiedAreaChart
+              height="280px"
+              option={{
+                series: [
+                  {
+                    data: this.state.reactStatic.commentStatic,
+                    // data: [34,12, 31, 45, 31, 43, 26, 43, 31, 45, 33, 40],
+                    name: "Bình luận",
+                    type: "line",
+                    itemStyle: { color: "#c23531" },
+                  },
+                  // ,{
+                  //   data: this.state.reactStatic.shareStatic,
+                  //   name:"Luợt xem",
+                  //   type: "line"
+                  // }
+                  // {
+                  //   data: this.state.reactStatic.shareStatic,
+                  //   name: "Chia sẻ",
+                  //   type: "line"
+                  // },
+                  {
+                    data: this.state.reactStatic.clickLinkStatic,
+                    name: "Click vào link",
+                    type: "line",
+                    itemStyle: {
+                      color: "#759aa0",
+                    },
+                  },
+                  {
+                    data: this.state.reactStatic.hitPointStatic,
+                    name: "Hoàn thành",
+                    type: "line",
+                    itemStyle: {
+                      color: "#ca8622db",
+                    },
+                  },
+                ],
+                xAxis: {
+                  data: this.state.reactStatic.times,
+                },
+              }}
+            ></ModifiedAreaChart>
+          </div>
+
           <div className=" m-sm-30 mt--18">
             <Grid container spacing={3}>
               <Grid item lg={4} md={4} sm={12} xs={12}>
                 {/* thong tin truyen */}
-                <Card  style={{ marginBottom: 10 , padding:"0px" }}>
+                <Card style={{ marginBottom: 10, padding: "0px" }}>
                   <CardMedia
                     component="img"
                     alt="Ảnh bìa"
@@ -468,8 +588,10 @@ let time = now.getHours() + "h" + now.getMinutes() + "p"
                       color="textSecondary"
                       component="p"
                     >
-                      {
-                     StringUtils.truncate(StringUtils.removeHtml(this.state.story.intro), 60) }
+                      {StringUtils.truncate(
+                        StringUtils.removeHtml(this.state.story.intro),
+                        60
+                      )}
                     </Typography>{" "}
                     tạo ngày:
                     <Typography
@@ -492,25 +614,27 @@ let time = now.getHours() + "h" + now.getMinutes() + "p"
                   </CardContent>
                   <CardActions>
                     <Button size="small" color="primary">
-                      <a>Xem chi tiết</a>
+                      <a href="/">Xem chi tiết</a>
                     </Button>
                   </CardActions>
                 </Card>
                 {/* danh gia */}
                 <Card className="px-6 py-4 mb-6">
-                  <div className="card-title" style={{paddingLeft: "10px"}}>
-
-                    
-           
-                    <h5>Đánh giá {"  "} 
-                      
-                    <Icon path={mdiAccountMultiple} size={1} color="#ccc"  style={{paddingBottom:"2px"}}></Icon>
-                    <strong style={{ color: "#b0b0b0", fontSize: "20px" }}>
-                      {this.state.story.numOfRate}
-                    </strong> </h5>{" "}
-                    
+                  <div className="card-title" style={{ paddingLeft: "10px" }}>
+                    <h5>
+                      Đánh giá {"  "}
+                      <Icon
+                        path={mdiAccountMultiple}
+                        size={1}
+                        color="#ccc"
+                        style={{ paddingBottom: "2px" }}
+                      ></Icon>
+                      <strong style={{ color: "#b0b0b0", fontSize: "20px" }}>
+                        {this.state.story.numOfRate}
+                      </strong>{" "}
+                    </h5>{" "}
                   </div>
-                  <div className="card-title" style={{paddingLeft: "10px"}}>
+                  <div className="card-title" style={{ paddingLeft: "10px" }}>
                     {" "}
                     <BeautyStars
                       value={this.state.story.avgRate}
@@ -527,7 +651,7 @@ let time = now.getHours() + "h" + now.getMinutes() + "p"
                       theme.palette.primary.light,
                       theme.palette.primary.main2,
                       theme.palette.primary.main,
-                      theme.palette.primary.dark
+                      theme.palette.primary.dark,
                     ]}
                     data1={this.state.rating}
                   />
@@ -549,46 +673,103 @@ let time = now.getHours() + "h" + now.getMinutes() + "p"
                 <h4>Tổng thời gian đọc {"  "} </h4>
                 <div>
                   <Button
-                variant="outlined"
-                endIcon={< ArrowDropDownIcon/>}
-                aria-owns={this.state.anchorE2 ? "simple-menu" : undefined}
-                aria-haspopup="true"
-                
-                style={{marginBottom: "10px", color:"rgba(0, 0, 0, 0.54)" , 
-                outlineColor: "#dee2e6" ,marginRight:"10px"}}
-                onClick={this.handleClick2}
-              >
-                {this.state.daybeforelabel2}
-              </Button>
-                <Menu
-                  style={{ borderRadius: "8px" }}
-                  id="simple-menu"
-                  anchorEl={this.state.anchorE2}
-                  open={Boolean(this.state.anchorE2)}
-                  onClose={this.handleLoadScreenTime.bind(this, 1)}
-                >
-                  <MenuItem onClick={this.handleLoadScreenTime.bind(this, 1)}>
-                    1 ngày qua
-                  </MenuItem>
-                  <MenuItem onClick={this.handleLoadScreenTime.bind(this, 5)}>
-                    5 ngày qua
-                  </MenuItem>
-                  <MenuItem onClick={this.handleLoadScreenTime.bind(this, 28)}>
-                    28 ngày qua
-                  </MenuItem>
-                </Menu>
-                <span style={{color: "#ccc", fontSize:"14px"}} >
-                   {this.state.timelable2}</span>
-              </div>
+                    variant="outlined"
+                    endIcon={<ArrowDropDownIcon />}
+                    aria-owns={this.state.anchorE2 ? "simple-menu" : undefined}
+                    aria-haspopup="true"
+                    style={{
+                      marginBottom: "10px",
+                      color: "rgba(0, 0, 0, 0.54)",
+                      outlineColor: "#dee2e6",
+                      marginRight: "10px",
+                    }}
+                    onClick={this.handleClick2}
+                  >
+                    {this.state.daybeforelabel2}
+                  </Button>
+                  <Menu
+                    style={{ borderRadius: "8px" }}
+                    id="simple-menu"
+                    anchorEl={this.state.anchorE2}
+                    open={Boolean(this.state.anchorE2)}
+                    onClose={this.handleLoadScreenTime.bind(this, 1)}
+                  >
+                    <MenuItem onClick={this.handleLoadScreenTime.bind(this, 1)}>
+                      1 ngày qua
+                    </MenuItem>
+                    <MenuItem onClick={this.handleLoadScreenTime.bind(this, 5)}>
+                      5 ngày qua
+                    </MenuItem>
+                    <MenuItem
+                      onClick={this.handleLoadScreenTime.bind(this, 28)}
+                    >
+                      28 ngày qua
+                    </MenuItem>
+                  </Menu>
+                  <span style={{ color: "#ccc", fontSize: "14px" }}>
+                    {this.state.timelable2}
+                  </span>
+                </div>
                 <MDBDataTable
                   striped
                   bordered
-                  small searching={false}
+                  small
+                  searching={false}
                   data={this.state.datax}
                   entrieslabel={""}
                   paging={false}
                   displayEntries={false}
                 />
+                <div>
+                  <Button
+                    variant="outlined"
+                    endIcon={<ArrowDropDownIcon />}
+                    aria-owns={this.state.anchorE3 ? "simple-menu" : undefined}
+                    aria-haspopup="true"
+                    style={{
+                      marginBottom: "10px",
+                      color: "rgba(0, 0, 0, 0.54)",
+                      outlineColor: "#dee2e6",
+                      marginRight: "10px",
+                    }}
+                    onClick={this.handleClick3}
+                  >
+                    {this.state.daybeforelabel3}
+                  </Button>
+                  <Menu
+                    style={{ borderRadius: "8px" }}
+                    id="simple-menu"
+                    anchorEl={this.state.anchorE3}
+                    open={Boolean(this.state.anchorE3)}
+                    onClose={this.handleLoadClickLink.bind(this, 1)}
+                  >
+                    <MenuItem onClick={this.handleLoadClickLink.bind(this, 1)}>
+                      1 ngày qua
+                    </MenuItem>
+                    <MenuItem onClick={this.handleLoadClickLink.bind(this, 5)}>
+                      5 ngày qua
+                    </MenuItem>
+                    <MenuItem
+                      onClick={this.handleLoadClickLink.bind(this, 28)}
+                    >
+                      28 ngày qua
+                    </MenuItem>
+                  </Menu>
+                  <span style={{ color: "#ccc", fontSize: "14px" }}>
+                    {this.state.timelable3}
+                  </span>
+                </div>
+                <MDBDataTable
+                  striped
+                  bordered
+                  small
+                  searching={false}
+                  data={this.state.clickData}
+                  entrieslabel={""}
+                  paging={false}
+                  displayEntries={false}
+                />
+
                 {/* <Pagination
                   // count={pageInfo.totalPages}
                   count={3}
@@ -600,8 +781,7 @@ let time = now.getHours() + "h" + now.getMinutes() + "p"
             </Grid>
           </div>
         </Fragment>
-         </MainLayout>
-
+      </MainLayout>
     );
   }
 }

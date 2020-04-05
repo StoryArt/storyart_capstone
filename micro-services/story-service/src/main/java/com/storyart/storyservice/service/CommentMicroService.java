@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 
-@FeignClient(name="comment-service")
+@FeignClient(name="api-gateway")
 public interface CommentMicroService {
-    @GetMapping(value = "/api/v1/comment/public/getCommentStatistic")
+    @GetMapping(value = "comment-service/api/v1/comment/public/getCommentStatistic")
     StatisticResponse getCommentListResponce(@RequestParam(defaultValue = "0") @Valid Integer storyId,
                                              @RequestParam(defaultValue = "0") @Valid Integer userId,
                                              @RequestParam(defaultValue = "0") @Valid String start,
