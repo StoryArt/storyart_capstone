@@ -13,7 +13,7 @@ const defaultOption = {
     show: true,
     backgroundColor: "rgb(51, 51, 51)",
   },
-  lineStyle:{color: "rgb(221, 107, 102)"},
+  // lineStyle:{color: "rgb(221, 107, 102)"},
   legend: { 
     backgroundColor: "rgb(51, 51, 51)",
     textStyle: { color: "#fff" },
