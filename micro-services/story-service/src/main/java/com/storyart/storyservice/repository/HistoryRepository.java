@@ -37,7 +37,7 @@ public interface HistoryRepository extends JpaRepository<ReadingHistory, Integer
     @Query(value = "SELECT rh1.* FROM storyart_db.reading_history as rh1" +
             " JOIN (select max(id) id, max(created_at) " +
             "from storyart_db.reading_history " +
-            "where user_id = ?1 group by user_id, story_id order by created_at desc) as rh2" +
-            " on rh1.id = rh2.id", nativeQuery = true)
+            "where user_id = ?1 group by user_id, story_id) as rh2" +
+            " on rh1.id = rh2.id order by created_at desc", nativeQuery = true)
     Page<ReadingHistory> findAllWithUserId(int userId, Pageable pageable);
 }

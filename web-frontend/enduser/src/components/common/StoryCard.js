@@ -18,57 +18,57 @@ const useStyles = makeStyles({
 });
 
 const StoryCard = (props) => {
-    const classes = useStyles();
-    const { story } = props;
+  const classes = useStyles();
+  const { story } = props;
 
-    const viewDetails = () => props.history.push('/stories/details/' + story.id);
-    const readStory = () => props.history.push('/stories/read/' + story.id);
-    
-    return (
-        <Card className={classes.root}>
-        <CardActionArea onClick={viewDetails}>
-          <CardMedia
-            component="img"
-            alt={story.title}
-            height="140"
-            image={ValidationUtils.isEmpty(story.image) ? '/assets/img/no_image.jpeg' : story.image}
-            title={story.title}
-          />
-          <CardContent>
-            {!ValidationUtils.isEmpty(story.user) && (
-                <span>
-                  <PersonIcon/> {(story.user.name)}
-                </span>
-              )}
-            <Typography gutterBottom variant="h5" component="h4" style={{ fontSize: '1.2em' }}>
-              { story.title }
-              <span className="rating-point float-right">
-                {story.avgRate } <StarIcon style={{ color: 'red' }}/>
-              </span>
-            </Typography>
-           
-            {/* <div className="mb-3">{ StringUtils.truncate(StringUtils.removeHtml(story.intro), 60) }</div> */}
-            <div>
-              {DateTimeUtils.getDate(story.createdAt)}
-            </div>
-            
+  const viewDetails = () => props.history.push('/stories/details/' + story.id);
+  const readStory = () => props.history.push('/stories/read/' + story.id);
 
-            <div className="clearfix"></div>
-            <TagList tags={story.tags} />
-            
-           
-          </CardContent>
-        </CardActionArea>
-        <CardActions>
-          <Button size="small" color="primary" onClick={readStory}>
-            Dọc truyện
+  return (
+    <Card className={classes.root}>
+      <CardActionArea onClick={viewDetails}>
+        <CardMedia
+          component="img"
+          alt={story.title}
+          height="140"
+          image={ValidationUtils.isEmpty(story.image) ? '/assets/img/no_image.jpeg' : story.image}
+          title={story.title}
+        />
+        <CardContent>
+          {!ValidationUtils.isEmpty(story.user) && (
+            <span>
+              <PersonIcon /> {(story.user.name)}
+            </span>
+          )}
+          <Typography gutterBottom variant="h5" component="h4" style={{ fontSize: '1.2em' }}>
+            {story.title}
+            <span className="rating-point float-right">
+              {story.avgRate} <StarIcon style={{ color: 'red' }} />
+            </span>
+          </Typography>
+
+          {/* <div className="mb-3">{ StringUtils.truncate(StringUtils.removeHtml(story.intro), 60) }</div> */}
+          <div>
+            {DateTimeUtils.getDate(story.createdAt)}
+          </div>
+
+
+          <div className="clearfix"></div>
+          <TagList tags={story.tags} />
+
+
+        </CardContent>
+      </CardActionArea>
+      <CardActions>
+        <Button size="small" color="primary" onClick={readStory}>
+          Đọc truyện
           </Button>
-          <Button size="small" color="secondary" onClick={viewDetails}>
-            Chi tiết
+        <Button size="small" color="secondary" onClick={viewDetails}>
+          Chi tiết
           </Button>
-        </CardActions>
-      </Card>
-    );
+      </CardActions>
+    </Card>
+  );
 };
 
 
