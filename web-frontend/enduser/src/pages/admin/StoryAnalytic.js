@@ -18,7 +18,7 @@ import axios from "axios";
 import Button from "@material-ui/core/Button";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-
+import StringUtils from "../../utils/string"
 //
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
@@ -202,7 +202,7 @@ class Dashboard1 extends React.Component {
 
     for (var index = 0; index < userList.length; index++) {
       let rowItem = {};
-      rowItem["id"] = userList[index].id;
+      rowItem["id"] = StringUtils.truncate(StringUtils.removeHtml(userList[index].id), 8) ;
       rowItem["title"] = userList[index].title;
       rowItem["sumtime"] = userList[index].sumtime;
       rowsData.push(rowItem);
@@ -211,7 +211,7 @@ class Dashboard1 extends React.Component {
     this.setState({
       datax: {columns: [
         {
-          label: "#",
+          label: "ID",
           field: "id",
           sort: "asc",
           width: 50
@@ -240,14 +240,14 @@ console.log("datx:")
     console.log(daybefore);
     let now = new Date();
     let toDate= new Date();
-    toDate.setDate(now.getDate()-1);
+    toDate.setDate(now.getDate());
     let to = this.toddMMyyyy(toDate);
     console.log("hom nay: ");
     console.log(to);
     let fromDate = new Date();
     let from = "";
     this.setState({ anchorEl: null });
-    this.setState({ daybeforelabel: daybefore + " ngày truớc" });
+    this.setState({ daybeforelabel: daybefore + " ngày qua" });
     fromDate.setDate(now.getDate() - daybefore);
 
     from = this.toddMMyyyy(fromDate);
@@ -286,17 +286,20 @@ console.log("datx:")
 
   handleLoadScreenTime(daybefore){
     this.setState({ anchorE2: null });
-    this.setState({ daybeforelabel2: daybefore + " ngày truớc" });
+    this.setState({ daybeforelabel2: daybefore + " ngày qua" });
     let now = new Date();
     let fromDate = new Date();
     let toDate = new Date();
+    toDate.setDate(toDate.getDate()+1)
 // toDate.setDate(now.getDate()-1);
     let to = this.toyyyyMMdd(toDate);
     let from = "";
     fromDate.setDate(now.getDate() - daybefore);
 
     from = this.toyyyyMMdd(fromDate);
-    this.setState({timelable2:"Kết quả từ ngày "+from+" đến "+ " ngày hôm nay "+ to })
+
+let time = now.getHours() + "h" + now.getMinutes() + "p"
+    this.setState({timelable2:"Kết quả từ 0h0p ngày "+from+" đến "+ time+" ngày hôm nay "+ this.toyyyyMMdd(now) })
 
     const timerange = {
       start: from,
@@ -306,6 +309,7 @@ console.log("datx:")
     "http://localhost:8000/api/story-service/interact/getScreenTime/" + this.sid;
   this.getScreenTime(screenUrl, timerange);
   }
+
 
   render() {
     const theme = {
@@ -372,13 +376,13 @@ console.log("datx:")
               onClose={this.handleLoadReactStatic.bind(this, 1)}
             >
               <MenuItem onClick={this.handleLoadReactStatic.bind(this, 1)}>
-                1 ngày trước
+                1 ngày qua
               </MenuItem>
               <MenuItem onClick={this.handleLoadReactStatic.bind(this, 5)}>
-                5 ngày trước
+                5 ngày qua
               </MenuItem>
               <MenuItem onClick={this.handleLoadReactStatic.bind(this, 28)}>
-                28 ngày trước
+                28 ngày qua
               </MenuItem>
             </Menu>
           </div>
@@ -464,7 +468,8 @@ console.log("datx:")
                       color="textSecondary"
                       component="p"
                     >
-                      {this.state.story.intro}
+                      {
+                     StringUtils.truncate(StringUtils.removeHtml(this.state.story.intro), 60) }
                     </Typography>{" "}
                     tạo ngày:
                     <Typography
@@ -553,7 +558,7 @@ console.log("datx:")
                 outlineColor: "#dee2e6" ,marginRight:"10px"}}
                 onClick={this.handleClick2}
               >
-                {this.state.daybeforelabel}
+                {this.state.daybeforelabel2}
               </Button>
                 <Menu
                   style={{ borderRadius: "8px" }}
@@ -563,13 +568,13 @@ console.log("datx:")
                   onClose={this.handleLoadScreenTime.bind(this, 1)}
                 >
                   <MenuItem onClick={this.handleLoadScreenTime.bind(this, 1)}>
-                    1 ngày trước
+                    1 ngày qua
                   </MenuItem>
                   <MenuItem onClick={this.handleLoadScreenTime.bind(this, 5)}>
-                    5 ngày trước
+                    5 ngày qua
                   </MenuItem>
                   <MenuItem onClick={this.handleLoadScreenTime.bind(this, 28)}>
-                    28 ngày trước
+                    28 ngày qua
                   </MenuItem>
                 </Menu>
                 <span style={{color: "#ccc", fontSize:"14px"}} >

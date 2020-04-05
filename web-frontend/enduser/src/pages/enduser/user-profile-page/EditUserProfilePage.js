@@ -134,9 +134,11 @@ const EditUserProfilePage = props => {
     reader.onload = function(e) {
       setAvatar(e.target.result);
     };
+    if(file!= null){
 
     reader.readAsDataURL(file);
     setSaveAvatarBt("");
+    }
   };
 
   const handleUpload = async event => {
@@ -212,9 +214,11 @@ const EditUserProfilePage = props => {
     reader.onload = function(e) {
       setBanner(e.target.result);
     };
+    if(file!= null){
 
-    reader.readAsDataURL(file);
-    setSaveBannerBt("");
+  reader.readAsDataURL(file);
+  setSaveBannerBt("");
+}
   };
 
   const mystyle = {
