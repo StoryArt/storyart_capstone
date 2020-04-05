@@ -1,12 +1,10 @@
 package com.storyart.storyservice.service;
 
-import com.github.javafaker.Faker;
 import com.storyart.storyservice.common.constants.ACTION_TYPES;
 import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.TagDto;
 import com.storyart.storyservice.dto.create_story.CreateStoryDto;
 import com.storyart.storyservice.dto.ResultDto;
-import com.storyart.storyservice.dto.history.ReadingHistoryResponse;
 import com.storyart.storyservice.dto.read_story.ReadStoryDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryInformationDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryScreenDto;
@@ -54,8 +52,6 @@ public interface StoryService {
     List<GetStoryDto> getTheMostReadingStories();
 
     Page<Story> getNewReleaseStory(int quantity);
-
-    void createTempStories();
 
     List<GetStoryDto> getAll();
 
@@ -131,13 +127,15 @@ class StoryServiceImpl implements StoryService {
     @Autowired
     ModelMapper modelMapper;
 
+    @Autowired
+    EntityManager entityManager;
+
     @Override
     public HashMap<String, String> validateStoryinfo(CreateStoryDto storyDto) {
         HashMap<String, String> errors = new HashMap<>();
-
-
-        if (errors.size() > 0) return errors;
-
+        if(storyDto.getTags().size() == 0){
+            errors.put("TAGS", "Chưa gắn thẻ cho truyện");
+        }
         return errors;
     }
 
@@ -367,15 +365,18 @@ class StoryServiceImpl implements StoryService {
 
     @Override
     public ResultDto createStory(CreateStoryDto createStoryDto, int userId) {
-
         ResultDto result = new ResultDto();
-        Story story = modelMapper.map(createStoryDto, Story.class);
+        HashMap<String, String> errors = validateStoryinfo(createStoryDto);
 
-        if(createStoryDto.getTags().size() == 0){
+        if(errors.size() > 0){
             result.setSuccess(false);
-            result.getErrors().put("TAGS", "Chưa gắn thẻ cho truyện");
+            result.setErrors(errors);
             return result;
         }
+
+        Story story = modelMapper.map(createStoryDto, Story.class);
+
+
 
         HashMap<String, String> screenIdsMap = new HashMap<>();
         HashMap<String, String> actionIdsMap = new HashMap<>();
@@ -466,6 +467,13 @@ class StoryServiceImpl implements StoryService {
     @Override
     public ResultDto updateStory(CreateStoryDto storyDto, int userId) {
         ResultDto resultDto = new ResultDto();
+        HashMap<String, String> errors = validateStoryinfo(storyDto);
+
+        if(errors.size() > 0){
+            resultDto.setSuccess(false);
+            resultDto.setErrors(errors);
+            return resultDto;
+        }
         Story foundStory = storyRepository.findById(storyDto.getId()).orElse(null);
 
         if (foundStory == null) {
@@ -675,64 +683,6 @@ class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public void createTempStories() {
-        Faker faker = new Faker(new Locale("vi"));
-
-        String[] tags = new String[]{"kinh dị", "bi kịch", "hài kịch", "thiếu nhi", "người lớn",
-                "thế giới", "động vật", "thực vật", "khám phá", "thiên nhiên", "con nguời", "thần thoại",
-                "cổ tích", "quảng cáo", "marketing", "thương hiệu", "kinh doanh", "trò choi", "bí ẩn",
-                "giới tính", "giáo dục", "chính trị", "lịch sử", "nhân văn", "nhân loại", "vũ trụ"};
-
-        List<Tag> savedTags = Arrays.asList(tags).stream().map(tag -> {
-            Tag tag1 = new Tag();
-            tag1.setTitle(tag);
-            return tag1;
-        }).collect(Collectors.toList());
-        tagRepository.saveAll(savedTags);
-
-
-        List<Story> stories = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            Story story = new Story();
-            story.setTitle(faker.book().title());
-            story.setIntro(faker.lorem().paragraph(8));
-            story.setAvgRate(faker.number().randomDouble(2, 0, 5));
-            int reads = new Random().nextInt(100) + 10;
-            story.setImage("http://lorempixel.com/400/200");
-            story.setActive(true);
-            story.setUserId(1);
-            story.setDeactiveByAdmin(false);
-            story.setPublished(true);
-            story.setFirstScreenId(MyStringUtils.generateUniqueId());
-            stories.add(story);
-            Story saved = storyRepository.save(story);
-            List<Integer> tagList = getRandomTags(7);
-            tagList.stream().forEach(t -> {
-                StoryTag st = new StoryTag();
-                st.setStoryId(saved.getId());
-                st.setTagId(t);
-                storyTagRepository.save(st);
-            });
-        }
-        List<Story> savedStories = storyRepository.saveAll(stories);
-
-        savedStories.stream().forEach(story -> {
-            int quantity = faker.number().numberBetween(12, 100);
-            for (int i = 1; i <= quantity; i++) {
-                Comment comment = new Comment();
-                comment.setStoryId(story.getId());
-                comment.setContent(faker.lorem().sentence(10, 100));
-                Rating rating = new Rating();
-                rating.setStoryId(story.getId());
-                double stars = faker.number().numberBetween(1, 5);
-                rating.setStars(stars);
-                commentRepository.save(comment);
-                ratingRepository.save(rating);
-            }
-        });
-    }
-
-    @Override
     public List<GetStoryDto> getAll() {
         List<Story> stories = storyRepository.findAll();
         return stories.stream().map(story -> mapModelToDto(story)).collect(Collectors.toList());
@@ -857,21 +807,6 @@ class StoryServiceImpl implements StoryService {
         return result;
     }
 
-    List<Integer> getRandomTags(int quantity) {
-        List<Tag> tagsList = tagRepository.findAll();
-        int length = tagsList.size();
-        List<Tag> list = new ArrayList<>();
-        List<Integer> indexes = new ArrayList<>();
-        for (int i = 1; i <= quantity; i++) {
-            int index = new Random().nextInt(length);
-            if (indexes.contains(index)) continue;
-            indexes.add(index);
-            list.add(tagsList.get(index));
-        }
-        return list.stream().map(t -> t.getId()).collect(Collectors.toList());
-    }
-@Autowired
-    EntityManager entityManager;
     @Override
     public StorySummarizeResponse getStorySummarizeResponse(int sid) {
         Story story = storyRepository.findById(sid).orElse(null);
