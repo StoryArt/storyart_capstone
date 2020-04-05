@@ -38,7 +38,7 @@ const defaultOption = {
   series: [
     {
       areaStyle: {},
-      smooth: false,
+      smooth: true,
       lineStyle: {
         width: 3,
         // color: "rgb(221, 107, 102)",

@@ -4,6 +4,7 @@ import com.storyart.storyservice.model.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Date;
 import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Integer> {
@@ -26,6 +27,9 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
             "and storyart_db.comment.story_id in (?1)"
             , nativeQuery = true)
     List<Integer> countDisLikeCommentByStoryIds (List<Integer> storyId);
+
+    List<Comment> findAllByStoryIdInAndActiveAndDisableByAdminAndCreatedAtBetweenOrderByCreatedAtDesc(List<Integer> storyIds, boolean isActive, boolean isDisableByAdmin, Date startDate, Date endDate);
+
 
 
 }

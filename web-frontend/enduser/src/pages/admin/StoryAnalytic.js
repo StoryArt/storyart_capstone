@@ -406,7 +406,7 @@ class Dashboard1 extends React.Component {
 
     let time = now.getHours() + "h" + now.getMinutes() + "p";
     this.setState({
-      timelable2:
+      timelable3:
         "Kết quả từ 0h0p ngày " +
         from +
         " đến " +
@@ -519,17 +519,9 @@ class Dashboard1 extends React.Component {
                     name: "Bình luận",
                     type: "line",
                     itemStyle: { color: "#c23531" },
+                    smooth: true,
                   },
-                  // ,{
-                  //   data: this.state.reactStatic.shareStatic,
-                  //   name:"Luợt xem",
-                  //   type: "line"
-                  // }
-                  // {
-                  //   data: this.state.reactStatic.shareStatic,
-                  //   name: "Chia sẻ",
-                  //   type: "line"
-                  // },
+                 
                   {
                     data: this.state.reactStatic.clickLinkStatic,
                     name: "Click vào link",
@@ -537,6 +529,7 @@ class Dashboard1 extends React.Component {
                     itemStyle: {
                       color: "#759aa0",
                     },
+                    smooth: true,
                   },
                   {
                     data: this.state.reactStatic.hitPointStatic,
@@ -545,6 +538,7 @@ class Dashboard1 extends React.Component {
                     itemStyle: {
                       color: "#ca8622db",
                     },
+                    smooth: true,
                   },
                 ],
                 xAxis: {
