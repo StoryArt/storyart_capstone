@@ -88,6 +88,7 @@ const AppNavbar = (props) => {
   const isRouteSysAdmin = currentRoute.indexOf('/sysadmin') === 0;
   const isShowGoToAdmin  = (!isRouteAdmin && !isRouteSysAdmin) && isAdminAuth(user);
   const isShowGoToSysAdmin  = (!isRouteAdmin && !isRouteSysAdmin) && isSysAdminAuth(user);
+  const isShowGoToHomePage =  (isRouteAdmin || isRouteSysAdmin);
 
   const handleMenu = event => {
     setAnchorEl(event.currentTarget);
@@ -154,6 +155,15 @@ const AppNavbar = (props) => {
                 onClick={() => navigateRoute('/admin/users')}
                 edge="end"
                 color="inherit">Đi tới trang quản lý</Button>
+            </>
+          )}
+          
+          {isShowGoToHomePage && (
+            <>
+              <Button
+                onClick={() => navigateRoute('/home')}
+                edge="end"
+                color="inherit">Đi tới trang truyện</Button>
             </>
           )}
 
