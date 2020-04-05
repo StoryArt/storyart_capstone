@@ -59,9 +59,6 @@ public class Story extends DateAudit {
     @Column(columnDefinition="tinyint(1) default 0")
     private boolean deactiveByAdmin;
 
-    @Column(columnDefinition = "int default 0")
-    private int numOfRead;
-
     private Date createdAt;
 
     private Date updatedAt;
