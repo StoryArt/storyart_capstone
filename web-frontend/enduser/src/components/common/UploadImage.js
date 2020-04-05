@@ -28,15 +28,18 @@ const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
         setBanner2(e.target.result);
           console.log(imageBanner)
       };
+    if(file!= null){
+
       reader.readAsDataURL(file);
       setSaveBannerBt("");
+    }
     } else {
       setUploadFile(file);
       reader.onload = function (e) {
         setAvatar2(e.target.result);
       };
-    if(file!= null){
-      reader.readAsDataURL(file);
+      if(file!= null){
+        reader.readAsDataURL(file);
       setSaveAvatarBt("");
     }
 

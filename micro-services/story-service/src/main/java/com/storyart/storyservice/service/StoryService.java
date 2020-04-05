@@ -812,7 +812,7 @@ class StoryServiceImpl implements StoryService {
         Story story = storyRepository.findById(sid).orElse(null);
         if (story != null) {
             StorySummarizeResponse storySummarizeResponse = modelMapper.map(story, StorySummarizeResponse.class);
-
+storySummarizeResponse.setNumOfRead(historyRepository.countAllByStoryId(sid));
 
             List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
             storySummarizeResponse.setTags(tagService.mapModelToDto(tagList));
