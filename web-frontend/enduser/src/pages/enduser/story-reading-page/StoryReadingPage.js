@@ -25,6 +25,23 @@ let listScreenId = [];
 let initialInformations;
 let isEndStory = false;
 let savedStoryId;
+let myCurrentScreen = null;
+
+const countTimeReading = () => {
+    readingScreenDuration = 0;
+    interval = window.setInterval(() => {
+        readingScreenDuration++;
+
+        //if time is more than 5 min, set time for this screen and stop counter
+        if(readingScreenDuration > 60*60) {
+            stopCountTimeReading();
+        }
+    }, 1000);
+}
+
+const stopCountTimeReading = () => {
+    window.clearInterval(interval);
+}
 
 const ReadStoryPage = (props) => {
 
@@ -54,10 +71,12 @@ const ReadStoryPage = (props) => {
         
         getReadingStory(storyId);
 
+        //save history when reload the page
         window.addEventListener('beforeunload', () => {
             saveHistoryBeforeLeavePage();
         });
 
+        //save history when navigate page
         return () => {
             if(!notfound){
                 window.addEventListener('beforeunload', () => {});
@@ -68,6 +87,7 @@ const ReadStoryPage = (props) => {
     }, []);
 
     const saveHistoryBeforeLeavePage = () => {
+        stopCountTimeReading();
         if(!isEndStory && listScreenId.length > 0){
             const data = {
                 storyId: savedStoryId,
@@ -75,11 +95,17 @@ const ReadStoryPage = (props) => {
                 listScreenId: listScreenId.toString()
             }
             saveReadingHistory(data);
+        } else {
+            //cal time of end screen
+            saveScreenReadTime({
+                screenId: myCurrentScreen.id, 
+                duration: readingScreenDuration 
+            })
         }
     }
 
     const isEndScreen = (screen) => {
-        if(screen == null) return false;
+        if(ValidationUtils.isEmpty(screen)) return false;
         if (screen.id === story.firstScreenId) return false;
         
         const haveNextScreenAction = ValidationUtils.isEmpty(screen.actions) ? false : screen.actions.some(a => a.type === ACTION_TYPES.NEXT_SCREEN || a.type === ACTION_TYPES.UPDATE_INFORMATION)
@@ -103,18 +129,19 @@ const ReadStoryPage = (props) => {
         if(!ValidationUtils.isEmpty(screen)){
             
             listScreenId.push(screen.id);
+            myCurrentScreen = JSON.parse(JSON.stringify(screen));
 
-            if(currentScreen != null && !isEndScreen(currentScreen)){
+            if(currentScreen != null){
                 stopCountTimeReading();
-                saveScreenReadTime({ screenId: currentScreen.id, duration: readingScreenDuration });
+                saveScreenReadTime({ 
+                    screenId: currentScreen.id, 
+                    duration: readingScreenDuration 
+                });
             }
-            
 
             if(isEndScreen(screen)){
                 setEnd(true);
                 isEndStory = true;
-                stopCountTimeReading();
-                readingScreenDuration = 0;
                 const data = {
                     storyId: story.id,
                     isReachingEnd: true,
@@ -124,11 +151,9 @@ const ReadStoryPage = (props) => {
             }
         }
 
-
         setTimeout(() => {
             setCurrentScreen(screen)
             setShowScreen(true);
-
             countTimeReading();
         }, 1000);
     }
@@ -140,22 +165,6 @@ const ReadStoryPage = (props) => {
         } catch (error) {
             console.log(error);
         }
-    }
-
-    const countTimeReading = () => {
-        readingScreenDuration = 0;
-        interval = window.setInterval(() => {
-            readingScreenDuration++;
-
-            //if time is more than 5 min, set time for this screen and stop counter
-            if(readingScreenDuration > 60*60) {
-                stopCountTimeReading();
-            }
-        }, 1000);
-    }
-
-    const stopCountTimeReading = () => {
-        window.clearInterval(interval);
     }
 
     const getReadingStory = async (storyId) => {

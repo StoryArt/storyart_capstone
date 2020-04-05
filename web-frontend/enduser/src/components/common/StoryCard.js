@@ -48,15 +48,14 @@ const StoryCard = (props) => {
             </Typography>
            
             {/* <div className="mb-3">{ StringUtils.truncate(StringUtils.removeHtml(story.intro), 60) }</div> */}
+            <div className="mb-3">Lượt đọc: { story.numOfRead }</div>
             <div>
               {DateTimeUtils.getDate(story.createdAt)}
             </div>
-            
 
             <div className="clearfix"></div>
             <TagList tags={story.tags} />
             
-           
           </CardContent>
         </CardActionArea>
         <CardActions>

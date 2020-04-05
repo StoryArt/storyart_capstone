@@ -451,11 +451,11 @@ const CreateStoryPage = (props) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="row">
+                                        {/* <div className="row">
                                             <div className="col-8 mx-auto">
                                                 <MyUploadImage/>
                                             </div>
-                                        </div>
+                                        </div> */}
                                         <div className="mb-5">
                                           
 

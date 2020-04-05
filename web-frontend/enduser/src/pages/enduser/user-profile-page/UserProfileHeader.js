@@ -65,9 +65,9 @@ const UserProfileHeader = (props) => {
                 </CardContent>
             </CardActionArea>
             <CardActions className={classes.actions}>
-                <Button style={{ float: 'right' }} className={classes.button} size="small" color="primary">
+                {/* <Button style={{ float: 'right' }} className={classes.button} size="small" color="primary">
                      Chia sẻ
-                </Button>
+                </Button> */}
                {canEdit && (
                 <Button onClick={() => navigateRoute('/user/edit-profile')} size="small" color="secondary">
                     Cập nhât 

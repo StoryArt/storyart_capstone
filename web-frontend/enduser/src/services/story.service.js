@@ -72,9 +72,8 @@ class StoryService {
     return axios.get(url);
   }
 
-  static async getTrendStories(quantity) {
-    if (!quantity) quantity = 12;
-    const url = baseUrl + "/public/trend?quantity=" + quantity;
+  static async getTrendStories() {
+    const url = baseUrl + "/public/trend";
     return axios.get(url);
   }
 

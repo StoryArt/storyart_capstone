@@ -40,4 +40,6 @@ public interface HistoryRepository extends JpaRepository<ReadingHistory, Integer
             "where user_id = ?1 group by user_id, story_id order by created_at desc) as rh2" +
             " on rh1.id = rh2.id", nativeQuery = true)
     Page<ReadingHistory> findAllWithUserId(int userId, Pageable pageable);
+
+    int countAllByStoryId(int storyId);
 }
