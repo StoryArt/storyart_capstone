@@ -5,9 +5,7 @@ import MyAlert from "./MyAlert";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 
 const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
-// h đơn giản vậy thôi nè. a có input avatar ở trên .
-// chỉ cần cho nó cập nhật là đcd
-// a nghi la do cai nay. vì bên kia là object
+
     let checkimage = null;
 
   const [avatar2, setAvatar2] = useState(imageAvatar);
@@ -154,7 +152,7 @@ const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
                   accept=".jpg, .gif, .png"
                   onChange={(e) => onchange(e.target.files[0])}
                 />
-                <p className="tips">JPG, GIF or PNG, Max size: 10MB</p>
+                <p className="tips">JPG, GIF or PNG, Dung lượng tối đa: 10MB</p>
                 <div className="form-group">
                   <Button
                     color="primary"
@@ -202,7 +200,7 @@ const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
                   accept=".jpg, .gif, .png"
                   onChange={(e) => onchange(e.target.files[0])}
                 />
-                <p className="tips">JPG, GIF or PNG, Max size: 10MB</p>
+                <p className="tips">JPG, GIF or PNG, Dung lượng tối đa: 10MB</p>
                 <div className="form-group">
                   <Button
                     color="primary"
