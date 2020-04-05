@@ -7,6 +7,7 @@ import com.storyart.storyservice.dto.statistic.*;
 import com.storyart.storyservice.model.Rating;
 import com.storyart.storyservice.security.CurrentUser;
 import com.storyart.storyservice.security.UserPrincipal;
+import com.storyart.storyservice.service.LinkClickService;
 import com.storyart.storyservice.service.ScreenReadingTimeService;
 import com.storyart.storyservice.service.StoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -220,5 +221,13 @@ public class StoryController {
     public ResponseEntity getReacts_Statistic(@PathVariable int sid, @RequestBody TimeRangeRequest timeRangeRequest){
         StoryReactByRange storyReactByRanges= storyService.getReactStatisticInTimeRange(sid,timeRangeRequest );
         return new ResponseEntity(storyReactByRanges, HttpStatus.OK);
+    }
+
+    @Autowired
+    LinkClickService linkClickService;
+    @PostMapping("story/{sid}/statistic/link-click")
+    public ResponseEntity countLinkClickByStoryInTimeRange(@PathVariable int sid, @RequestBody TimeRangeRequest timeRangeRequest){
+        List<ILinkClickCountResponse> iLinkClickCountResponses = linkClickService.countLinkClickByStoryIdInTimeRange(sid, timeRangeRequest.getStart(), timeRangeRequest.getEnd());
+        return new ResponseEntity(iLinkClickCountResponses, HttpStatus.OK);
     }
 }

@@ -97,6 +97,7 @@ const DoughnutChart = ({ height, color = [], theme, data1=[]}) => {
   // option nay co 
   console.log("du lieu rating donut char:");
   console.log(data1);
+console.log({option});
 
   return (
     <ReactEcharts

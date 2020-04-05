@@ -156,4 +156,10 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
 
     @Query(value = "SELECT * FROM story s where s.user_id = ?1 order by s.created_at desc", nativeQuery = true)
     List<Story> findAllByUserId(int userId);
+
+   //ta: use for get comment
+    @Query("select s.id from Story s where s.userId = ?1 and s.active = true and s.deactiveByAdmin=false")
+    List<Integer> getAllStoryIdByUserId(int userId);
+
+
 }
