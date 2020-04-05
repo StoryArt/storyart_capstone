@@ -44,9 +44,9 @@ const EditUserProfilePage = props => {
   const [jointAt, setJointAt] = useState("");
   const [is_active, setIsActive] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [avatar, setAvatar] = useState(null);
+  const [avatar, setAvatar] = useState("");
   const [upfile, setUploadFile] = useState(null);
-  const [banner, setBanner] = useState(null);
+  const [banner, setBanner] = useState("");
   const [upfileBanner, setUploadFileBanner] = useState(null);
   const [saveAvatarBt, setSaveAvatarBt] = useState("disabled");
   const [saveBannerBt, setSaveBannerBt] = useState("disabled");
@@ -111,6 +111,7 @@ const EditUserProfilePage = props => {
       setProfile(res.data);
       setEmail(res.data.email);
       setAvatar(res.data.avatar);
+      console.log(avatar);
       setId(res.data.id);
       setName(res.data.name);
       setUs(res.data.username);
@@ -124,102 +125,10 @@ const EditUserProfilePage = props => {
       console.log(error);
     }
   };
-
-  const onChangeAvatar = async file => {
-    setUploadFile(file);
-
-    var reader = new FileReader();
-
-    reader.onload = function(e) {
-      setAvatar(e.target.result);
-    };
-
-    reader.readAsDataURL(file);
-    setSaveAvatarBt("");
-  };
-  const handleUpload = async event => {
-    event.preventDefault();
-    try {
-      let res = null;
-      let flag = "";
-      if(upfile != null){
-        res = await UserService.uploadAvatar(upfile);
-        flag = "avatar";
-        console.log(res);
-      }else if (upfileBanner != null){
-        res = await UserService.uploadProfileImage(upfileBanner);
-        flag = "image";
-        console.log(res);
-      }
-      if (res.data.status == 200) {
-        let linkImgur = res.data.data.link;
-        try {
-
-          if(flag ==="avatar"){
-            const r2 = await UserService.saveToDatabase(id, linkImgur);
-          }else if (flag = "image"){
-
-            const r2 = await UserService.saveToDatabaseProfileImage(id, linkImgur);
-          }
-          setAlert({
-            open: true,
-            content: "Đã cập nhật ảnh!",
-            type: "success"
-          });
-          window.setTimeout(() => {
-            closeAlert();
-          }, 3000);
-        } catch (error) {
-          setAlert({
-            open: true,
-            content: "Lưu thất bại. Thử lại!",
-            type: "error"
-          });
-          window.setTimeout(() => {
-            closeAlert();
-          }, 3000);
-        }
-      }
-    } catch (error) {
-      setAlert({
-        open: true,
-        content: "Upload thất bại. Thử lại!",
-        type: "error"
-      });
-      window.setTimeout(() => {
-        closeAlert();
-      }, 3000);
-    }
-  };
-
-  const onChangeBanner = async file => {
-    setUploadFileBanner(file);
-
-    var reader = new FileReader();
-
-    reader.onload = function(e) {
-      setBanner(e.target.result);
-    };
-
-    reader.readAsDataURL(file);
-    setSaveBannerBt("");
-  };
-
   const mystyle = {
     textAlign: "center",
     margin: "0 auto"
   };
-  const mystyleLeft = {
-    textAlign: "left",
-    paddingTop: "200px",
-    margin: "0 auto"
-  };
-  const mystyleRight = {
-    textAlign: "right",
-    margin: "0 auto"
-  };
-
-  
   const statusButton = [];
   statusButton.push(
     <MDBBtn
@@ -229,10 +138,7 @@ const EditUserProfilePage = props => {
       {profile.active ? "Active" : "Deactivated"}
     </MDBBtn>
   );
-
-
   const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
-
   return (
     <MainLayout>
       <MyAlert
@@ -248,15 +154,20 @@ const EditUserProfilePage = props => {
           Tài khoản
         </Typography>
         <div className="col-sm-12">
-
-
+     
          <UploadImage 
          isBanner = 'banner'
          Idis ={id}
+         imageBanner={banner}
+         imageAvatar= ''
          />
+ 
+
          <UploadImage 
          isBanner = 'avatar'
          Idis ={id}
+         imageAvatar={avatar}
+         imageBanner= ''
          />
         </div>
 
