@@ -4,16 +4,9 @@ import Button from "@material-ui/core/Button";
 import MyAlert from "./MyAlert";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 
-const UploadImage = ({
-  isBanner,
-  Idis,
-  imageBanner = "",
-  imageAvatar = "",
-}) => {
-  // h đơn giản vậy thôi nè. a có input avatar ở trên .
-  // chỉ cần cho nó cập nhật là đcd
-  // a nghi la do cai nay. vì bên kia là object
-  let checkimage = null;
+const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
+
+    let checkimage = null;
 
   const [avatar2, setAvatar2] = useState(imageAvatar);
   const [upfile, setUploadFile] = useState(null);
@@ -27,26 +20,27 @@ const UploadImage = ({
     open: false,
   });
   const onchange = async (file) => {
+  
     var reader = new FileReader();
     if (isBanner === "banner") {
       setUploadFileBanner(file);
       reader.onload = function (e) {
         setBanner2(e.target.result);
-        console.log(imageBanner);
+          console.log(imageBanner)
       };
-      if (file != null) {
-        reader.readAsDataURL(file);
-        setSaveBannerBt("");
-      }
+      reader.readAsDataURL(file);
+      setSaveBannerBt("");
     } else {
       setUploadFile(file);
       reader.onload = function (e) {
         setAvatar2(e.target.result);
       };
-      if (file != null) {
-        reader.readAsDataURL(file);
-        setSaveAvatarBt("");
-      }
+    if(file!= null){
+      reader.readAsDataURL(file);
+      setSaveAvatarBt("");
+    }
+
+   
     }
   };
   const handleUpload = async (event) => {
@@ -120,11 +114,15 @@ const UploadImage = ({
     margin: "0 auto",
   };
 
+
+  
   const closeAlert = () =>
     window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
-  console.log(imageAvatar);
+    console.log(imageAvatar)
+    
 
-  if (isBanner == "banner") {
+
+    if (isBanner == "banner") { 
     return (
       <div style={mystyleRight}>
         <form
@@ -144,12 +142,7 @@ const UploadImage = ({
               <div className="banner-container">
                 <label htmlFor="banner1">hình nền</label>
                 <div className="banner-600">
-                  <img
-                    id="banner1"
-                    name="banner1"
-                    src={banner2 != "" ? banner2 : imageBanner}
-                    width="200"
-                  />
+                  <img id="banner1" name="banner1" src={banner2!=""?banner2:imageBanner} width="200" />
                 </div>
               </div>
               <div className="control">
@@ -159,7 +152,7 @@ const UploadImage = ({
                   accept=".jpg, .gif, .png"
                   onChange={(e) => onchange(e.target.files[0])}
                 />
-                <p className="tips">JPG, GIF or PNG, Max size: 10MB</p>
+                <p className="tips">JPG, GIF or PNG, Dung lượng tối đa: 10MB</p>
                 <div className="form-group">
                   <Button
                     color="primary"
@@ -195,14 +188,9 @@ const UploadImage = ({
             {/* //avatar */}
             <div style={mystyle} className="form-group field avatar">
               <div className="avatar-container">
-                <label htmlFor="avatar1">Avatar </label>
+    <label htmlFor="avatar1">Avatar </label>
                 <div className="avatar-80">
-                  <img
-                    id="avatar1"
-                    name="avatar1"
-                    src={avatar2 != "" ? avatar2 : imageAvatar}
-                    width="80"
-                  />
+                  <img id="avatar1" name="avatar1" src={avatar2!=""? avatar2:imageAvatar} width="80" />
                 </div>
               </div>
               <div className="control">
@@ -212,7 +200,7 @@ const UploadImage = ({
                   accept=".jpg, .gif, .png"
                   onChange={(e) => onchange(e.target.files[0])}
                 />
-                <p className="tips">JPG, GIF or PNG, Max size: 10MB</p>
+                <p className="tips">JPG, GIF or PNG, Dung lượng tối đa: 10MB</p>
                 <div className="form-group">
                   <Button
                     color="primary"
