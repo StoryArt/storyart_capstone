@@ -416,3 +416,7 @@ canvas {
 .text-primary {
   color: #0277bd !important;
 }
+
+.btn-success, .btn-primary, .btn-warning{
+  background-color: #766994!important;
+}
