@@ -36,6 +36,11 @@ const orderBys = getOrderBys();
 
 let searchTimeout;
 
+const getDateAgo = (numOfDays) => {
+  const d = new Date();
+  return new Date(d.setDate(d.getDate() - numOfDays));
+}
+
 const UserProfilePage = (props) => {
 
   const [user, setUser] = useState({});
@@ -47,7 +52,7 @@ const UserProfilePage = (props) => {
   const [story, setStory] = useState(null);
   const [isLoadingstories, setIsLoadingStories] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
-  const [dateRange, setDateRange] = useState({ from: new Date(), to: new Date() });
+  const [dateRange, setDateRange] = useState({ from: getDateAgo(7), to: new Date() });
   const [readingStatisticData, setReadingStatisticData] = useState([]);
   const [filters, setFilters] = useState({
     keyword: '',
@@ -72,7 +77,8 @@ const UserProfilePage = (props) => {
     }
   }
 
-  const getReadStatistic = async () => {
+  const getReadStatistic = async (dateRange) => {
+    if(ValidationUtils.isEmpty(dateRange)) dateRange = { from: getDateAgo(7), to: new Date() };
     let { from, to } = dateRange;
     
     from = from.toLocaleDateString();
@@ -214,9 +220,7 @@ const UserProfilePage = (props) => {
 
   const changeDateRange = (prop, value) => {
     setDateRange({ ...dateRange, [prop]: value });
-    window.setTimeout(() => {
-      getReadStatistic();
-    }, 300);
+    getReadStatistic({ ...dateRange, [prop]: value });
   }
 
   return (
@@ -230,7 +234,7 @@ const UserProfilePage = (props) => {
                 </div> 
               </div>
 
-                <h3 className="text-bold">Thống kê lượt đọc tát cả các truyện</h3> 
+                <h3 className="text-bold">Thống kê lượt đọc tất cả các truyện</h3> 
                 <hr style={{ border: "1px solid #ccc" }} /> 
                 <div className="row my-5">
                   <div className="col-12">
@@ -246,7 +250,7 @@ const UserProfilePage = (props) => {
                       label="Đến ngày"
                     />
                     <UserReadingChart
-                      data={readingStatisticData}
+                      data={readingStatisticData.map(item => ({ ...item, name: 'Lượt đọc' }))}
                       dataKeyName="dateCreated"
                       dataKeyArea="readCount"
                     />
@@ -317,6 +321,7 @@ const UserProfilePage = (props) => {
                           style={{float: 'right'}}
                           count={totalPages} 
                           page={filters.page}
+                          color="primary"
                           onChange={changePage} />
                     </div>
                   </div>
@@ -409,6 +414,7 @@ const UserProfilePage = (props) => {
                           style={{float: 'right'}}
                           count={totalPages} 
                           page={filters.page}
+                          color="primary"
                           onChange={changePage} />
                     </div>
                   </div>

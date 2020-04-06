@@ -189,7 +189,7 @@ let searchTimeout = null;
                         style={{float: 'right'}}
                         count={totalPages} 
                         page={filters.page}
-                        color="success" 
+                        color="primary" 
                         onChange={changePage} />
                         <div className="clearfix"></div>
                 </div>

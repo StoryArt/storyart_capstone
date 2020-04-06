@@ -5,9 +5,7 @@ import MyAlert from "./MyAlert";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 
 const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
-// h đơn giản vậy thôi nè. a có input avatar ở trên .
-// chỉ cần cho nó cập nhật là đcd
-// a nghi la do cai nay. vì bên kia là object
+
     let checkimage = null;
 
   const [avatar2, setAvatar2] = useState(imageAvatar);
@@ -30,15 +28,18 @@ const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
         setBanner2(e.target.result);
           console.log(imageBanner)
       };
+    if(file!= null){
+
       reader.readAsDataURL(file);
       setSaveBannerBt("");
+    }
     } else {
       setUploadFile(file);
       reader.onload = function (e) {
         setAvatar2(e.target.result);
       };
-    if(file!= null){
-      reader.readAsDataURL(file);
+      if(file!= null){
+        reader.readAsDataURL(file);
       setSaveAvatarBt("");
     }
 
@@ -142,7 +143,7 @@ const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
             {/* //avatar */}
             <div className="form-group field banner">
               <div className="banner-container">
-                <label htmlFor="banner1">hình nền</label>
+                {/* <label htmlFor="banner1">hình nền</label> */}
                 <div className="banner-600">
                   <img id="banner1" name="banner1" src={banner2!=""?banner2:imageBanner} width="200" />
                 </div>
@@ -154,7 +155,7 @@ const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
                   accept=".jpg, .gif, .png"
                   onChange={(e) => onchange(e.target.files[0])}
                 />
-                <p className="tips">JPG, GIF or PNG, Max size: 10MB</p>
+                <p className="tips">JPG, GIF or PNG, Dung lượng tối đa: 10MB</p>
                 <div className="form-group">
                   <Button
                     color="primary"
@@ -202,7 +203,7 @@ const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
                   accept=".jpg, .gif, .png"
                   onChange={(e) => onchange(e.target.files[0])}
                 />
-                <p className="tips">JPG, GIF or PNG, Max size: 10MB</p>
+                <p className="tips">JPG, GIF or PNG, Dung lượng tối đa: 10MB</p>
                 <div className="form-group">
                   <Button
                     color="primary"

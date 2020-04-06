@@ -29,8 +29,6 @@ const useStyles = makeStyles({
 const UserProfileHeader = (props) => {
     const classes = useStyles();
     const { user, canEdit } = props;
-    console.log('user');
-    console.log(user);
 
     const navigateRoute = (route) => props.history.push(route);
 
@@ -48,7 +46,10 @@ const UserProfileHeader = (props) => {
                     <CardHeader
                         avatar={
                             <Avatar className={classes.avatar} aria-label="recipe" >
-                                { ValidationUtils.isEmpty(user.avatar) ? '/assets/img/no_image.jpeg' : user.avatar }
+                                <img style={{ width: '100%' }} src={
+                                    ValidationUtils.isEmpty(user.avatar) ? '/assets/img/no_image.jpeg' : user.avatar 
+                                } />
+                                
                             </Avatar>
                         }
                         // action={

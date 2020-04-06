@@ -60,6 +60,11 @@ public class User extends DateAudit {
 
     boolean isDeactiveByAdmin;
 
+//  private   String token;
+//
+//  Date expiredDate;
+
+
     @PrePersist
     protected void onCreate() {
         createdAt = new Date();

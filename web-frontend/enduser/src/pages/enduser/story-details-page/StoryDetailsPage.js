@@ -513,7 +513,8 @@ const StoryDetailsPage = (props) => {
                                 {!ValidationUtils.isEmpty(story.user) && (
                                     <h4>
                                         <Link to={`/user/profile/${story.user.id}`}>
-                                            <PersonIcon />  <img src={story.user.avatar} style={{ width: '50px', height: '50px' }}/>
+                                            {/* <PersonIcon />   */}
+                                            <img src={story.user.avatar} style={{ width: '30px', height: '30px' }}/>
                                              {' ' + story.user.name}
                                         </Link>
                                     </h4>

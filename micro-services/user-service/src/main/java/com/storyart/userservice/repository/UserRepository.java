@@ -31,4 +31,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
      , countQuery = "SELECT count(*) FROM storyart_db.user u  WHERE u.role_id in (select distinct id from role where name=:rolename) and (u.username LIKE %:search% or u.email like %:search%)"
             , nativeQuery = true)
     Page<User> findByRoleNameUsernameOrEmail(@Param("search") String search,@Param("rolename") String roleName, Pageable pageable);
+
+//User findByToken(String token);
+
 }

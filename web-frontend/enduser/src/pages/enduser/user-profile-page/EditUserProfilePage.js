@@ -188,7 +188,7 @@ const EditUserProfilePage = props => {
                   margin="normal"
                   fullWidth
                   label="Tên của bạn"
-                  autoFocus
+                  
                   value={name}
                   onChange={e => setName(e.target.value)}
                 />
@@ -212,7 +212,7 @@ const EditUserProfilePage = props => {
                   margin="normal"
                   fullWidth
                   label="Tên đăng nhập"
-                  autoFocus
+                  
                   value={us}
                   onChange={e => setUs(e.target.value)}
                 />
@@ -236,7 +236,7 @@ const EditUserProfilePage = props => {
                   margin="normal"
                   fullWidth
                   label="Email"
-                  autoFocus
+                  
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                 />
@@ -249,7 +249,7 @@ const EditUserProfilePage = props => {
                   id="intro_content"
                   value={intro_content == null ? "" : intro_content}
                   outline
-                  autoFocus
+                  
                   className="form-control text-area"
                   onChange={e => setIntro_content(e.target.value)}
                 />

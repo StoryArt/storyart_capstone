@@ -1,6 +1,8 @@
 package com.storyart.storyservice.service;
 
 import com.storyart.storyservice.dto.LinkAndSidDTO;
+import com.storyart.storyservice.dto.statistic.ILinkClickCountResponse;
+import com.storyart.storyservice.dto.statistic.LinkClickCountResponse;
 import com.storyart.storyservice.model.ClickLink;
 import com.storyart.storyservice.repository.ClickLinkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,8 @@ public interface LinkClickService {
     List<Integer> findClickLinkRange(Integer storyId, String start, String end);
 
     void save(LinkAndSidDTO linkAndSidDTO);
+
+    List<ILinkClickCountResponse> countLinkClickByStoryIdInTimeRange(int storyId, String start, String end);
 
 }
 
@@ -99,8 +103,13 @@ class LinkClickServiceImpl implements LinkClickService {
         clickLinkRepository.save(p);
     }
 
+    @Override
+    public List<ILinkClickCountResponse> countLinkClickByStoryIdInTimeRange(int storyId, String start, String end) {
 
+        List<ILinkClickCountResponse> iLinkClickCountResponses = clickLinkRepository.countLinkClickNumberByLinkByStoryIdInTimeRange(storyId, start, end);
+    return iLinkClickCountResponses;
 
+    }
 
 
 }
