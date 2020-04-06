@@ -32,6 +32,7 @@ import TagService from '../../../services/tag.service';
 import ValidationUtils from '../../../utils/validation';
 import StringUtils from '../../../utils/string';
 import { getAuthUserInfo } from '../../../config/auth';
+import ScreenTypes from './ScreenTypes';
 
 const parameters = getParameters();
 
@@ -520,19 +521,7 @@ const CreateStoryPage = (props) => {
                                     />
 
                                     <br/>
-                                    <div>
-                                        <span className="screen-box" 
-                                        style={{  background: SCREEN_COLORS.FIRST_SCREEN }}></span> Màn hình đầu tiên
-                                    </div>
-                                    <div>
-                                        <span className="screen-box" 
-                                        style={{  background: SCREEN_COLORS.ENDING_SCREEN }}></span> Màn hình kết thúc
-                                    </div>
-                                    <div>
-                                        <span className="screen-box" 
-                                        style={{  background: SCREEN_COLORS.NORMAL_SCREEN }}></span> Màn hình
-                                    </div>
-
+                                    <ScreenTypes/>
                                 
                                 </div>
                                 <div className="col-sm-7">
