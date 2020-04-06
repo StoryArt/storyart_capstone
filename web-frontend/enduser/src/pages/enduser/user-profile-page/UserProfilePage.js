@@ -321,6 +321,7 @@ const UserProfilePage = (props) => {
                           style={{float: 'right'}}
                           count={totalPages} 
                           page={filters.page}
+                          color="primary"
                           onChange={changePage} />
                     </div>
                   </div>
@@ -413,6 +414,7 @@ const UserProfilePage = (props) => {
                           style={{float: 'right'}}
                           count={totalPages} 
                           page={filters.page}
+                          color="primary"
                           onChange={changePage} />
                     </div>
                   </div>

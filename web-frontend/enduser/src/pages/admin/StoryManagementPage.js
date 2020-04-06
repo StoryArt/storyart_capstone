@@ -203,7 +203,7 @@ const changePage = (e, value) => {
                   style={{float: 'right'}}
                   count={totalPages} 
                   page={filters.page}
-                  // color="primary" 
+                  color="primary" 
                   onChange={changePage} />
             </div>
           </div>
@@ -280,7 +280,7 @@ const changePage = (e, value) => {
                   style={{float: 'right'}}
                   count={totalPages} 
                   page={filters.page}
-                  // color="primary" 
+                  color="primary" 
                   onChange={changePage} />
             </div>
           </div>
