@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.function.Function;
 
 public interface HistoryService {
-    List<Integer> jaccardCalculate(Integer id);
+ //   List<Integer> jaccardCalculate(Integer id);
     void createTempHistory();
     ResultDto saveReadHistory(ReadingHistoryDto readingHistoryDto, int userId);
     ResultDto saveClickLink(ClickLinkDto clickLink);
@@ -96,7 +96,7 @@ class HistoryServiceIml implements HistoryService {
         result.setData(screenReadingTime);
         return result;
     }
-
+/*
     @Override
     public   List<Integer> jaccardCalculate(Integer id) {
         List<ReadingHistory> CurrentUserHistory = historyRepository.findHistoryByIdOnly(id);
@@ -145,7 +145,7 @@ class HistoryServiceIml implements HistoryService {
         MostFitHistory.removeAll(currentUserH.getListStory());
 
         return MostFitHistory;
-    }
+    }*/
 
     @Override
     public void createTempHistory() {
@@ -181,7 +181,7 @@ class HistoryServiceIml implements HistoryService {
         return result;
     }
 
-
+/*
     public Double calculate(List<Integer> curUser, List<Integer> nextUser) {
         List<Integer> intersect = new ArrayList<>();
         for (Integer i : curUser) {
@@ -197,7 +197,7 @@ class HistoryServiceIml implements HistoryService {
 
         return Double.valueOf(intersect.size()) / Double.valueOf(union.size() - intersect.size());
 
-    }
+    }*/
 
     @Override
     public List<Integer> findHitpointListByRange(Integer sid,String start, String  end) {

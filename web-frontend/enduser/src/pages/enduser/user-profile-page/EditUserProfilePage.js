@@ -83,6 +83,9 @@ const EditUserProfilePage = props => {
         content: "Lưu thành công",
         type: "success"
       });
+      window.setTimeout(() => {
+        closeAlert();
+      }, 3000);
     } catch (error) {
 
       var err;

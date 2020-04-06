@@ -1,9 +1,7 @@
 package com.storyart.storyservice.service;
 
 import com.storyart.storyservice.dto.ResultDto;
-import com.storyart.storyservice.dto.story_suggestion.RatedStoryDTO;
-import com.storyart.storyservice.dto.story_suggestion.RatingDTO;
-import com.storyart.storyservice.dto.story_suggestion.StoryCommentDTO;
+import com.storyart.storyservice.dto.story_suggestion.*;
 import com.storyart.storyservice.model.Rating;
 import com.storyart.storyservice.model.ids.RatingId;
 import com.storyart.storyservice.repository.*;
@@ -16,8 +14,9 @@ import java.util.Optional;
 
 public interface RatingService {
     List<Integer>  getSuggestion(Integer id, boolean flag);
-    List<Integer> getSuggestByCommentAndReaction();
+ //   List<Integer> getSuggestByCommentAndReaction();
     ResultDto rateStory(double stars, int  userId, int storyId);
+    List<Integer> listAvgRate();
 }
 
 
@@ -26,6 +25,10 @@ class RatingServiceIml implements RatingService {
 
     @Autowired
     StoryRepository storyRepository;
+
+    @Autowired
+    HistoryRepository historyRepository;
+
 
     @Autowired
     RatingRepository ratingRepository;
@@ -43,17 +46,24 @@ class RatingServiceIml implements RatingService {
     CommentRepository commentRepository;
 
     @Override
+    public List<Integer> listAvgRate() {
+       List<Integer> list = historyRepository.countTopView();
+
+
+        return list;
+    }
+
+    @Override
     public List<Integer> getSuggestion(Integer id, boolean flagcheck) {
         // Step 1
         // find All User Rating
         List<Integer> listStory = new ArrayList<>();
         if(flagcheck){
             listStory = storyRepository.findStoryThisWeek();
+
         }else{
             listStory = storyRepository.findStoryExceptThisWeek();
         }
-
-        List<RatingDTO> listRatingUser = new ArrayList<>();
         List<RatedStoryDTO> ListAssumRatedStory = new ArrayList<>();
 
         List<Rating> ratingUser = ratingRepository.findRatingByStoryIdEXceptId(listStory, id);
@@ -91,6 +101,7 @@ class RatingServiceIml implements RatingService {
         }
 
         for(Integer integer : listStory) {
+            List<RatingDTO> listRatingUser = new ArrayList<>();
             boolean flag2 = false;
             List<Rating> userInStory = new ArrayList<>();
             for (Rating rate : ratingUser) {
@@ -109,6 +120,8 @@ class RatingServiceIml implements RatingService {
             } else {
 
                 for (Rating rated : userInStory) {
+
+
                     List<Rating> userRating = new ArrayList<>();
                     for (Rating rate : ratingUser) {
                         if (rate.getUserId() == rated.getUserId()) {
@@ -137,7 +150,6 @@ class RatingServiceIml implements RatingService {
                         RatedStoryDTO ratedDTO = new RatedStoryDTO();
 
                         for (Rating rateUser : userRating) {
-
                             if (storyid.equals(rateUser.getStoryId())) {
                                 ratedDTO.setStoryId(rateUser.getStoryId());
                                 double userPoint = rateUser.getStars() - normalizeNumber;
@@ -153,15 +165,20 @@ class RatingServiceIml implements RatingService {
                         listRated.add(ratedDTO);
                     }
                     dtoUSER.setListPoint(listRated);
-                    listRatingUser.add(dtoUSER);
+                    boolean flag = false;
+                    for(int i =0 ; i< listRatingUser.size(); i++ ){
+                        if(dtoUSER.getUserid() == listRatingUser.get(i).getUserid()){
+                            flag = true;
+                        }
+                    }
+                    if(!flag){
+                        listRatingUser.add(dtoUSER);
+                    }
                 }
+            // ------------------------------------------
 
-
+                List<SimilarityDTO> listsimi = new ArrayList<>();
                 // ------------
-                int MostFitId = 0;
-                double MostFit = 0;
-                int SecondFitId = 0;
-                double SecondFit = 0;
                 for (RatingDTO dto : listRatingUser) {
                     List<Double> listRatingSelectedUser = new ArrayList<>();
                     List<Double> listRatingCurrentUser = new ArrayList<>();
@@ -175,50 +192,83 @@ class RatingServiceIml implements RatingService {
 
                     } else {
                         double cosine = cosineSimilarity(listRatingCurrentUser, listRatingSelectedUser);
-                        if (MostFit == 0) {
-                            MostFitId = dto.getUserid();
-                            MostFit = cosine;
-                        } else if (cosine >= MostFit) {
-                            SecondFitId = MostFitId;
-                            SecondFit = MostFit;
-                            MostFitId = dto.getUserid();
-                            MostFit = cosine;
-                        } else if (cosine >= SecondFit) {
-                            SecondFitId = dto.getUserid();
-                            SecondFit = cosine;
-                        }
+                        SimilarityDTO simidto = new SimilarityDTO();
+                        simidto.setUserid(dto.getUserid());
+                        simidto.setSimilarity(cosine);
+                        listsimi.add(simidto);
                     }
                 }
                 //Step 6
                 // Count Rate Prediction
 
+                List<SimilarityDTO> listuser = new ArrayList<>();
+                for (SimilarityDTO dtosimi : listsimi) {
+                    SimilarityDTO simidto = new SimilarityDTO();
 
-                double normalizePointMostFit = 0.0;
-                double normalizePointSecondFit = 0.0;
-                for (RatingDTO dto : listRatingUser) {
-                    if (dto.getUserid() == MostFitId) {
-                        for (RatedStoryDTO dto2 : dto.getListPoint()) {
-                            if (dto2.getStoryId() == integer) {
-                                normalizePointMostFit = dto2.getRatedPoint();
-                            }
-                        }
-                    }
-                    if (dto.getUserid() == SecondFitId) {
-                        for (RatedStoryDTO dto2 : dto.getListPoint()) {
-                            if (dto2.getStoryId() == integer) {
-                                normalizePointSecondFit = dto2.getRatedPoint();
-                            }
-                        }
+                    if (dtosimi.getSimilarity() > 0.5) {
+                        simidto.setUserid(dtosimi.getUserid());
+                        simidto.setSimilarity(dtosimi.getSimilarity());
+                        listuser.add(simidto);
                     }
                 }
+                int MostFitId = 0;
+                int SecondFitId = 0;
+                double MostFit = 0.0;
+                double SecondFit = 0.0;
 
-                AssumRatedStory.setStoryId(integer);
-                Double ra = ((normalizePointMostFit * MostFit) + (normalizePointSecondFit * SecondFit)) / ((Math.abs(MostFit)) + (Math.abs(SecondFit)));
-                Double AssumtionPoint = ra + normalizeCurrUser;
-                AssumRatedStory.setRatedPoint(AssumtionPoint);
-                ListAssumRatedStory.add(AssumRatedStory);
+                if (listuser.size() == 0) {
+
+
+                } else {
+                    for (int i = 0; i < listuser.size(); i++) {
+                        if (listuser.get(i).getSimilarity() >= MostFit) {
+                            SecondFit = MostFit;
+                            MostFit = listuser.get(i).getSimilarity();
+                            SecondFitId = MostFitId;
+                            MostFitId = listuser.get(i).getUserid();
+                        } else if (listuser.get(i).getSimilarity() >= SecondFit) {
+                            SecondFit = listuser.get(i).getSimilarity();
+                            SecondFitId = listuser.get(i).getUserid();
+                        }
+                    }
+
+
+                    double normalizePointMostFit = 0.0;
+                    double normalizePointSecondFit = 0.0;
+                    for (RatingDTO dto : listRatingUser) {
+                        if (dto.getUserid() == MostFitId) {
+                            for (RatedStoryDTO dto2 : dto.getListPoint()) {
+                                if (dto2.getStoryId() == integer) {
+                                    normalizePointMostFit = dto2.getRatedPoint();
+                                }
+                            }
+                        }
+                        if (dto.getUserid() == SecondFitId) {
+                            for (RatedStoryDTO dto2 : dto.getListPoint()) {
+                                if (dto2.getStoryId() == integer) {
+                                    normalizePointSecondFit = dto2.getRatedPoint();
+                                }
+                            }
+                        }
+
+
+                    }
+
+                    AssumRatedStory.setStoryId(integer);
+                    Double ra = ((normalizePointMostFit * MostFit) + (normalizePointSecondFit * SecondFit)) / ((Math.abs(MostFit)) + (Math.abs(SecondFit)));
+                    Double AssumtionPoint = ra + normalizeCurrUser;
+                    AssumRatedStory.setRatedPoint(AssumtionPoint);
+                    ListAssumRatedStory.add(AssumRatedStory);
+                }
             }
         }
+
+        if(ListAssumRatedStory.size() == 0){
+            List<Integer> listnull = null;
+            return listnull;
+        }else{
+
+
 
         // Step 7
         // remove all lesser than 2.5
@@ -239,6 +289,7 @@ class RatingServiceIml implements RatingService {
 
 
         return listSuggestStory;
+        }
     }
 
     @Override
@@ -264,6 +315,7 @@ class RatingServiceIml implements RatingService {
         return null;
     }
 
+
     public Double cosineSimilarity(List<Double> currUser, List<Double> SelectedUser) {
 
         double AB = 0.0;
@@ -280,6 +332,8 @@ class RatingServiceIml implements RatingService {
         return cosineSimilarity;
     }
 
+
+    /*
     @Override
     public List<Integer> getSuggestByCommentAndReaction() {
 
@@ -359,5 +413,5 @@ class RatingServiceIml implements RatingService {
         listSuggestion.add(fourtopid);
 
         return listSuggestion;
-    }
+    }*/
 }
