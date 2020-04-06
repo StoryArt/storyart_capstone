@@ -1,5 +1,6 @@
 import React from 'react';
 import ValidationUtils from '../../utils/validation';
+import '../../style/quill.snow.css';
 
 const MyFullScreenShowWrapper = (props) => {
     let { informations, children } = props;

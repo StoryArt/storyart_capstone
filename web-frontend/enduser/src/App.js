@@ -61,11 +61,11 @@ function App() {
     }
 
     // redirect to login page when response status is 401 or 403
-    interceptResponse(() => {
-      setAuthHeader(null);
-      clearTokenFromLocal();
-      window.location.href = '/login';
-    });
+    // interceptResponse(() => {
+    //   setAuthHeader(null);
+    //   clearTokenFromLocal();
+    //   window.location.href = '/login';
+    // });
 
     isSetupAuth = true;
   }

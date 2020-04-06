@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { MDBInput, MDBAlert } from "mdbreact";
+import { MDBAlert } from "mdbreact";
 import UserService from "../../services/user.service";
 // import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
@@ -16,7 +16,7 @@ import {
 
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
-import Link from "@material-ui/core/Link";
+import { Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 const useStyles = makeStyles(theme => ({
@@ -268,7 +268,7 @@ const RegisterPage = () => {
               </Button>
               <Grid container justify="flex-end">
                 <Grid item>
-                  <Link to="login" variant="body2">
+                  <Link to="/login">
                     Nếu bạn đã có tài khoản? Vui lòng đăng nhập tại đây
                   </Link>
                 </Grid>
