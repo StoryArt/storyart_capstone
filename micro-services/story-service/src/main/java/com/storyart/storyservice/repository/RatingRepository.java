@@ -2,7 +2,6 @@ package com.storyart.storyservice.repository;
 
 
 import com.storyart.storyservice.dto.statistic.IRatingClassify;
-import com.storyart.storyservice.dto.story_suggestion.ListAvgRate;
 import com.storyart.storyservice.model.Rating;
 import com.storyart.storyservice.model.ids.RatingId;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,8 +27,8 @@ public interface RatingRepository extends JpaRepository<Rating, RatingId> {
     @Query(value = "SELECT ROUND(AVG(stars), 1) FROM rating where story_id = ?1", nativeQuery = true)
     double findAvgStarsByStoryId(int storyId);
 
-    @Query(value = "select r.story_id,round(AVG(r.stars),1) 'avgRate'  FROM storyart_db.rating as r group by r.story_id order by avgRate DESC limit 20", nativeQuery = true)
-    List<ListAvgRate> findListAvgStarsByStoryId();
+   /* @Query(value = "select r.story_id,round(AVG(r.stars),1) 'avgRate'  FROM storyart_db.rating as r group by r.story_id order by avgRate DESC limit 20", nativeQuery = true)
+    List<ListAvgRate> findListAvgStarsByStoryId();*/
 
     @Query(value = "SELECT * FROM rating where story_id = ?1 and user_id = ?2", nativeQuery = true)
     Rating findById(int storyId, int userId);
