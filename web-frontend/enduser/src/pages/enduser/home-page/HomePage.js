@@ -42,7 +42,6 @@ const HomePage = () => {
         try {
             
             var array = [...suggestedStories]
-            //check xem array hien tai co data chua, co' thi load next page
             if (array.length > 1) {
                 
                 setPageNoRating(pageNoRating + 1);
@@ -80,9 +79,6 @@ const HomePage = () => {
                         ))}
                     </div>
                 )}
-                <Button size="small" color="secondary" onClick={e => getsuggestedStories()}>
-                    Thêm Truyện
-                </Button>
                 {suggestedStoriesLoading && <MySpinner/>}
 
 

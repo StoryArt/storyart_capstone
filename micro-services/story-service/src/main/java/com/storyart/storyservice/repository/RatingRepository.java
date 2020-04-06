@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, RatingId> {
@@ -26,11 +27,20 @@ public interface RatingRepository extends JpaRepository<Rating, RatingId> {
     @Query(value = "SELECT ROUND(AVG(stars), 1) FROM rating where story_id = ?1", nativeQuery = true)
     double findAvgStarsByStoryId(int storyId);
 
+   /* @Query(value = "select r.story_id,round(AVG(r.stars),1) 'avgRate'  FROM storyart_db.rating as r group by r.story_id order by avgRate DESC limit 20", nativeQuery = true)
+    List<ListAvgRate> findListAvgStarsByStoryId();*/
+
     @Query(value = "SELECT * FROM rating where story_id = ?1 and user_id = ?2", nativeQuery = true)
     Rating findById(int storyId, int userId);
 
+    @Query(value = "select user_id from rating where user_id = :userid ", nativeQuery = true)
+    Optional<Integer> checkRatingById(@Param("userid") Integer userid);
 //    @Query(value = "SELECT count(*) FROM rating r where r.story_id = ?1", nativeQuery = true)
 //    int countRateByStoryId (int storyId);
+
+
+    @Query(value = "SELECT DISTINCT rating.story_id FROM storyart_db.rating", nativeQuery = true)
+    List<Integer> findAllStoryIdRating ();
 
     int countRatingByStoryId(int storyId);
     @Query(value = "SELECT stars as 'star', count(*) as 'count'\n" +
