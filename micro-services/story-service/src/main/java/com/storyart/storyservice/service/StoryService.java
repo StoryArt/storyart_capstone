@@ -476,6 +476,7 @@ class StoryServiceImpl implements StoryService {
             resultDto.setErrors(errors);
             return resultDto;
         }
+
         Story foundStory = storyRepository.findById(storyDto.getId()).orElse(null);
 
         if (foundStory == null) {

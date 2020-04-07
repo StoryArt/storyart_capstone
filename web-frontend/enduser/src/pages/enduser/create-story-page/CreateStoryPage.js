@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import { Prompt } from 'react-router-dom';
 import { TextField, Tooltip, Fab, Checkbox, FormControlLabel, Button } from '@material-ui/core';
 import { Pagination } from '@material-ui/lab';
@@ -70,6 +70,8 @@ const CreateStoryPage = (props) => {
     const [image, setImage] = useState(null);
 
     let canChangeScreenContent = true;
+    
+
 
     React.useEffect(() => {
         getTags();
@@ -81,12 +83,13 @@ const CreateStoryPage = (props) => {
             setSaveStory(false);
         }
         setOpenSidebar(false);
+        console.log('use effect');
+
 
         return () => {
             setOpenSidebar(true);
         }
         // window.onbeforeunload = confirmBeforeLeavePage;
-        
        
     }, []);
 
@@ -317,7 +320,7 @@ const CreateStoryPage = (props) => {
                     open: true
                 });
                 if(!isEditPage){
-                    window.setTimeout(() => props.history.push(`/stories/edit/${data.id}`), 2000);
+                    window.setTimeout(() => window.location.href = `/stories/edit/${data.id}`, 2000);
                 }
             } else {
                 setAlert({ content: Object.values(errors), type:'error', open: true });
@@ -338,10 +341,6 @@ const CreateStoryPage = (props) => {
     }
 
     const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
-
-    const viewStoryStructure = () => {
-        setOpenStoryPreview(true);
-    }
 
     // console.log(storyParameters);
     let actionTypesList = actions.filter(action => {
