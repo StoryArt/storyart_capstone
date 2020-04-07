@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RatingClassify{
-    int star;
+    double star;
     int count;
 
 

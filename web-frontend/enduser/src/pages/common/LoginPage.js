@@ -81,6 +81,7 @@ const LoginPage = () => {
           content: 'Đăng nhập thành công',
           type: 'success'
         });
+        closeAlert();
         const userInfo = getAuthUserInfo();
 
         let url = '/home';
@@ -114,7 +115,7 @@ const LoginPage = () => {
     closeAlert();
   }
 
-  const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
+  const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 2000);
 
   return (
     <div className="pt-5">

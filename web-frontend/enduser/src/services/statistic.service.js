@@ -10,39 +10,26 @@ class StatisticService {
   }
 
   static async getScreenTimeData(sid, timeRange) {
-    let screenUrl =
-      "http://localhost:8000/api/story-service/interact/getScreenTime/" + sid;
+    let screenUrl = baseUrl + "/story/" + sid + "/screen-time";
 
     return axios.post(screenUrl, timeRange);
   }
   static async getLinkClickData(sid, timeRange) {
-    let screenUrl =
-      "http://localhost:8000/api/story-service/stories/story/" +
-      sid +
-      "/statistic/link-click";
+    let screenUrl = baseUrl + "/story/" + sid + "/link-click";
     return axios.post(screenUrl, timeRange);
   }
 
   static async getStorySummary(storyId) {
-    const url =
-      `http://localhost:8000/api/story-service/stories/story/` +
-      storyId +
-      `/summary`;
+    const url = baseUrl + `/story/` + storyId + `/summary`;
     return axios.get(url);
   }
 
   static async getReactStatic(storyId, timeRange) {
-    const url =
-      `http://localhost:8000/api/story-service/stories/story/` +
-      storyId +
-      `/statistic/react`;
-    return axios.post(url,timeRange);
+    const url = baseUrl + `/story/` + storyId + `/react`;
+    return axios.post(url, timeRange);
   }
   static async getRatingStatic(storyId) {
-    const url =
-      `http://localhost:8000/api/story-service/stories/story/` +
-      storyId +
-      `/statistic/rating`;
+    const url = baseUrl + `/story/` + storyId + `/rating`;
     return axios.get(url);
   }
 }

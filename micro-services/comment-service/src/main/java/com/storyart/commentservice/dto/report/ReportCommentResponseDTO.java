@@ -20,6 +20,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReportCommentResponseDTO {
+
+
     private List<Integer> reportIds;
 
     private int numberOfReports;

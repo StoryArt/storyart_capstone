@@ -71,20 +71,31 @@ public class SuggestController {
         //     List<Integer> listhistory = historyService.jaccardCalculate(id);
         //  List<Integer> listStoryPoint = ratingService.getSuggestByCommentAndReaction();
 
-        List<Integer> listRatingthisWeek = ratingService.getSuggestion(id,true);
+    //    List<Integer> listRatingthisWeek = ratingService.getSuggestion(id,true);
         List<Integer> listRatingExceptThisWeek = ratingService.getSuggestion(id,false);
 
     try{
-    if(listRatingExceptThisWeek.size() >=4){
-        List<Integer> listRatingExceptThisWeekR = getRandomElement(listRatingExceptThisWeek, 4);
-        total.addAll(listRatingExceptThisWeekR);
+        if(listRatingExceptThisWeek.size() == 0){
+            List<Integer> liststoryInteger = ratingService.listAvgRate();
+            if(liststoryInteger.size() >= 4){
+                List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
+                total.addAll(AfterRandom);
+            }else{
+                total.addAll(liststoryInteger);
+            }
+        }else{
+            if(listRatingExceptThisWeek.size() >=4){
+                List<Integer> listRatingExceptThisWeekR = getRandomElement(listRatingExceptThisWeek, 4);
+                total.addAll(listRatingExceptThisWeekR);
 
-    }else{
-        for (int i =0; i < listRatingExceptThisWeek.size(); i++){
-            total.add(listRatingExceptThisWeek.get(i));
+            }else{
+                for (int i =0; i < listRatingExceptThisWeek.size(); i++){
+                    total.add(listRatingExceptThisWeek.get(i));
+                }
+            }
         }
-    }
-    if(listRatingthisWeek.size() >=4){
+
+   /* if(listRatingthisWeek.size() >=4){
         List<Integer> listlistRatingthisWeek = getRandomElement(listRatingthisWeek, 4);
         total.addAll(listlistRatingthisWeek);
 
@@ -92,11 +103,11 @@ public class SuggestController {
         for (int i =0; i < listRatingthisWeek.size(); i++){
             total.add(listRatingthisWeek.get(i));
         }
-    }
+    }*/
     }catch (Exception ex){
         List<Integer> liststoryInteger = ratingService.listAvgRate();
-        if(liststoryInteger.size() >= 8){
-            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 8);
+        if(liststoryInteger.size() >= 4){
+            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
             total.addAll(AfterRandom);
         }else{
             total.addAll(liststoryInteger);
@@ -104,8 +115,8 @@ public class SuggestController {
     }
      }else{
         List<Integer> liststoryInteger = ratingService.listAvgRate();
-        if(liststoryInteger.size() >= 8){
-            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 8);
+        if(liststoryInteger.size() >= 4){
+            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
             total.addAll(AfterRandom);
         }else{
             total.addAll(liststoryInteger);
@@ -141,8 +152,8 @@ public class SuggestController {
         }
         List<Integer> total = new ArrayList<>();
         List<Integer> liststoryInteger = ratingService.listAvgRate();
-        if(liststoryInteger.size() >= 8){
-            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 8);
+        if(liststoryInteger.size() >= 4){
+            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
             total.addAll(AfterRandom);
         }else{
             total.addAll(liststoryInteger);
