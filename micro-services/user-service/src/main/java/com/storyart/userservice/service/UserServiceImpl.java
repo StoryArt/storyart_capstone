@@ -185,7 +185,6 @@ public class UserServiceImpl implements UserService {
 
         List<UserInManagementResponse> users = convertUserlist(usersList);
 
-
         return new PagedResponse<UserInManagementResponse>(users, userPage.getNumber() + 1, userPage.getSize(),
                 userPage.getTotalElements(),
                 userPage.getTotalPages(), userPage.isLast());
@@ -237,7 +236,6 @@ public class UserServiceImpl implements UserService {
         User user = findById(uid);
         user.setAvatar(link);
         userRepository.save(user);
-
     }
 
     @Override
@@ -245,7 +243,6 @@ public class UserServiceImpl implements UserService {
         User user = findById(uid);
         user.setProfileImage(link);
         userRepository.save(user);
-
     }
 
     @Override

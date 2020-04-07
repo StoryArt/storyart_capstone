@@ -23,7 +23,6 @@ import { getAuthUserInfo } from '../../../config/auth';
 import MyRating from '../../../components/common/MyRating';
 import MyAlert from '../../../components/common/MyAlert';
 import SocialShare from '../../../components/common/SocialShare';
-import { Person as PersonIcon } from '@material-ui/icons';
 
 const StoryDetailsPage = (props) => {
 
@@ -400,7 +399,9 @@ const StoryDetailsPage = (props) => {
                 setStoryNotfound(true);
             } else {
                 setStory(res.data);
-                getRatingByStoryAndUser(res.data.id);
+                if(!ValidationUtils.isEmpty(userInfo)){
+                    getRatingByStoryAndUser(res.data.id);
+                }
             }
         } catch (error) {
             console.log(error);
@@ -409,6 +410,7 @@ const StoryDetailsPage = (props) => {
     }
 
     const [reportStoryContent, setReportStoryContent] = useState('');
+   
     const reportStory = async () => {
         try {
             const { storyId } = props.match.params;
@@ -447,11 +449,10 @@ const StoryDetailsPage = (props) => {
     }
 
     const rateStory = async (stars) => {
-        if (ValidationUtils.isEmpty(stars)) return;
-        console.log(stars);
+        if(ValidationUtils.isEmpty(userInfo)) return;
+        if(ValidationUtils.isEmpty(stars)) return;
         try {
             const res = await StoryService.rateStory(story.id, stars);
-            console.log(res);
             const { success, errors, data } = res.data;
             if (success) {
                 setRating({ ...rating, stars: stars })
@@ -602,36 +603,36 @@ const StoryDetailsPage = (props) => {
                                             </p>
 
                                             {/* <span className="mr-3" >
-                                        <i class="far fa-thumbs-up" id="like-icon" style={{ color: 'blue' }}></i> <span className="likes-count">{comment.likes.length}</span>
+                                        <i className="far fa-thumbs-up" id="like-icon" style={{ color: 'blue' }}></i> <span className="likes-count">{comment.likes.length}</span>
                                     </span> */}
                                             <span className="mr-3" >
-                                                <i class={comment.likes.includes(userId) ? "fas fa-thumbs-up" : "far fa-thumbs-up"}
+                                                <i className={comment.likes.includes(userId) ? "fas fa-thumbs-up" : "far fa-thumbs-up"}
                                                     onClick={e => like(comment.likes.includes(userId), comment.id)}
                                                     style={{ cursor: 'pointer' }}>
                                                 </i>
                                                 <span className="likes-count"> {comment.likes.length}</span>
                                             </span>
                                             <span className="mr-3">
-                                                <i class={comment.dislikes.includes(userId) ? "fas fa-thumbs-down" : "far fa-thumbs-down"}
+                                                <i className={comment.dislikes.includes(userId) ? "fas fa-thumbs-down" : "far fa-thumbs-down"}
                                                     onClick={e => dislike(comment.dislikes.includes(userId), comment.id)}
                                                     style={{ cursor: 'pointer' }}>
                                                 </i>
                                                 <span className="dislikes-count"> {comment.dislikes.length}</span>
                                             </span>
                                             {userId !== comment.userId &&
-                                                <button type="button" class="btn btn-danger" onClick={toggleModal('reportModal', comment.id, index, comment.username, comment.content)}>
-                                                    <i class="far fa-flag" ></i>
+                                                <button type="button" className="btn btn-danger" onClick={toggleModal('reportModal', comment.id, index, comment.username, comment.content)}>
+                                                    <i className="far fa-flag" ></i>
                                                 </button>
                                             }
                                             {userId === comment.userId &&
-                                                <button type="button" class="btn btn-warning" onClick={toggleModal('editModal', comment.id, index)}>
-                                                    <i class="far fa-edit" ></i>
+                                                <button type="button" className="btn btn-warning" onClick={toggleModal('editModal', comment.id, index)}>
+                                                    <i className="far fa-edit" ></i>
                                                 </button>
 
                                             }
                                             {userId === comment.userId &&
-                                                <button type="button" class="btn btn-warning" onClick={toggleModal('deleteModal', comment.id, index)}>
-                                                    <i class="far fa-trash-alt" ></i>
+                                                <button type="button" className="btn btn-warning" onClick={toggleModal('deleteModal', comment.id, index)}>
+                                                    <i className="far fa-trash-alt" ></i>
                                                 </button>
                                             }
 

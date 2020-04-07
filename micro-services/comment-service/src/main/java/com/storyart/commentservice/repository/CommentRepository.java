@@ -34,4 +34,9 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
     @Query("select c.id from Comment c where c.userId in ?1")
     List<Integer> findAllCommentIdByUserIds(List<Integer> userIds);
+
+    @Query("select c FROM Comment c inner join Report r ON c.id = r.commentId " +
+            "where c.id in ?1 and r.isHandled = ?2 GROUP BY c.id " +
+            "order by count(r.commentId) desc")
+    Page<Comment> getCommentReports(List<Integer> commentIds,boolean isHandled, Pageable pageable);
 }

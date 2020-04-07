@@ -3,6 +3,8 @@ import { Grid } from "@material-ui/core";
 import MainLayout from "../../layouts/main-layout/MainLayout";
 import { setAuthHeader } from "../../config/auth";
 import Icon from "@mdi/react";
+import Tooltip from "@material-ui/core/Tooltip";
+
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import MyRating from "../../components/common/MyRating";
 import DoughnutChart from "./forstoryanalystic/charts/echarts/Doughnut";
@@ -121,8 +123,8 @@ class Dashboard1 extends React.Component {
     const storyInfo = this.getStorySummary(this.sid);
     this.loadRatingStatic();
     this.handleLoadReactStatic(1);
-    // this.handleLoadScreenTime(1);
-    // this.handleLoadClickLink(1);
+    this.handleLoadScreenTime(1);
+    this.handleLoadClickLink(1);
   }
   handleClick = (event) => {
     this.setState({
@@ -622,6 +624,8 @@ class Dashboard1 extends React.Component {
                   </div>
                   <div className="card-title" style={{ paddingLeft: "10px" }}>
                     {" "}
+        <Tooltip title={"đánh giá trung bình: "+this.state.avgRate} aria-label="add">
+
                     <BeautyStars
                       value={this.state.avgRate}
                       gap="3px"
@@ -629,6 +633,8 @@ class Dashboard1 extends React.Component {
                       inactiveColor="#b0b0b0"
                     ></BeautyStars>
                     {/* <MyRating value={this.state.story.avgRate} /> */}
+                  </Tooltip>
+
                   </div>
 
                   <DoughnutChart
