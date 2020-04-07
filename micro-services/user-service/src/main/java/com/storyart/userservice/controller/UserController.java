@@ -180,9 +180,11 @@ public class UserController {
     @PostMapping(value="/{uid}/password")
     public ResponseEntity<?> changePassword(@PathVariable("uid") int userId,@Valid  @RequestBody PasswordChangeRequest passwordChangeRequest){
 
+if(!passwordChangeRequest.getPassword().equals(passwordChangeRequest.getRepassword())){
+    throw new BadRequestException("Mật khẩu nhập lại không đúng. Vui lòng nhập lại!");
+}
 
-
-       boolean isChanged= userService.changePassword(passwordChangeRequest, userId);
+       boolean isChanged= userService.changePassword(passwordChangeRequest.getPassword(), userId);
 
 
 

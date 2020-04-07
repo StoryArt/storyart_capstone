@@ -266,10 +266,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean changePassword(PasswordChangeRequest passwordChangeRequest, int userId) {
+    public boolean changePassword(String password, int userId) {
         try {
             User us = findById(userId);
-            us.setPassword(passwordEncoder.encode(passwordChangeRequest.getPassword()));
+            us.setPassword(passwordEncoder.encode(password));
             userRepository.save(us);
         } catch (Exception e) {
             return false;

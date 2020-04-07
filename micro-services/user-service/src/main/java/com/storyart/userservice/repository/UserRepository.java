@@ -32,6 +32,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             , nativeQuery = true)
     Page<User> findByRoleNameUsernameOrEmail(@Param("search") String search,@Param("rolename") String roleName, Pageable pageable);
 
-//User findByToken(String token);
+User findByToken(String token);
 
 }

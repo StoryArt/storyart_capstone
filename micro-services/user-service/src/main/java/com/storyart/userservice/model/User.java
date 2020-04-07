@@ -7,6 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Calendar;
 import java.util.Date;
 
 @Entity
@@ -16,14 +17,14 @@ import java.util.Date;
 @AllArgsConstructor
 @Table(name = "user",
         uniqueConstraints = {@UniqueConstraint(columnNames = "username"),
-                @UniqueConstraint(columnNames = "email") })
+                @UniqueConstraint(columnNames = "email")})
 public class User extends DateAudit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @NotBlank(message = "Tên đăng nhập không được trống")
-    @Size(min=3,max = 15, message = "Tên đăng nhập phải có từ 3 đến 15 ký tự")
+    @Size(min = 3, max = 15, message = "Tên đăng nhập phải có từ 3 đến 15 ký tự")
     @Column(unique = true)
     private String username;
 
@@ -59,10 +60,18 @@ public class User extends DateAudit {
     private Date updatedAt;
 
     boolean isDeactiveByAdmin;
+    private String token;
+    Date expiryDate;
 
-//  private   String token;
-//
-//  Date expiredDate;
+    public void setExpiryDate(int minutes) {
+        Calendar now = Calendar.getInstance();
+        now.add(Calendar.MINUTE, minutes);
+        this.expiryDate = now.getTime();
+    }
+
+    public boolean isExpired() {
+        return new Date().after(this.expiryDate);
+    }
 
 
     @PrePersist

@@ -2,22 +2,21 @@ import axios from "axios";
 import {
   clearTokenFromLocal,
   getAuthUserInfo,
-  setAuthHeader
+  setAuthHeader,
 } from "../config/auth";
 import { ROLE_NAMES } from "../common/constants";
-import { API_URL } from '../config/api';
+import { API_URL } from "../config/api";
 
-const baseUrl = API_URL + '/api/user-service/api/v1';
+const baseUrl = API_URL + "/api/user-service/api/v1";
 
 class UserService {
-
-  static async getCurrentUser(token){
+  static async getCurrentUser(token) {
     setAuthHeader(token);
     const url = baseUrl + "/user/current";
     return axios.get(url);
   }
 
-  static async getUserPublicProfile(userId){
+  static async getUserPublicProfile(userId) {
     const url = baseUrl + "/user/public_profile/" + userId;
     return axios.get(url);
   }
@@ -43,7 +42,7 @@ class UserService {
       page +
       "&size=" +
       size +
-      "&s=" +   
+      "&s=" +
       search;
     return axios.get(url);
   }
@@ -61,22 +60,12 @@ class UserService {
   }
 
   static async setStatusUser(userId, status) {
-
-    let url =
-    baseUrl+"/admin/users/" +
-    userId +
-    "?setActive=" +
-    status;
+    let url = baseUrl + "/admin/users/" + userId + "?setActive=" + status;
     return axios.delete(url);
   }
 
   static async setStatusAdmin(userId, status) {
-
-
-    let url =
-    baseUrl+"/systemad/admins/" +userId+
-    "?setActive=" +
-    status;
+    let url = baseUrl + "/systemad/admins/" + userId + "?setActive=" + status;
     return axios.delete(url);
   }
 
@@ -109,10 +98,7 @@ class UserService {
     return axios.get(url);
   }
 
-
-  static async randomAvatar(){
-
-  }
+  static async randomAvatar() {}
   static async uploadAvatar(file) {
     // const apikey = "53d902f62768b188aaab4b5ec86e4f16";
     // let urlx = "http://arunranga.com/examples/access-control/https://api.imgbb.com/1/upload" + "?key=" + apikey;
@@ -121,8 +107,8 @@ class UserService {
     const config = {
       headers: {
         "content-type": "multipart/form-data",
-        Authorization: "Client-ID " + clientid
-      }
+        Authorization: "Client-ID " + clientid,
+      },
     };
     var formdata = new FormData();
     formdata.append("image", file);
@@ -138,8 +124,8 @@ class UserService {
     const config = {
       headers: {
         "content-type": "multipart/form-data",
-        Authorization: "Client-ID " + clientid
-      }
+        Authorization: "Client-ID " + clientid,
+      },
     };
     var formdata = new FormData();
     formdata.append("image", file);
@@ -147,18 +133,18 @@ class UserService {
     return axios.post(urlx, formdata, config);
   }
 
-  static async saveToDatabase(uid,link){
-    let url1 = baseUrl + "/user/" + uid+"/avatar/save";
+  static async saveToDatabase(uid, link) {
+    let url1 = baseUrl + "/user/" + uid + "/avatar/save";
 
-   let avatarInfo={link: link};
+    let avatarInfo = { link: link };
 
     return axios.post(url1, avatarInfo);
   }
 
-  static async saveToDatabaseProfileImage(uid,link){
-    let url1 = baseUrl + "/user/" + uid+"/profileImage/save";
+  static async saveToDatabaseProfileImage(uid, link) {
+    let url1 = baseUrl + "/user/" + uid + "/profileImage/save";
 
-   let profileInfo={link: link};
+    let profileInfo = { link: link };
 
     return axios.post(url1, profileInfo);
   }
@@ -166,26 +152,27 @@ class UserService {
   static async updateProfile(user, uid) {
     let url1 = baseUrl + "/user/" + uid;
 
-  
-
     return axios.put(url1, user);
-  
-   }
+  }
 
-   static async changePassword(pass, uid){
-    let url1 = baseUrl + "/user/" + uid+"/password";
-    let data={
-      password: pass
-    }
-    return axios.post(url1, data);
-   }
+  static async changePassword(passAndRepass, uid) {
+    let url1 = baseUrl + "/user/" + uid + "/password";
+    return axios.post(url1, passAndRepass);
+  }
 
-   
-  
+  static async forgotPassword(email) {
+    let currentServer = window.location.href;
+    let arr = currentServer.split("/");
+    let result = arr[0] + "//" + arr[2]+"/reset-password";
+    let form = { email: email, linkReset: result };
+    let url1 = baseUrl + "/forgot-password";
+    return axios.post(url1, form);
+  }
 
-
-
- 
+  static async resetPassword(passAndRepassAndToken) {
+    let url1 = baseUrl + "/reset-password";
+    return axios.post(url1, passAndRepassAndToken);
+  }
 }
 
 export default UserService;

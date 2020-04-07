@@ -61,7 +61,8 @@ const ChangePasswordPage = (props) => {
         }, 3000);
         
       }else{
-        const res = await UserService.changePassword(pass,user.id ).then((res) => {
+        let pr={password: pass, repassword: repass};
+        const res = await UserService.changePassword(pr,user.id ).then((res) => {
             setAlert({
               open: true,
               content: "Lưu thành công",

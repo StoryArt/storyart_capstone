@@ -168,16 +168,18 @@ const LoginPage = () => {
               Đăng nhập
               </Button>
             <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Quên mật khẩu
-                  </Link>
-              </Grid>
+              
               <Grid item>
                 <Link to="/register" variant="body2">
-                  {"Nếu bạn chưa có tài khoản, hãy đăng kí nhé!"}
+                  {"Dăng kí!"}
                 </Link>
               </Grid>
+              <Grid item>
+                <Link to="/forgot-password" variant="body2">
+                  {"Quên mật khẩu?"}
+                </Link>
+              </Grid>
+
             </Grid>
           </form>
         </div>
