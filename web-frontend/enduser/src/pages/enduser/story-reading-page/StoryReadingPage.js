@@ -95,7 +95,7 @@ const ReadStoryPage = (props) => {
                 listScreenId: listScreenId.toString()
             }
             saveReadingHistory(data);
-        } else {
+        } else if(isEndScreen(myCurrentScreen)) {
             //cal time of end screen
             saveScreenReadTime({
                 screenId: myCurrentScreen.id, 
@@ -293,7 +293,7 @@ const ReadStoryPage = (props) => {
                 //     enabled={isFullScreen}
                 //     onChange={isFull => setFullScreen(isFull)}
                 // >
-                    <MyFullScreenShowWrapper informations={informations} >
+                    <MyFullScreenShowWrapper informations={informations} storyId={story.id}>
                         <ScreenShow 
                             animation={ANIMATIONS.GROW}
                             showScreen={showScreen}

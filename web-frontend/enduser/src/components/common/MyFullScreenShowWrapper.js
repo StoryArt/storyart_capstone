@@ -2,12 +2,15 @@ import React from 'react';
 import ValidationUtils from '../../utils/validation';
 import * as quillCss from '../../style/quill.snow.css';
 import styled from 'styled-components';
+import { withRouter } from 'react-router-dom';
+import { Tooltip, IconButton } from '@material-ui/core';
+import { ArrowBackRounded } from '@material-ui/icons';
 
 const StyledQuill = styled.div`
    
 .ql-container {
     box-sizing: border-box;
-    
+    font-family: Roboto;
     font-size: 13px;
     height: 100%;
     margin: 0px;
@@ -352,10 +355,10 @@ const StyledQuill = styled.div`
     color: #93f;
   }
   .ql-editor .ql-font-serif {
-    font-family: Georgia, Times New Roman, serif;
+    font-family: Roboto, Georgia, Times New Roman, serif;
   }
   .ql-editor .ql-font-monospace {
-    font-family: Monaco, Courier New, monospace;
+    font-family: Roboto, Monaco, Courier New, monospace;
   }
   .ql-editor .ql-size-small {
     font-size: 0.75em;
@@ -633,7 +636,7 @@ const StyledQuill = styled.div`
     display: inline-block;
     float: left;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     height: 24px;
     position: relative;
     vertical-align: middle;
@@ -793,10 +796,10 @@ const StyledQuill = styled.div`
     content: 'Monospace';
   }
   .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=serif]::before {
-    font-family: Georgia, Times New Roman, serif;
+    font-family: Roboto, Georgia, Times New Roman, serif;
   }
   .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=monospace]::before {
-    font-family: Monaco, Courier New, monospace;
+    font-family: Roboto, Monaco, Courier New, monospace;
   }
   .ql-snow .ql-picker.ql-size {
     width: 98px;
@@ -835,7 +838,7 @@ const StyledQuill = styled.div`
   .ql-toolbar.ql-snow {
     border: 1px solid #ccc;
     box-sizing: border-box;
-    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    font-family: Roboto, 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
     padding: 8px;
   }
   .ql-toolbar.ql-snow .ql-formats {
@@ -934,9 +937,15 @@ const StyledQuill = styled.div`
 `
 
 const MyFullScreenShowWrapper = (props) => {
-    let { informations, children } = props;
+    let { informations, children, storyId } = props;
     if(ValidationUtils.isEmpty(informations)){
         informations = [];
+    }
+
+    const gobackStoryDetails = () => {
+      if(!ValidationUtils.isEmpty(storyId)){
+        props.history.push(`/stories/details/${storyId}`)
+      }
     }
 
     return (
@@ -952,13 +961,13 @@ const MyFullScreenShowWrapper = (props) => {
             // backgroundSize: '100% 100%'
             
         }}>
-            {/* <Tooltip title="Toàn màn hình">
+            <Tooltip title="Quay lại chi tiết truyện">
                 <IconButton 
                     style={{ position: 'absolute', top: 20, right: 20 }}
-                    aria-label="delete" onClick={() => setFullScreen(!isFullScreen)}>
-                    <FullscreenIcon />
+                    onClick={gobackStoryDetails}>
+                    <ArrowBackRounded />
                 </IconButton>
-            </Tooltip> */}
+            </Tooltip>
 
             {informations.map(information => (
                 <div  
@@ -980,4 +989,4 @@ const MyFullScreenShowWrapper = (props) => {
 };
 
 
-export default MyFullScreenShowWrapper;
+export default withRouter(MyFullScreenShowWrapper);
