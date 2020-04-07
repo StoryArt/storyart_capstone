@@ -1,7 +1,7 @@
 package com.storyart.storyservice.dto.statistic;
 
 public interface IRatingClassify {
-int getStar();
+double getStar();
 int getCount();
 
 }

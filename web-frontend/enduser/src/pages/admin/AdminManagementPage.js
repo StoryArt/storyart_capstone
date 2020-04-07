@@ -23,14 +23,14 @@ import SearchIcon from "@material-ui/icons/Search";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
 const useStyles = makeStyles((theme) => ({
   paging: {
-    magrin: "0px 0px 30px 0px",
+    marginBottom: "1rem",
   },
-  button: {
-    fontFamily: ["Roboto", "Helvetica", "Arial"],
-    backgroundColor: "#719e7c",
-    color: "white",
-    marginLeft: "10px",
-    paddingRight: "0px",
+  button: {  outline:"none",
+    // fontFamily: ["Roboto", "Helvetica", "Arial"],
+    // backgroundColor: "#719e7c",
+    // color: "white",
+    // marginLeft: "10px",
+    // paddingRight: "0px",
 
     "&:hover": {
       backgroundColor: "#53825e",
@@ -39,19 +39,19 @@ const useStyles = makeStyles((theme) => ({
   },
 
   h3: {
-    fontWeight: "500",
-    margin: "0px 0px 20px 0px",
+    fontWeight: "600",
+    marginBottom: "1.4rem",
+    fontSize:"32px"
   },
   active: {
+    outline: "none",
     fontFamily: ["Roboto", "Helvetica", "Arial"],
     backgroundColor: "#42e6a4",
-    color: "white",
-    fontSize:"8px",
-    padding:"2px 5px",
-    
-    label: {
-      textTransform: 'capitalize',
-    },
+    color: "#000000",
+    fontSize:"11px",
+    padding:"2px 10px",
+    borderRadius:"10px",
+      textTransform: 'lowercase',
 
     "&:hover": {
       backgroundColor: "#53825e",
@@ -59,18 +59,19 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   deactive: {
-    fontFamily: ["Roboto", "Helvetica", "Arial"],
+    
+    fontFamily: ["Roboto", "Helvetica", "Arial","Times New Roman", "Verdana","Calibri"],
     backgroundColor: "#d7385e",
     color: "white",
     padding:"2px",
-    fontSize:"8px",
+    fontSize:"11px",
+    borderRadius:"10px",
+
 
     padding:"2px 2px",
     
    
-    label: {
-      textTransform: 'capitalize',
-    },
+      textTransform: 'lowercase',
     "&:hover": {
       backgroundColor: "#ab1d3f",
       boxShadow: "none",
@@ -217,7 +218,7 @@ const AdminManagementPage = (props) => {
       );
       const id = userList[index].id;
       rowItem["name"] = userList[index].username;
-      rowItem["role"] = userList[index].role;
+      // rowItem["role"] = userList[index].role;
       rowItem["deactiveByAdmin"] =
         userList[index].deactiveByAdmin == false ? (
           <Button
@@ -312,12 +313,12 @@ const AdminManagementPage = (props) => {
         sort: "asc",
         width: 270,
       },
-      {
-        label: "Vai trò",
-        field: "role",
-        sort: "asc",
-        width: 200,
-      },
+      // {
+      //   label: "Vai trò",
+      //   field: "role",
+      //   sort: "asc",
+      //   width: 200,
+      // },
 
       {
         label: "Ngày tạo",
@@ -426,11 +427,14 @@ const AdminManagementPage = (props) => {
       <h3 className={classes.h3}>
         Danh sách quản trị viên
         <Tooltip title="Thêm quản trị viên" aria-label="add">
-          <Button
+          <IconButton onClick={openDialogAddAccount} className={classes.button}>
+          <PersonAddIcon />
+          </IconButton>
+          {/* <Button
             className={classes.button}
             startIcon={<PersonAddIcon />}
             onClick={openDialogAddAccount}
-          ></Button>
+          ></Button> */}
         </Tooltip>
         <Tooltip title="theo tên đăng nhập và email " aria-label="add">
           <OutlinedInput

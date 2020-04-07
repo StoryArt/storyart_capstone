@@ -189,45 +189,5 @@ public class StoryController {
     }
 
 
-    //số liệu từ khi xuất bản câu truyện lần đầu (cũng bao gồm 1 số thông tin khác)
-    @GetMapping("story/{sid}/summary")
-    public ResponseEntity getStorySummary(@PathVariable int sid){
-        StorySummarizeResponse storySummarizeResponse= storyService.getStorySummarizeResponse(sid);
-        return new ResponseEntity(storySummarizeResponse, HttpStatus.OK);
-    }
 
-
-    @Autowired
-    ScreenReadingTimeService screenReadingTimeService;
-    // tam thoi de null
-    @GetMapping("story/{sid}/statistic/screen")
-    public ResponseEntity getStoryScreenStatistic(@PathVariable int sid,@RequestBody TimeRangeRequest timeRangeRequest){
-        List<ScreenTimeResponse> storySummarizeResponse= screenReadingTimeService.getListDurationOfEachSreenInTimeRangeByStoryId(sid, timeRangeRequest.getStart(), timeRangeRequest.getEnd());
-
-        return new ResponseEntity(storySummarizeResponse, HttpStatus.OK);
-    }
-
-
-    // bao gồm số liệu cho biểu đồ đường của rating theo khung thời gian
-    @GetMapping("story/{sid}/statistic/rating")
-    public ResponseEntity getRating_Statistic(@PathVariable int sid){
-        List<IRatingClassify> ratingClassifyList= storyService.getRatingClassify(sid);
-        return new ResponseEntity(ratingClassifyList, HttpStatus.OK);
-    }
-
-    // bao gồm số liệu cho biểu đồ đường của (share, comment(cái
-    // này gọi qua gw sang comment sv của a đạt))
-    @PostMapping("story/{sid}/statistic/react")
-    public ResponseEntity getReacts_Statistic(@PathVariable int sid, @RequestBody TimeRangeRequest timeRangeRequest){
-        StoryReactByRange storyReactByRanges= storyService.getReactStatisticInTimeRange(sid,timeRangeRequest );
-        return new ResponseEntity(storyReactByRanges, HttpStatus.OK);
-    }
-
-    @Autowired
-    LinkClickService linkClickService;
-    @PostMapping("story/{sid}/statistic/link-click")
-    public ResponseEntity countLinkClickByStoryInTimeRange(@PathVariable int sid, @RequestBody TimeRangeRequest timeRangeRequest){
-        List<ILinkClickCountResponse> iLinkClickCountResponses = linkClickService.countLinkClickByStoryIdInTimeRange(sid, timeRangeRequest.getStart(), timeRangeRequest.getEnd());
-        return new ResponseEntity(iLinkClickCountResponses, HttpStatus.OK);
-    }
 }

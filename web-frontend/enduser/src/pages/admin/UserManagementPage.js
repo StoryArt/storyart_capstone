@@ -27,29 +27,35 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
 const useStyles = makeStyles((theme) => ({
   paging: {
-    magrin: "0px 0px 30px 0px",
+    marginBottom: "1rem",
   },
-  button: {
-    fontFamily: ["Roboto", "Helvetica", "Arial"],
-    backgroundColor: "#719e7c",
-    color: "white",
-    marginLeft: "10px",
-    paddingRight: "0px",
+  button: {  outline:"none",
+    // fontFamily: ["Roboto", "Helvetica", "Arial"],
+    // backgroundColor: "#719e7c",
+    // color: "white",
+    // marginLeft: "10px",
+    // paddingRight: "0px",
 
     "&:hover": {
       backgroundColor: "#53825e",
       boxShadow: "none",
-    },
+    }
   },
 
   h3: {
-    fontWeight: "500",
-    margin: "0px 0px 20px 0px",
+    fontWeight: "600",
+    marginBottom: "1.4rem",
+    fontSize:"32px"
   },
   active: {
+    outline:"none",
     fontFamily: ["Roboto", "Helvetica", "Arial"],
     backgroundColor: "#42e6a4",
-    color: "white",
+    color: "#000000",
+    fontSize:"11px",
+    padding:"2px 5px",
+    borderRadius:"10px",
+      textTransform: 'lowercase',
 
     "&:hover": {
       backgroundColor: "#53825e",
@@ -57,10 +63,19 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   deactive: {
-    fontFamily: ["Roboto", "Helvetica", "Arial"],
+    
+    fontFamily: ["Roboto", "Helvetica", "Arial","Times New Roman", "Verdana","Calibri"],
     backgroundColor: "#d7385e",
     color: "white",
+    padding:"2px",
+    fontSize:"11px",
+    borderRadius:"10px",
 
+
+    padding:"2px 2px",
+    
+   
+      textTransform: 'lowercase',
     "&:hover": {
       backgroundColor: "#ab1d3f",
       boxShadow: "none",
@@ -115,22 +130,22 @@ const UserManagementPage = () => {
     columns: [
       {
         label: "ID",
-        field: "stt",
+        field: "id",
         sort: "asc",
         width: 150,
       },
       {
-        label: "Tên",
-        field: "name",
+        label: "Tên đăng nhập",
+        field: "username",
         sort: "asc",
         width: 270,
       },
-      {
-        label: "Vai trò",
-        field: "role",
-        sort: "asc",
-        width: 200,
-      },
+      // {
+      //   label: "Vai trò",
+      //   field: "role",
+      //   sort: "asc",
+      //   width: 200,
+      // },
 
       {
         label: "Ngày tạo",
@@ -161,16 +176,15 @@ const UserManagementPage = () => {
     for (var index = 0; index < userList.length; index++) {
       let rowItem = {};
 
-      rowItem["stt"] = userList[index].id;
-      rowItem["username"] = userList[index].username;
+      rowItem["id"] = userList[index].id;
       rowItem["username"] = (
         <a href={`/user/profile/${userList[index].id}`}>
-          {rowItem["username"]}
+          {userList[index].username}
         </a>
       );
       const id = userList[index].id;
-      rowItem["name"] = userList[index].username;
-      rowItem["role"] = userList[index].role;
+      // rowItem["username"] = userList[index].username;
+      // rowItem["role"] = userList[index].role=="ROLE_USER"?"Người dùng":"";
       rowItem["deactiveByAdmin"] =
         userList[index].deactiveByAdmin == false ? (
           <Button
