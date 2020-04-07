@@ -10,6 +10,7 @@ import com.storyart.commentservice.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -73,12 +74,12 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public void reportStory(ReportStoryRequest request) {
-        if(request.getContent().trim().length()<1){
+        if (request.getContent().trim().length() < 1) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Vui lòng nhập nội dung báo cáo.");
         }
 
         Optional<Story> story = storyRepository.findById(request.getStoryId());
-        if(!story.isPresent()){
+        if (!story.isPresent()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Truyện không tồn tại.");
         }
 
@@ -105,82 +106,96 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Page<ReportCommentResponseDTO> getListReportComment(String searchString, boolean isHandled, int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<Report> reportPage;
-        if(searchString.trim().length()<1){
-            reportPage = reportRepository.findReportComment(isHandled, pageable);
-        }else {
-            List<Integer> commentIds = new ArrayList<>();
-            try{
+        List<Integer> commentIds = new ArrayList<>();
+
+
+        Page<Comment> commentPage;
+        if (searchString.trim().length() < 1) {
+            commentIds = reportRepository.getCommentIds(isHandled);
+            commentPage = commentRepository.getCommentReports(commentIds, isHandled, pageable);
+        } else {
+            try {
                 int commentId = Integer.parseInt(searchString);
                 commentIds.add(commentId);
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 List<Integer> userIds = userRepository.findUserIdsBySearchString(searchString);
-                commentIds =commentRepository.findAllCommentIdByUserIds(userIds);
+                commentIds = commentRepository.findAllCommentIdByUserIds(userIds);
 
             }
-            reportPage = reportRepository.findReportCommentWithCommentIds(isHandled, commentIds, pageable);
+            commentPage = commentRepository.getCommentReports(commentIds, isHandled, pageable);
         }
-        
-        
 
-        Page<ReportCommentResponseDTO> responsePage = reportPage.map(new Function<Report, ReportCommentResponseDTO>() {
+
+        Page<ReportCommentResponseDTO> responsePage = commentPage.map(new Function<Comment, ReportCommentResponseDTO>() {
             @Override
-            public ReportCommentResponseDTO apply(Report report) {
+            public ReportCommentResponseDTO apply(Comment comment) {
                 ModelMapper mm = new ModelMapper();
-                ReportCommentResponseDTO reportCommentResponseDTO = mm.map(report, ReportCommentResponseDTO.class);
+                ReportCommentResponseDTO reportCommentResponseDTO = mm.map(comment, ReportCommentResponseDTO.class);
                 return reportCommentResponseDTO;
             }
         });
+        List<ReportCommentResponseDTO> responseList = responsePage.getContent();
+        List<Comment> commentList = commentPage.getContent();
 
-        List<Report> reportList = reportPage.getContent();
-        List<Integer> commentIds = new ArrayList<>();
-
-        for (Report report : reportList) {
-            commentIds.add(report.getCommentId());
+        int index = 0;
+        for (ReportCommentResponseDTO response : responseList) {
+            response.setCommentId(commentList.get(index).getId());
+            response.setCommentOwnerId(commentList.get(index).getUserId());
+            response.setCommentIsDisableByAdmin(commentList.get(index).isDisableByAdmin());
+            response.setCommentContent(commentList.get(index).getContent());
+            index++;
         }
 
-        List<Comment> comments = commentRepository.findAllById(commentIds);
+
+        //Page<ReportCommentResponseDTO> responsePage = commentPage.map(new Function<Comment, ReportCommentResponseDTO>() {
+        //    @Override
+        //    public ReportCommentResponseDTO apply(Comment comment) {
+        //        ModelMapper mm = new ModelMapper();
+        //        ReportCommentResponseDTO reportCommentResponseDTO = mm.map(comment, ReportCommentResponseDTO.class);
+        //        return reportCommentResponseDTO;
+        //    }
+        //});
+
+        //List<Report> reportList = reportPage.getContent();
+        //List<Integer> commentIds = new ArrayList<>();
+
+        //for (Report report : reportList) {
+        //    commentIds.add(report.getCommentId());
+        //}
+
+        //List<Comment> comments = commentRepository.findAllById(commentIds);
 
         List<Integer> userIds = new ArrayList<>();
-        for (Comment comment : comments) {
+        for (Comment comment : commentList) {
             userIds.add(comment.getUserId());
         }
         List<User> users = userRepository.findAllById(userIds);
         List<Report> fullInfoReport = reportRepository.findFullInformationReport(commentIds, isHandled);
 
         //List<Integer> numberOfReports = reportRepository.getNumberOfReports(commentIds, isHandled);
-        List<ReportCommentResponseDTO> responseList = responsePage.getContent();
-        int index = 0;
+        //List<ReportCommentResponseDTO> responseList = responsePage.getContent();
+        //int index = 0;
         for (ReportCommentResponseDTO response : responseList) {
             List<Integer> reportIds = new ArrayList<>();
-            for (Report report: fullInfoReport) {
-                if(report.getCommentId().equals(response.getCommentId())){
+            boolean handled = false;
+            for (Report report : fullInfoReport) {
+                if (report.getCommentId().equals(response.getCommentId())) {
                     reportIds.add(report.getId());
                 }
             }
             response.setNumberOfReports(reportIds.size());
-            //response.setNumberOfReports(numberOfReports.get(index));
-            for (Comment comment : comments) {
-                if (response.getCommentId() == comment.getId()) {
-
-                    response.setCommentContent(comment.getContent());
-                    response.setCommentIsDisableByAdmin(comment.isDisableByAdmin());
-                    for (User user : users) {
-                        if (user.getId() == comment.getUserId()) {
-                            response.setCommentOwnerId(user.getId());
-                            response.setCommentOwner(user.getUsername());
-                            response.setCommentOwnerEmail(user.getEmail());
-                            response.setUserIsDisableByAdmin(user.isDeactiveByAdmin());
-                        }
-                    }
+            for (User user : users) {
+                if (user.getId() == response.getCommentOwnerId()) {
+                    response.setCommentOwner(user.getUsername());
+                    response.setCommentOwnerEmail(user.getEmail());
+                    response.setUserIsDisableByAdmin(user.isDeactiveByAdmin());
                 }
             }
-            //response.setCommentOwner(reportList.get(index).getComment().getUser().getUsername());
             response.setReportIds(reportIds);
-            index++;
+            response.setHandled(isHandled);
+            //index++;
         }
-
+        //response.setCommentOwner(reportList.get(index).getComment().getUser().getUsername());
 
 
         return responsePage;
@@ -227,41 +242,55 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Page<StoryReportResponse> getListReportStory(String searchString,boolean isHandled, int pageNo, int pageSize) {
+    public Page<StoryReportResponse> getListReportStory(String searchString, boolean isHandled, int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<Report> reportPage;
-        if(searchString.trim().length()<1){
-            reportPage = reportRepository.findReportStory(isHandled, pageable);
-        }else {
-            List<Integer> storyIds = new ArrayList<>();
-            try{
+        List<Integer> storyIds = new ArrayList<>();
+
+        Page<Story> reportPage;
+        if (searchString.trim().length() < 1) {
+            storyIds = reportRepository.getStoryIds(isHandled);
+            reportPage = storyRepository.getStoryReports(storyIds, isHandled, pageable);
+        } else {
+            //List<Integer> storyIds = new ArrayList<>();
+            try {
                 int storyId = Integer.parseInt(searchString);
                 storyIds.add(storyId);
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 List<Integer> userIds = userRepository.findUserIdsBySearchString(searchString);
-                storyIds =storyRepository.findAllStoryIdByUserIds(userIds);
+                storyIds = storyRepository.findAllStoryIdByUserIds(userIds);
             }
-            reportPage = reportRepository.findReportCommentWithStoryIds(isHandled, storyIds, pageable);
+            reportPage = storyRepository.getStoryReports(storyIds, isHandled, pageable);
         }
 
-        Page<StoryReportResponse> responsePage = reportPage.map(new Function<Report, StoryReportResponse>() {
+
+        Page<StoryReportResponse> responsePage = reportPage.map(new Function<Story, StoryReportResponse>() {
             @Override
-            public StoryReportResponse apply(Report report) {
+            public StoryReportResponse apply(Story story) {
                 ModelMapper mm = new ModelMapper();
-                StoryReportResponse storyReportResponse = mm.map(report, StoryReportResponse.class);
+                StoryReportResponse storyReportResponse = mm.map(story, StoryReportResponse.class);
                 return storyReportResponse;
             }
         });
 
-        List<Report> reportList = reportPage.getContent();
-        List<Integer> storyIds = new ArrayList<>();
-
-        for (Report report : reportList) {
-            storyIds.add(report.getStoryId());
+        List<StoryReportResponse> responseList = responsePage.getContent();
+        List<Story> stories = reportPage.getContent();
+        int index = 0;
+        for (StoryReportResponse response : responseList) {
+            response.setUserId(stories.get(index).getUserId());
+            response.setStoryIsDisableByAdmin(stories.get(index).isDeactiveByAdmin());
+            response.setStoryName(stories.get(index).getTitle());
+            response.setStoryId(stories.get(index).getId());
+            index++;
         }
 
-        List<Story> stories = storyRepository.findAllById(storyIds);
+        //List<Report> reportList = reportPage.getContent();
+        //List<Integer> storyIds = new ArrayList<>();
+
+        //for (Report report : reportList) {
+        //storyIds.add(report.getStoryId());
+        //}
+
+        //List<Story> stories = storyRepository.findAllById(storyIds);
 
         List<Integer> userIds = new ArrayList<>();
         for (Story story : stories) {
@@ -272,34 +301,26 @@ public class ReportServiceImpl implements ReportService {
         List<Report> fullInfoReport = reportRepository.findFullInformationReportStory(storyIds, isHandled);
 
         //List<Integer> numberOfReports = reportRepository.getNumberOfReports(commentIds, isHandled);
-        List<StoryReportResponse> responseList = responsePage.getContent();
+        //List<StoryReportResponse> responseList = responsePage.getContent();
         //int index = 0;
         for (StoryReportResponse response : responseList) {
             List<Integer> reportIds = new ArrayList<>();
-            for (Report report: fullInfoReport) {
-                if(report.getStoryId().equals(response.getStoryId())){
+            for (Report report : fullInfoReport) {
+                if (report.getStoryId().equals(response.getStoryId())) {
                     reportIds.add(report.getId());
                 }
             }
             response.setNumberOfReports(reportIds.size());
-            for (Story story : stories) {
-                if (response.getStoryId() == story.getId()) {
-
-                    response.setStoryName(story.getTitle());
-                    response.setStoryIsDisableByAdmin(story.isDeactiveByAdmin());
-                    for (User user : users) {
-                        if (user.getId() == story.getUserId()) {
-                            response.setUserId(user.getId());
-                            response.setAuthorName(user.getUsername());
-                            response.setAuthorEmail(user.getEmail());
-                            response.setUserIsDisableByAdmin(user.isDeactiveByAdmin());
-                        }
-                    }
+            for (User user : users) {
+                if (user.getId() == response.getUserId()) {
+                    response.setAuthorName(user.getUsername());
+                    response.setAuthorEmail(user.getEmail());
+                    response.setUserIsDisableByAdmin(user.isDeactiveByAdmin());
                 }
             }
             response.setReportIds(reportIds);
+            response.setHandled(isHandled);
         }
-
 
 
         return responsePage;
@@ -394,7 +415,7 @@ public class ReportServiceImpl implements ReportService {
                 commentRepository.save(c);
             }
         }
-        if(request.getReportIds().size()>0){
+        if (request.getReportIds().size() > 0) {
             changeStatusOfReport(request.getReportIds());
         }
 
