@@ -1,9 +1,7 @@
 import axios from "axios";
-import { API_ENDPOINT_PREFIX } from "../config/api";
 import { getAuthUserInfo } from "../config/auth";
 import { API_URL } from '../config/api';
 
-// const baseUrl = API_ENDPOINT_PREFIX + '/stories';
 const baseUrl = API_URL + "/api/story-service/stories";
 
 const baseUrl2 = API_URL + "/api/story-service";

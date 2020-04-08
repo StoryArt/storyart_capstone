@@ -38,12 +38,10 @@ export const getAuthUserInfo = () => {
 
 export const interceptResponse = (handleUnauthorizedAction) => {
     axios.interceptors.response.use(function (response) {
-        // Any status code that lie within the range of 2xx cause this function to trigger
-        // Do something with response data
+    
         return response;
     }, function (error) {
-        // Any status codes that falls outside the range of 2xx cause this function to trigger
-        // Do something with response error
+       
         const responseURL = error.request.responseURL;
         // if(responseURL.indexOf('/api/auth/login') > -1 || responseURL.indexOf('/api/auth/change-password') > -1) return Promise.reject(error);
      
