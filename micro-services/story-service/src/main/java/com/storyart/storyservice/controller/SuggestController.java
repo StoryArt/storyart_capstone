@@ -17,10 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Function;
 
 @RestController
@@ -66,7 +63,7 @@ public class SuggestController {
         }
             Pageable pageable = PageRequest.of(pageNo, pageSize);
             List<Integer> total = new ArrayList<>();
-            List<Integer> liststoryInteger = ratingService.listAvgRate();
+            List<Integer> liststoryInteger =  historyRepository.countTopView();
     Optional<Integer> check = ratingRepository.checkRatingById(id);
     if(check.isPresent()){
         //     List<Integer> listhistory = historyService.jaccardCalculate(id);
@@ -147,9 +144,9 @@ public class SuggestController {
             return new ResponseEntity(responsePage, HttpStatus.OK);
     }
 
-    @GetMapping("/suggeststory{id}")
-    public ResponseEntity getSuggestionStory(@PathVariable("id") Integer id,
-                                        @RequestParam(defaultValue = "1") Integer pageNo,
+    @GetMapping("/suggeststory")
+    public ResponseEntity getSuggestionStory(
+                @RequestParam(defaultValue = "1") Integer pageNo,
                                         @RequestParam(defaultValue = "10") Integer pageSize)
     {
 
@@ -158,7 +155,7 @@ public class SuggestController {
             pageNo = 0;
         }
         List<Integer> total = new ArrayList<>();
-        List<Integer> liststoryInteger = ratingService.listAvgRate();
+        List<Integer> liststoryInteger = historyRepository.countTopView();
         if(liststoryInteger.size() >= 4){
             List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
             total.addAll(AfterRandom);
@@ -191,11 +188,8 @@ public class SuggestController {
                                           int totalItems)
     {
         Random rand = new Random();
-        List<Integer> newList = new ArrayList<>();
-        for (int i = 0; i < totalItems; i++) {
-            int randomIndex = rand.nextInt(list.size());
-            newList.add(list.get(randomIndex));
-        }
+        Collections.shuffle(list);
+        List<Integer> newList = list.subList(0,totalItems);
         return newList;
     }
 }

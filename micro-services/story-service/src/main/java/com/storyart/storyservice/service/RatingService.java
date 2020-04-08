@@ -16,7 +16,7 @@ public interface RatingService {
     List<Integer>  getSuggestion(Integer id, boolean flag);
  //   List<Integer> getSuggestByCommentAndReaction();
     ResultDto rateStory(double stars, int  userId, int storyId);
-    List<Integer> listAvgRate();
+ //   List<Integer> listAvgRate();
 }
 
 
@@ -44,14 +44,6 @@ class RatingServiceIml implements RatingService {
 
     @Autowired
     CommentRepository commentRepository;
-
-    @Override
-    public List<Integer> listAvgRate() {
-       List<Integer> list = historyRepository.countTopView();
-
-
-        return list;
-    }
 
     @Override
     public List<Integer> getSuggestion(Integer id, boolean flagcheck) {
