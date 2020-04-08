@@ -30,7 +30,10 @@ export const NUMBER_OPERATIONS = {
 }
 
 export const STRING_OPERATIONS = {
-    REPLACE: 'REPLACE'
+    // REPLACEALL: 'REPLACEALL',
+    APPEND: 'APPEND',
+    PREPEND: 'PREPEND',
+    REPLACE: 'REPLACE',
 }
 
 export const ROLE_NAMES = {
@@ -64,11 +67,11 @@ export const getParameters = () => {
             NUMBER_CONDITIONS.LESS_OR_EQUAL,
         ],
         operations: [
-            NUMBER_OPERATIONS.PLUS,
-            NUMBER_OPERATIONS.MINUS,
-            NUMBER_OPERATIONS.MULTIPLY,
-            NUMBER_OPERATIONS.DIVIDE,
-            NUMBER_OPERATIONS.REPLACE,
+            { value: NUMBER_OPERATIONS.PLUS, title: 'Cộng' },
+            { value: NUMBER_OPERATIONS.MINUS, title: 'Trừ' },
+            { value: NUMBER_OPERATIONS.MULTIPLY, title: 'Nhân' },
+            { value: NUMBER_OPERATIONS.DIVIDE, title: 'Chia' },
+            { value: NUMBER_OPERATIONS.REPLACE, title: 'Thay giá trị mới' },
         ]
     },
     {
@@ -77,7 +80,9 @@ export const getParameters = () => {
             STRING_CONDITIONS.EQUAL
         ],
         operations: [
-            STRING_OPERATIONS.REPLACE
+            { value: STRING_OPERATIONS.REPLACE, title: 'Thay giá trị mới' },
+            { value: STRING_OPERATIONS.APPEND, title: 'Thêm chữ vào sau' },
+            { value: STRING_OPERATIONS.PREPEND, title: 'Thêm chữ vào trước' },
         ]
     }];
 }
