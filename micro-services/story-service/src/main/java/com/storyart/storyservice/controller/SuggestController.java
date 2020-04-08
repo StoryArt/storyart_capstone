@@ -66,6 +66,7 @@ public class SuggestController {
         }
             Pageable pageable = PageRequest.of(pageNo, pageSize);
             List<Integer> total = new ArrayList<>();
+            List<Integer> liststoryInteger = ratingService.listAvgRate();
     Optional<Integer> check = ratingRepository.checkRatingById(id);
     if(check.isPresent()){
         //     List<Integer> listhistory = historyService.jaccardCalculate(id);
@@ -76,7 +77,6 @@ public class SuggestController {
 
     try{
         if(listRatingExceptThisWeek.size() == 0){
-            List<Integer> liststoryInteger = ratingService.listAvgRate();
             if(liststoryInteger.size() >= 4){
                 List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
                 total.addAll(AfterRandom);
@@ -105,7 +105,7 @@ public class SuggestController {
         }
     }*/
     }catch (Exception ex){
-        List<Integer> liststoryInteger = ratingService.listAvgRate();
+
         if(liststoryInteger.size() >= 4){
             List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
             total.addAll(AfterRandom);
@@ -114,13 +114,20 @@ public class SuggestController {
         }
     }
      }else{
-        List<Integer> liststoryInteger = ratingService.listAvgRate();
         if(liststoryInteger.size() >= 4){
             List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
             total.addAll(AfterRandom);
         }else{
             total.addAll(liststoryInteger);
         }
+    }
+    List<Integer> listStoryAuthor = storyRepository.getAllStoryIdByUserId(id);
+    if(listStoryAuthor.size() >0){
+        total.removeAll(listStoryAuthor);
+    }
+    if(total.size() == 0){
+        List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
+        total.addAll(AfterRandom);
     }
 
             Page<Story> storyPage = storyRepository.findAllByStoryIds(total, pageable);
@@ -131,7 +138,7 @@ public class SuggestController {
                     List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
                     GetStoryDto dto = mm.map(story, GetStoryDto.class);
                     dto.setTags(tagService.mapModelToDto(tagList));
-                    dto.setUser(userRepository.findById(dto.getAuthorId() ).orElse(null));
+                    dto.setUser(userRepository.findById(story.getUserId()).orElse(null));
                     dto.setNumOfRead(historyRepository.countAllByStoryId(dto.getId()));
                     return dto;
                 }
@@ -140,8 +147,8 @@ public class SuggestController {
             return new ResponseEntity(responsePage, HttpStatus.OK);
     }
 
-    @GetMapping("/suggeststory")
-    public ResponseEntity getSuggestionStory(
+    @GetMapping("/suggeststory{id}")
+    public ResponseEntity getSuggestionStory(@PathVariable("id") Integer id,
                                         @RequestParam(defaultValue = "1") Integer pageNo,
                                         @RequestParam(defaultValue = "10") Integer pageSize)
     {
@@ -159,8 +166,6 @@ public class SuggestController {
             total.addAll(liststoryInteger);
         }
 
-
-
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         Page<Story> storyPage = storyRepository.findAllByStoryIds(total, pageable);
         ModelMapper mm = new ModelMapper();
@@ -170,7 +175,7 @@ public class SuggestController {
                 List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
                 GetStoryDto dto = mm.map(story, GetStoryDto.class);
                 dto.setTags(tagService.mapModelToDto(tagList));
-                dto.setUser(userRepository.findById(dto.getAuthorId() ).orElse(null));
+                dto.setUser(userRepository.findById(story.getUserId()).orElse(null));
                 dto.setNumOfRead(historyRepository.countAllByStoryId(dto.getId()));
                 return dto;
             }
