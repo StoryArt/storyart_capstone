@@ -89,7 +89,7 @@ class StoryService {
   }
 
   static async getSuggestion(pageNo) {
-    let pagesize = 8;
+    let pagesize = 4;
     try {
       const userinfo = getAuthUserInfo();
 
