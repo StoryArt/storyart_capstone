@@ -40,8 +40,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
-@Autowired
+
+    @Autowired
     UserRepository userRepository;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
@@ -54,8 +56,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 //decode token and take userid from it
                 Integer uid = jwtTokenProvider.getUserIdFromToken(jwt);
                 UserDetails userDetails = userDetailsService.loadUserById(uid);
-                User us= userRepository.findByUsername(userDetails.getUsername()).orElse(null);
-                if(us!= null && us.isDeactiveByAdmin()){
+                User us = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
+                if (us != null && us.isDeactiveByAdmin()) {
                     throw new BadRequestException("Tài khoản đã bị khóa. Vui lòng liên hệ với quản trị viên!");
                 }
                 UsernamePasswordAuthenticationToken authenticationToken =

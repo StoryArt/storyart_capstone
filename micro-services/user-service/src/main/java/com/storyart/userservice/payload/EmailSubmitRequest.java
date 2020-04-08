@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
@@ -13,8 +12,12 @@ import javax.validation.constraints.NotBlank;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmailForgotPasswordRequest {
+public class EmailSubmitRequest {
 @Email(message = "Không đúng dịnh dạng email!")
         @NotBlank(message = "Email không được để trống!")
     String email;
+
+String linkReset;
+
+
 }

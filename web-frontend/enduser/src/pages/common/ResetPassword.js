@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
-import MainLayout from "../../../layouts/main-layout/MainLayout";
+import MainLayout from "../../layouts/main-layout/MainLayout";
 import { MDBAlert, MDBBtn } from "mdbreact";
-import UserService from "../../../services/user.service";
+
 import {
-  getAuthUserInfo,
+  saveTokenToLocal,
   setAuthHeader,
-  getTokenFromLocal,
-} from "../../../config/auth";
-import MyAlert from "../../../components/common/MyAlert";
+  getAuthUserInfo,
+} from "../../config/auth";
+
+import UserService from "../../services/user.service";
+
+import MyAlert from "../../components/common/MyAlert";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -33,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ChangePasswordPage = (props) => {
+const ResetPassword = (props) => {
   const classes = useStyles();
   const [pass, setpass] = useState("");
   const [repass, setRepass] = useState("");
@@ -46,52 +49,62 @@ const ChangePasswordPage = (props) => {
 
   const user = getAuthUserInfo();
   const [errorMessage, setErrorMessage] = useState("");
+  const resetToken = props.match.params.token;
 
-  async function handleChangePassword(event) {
+  async function handleResetPassword(event) {
     event.preventDefault();
+
+    if (resetToken == "") {
+      setAlert({
+        open: true,
+        content:
+          "Bạn không có mã xác nhận. Vui lòng gửi lại mail để lấy đường dẫn đặt lại mật khẩu!",
+        type: "error",
+      });
+      closeAlert();
+      return;
+    }
     try {
       if (repass != pass) {
         setAlert({
+          open: true,
+          content: "Mật khẩu nhập lại chưa trùng!",
+          type: "error",
+        });
+        closeAlert();
+      } else {
+        let prt = { password: pass, repassword: repass, token: resetToken };
+        const res = await UserService.resetPassword(prt).then((res) => {
+          setAlert({
             open: true,
-            content: "Mật khẩu nhập lại chưa trùng. Mời nhập lại!",
-            type: "error",
+            content: "Lưu thành công",
+            type: "success",
           });
-        window.setTimeout(() => {
-          closeAlert();
-        }, 3000);
-        
-      }else{
-        let pr={password: pass, repassword: repass};
-        const res = await UserService.changePassword(pr,user.id ).then((res) => {
-            setAlert({
-              open: true,
-              content: "Lưu thành công",
-              type: "success",
-            });
-          });
-          window.setTimeout(() => {
-            closeAlert();
-          }, 3000);
+
+          if (res.data.accessToken != null) {
+            const { tokenType, accessToken } = res.data;
+            const token = tokenType + " " + accessToken;
+            saveTokenToLocal(token);
+            setAuthHeader(token);
+
+            window.location.href = "/home";
+          }
+        });
+        closeAlert();
       }
-     
     } catch (error) {
-    
-      
-        var err;
-        if (typeof error.response.data.errors != "undefined") {
-          err = error.response.data.errors[0].defaultMessage;
-        } else if (typeof error.response.data.message == "string") {
-          err = error.response.data.message;
-        }
-        setAlert({
-            open: true,
-            content: err,
-            type: "error",
-          });
-        window.setTimeout(() => {
-          closeAlert();
-        }, 3000);
-     
+      var err;
+      if (typeof error.response.data.errors != "undefined") {
+        err = error.response.data.errors[0].defaultMessage;
+      } else if (typeof error.response.data.message == "string") {
+        err = error.response.data.message;
+      }
+      setAlert({
+        open: true,
+        content: err,
+        type: "error",
+      });
+      closeAlert();
     }
   }
 
@@ -101,7 +114,7 @@ const ChangePasswordPage = (props) => {
   };
 
   const closeAlert = () =>
-    window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
+    window.setTimeout(() => setAlert({ ...alert, open: false }), 2000);
 
   return (
     <MainLayout>
@@ -113,18 +126,17 @@ const ChangePasswordPage = (props) => {
       />
 
       <div style={mystyle}>
-        <Typography component="h3" variant="h3">
-          Đổi mật khẩu
+        <Typography component="h3" variant="h3" style={{ margin: "40px 0px;" }}>
+          Nhập mật khẩu mới
         </Typography>
 
-        <form style={mystyle} onSubmit={handleChangePassword}>
+        <form style={mystyle} onSubmit={handleResetPassword}>
           <div className="row">
-
             <div style={mystyle} className="col-sm-4">
               {/* //name */}
               <div className="form-group">
-      {errorMessage}
-                  
+                {errorMessage}
+
                 <TextField
                   variant="outlined"
                   margin="normal"
@@ -135,8 +147,6 @@ const ChangePasswordPage = (props) => {
                   type="password"
                   onChange={(e) => setpass(e.target.value)}
                 />
-              </div>
-              <div className="form-group">
                 <TextField
                   variant="outlined"
                   margin="normal"
@@ -144,10 +154,10 @@ const ChangePasswordPage = (props) => {
                   label="Nhập lại mật khẩu mới"
                   value={repass}
                   type="password"
-
                   onChange={(e) => setRepass(e.target.value)}
                 />
               </div>
+
               {/* //email */}
 
               <div className="form-group">
@@ -163,4 +173,4 @@ const ChangePasswordPage = (props) => {
   );
 };
 
-export default ChangePasswordPage;
+export default ResetPassword;

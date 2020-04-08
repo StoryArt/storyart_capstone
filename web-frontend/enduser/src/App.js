@@ -17,6 +17,8 @@ import EditUserProfilePage from './pages/enduser/user-profile-page/EditUserProfi
 import ChangePasswordPage from './pages/enduser/user-profile-page/ChangePasswordPage';
 
 import LoginPage from './pages/common/LoginPage';
+import ResetPassword from './pages/common/ResetPassword';
+import EmailSubmitPage from './pages/common/EmailSubmitPage';
 import RegisterPage from './pages/common/RegisterPage';
 
 import DashboardPage from './pages/admin/DashboardPage';
@@ -86,6 +88,8 @@ function App() {
             <Route exact path="/stories/read/:storyId" component={StoryReadingPage}/>
             <Route exact path="/user/profile/:userId" component={PublicUserProfilePage}/>
             <Route exact path="/story/analystics/:storyId" component={StoryAnalytic}/>
+            <Route exact path="/forgot-password" component={EmailSubmitPage}/>
+            <Route exact path="/reset-password/token/:token" component={ResetPassword}/>
             <Route 
               exact 
               path="/user/settings/password" 

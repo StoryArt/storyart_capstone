@@ -47,7 +47,7 @@ const RegisterPage = () => {
   const [avatar, setAvatar] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [introContent, setIntroContent] = useState("");
+  const [intro_content, setintro_content] = useState("");
   const [alert, setAlert] = useState({ open: false, type: 'success', content: '' });
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -64,7 +64,7 @@ const RegisterPage = () => {
       name: name,
       username: username,
       password: password,
-      introContent: introContent,
+      intro_content: intro_content,
       email: email,
       avatar: randomImage
     };
@@ -91,101 +91,7 @@ const RegisterPage = () => {
   }
   const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
 
-  return (
-    // <div className="signup flex justify-center w-full h-full-screen">
-    //   <div className="p-8">
-    //     <Card className="signup-card position-relative y-center">
-    //       <Grid container>
-    //         <Grid item lg={5} md={5} sm={5} xs={12}>
-    //           <div className="p-8 flex justify-center bg-light-gray items-center h-full">
-    //             <img src="" alt="" />
-    //           </div>
-    //         </Grid>
-    //         <Grid item lg={7} md={7} sm={7} xs={12}>
-    //           <div className="p-9 h-full">
-    //             <form onSubmit={handleSubmit}>
-    //               <TextField
-    //                 name="firstName"
-    //                 variant="outlined"
-    //                 required
-    //                 fullWidth
-    //                 value={username}
-    //                 onChange={e => setUsername(e.target.value)}
-    //                 label="Tên đăng nhập"
-    //                 autoFocus
-    //               />
-    //               <TextField
-    //                 variant="outlined"
-    //                 required
-    //                 fullWidth
-    //                 value={name}
-    //                 label="tên đầy đủ"
-    //                 onChange={e => setName(e.target.value)}
-    //               />
-    //               {/* <TextValidator
-    //               className="mb-6 w-full"
-    //               variant="outlined"
-    //               label="Email"
-    //               onChange={this.handleChange}
-    //               type="email"
-    //               name="email"
-    //               value={email}
-    //               validators={["required", "isEmail"]}
-    //               errorMessages={[
-    //                 "Bạn chưa điền email",
-    //                 "Email không hợp lệ"
-    //               ]}
-    //             /> */}
-
-    //               <TextField
-    //                 variant="outlined"
-    //                 required
-    //                 fullWidth
-    //                 type="email"
-    //                 label="Email"
-    //                 onChange={e => setEmail(e.target.value)}
-    //               />
-    //               <TextField
-    //                 variant="outlined"
-    //                 required
-    //                 fullWidth
-    //                 value={password}
-    //                 type="password"
-    //                 label="Mật khẩu"
-    //                 onChange={e => setPassword(e.target.value)}
-    //               />
-    //               {/* <FormControlLabel
-    //               className="mb-4"
-    //               name="agreement"
-    //               onChange={this.handleChange}
-    //               control={<Checkbox />}
-    //               label="I have read and agree to the terms of service."
-    //             /> */}
-    //               <div className="flex items-center">
-    //                 <Button
-    //                   className="capitalize"
-    //                   variant="contained"
-    //                   color="primary"
-    //                   type="submit"
-    //                 >
-    //                   Đăng ký
-    //                 </Button>
-    //                 <span className="mx-2 ml-5">or</span>
-    //                 <Button
-    //                   className="capitalize"
-    //                   onClick={() => this.props.history.push("/session/signin")}
-    //                 >
-    //                   Đăng nhập
-    //                 </Button>
-    //               </div>
-    //             </form>
-    //           </div>
-    //         </Grid>
-    //       </Grid>
-    //     </Card>
-    //   </div>
-    // </div>
-    
+  return (   
     <div className="py-5">
         <Container component="main" maxWidth="xs">
           <CssBaseline />
@@ -250,9 +156,9 @@ const RegisterPage = () => {
                     multiline
                     fullWidth
                     rows="3"
-                    value={introContent}
+                    value={intro_content}
                     label="Thông tin giới thiệu về bạn..."
-                    onChange={e => setIntroContent(e.target.value)}
+                    onChange={e => setintro_content(e.target.value)}
                   />
                 </Grid>
 

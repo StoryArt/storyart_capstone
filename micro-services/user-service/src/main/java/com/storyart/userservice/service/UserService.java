@@ -51,5 +51,5 @@ public interface UserService {
 
     ResultDto getUserProfile(int userId);
 
-    boolean changePassword(PasswordChangeRequest passwordChangeRequest, int userId);
+    boolean changePassword(String password, int userId);
 }
