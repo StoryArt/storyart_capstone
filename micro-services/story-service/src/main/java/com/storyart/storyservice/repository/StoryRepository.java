@@ -17,13 +17,13 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
             "WHERE (s.active = true and s.published = true and s.deactive_by_admin = false) " +
             "and (s.title like %?1% or s.intro like %?1% or " +
             "u.name like %?1%) and u.is_active = true and u.is_deactive_by_admin = false " +
-            "and s.id in (select distinct story_id from story_tag st where st.tag_id in ?2)",
+            "and s.id in (select distinct story_id from story_tag st where st.tag_id in ?2) order by s.created_at DESC",
 
             countQuery = "select count(*) from story s left join user u ON s.user_id = u.id WHERE " +
                     "(s.active = true and s.published = true and s.deactive_by_admin = false) " +
                     "and (s.title like %?1% or s.intro like %?1% or " +
                     "u.name like %?1%) and u.is_active = true and u.is_deactive_by_admin = false " +
-                    "and s.id in (select distinct story_id from story_tag st where st.tag_id in ?2)",
+                    "and s.id in (select distinct story_id from story_tag st where st.tag_id in ?2) order by s.created_at DESC",
 
             nativeQuery = true)
     Page<Story> findAllBySearchCondition(String title, Set<Integer> tagIds,
@@ -31,11 +31,11 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
 
     @Query(value = "select * from story s WHERE s.user_id = ?1 and (s.title like %?2% or s.intro like %?2%) " +
             "and s.active = true and s.published = true and s.deactive_by_admin = false and s.id in " +
-            "(select distinct story_id from story_tag st where st.tag_id in ?3)",
+            "(select distinct story_id from story_tag st where st.tag_id in ?3) order by s.created_at DESC",
 
             countQuery = "select count(*) from story s WHERE s.user_id = ?1 and (s.title like %?2% or s.intro like %?2%) " +
                     "and s.active = true and s.published = true and s.deactive_by_admin = false and s.id in " +
-                    "(select distinct story_id from story_tag st where st.tag_id in ?3)",
+                    "(select distinct story_id from story_tag st where st.tag_id in ?3) order by s.created_at DESC",
 
             nativeQuery = true)
     Page<Story> findAllByUserProfile(int userId, String title, Set<Integer> tagIds, Pageable pageable);
@@ -45,7 +45,7 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
             "where s.active = true and s.deactive_by_admin = false and s.published = true order by " +
             "(select count(id) from reading_history rd where rd.story_id = s.id " +
             "and (DATE(rd.created_at) >= (DATE(NOW()) - INTERVAL 7 DAY) " +
-            "and (DATE(rd.created_at) <= DATE(NOW())) )) DESC LIMIT 12", nativeQuery = true)
+            "and (DATE(rd.created_at) <= DATE(NOW())) )) DESC LIMIT 6", nativeQuery = true)
     List<Story> findTheMostReadingStories();
 
     @Query(value = MyQueries. getStoriesForAdminOrderByDate+ " ASC",

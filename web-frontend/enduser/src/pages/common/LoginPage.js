@@ -168,13 +168,12 @@ const LoginPage = () => {
               Đăng nhập
               </Button>
             <Grid container>
-              
               <Grid item>
                 <Link to="/register" variant="body2">
                   {"Dăng kí!"}
                 </Link>
               </Grid>
-              <Grid item>
+              <Grid item style={{ marginLeft: '10px' }}>
                 <Link to="/forgot-password" variant="body2">
                   {"Quên mật khẩu?"}
                 </Link>

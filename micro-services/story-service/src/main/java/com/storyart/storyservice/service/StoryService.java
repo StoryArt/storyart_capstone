@@ -24,9 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -51,10 +48,6 @@ public interface StoryService {
 
     List<GetStoryDto> getTheMostReadingStories();
 
-    Page<Story> getNewReleaseStory(int quantity);
-
-    List<GetStoryDto> getAll();
-
     Page<GetStoryDto> getStoriesForAdmin(String keyword, String orderBy, boolean asc, int page, int itemsPerPage);
 
     Page<GetStoryDto> getStoriesForUser(int userId, String keyword, String orderBy, boolean asc, int page, int itemsPerPage);
@@ -64,6 +57,8 @@ public interface StoryService {
     ResultDto deleteStory(int storyId, int userId);
 
     ResultDto changePublishedStatus(int storyId, int userId, boolean turnOnPublished);
+
+    ResultDto updateStoryImage(int storyId, int userId, String imageUrl);
 
     ResultDto increaseStoryRead(int storyId);
 
@@ -196,6 +191,26 @@ class StoryServiceImpl implements StoryService {
     }
 
     @Override
+    public ResultDto updateStoryImage(int storyId, int userId, String imageUrl) {
+        ResultDto result = new ResultDto();
+        Story story = storyRepository.findById(storyId).orElse(null);
+        result.setSuccess(false);
+        if(story == null){
+            result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
+        } else if(!story.isActive() || story.isDeactiveByAdmin()){
+            result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
+        } else if(story.getUserId() != userId){
+            result.getErrors().put("NOT_OWN", "Truyện này không thuộc về bạn");
+        } else {
+            story.setImage(imageUrl);
+            story = storyRepository.save(story);
+            result.setSuccess(true);
+            result.setData(story);
+        }
+        return result;
+    }
+
+    @Override
     public ResultDto increaseStoryRead(int storyId) {
         ResultDto result = new ResultDto();
         result.setSuccess(true);
@@ -262,7 +277,6 @@ class StoryServiceImpl implements StoryService {
         result.setSuccess(true);
         return result;
     }
-
 
     @Override
     public ResultDto deleteStory(int storyId, int userId) {
@@ -670,19 +684,6 @@ class StoryServiceImpl implements StoryService {
             dto.setNumOfRead(historyRepository.countAllByStoryId(s.getId()));
             return dto;
         }).collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<Story> getNewReleaseStory(int quantity) {
-        Pageable pageable = PageRequest.of(0, quantity, Sort.by("created_at").descending());
-        return storyRepository.findStoryOrderByCreateAt(pageable);
-
-    }
-
-    @Override
-    public List<GetStoryDto> getAll() {
-        List<Story> stories = storyRepository.findAll();
-        return stories.stream().map(story -> mapModelToDto(story)).collect(Collectors.toList());
     }
 
     @Override

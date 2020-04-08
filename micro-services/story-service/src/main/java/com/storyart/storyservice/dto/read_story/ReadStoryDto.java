@@ -3,6 +3,7 @@ package com.storyart.storyservice.dto.read_story;
 import com.storyart.storyservice.model.Information;
 import com.storyart.storyservice.model.InformationAction;
 import com.storyart.storyservice.model.Screen;
+import com.storyart.storyservice.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,10 +22,13 @@ public class ReadStoryDto {
     private double avgRate;
     private String intro;
     private String animation;
+    private String image;
     private boolean published;
     private boolean active;
+    private boolean deactiveByAdmin;
     private String firstScreenId;
 
+    private User user;
     private List<ReadStoryScreenDto> screens;
     private List<ReadStoryTagDto> tags;
     private List<ReadStoryInformationDto> informations;

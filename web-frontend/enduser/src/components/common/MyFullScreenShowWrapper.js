@@ -636,7 +636,7 @@ const StyledQuill = styled.div`
     display: inline-block;
     float: left;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     height: 24px;
     position: relative;
     vertical-align: middle;

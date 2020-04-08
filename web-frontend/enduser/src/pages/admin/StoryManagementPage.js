@@ -67,10 +67,10 @@ const StoryManagementPage =  (props) => {
       }
   }
 
-const changePage = (e, value) => {
+  const changePage = (e, value) => {
   console.log(value);
   changeFilters('page', value);
-}
+  }
 
   const getStories = async () => {
       let data = [];
@@ -264,7 +264,7 @@ const changePage = (e, value) => {
                           {/* <MenuItem>Chi tiết</MenuItem> */}
                           <Divider/>
                           <MenuItem onClick={() => handleUpdateByAdmin(story)}>
-                            {story.deactiveByAdmin ? 'Khôi phục truyện' : 'Xóa truyện'}
+                            {story.deactiveByAdmin ? 'Khôi phục truyện' : 'Khóa truyện'}
                           </MenuItem>
                         </MyDropdownMenu>
                       </TableCell>

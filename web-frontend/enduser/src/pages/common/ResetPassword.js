@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import MainLayout from "../../layouts/main-layout/MainLayout";
 import { MDBAlert, MDBBtn } from "mdbreact";
 
 import {
@@ -117,7 +116,7 @@ const ResetPassword = (props) => {
     window.setTimeout(() => setAlert({ ...alert, open: false }), 2000);
 
   return (
-    <MainLayout>
+    <>
       <MyAlert
         open={alert.open}
         setOpen={() => setAlert({ ...alert, open: true })}
@@ -169,7 +168,7 @@ const ResetPassword = (props) => {
           </div>
         </form>
       </div>
-    </MainLayout>
+    </>
   );
 };
 

@@ -99,9 +99,8 @@ class UserService {
   }
 
   static async randomAvatar() {}
-  static async uploadAvatar(file) {
-    // const apikey = "53d902f62768b188aaab4b5ec86e4f16";
-    // let urlx = "http://arunranga.com/examples/access-control/https://api.imgbb.com/1/upload" + "?key=" + apikey;
+
+  static async uploadImage (file){
     let urlx = "https://api.imgur.com/3/image";
     const clientid = "ff80852491ab3a1";
     const config = {
@@ -116,22 +115,35 @@ class UserService {
     return axios.post(urlx, formdata, config);
   }
 
-  static async uploadProfileImage(file) {
-    // const apikey = "53d902f62768b188aaab4b5ec86e4f16";
-    // let urlx = "http://arunranga.com/examples/access-control/https://api.imgbb.com/1/upload" + "?key=" + apikey;
-    let urlx = "https://api.imgur.com/3/image";
-    const clientid = "ff80852491ab3a1";
-    const config = {
-      headers: {
-        "content-type": "multipart/form-data",
-        Authorization: "Client-ID " + clientid,
-      },
-    };
-    var formdata = new FormData();
-    formdata.append("image", file);
+  // static async uploadAvatar(file) {
+  //   let urlx = "https://api.imgur.com/3/image";
+  //   const clientid = "ff80852491ab3a1";
+  //   const config = {
+  //     headers: {
+  //       "content-type": "multipart/form-data",
+  //       Authorization: "Client-ID " + clientid,
+  //     },
+  //   };
+  //   var formdata = new FormData();
+  //   formdata.append("image", file);
 
-    return axios.post(urlx, formdata, config);
-  }
+  //   return axios.post(urlx, formdata, config);
+  // }
+
+  // static async uploadProfileImage(file) {
+  //   let urlx = "https://api.imgur.com/3/image";
+  //   const clientid = "ff80852491ab3a1";
+  //   const config = {
+  //     headers: {
+  //       "content-type": "multipart/form-data",
+  //       Authorization: "Client-ID " + clientid,
+  //     },
+  //   };
+  //   var formdata = new FormData();
+  //   formdata.append("image", file);
+
+  //   return axios.post(urlx, formdata, config);
+  // }
 
   static async saveToDatabase(uid, link) {
     let url1 = baseUrl + "/user/" + uid + "/avatar/save";

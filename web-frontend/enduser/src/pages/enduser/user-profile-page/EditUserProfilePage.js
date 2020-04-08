@@ -188,7 +188,6 @@ const EditUserProfilePage = props => {
                   margin="normal"
                   fullWidth
                   label="Tên của bạn"
-                  
                   value={name}
                   onChange={e => setName(e.target.value)}
                 />

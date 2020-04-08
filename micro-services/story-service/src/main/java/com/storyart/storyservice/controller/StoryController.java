@@ -95,6 +95,14 @@ public class StoryController {
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
+    @PutMapping("upload_story_image")
+    public ResponseEntity uploadStoryImage(@RequestParam int storyId,
+                                    @RequestParam String image,
+                                    @CurrentUser UserPrincipal userPrincipal){
+        ResultDto result = storyService.updateStoryImage(storyId, userPrincipal.getId(), image);
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
+
     @PostMapping("read_history")
     public ResponseEntity saveReadHistory(@RequestParam int storyId, @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.saveReadHistory(storyId, userPrincipal.getId());
@@ -130,12 +138,6 @@ public class StoryController {
         return new ResponseEntity(stories, HttpStatus.OK);
     }
 
-    @GetMapping("public/getAll")
-    public ResponseEntity getAllStories(@PathVariable int userId){
-        List<GetStoryDto> stories = storyService.getAll();
-        return new ResponseEntity(stories, HttpStatus.OK);
-    }
-
     @GetMapping("public/{storyId}")
     public ResponseEntity getStoryDetails(@PathVariable int storyId){
         GetStoryDto story = storyService.getStoryDetails(storyId);
@@ -144,7 +146,6 @@ public class StoryController {
 
     @GetMapping("public/read/{storyId}")
     public ResponseEntity getStoryToRead(@PathVariable int storyId){
-        System.out.println("story: " + storyId);
         ResultDto result = storyService.getReadingStory(storyId);
         return new ResponseEntity(result, HttpStatus.OK);
     }
