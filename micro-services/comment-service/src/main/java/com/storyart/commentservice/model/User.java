@@ -9,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 
@@ -59,6 +60,19 @@ public class User extends DateAudit {
     private Date updatedAt;
 
     boolean isDeactiveByAdmin;
+
+    private String token;
+    Date expiryDate;
+
+    public void setExpiryDate(int minutes) {
+        Calendar now = Calendar.getInstance();
+        now.add(Calendar.MINUTE, minutes);
+        this.expiryDate = now.getTime();
+    }
+
+    public boolean isExpired() {
+        return new Date().after(this.expiryDate);
+    }
 
     @PrePersist
     protected void onCreate() {
