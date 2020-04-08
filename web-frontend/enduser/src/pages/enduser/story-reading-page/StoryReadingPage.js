@@ -189,7 +189,6 @@ const ReadStoryPage = (props) => {
                     setStory({ ...data, screens: null, informations: null, informationActions: null });
                 }
             }
-           
         } catch (error) {
             console.log(error);
         }

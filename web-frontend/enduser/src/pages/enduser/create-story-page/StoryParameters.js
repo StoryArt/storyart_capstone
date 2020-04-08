@@ -18,7 +18,7 @@ const StoryParameters = (props) => {
                     <div className="card card-body mt-3">
                         {storyParameters.map((param, index) => {
                             const conditions = parameters.find(p => param.type === p.type).conditions;
-                            return (
+                            return (    
                                <div key={param.id}>
                                     <div className="row mb-4" key={param.id}>
                                         <div className="col-sm-4 px-1">

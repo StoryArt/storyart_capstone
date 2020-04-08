@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import { withStyles } from "@material-ui/core/styles";
 import './App.css';
@@ -21,7 +21,6 @@ import ResetPassword from './pages/common/ResetPassword';
 import EmailSubmitPage from './pages/common/EmailSubmitPage';
 import RegisterPage from './pages/common/RegisterPage';
 
-import DashboardPage from './pages/admin/DashboardPage';
 import UserManagementPage from './pages/admin/UserManagementPage';
 
 import StoryManagementPage from './pages/admin/StoryManagementPage';
@@ -35,14 +34,10 @@ import PrivateRoute from './pages/common/auth/PrivateRoute';
 
 import { getTokenFromLocal, setAuthHeader, interceptResponse, clearTokenFromLocal } from './config/auth';
 import ValidationUtils from './utils/validation';
-import { ROLE_NAMES } from './common/constants';
-import UserService from './services/user.service';
 
 
 const styles = theme => ({
   "@global": {
-    // MUI typography elements use REMs, so you can scale the global
-    // font size by setting the font-size on the <html> element.
     html: {
       fontSize: 16,
     }
@@ -54,7 +49,7 @@ let isSetupAuth = false;
 function App() {
 
   if(!isSetupAuth){
-    //get token from local storage when user access the website
+    //get token from local-storage when user access the website
     const token = getTokenFromLocal();
     if(ValidationUtils.isEmpty(token)){
       setAuthHeader(null);
@@ -63,11 +58,11 @@ function App() {
     }
 
     // redirect to login page when response status is 401 or 403
-    // interceptResponse(() => {
-    //   setAuthHeader(null);
-    //   clearTokenFromLocal();
-    //   window.location.href = '/login';
-    // });
+    interceptResponse(() => {
+      setAuthHeader(null);
+      clearTokenFromLocal();
+      window.location.href = '/login';
+    });
 
     isSetupAuth = true;
   }
@@ -123,7 +118,6 @@ function App() {
               exact 
               path="/user/history" 
               component={UserHistoryPage}/>
-
 
 
             {/* system admin routes */}

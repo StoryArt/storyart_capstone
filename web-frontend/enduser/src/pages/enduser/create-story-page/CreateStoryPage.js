@@ -1,8 +1,8 @@
 import React, { useState, useContext, useCallback } from 'react';
 import { Prompt } from 'react-router-dom';
-import { TextField, Tooltip, Fab, Checkbox, FormControlLabel, Button } from '@material-ui/core';
+import { TextField, Tooltip, Fab, Checkbox, FormControlLabel, Button, Paper } from '@material-ui/core';
 import { Pagination } from '@material-ui/lab';
-import { Add as AddIcon } from '@material-ui/icons';
+import { Add as AddIcon, CloudUpload as CloudUploadIcon } from '@material-ui/icons';
 import MainLayout from '../../../layouts/main-layout/MainLayout';
 
 import StoryParameters from './StoryParameters';
@@ -24,15 +24,18 @@ import StoryTabs from './StoryTabs';
 import { LayoutContext } from '../../../context/layout.context';
 
 
-import { getParameters, getActions, ANIMATIONS, ACTION_TYPES, INFORMATION_TYPES, SCREEN_COLORS  }  from '../../../common/constants';
+import { getParameters, getActions, ANIMATIONS, ACTION_TYPES, 
+    INFORMATION_TYPES, SCREEN_COLORS  }  from '../../../common/constants';
 
 
 import StoryService from '../../../services/story.service';
 import TagService from '../../../services/tag.service';
 import ValidationUtils from '../../../utils/validation';
 import StringUtils from '../../../utils/string';
+import FileUtils from '../../../utils/file';
 import { getAuthUserInfo } from '../../../config/auth';
 import ScreenTypes from './ScreenTypes';
+import FIleService from '../../../services/file.service';
 
 const parameters = getParameters();
 
@@ -70,7 +73,6 @@ const CreateStoryPage = (props) => {
     const [image, setImage] = useState(null);
 
     let canChangeScreenContent = true;
-    
 
 
     React.useEffect(() => {
@@ -83,8 +85,6 @@ const CreateStoryPage = (props) => {
             setSaveStory(false);
         }
         setOpenSidebar(false);
-        console.log('use effect');
-
 
         return () => {
             setOpenSidebar(true);
@@ -160,8 +160,23 @@ const CreateStoryPage = (props) => {
         setLoadingStory(false);
     }
 
-    const changeStory = (prop, value) => {
-        setStory({ ...story, [prop]: value });
+    const changeStory = async (prop, value) => {
+        if(prop === 'image'){
+            if(FileUtils.isFileImage(value)){
+                setImage(value);
+               try {
+                    value = await FileUtils.toBase64(value);
+               } catch (error) {
+                   console.log(error);
+               }
+               setStory({ ...story, [prop]: value });
+            } else {
+                setImage(null);
+                setStory({ ...story, image: '' });
+            }
+        } else {
+            setStory({ ...story, [prop]: value });
+        }
     }
 
     const handleAddScreen = () => {
@@ -275,10 +290,27 @@ const CreateStoryPage = (props) => {
 
     const closeScreenPreview = () => setOpenScreenPreview(false);
 
-   
+    const saveStoryImage = () => {
+        console.log(image);
+    }
+
     const saveStory = async () =>  {
         setOpenBackdrop(true);
-        
+        //upload image if exist
+        if(FileUtils.isFileImage(image)){
+            try {
+             const res = await FIleService.uploadImage(image);
+             console.log(res);
+             if(res.data.status == 200){
+                story.image = res.data.data.link;
+                setStory({ ...story });
+                //  const res = await StoryService.updateStoryImage(res.data.id, imageLink);
+             }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
         let informationActions = [];
 
         if(storyParameters.length > 0){
@@ -300,7 +332,7 @@ const CreateStoryPage = (props) => {
         story.tags = selectedTags.map(t => t.id);
         story.informations = storyParameters;
         story.informationActions = informationActions;
-
+        
         console.log(story);
 
         try {
@@ -314,11 +346,13 @@ const CreateStoryPage = (props) => {
             const { success, data, errors } = res.data;
 
             if(success) {
+                
                 setAlert({ 
                     content: 'Lưu thành công', 
                     type:'success',
                     open: true
                 });
+
                 if(!isEditPage){
                     window.setTimeout(() => window.location.href = `/stories/edit/${data.id}`, 2000);
                 }
@@ -335,9 +369,6 @@ const CreateStoryPage = (props) => {
         }
         setOpenBackdrop(false);
         closeAlert();
-        
-      
-        
     }
 
     const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
@@ -385,46 +416,65 @@ const CreateStoryPage = (props) => {
                                 <div className="row mb-4">
                                     <div className="col-md-9 mx-auto">
                                         {/* Story */}
-                                        <div className="card screen-card mb-2">
+                                        <Paper >
                                             <div className="card-header">
-                                                <h4 className="mb-4"></h4>
-                                                    <div className="row">
-                                                        <div className="col-sm-4">
-                                                            <TextField 
-                                                                size="small"
-                                                                variant="outlined"
-                                                                style={{ width: '100%' }}
-                                                                label="Tiêu đề truyện..."
-                                                                value={story.title} 
-                                                                onChange={(e) => changeStory('title', e.target.value)} />
-                                                        </div>
-                                                        <div className='col-sm-4'>
-                                                            <ScreensSelect
-                                                                placeholder={'Chọn màn hình đầu tiên'}
-                                                                screens={screens}
-                                                                value={story.firstScreenId}
-                                                                onChange={(e) => changeStory('firstScreenId', e.target.value)} 
-                                                            />
-                                                        </div>
+                                                <div className="row">
+                                                  
+                                                    <div className="col-sm-7">
+                                                        <div className="row">
+                                                            <div className="col-sm-12 mb-3">
+                                                                <TextField 
+                                                                    size="small"
+                                                                    variant="outlined"
+                                                                    style={{ width: '100%' }}
+                                                                    label="Tiêu đề truyện..."
+                                                                    value={story.title} 
+                                                                    onChange={(e) => changeStory('title', e.target.value)} />
+                                                            </div>
+                                                            <div className='col-sm-6'>
+                                                                <ScreensSelect
+                                                                    placeholder={'Chọn màn hình đầu tiên'}
+                                                                    screens={screens}
+                                                                    value={story.firstScreenId}
+                                                                    onChange={(e) => changeStory('firstScreenId', e.target.value)} 
+                                                                />
+                                                            </div>
 
-                                                        <div className='col-sm-4'>
-                                                            <AnimationSelect
-                                                                animation={story.animation}
-                                                                onChange={(e) => changeStory('animation', e.target.value)}
-                                                            />
+                                                            <div className='col-sm-6'>
+                                                                <AnimationSelect
+                                                                    animation={story.animation}
+                                                                    onChange={(e) => changeStory('animation', e.target.value)}
+                                                                />
+                                                            </div>
+                                                            <div className="col-sm-12 my-3">
+                                                                <TagsSelect
+                                                                    tags={tags}
+                                                                    selectedTags={selectedTags}
+                                                                    setSelectedTags={(tags) => setSelectedTags([...tags])}
+                                                                />
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    <div className="col-sm-5">
+                                                        <div className="">
+                                                            <div>
+                                                                <label 
+                                                                    for="files" 
+                                                                    class="btn btn-block">Chọn ảnh</label>
+                                                                <input 
+                                                                    id="files" 
+                                                                    style={{ visibility:"hidden" }} 
+                                                                    accept=".jpg, .gif, .png, .jpeg"
+                                                                    onChange={(e) => changeStory('image', e.target.files[0])}
+                                                                    type="file"/>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-center">
+                                                            <img src={story.image} style={{ maxWidth: '150px' }} />
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                     
-                                                    <div className="row my-3">
-                                                        <div className="col-12">
-                                                            <TagsSelect
-                                                                tags={tags}
-                                                                selectedTags={selectedTags}
-                                                                setSelectedTags={(tags) => setSelectedTags([...tags])}
-                                                            />
-                                                        </div>
-                                                    </div>
-
                                                     <StoryParameters 
                                                         parameters={parameters}
                                                         storyParameters={storyParameters}
@@ -450,7 +500,7 @@ const CreateStoryPage = (props) => {
                                                         varient="outlined">Thêm thông tin</Button>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </Paper>
                                         {/* <div className="row">
                                             <div className="col-8 mx-auto">
                                                 <MyUploadImage/>

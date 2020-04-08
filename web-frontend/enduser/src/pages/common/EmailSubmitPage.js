@@ -6,25 +6,13 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import MainLayout from "../../layouts/main-layout/MainLayout";
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -88,7 +76,7 @@ const [isSendMail, setIsSendMail] = useState(false);
 
     return (
 
-   <MainLayout>
+   <>
       <div className="pt-5">
         {/* <h3 className="text-center text-bold">D</h3> */}
         <Container component="main" maxWidth="xs">
@@ -103,34 +91,34 @@ const [isSendMail, setIsSendMail] = useState(false);
             <div> {errorMessage}</div>
 
 
-{isSendMail? "Bạn sẽ sớm nhận được một email hướng dẫn .Nếu bạn vẫn cần hỗ trợ, hãy liên hệ qua mail: storyartcapstone@gmail.com ": 
+            {isSendMail? "Bạn sẽ sớm nhận được một email hướng dẫn .Nếu bạn vẫn cần hỗ trợ, hãy liên hệ qua mail: storyartcapstone@gmail.com ": 
 
-<form className={classes.form}noValidate onSubmit={forgotPassword}>
-<TextField
-  variant="outlined"
-  margin="normal"
-  fullWidth
-//   value={user.username}
-  label="Email"
-  type="email"
-  value={email}
-  onChange={e => setEmail(e.target.value)}
-  autoFocus
-/>
+            <form className={classes.form}noValidate onSubmit={forgotPassword}>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              fullWidth
+            //   value={user.username}
+              label="Email"
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              autoFocus
+            />
 
-<Button
-  type="submit"
-  fullWidth
-  variant="contained"
-  color="primary"
-  className={classes.submit}
->
-  Gửi hướng dẫn
-  </Button>
- </form>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+            >
+              Gửi hướng dẫn
+              </Button>
+            </form>
 
 
-}
+            }
 
            
           
@@ -145,10 +133,8 @@ const [isSendMail, setIsSendMail] = useState(false);
           content={alert.content}
         />
       </div>
-      </MainLayout>
+      </>
     );
-  
-  
 };
 
 

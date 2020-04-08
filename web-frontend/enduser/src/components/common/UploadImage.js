@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import UserService from "../../services/user.service";
+import FileService from "../../services/file.service";
 import Button from "@material-ui/core/Button";
 import MyAlert from "./MyAlert";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 
 const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
 
-    let checkimage = null;
+  let checkimage = null;
 
   const [avatar2, setAvatar2] = useState(imageAvatar);
   const [upfile, setUploadFile] = useState(null);
@@ -52,11 +53,11 @@ const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
       let res = null;
       let flag = "";
       if (isBanner === "avatar") {
-        res = await UserService.uploadAvatar(upfile);
+        res = await FileService.uploadImage(upfile);
         flag = "avatar";
         console.log(res);
       } else if (isBanner === "banner") {
-        res = await UserService.uploadProfileImage(upfileBanner);
+        res = await FileService.uploadImage(upfileBanner);
         flag = "image";
         console.log(res);
       }
@@ -187,6 +188,7 @@ const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
             type={alert.type}
             content={alert.content}
           />
+
           <div className="row">
             {/* //avatar */}
             <div style={mystyle} className="form-group field avatar">
@@ -218,6 +220,7 @@ const UploadImage = ({ isBanner, Idis, imageBanner="", imageAvatar="" }) => {
               </div>
             </div>
           </div>
+       
         </form>
       </div>
     );
