@@ -115,7 +115,7 @@ const UserProfilePage = () => {
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <h4> Thong tin tai khoan </h4>{" "}
+                <h4> Thông tin tài khoản </h4>{" "}
               </div>{" "}
               <div className="card-body">
                 {updateResponse.message}
@@ -123,7 +123,7 @@ const UserProfilePage = () => {
                   <div className="row">
                     <div className="col-sm-6">
                       <MDBInput
-                        label="Ten day du"
+                        label="Tên đầy đủ"
                         value={name}
                         onChange={e => setName(e.target.value)}
                       />
@@ -139,7 +139,7 @@ const UserProfilePage = () => {
                     <div className="col-sm-6">
                       <MDBInput
                         value={dob}
-                        label="Ngay sinh"
+                        label="Ngày sinh"
                         type="date"
                         onChange={e => setDob(e.target.value)}
                       />
@@ -147,7 +147,7 @@ const UserProfilePage = () => {
                     <div className="col-sm-6">
                       <MDBInput
                         type="textarea"
-                        label="Gioi thieu ban than"
+                        label="Giới thiệu về bản thân"
                         value={intro_content == null ? "" : intro_content}
                         onChange={e => setIntro_content(e.target.value)}
                         outline

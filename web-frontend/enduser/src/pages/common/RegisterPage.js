@@ -124,7 +124,7 @@ const RegisterPage = () => {
                     required
                     fullWidth
                     value={name}
-                    label="tên đầy đủ"
+                    label="Tên đầy đủ"
                     onChange={e => setName(e.target.value)}
                   />
                 </Grid>
