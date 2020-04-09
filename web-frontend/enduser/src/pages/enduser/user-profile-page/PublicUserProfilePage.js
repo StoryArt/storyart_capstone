@@ -130,7 +130,7 @@ let searchTimeout = null;
                             <UserProfileHeader user={user} />
                         </div>
                     </div>   
-                    <h3 className="mt-5">Truyện của tác giá</h3>
+                    <h3 className="mt-5">Truyện của tác giả</h3>
                     <hr style={{ border: '1px solid #ccc' }} />
                     <div className="row">
                         <div className="col-sm-3">

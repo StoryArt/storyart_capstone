@@ -67,10 +67,12 @@ const StoryDetailsPage = (props) => {
         commentId: 0,
         content: ''
     });
+    
     const [reportCommentModalInfo, setReportCommentModalInfo] = useState({
         userName: '',
         comment: '',
     });
+
     const [reportStoryModalInfo, setReportStoryModalInfo] = useState({
         userName: '',
         storyName: '',

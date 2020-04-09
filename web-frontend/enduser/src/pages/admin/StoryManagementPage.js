@@ -124,9 +124,9 @@ const StoryManagementPage =  (props) => {
     currentStory = story;
     const enable = currentStory.deactiveByAdmin ? true : false;
     if(enable){
-      setDialogContent('Bạn có chắc muốn khôi phục truyện này chứ?')
+      setDialogContent('Bạn có chắc chắn muốn khôi phục truyện này chứ?')
     } else {
-      setDialogContent('Bạn có chắc muốn xóa truyện này chứ?')
+      setDialogContent('Bạn có chắc chắn muốn xóa truyện này chứ?')
     }
     setOpenDialog(true);
   }
@@ -166,7 +166,7 @@ const StoryManagementPage =  (props) => {
             </div>
             <div className="col-sm-3">
               <FormControl style={{ width: '100%' }}>
-                  <InputLabel>Sắp theo</InputLabel>
+                  <InputLabel>Sắp xếp theo</InputLabel>
                   <Select
                       value={filters.orderBy}
                       onChange={(e) => changeFilters('orderBy', e.target.value)}

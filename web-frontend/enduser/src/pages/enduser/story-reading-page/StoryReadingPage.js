@@ -226,7 +226,11 @@ const ReadStoryPage = (props) => {
             } else if(foundInformation.type === INFORMATION_TYPES.STRING){
                 if(infoAction.operation === STRING_OPERATIONS.REPLACE){
                     newValue = infoAction.value;
-                }   
+                } else if(infoAction.operation === STRING_OPERATIONS.PREPEND){
+                    newValue = '' + infoAction.value + foundInformation.value; 
+                } else if(infoAction.operation === STRING_OPERATIONS.APPEND){
+                    newValue = '' + foundInformation.value + infoAction.value; 
+                }
 
                 //check all conditions
                 for(let condition of foundInformation.conditions){

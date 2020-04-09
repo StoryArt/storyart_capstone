@@ -71,7 +71,7 @@ const UserProfileHeader = (props) => {
                 </Button> */}
                {canEdit && (
                 <Button onClick={() => navigateRoute('/user/edit-profile')} size="small" color="secondary">
-                    Cập nhât 
+                    Cập nhật
                 </Button>
                )}
             </CardActions>

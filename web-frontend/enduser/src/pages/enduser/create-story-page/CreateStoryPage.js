@@ -36,6 +36,7 @@ import FileUtils from '../../../utils/file';
 import { getAuthUserInfo } from '../../../config/auth';
 import ScreenTypes from './ScreenTypes';
 import FIleService from '../../../services/file.service';
+import ConfirmDialog from '../../../components/common/ConfirmDialog';
 
 const parameters = getParameters();
 
@@ -71,6 +72,8 @@ const CreateStoryPage = (props) => {
     const [selectedTags, setSelectedTags] = useState([]);
     const [storyTab, setStoryTab] = useState(0);
     const [image, setImage] = useState(null);
+
+    const [dialog, setDialog] = useState({ content: '', open: false });
 
     let canChangeScreenContent = true;
 
@@ -294,6 +297,30 @@ const CreateStoryPage = (props) => {
         console.log(image);
     }
 
+    const handleDeleteStory = () => {
+        setDialog({
+            open: true,
+            content: 'Bạn có chắc muốn xóa truyện này chứ?'
+        })
+    }
+
+    const deleteStory = async () => {
+        setDialog({ ...dialog, open: false })
+        try {
+          const res = await StoryService.deleteStory(story.id);
+          const { success, errors } = res.data;
+          if(success){
+            setAlert({ type: 'success', content: 'Xóa thành công', open: true });
+            window.setTimeout(() => props.history.push(`/user/my-profile`), 2000);
+          } else {
+            setAlert({ type: 'error', content: Object.values(errors)[0], open: true });
+          }
+        } catch (error) {
+          console.log(error);
+        }
+        closeAlert();
+      }
+
     const saveStory = async () =>  {
         setOpenBackdrop(true);
         //upload image if exist
@@ -422,7 +449,7 @@ const CreateStoryPage = (props) => {
                                                   
                                                     <div className="col-sm-7">
                                                         <div className="row">
-                                                            <div className="col-sm-12 mb-3">
+                                                            <div className="col-sm-12 mb-4">
                                                                 <TextField 
                                                                     size="small"
                                                                     variant="outlined"
@@ -446,7 +473,7 @@ const CreateStoryPage = (props) => {
                                                                     onChange={(e) => changeStory('animation', e.target.value)}
                                                                 />
                                                             </div>
-                                                            <div className="col-sm-12 my-3">
+                                                            <div className="col-sm-12 my-4">
                                                                 <TagsSelect
                                                                     tags={tags}
                                                                     selectedTags={selectedTags}
@@ -594,9 +621,15 @@ const CreateStoryPage = (props) => {
                             </div>
                         )}
                     </StoryTabs>
+                    {isEditPage && (
+                        <button 
+                            className="btn btn-danger float-right" 
+                            onClick={() => handleDeleteStory()}>
+                            Xóa truyện</button>
+                    )}
                     <button 
                         className="btn btn-warning float-right" 
-                        onClick={() => saveStory(false)}>
+                        onClick={() => saveStory()}>
                         Lưu truyện</button>
                 
                     <MyAlert 
@@ -605,6 +638,16 @@ const CreateStoryPage = (props) => {
                         type={alert.type}
                         content={alert.content}
                     />
+
+                    {isEditPage && (
+                        <ConfirmDialog
+                            openDialog={dialog.open}
+                            cancel={() => setDialog({ ...dialog, open: false })}
+                            ok={deleteStory}
+                            setOpenDialog={() => setDialog({ ...dialog, open: true })}
+                            content={dialog.content}
+                        />
+                    )}
 
                     <ScreenPreview 
                         animation={story.animation}

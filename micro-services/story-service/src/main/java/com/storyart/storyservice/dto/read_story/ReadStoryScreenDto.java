@@ -17,6 +17,5 @@ public class ReadStoryScreenDto {
     private int storyId;
     private String title;
     private String content;
-    private String nextScreenId;
     List<Action> actions;
 }

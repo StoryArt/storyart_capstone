@@ -45,7 +45,7 @@ const ActionsList = (props) => {
                                                 onChange={(e) => onChangeActions('operation', e.target.value, screen, index)}
                                             >
                                                 {currentParam.operations.map(o => (
-                                                    <MenuItem key={o} value={o}> { o }</MenuItem>
+                                                    <MenuItem key={o.value} value={o.value}>{ o.title }</MenuItem>
                                                 ))}
                                             </Select>
                                         </FormControl>

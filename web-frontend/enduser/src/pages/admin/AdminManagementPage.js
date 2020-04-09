@@ -436,7 +436,7 @@ const AdminManagementPage = (props) => {
             onClick={openDialogAddAccount}
           ></Button> */}
         </Tooltip>
-        <Tooltip title="theo tên đăng nhập và email " aria-label="add">
+        <Tooltip title="Tìm theo tên đăng nhập và email " aria-label="add">
           <OutlinedInput
           placeholder="Tìm kiếm"
 

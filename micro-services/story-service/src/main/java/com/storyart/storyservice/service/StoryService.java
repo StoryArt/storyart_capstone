@@ -418,7 +418,6 @@ class StoryServiceImpl implements StoryService {
 
             savedScreen.setStoryId(storyId);
             savedScreen.setId(screenIdsMap.get(screen.getId()));
-            savedScreen.setNextScreenId(screenIdsMap.get(screen.getNextScreenId()));
             screenRepository.save(savedScreen);
 
             screen.getActions().stream().forEach(action -> {
@@ -545,7 +544,6 @@ class StoryServiceImpl implements StoryService {
 
                 savedScreen.setStoryId(storyId);
                 savedScreen.setId(screenIdsMap.get(screen.getId()));
-                savedScreen.setNextScreenId(screenIdsMap.get(screen.getNextScreenId()));
                 screenRepository.save(savedScreen);
 
                 //delete all actions

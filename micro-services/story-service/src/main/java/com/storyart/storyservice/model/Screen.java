@@ -38,6 +38,4 @@ public class Screen extends DateAudit{
     @NotBlank
     private String content;
 
-    private String nextScreenId;
-
 }

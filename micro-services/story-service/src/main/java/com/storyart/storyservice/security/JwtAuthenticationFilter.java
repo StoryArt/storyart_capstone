@@ -1,6 +1,7 @@
 package com.storyart.storyservice.security;
 
 import com.storyart.storyservice.exception.BadRequestException;
+import com.storyart.storyservice.exception.UnauthorizedException;
 import com.storyart.storyservice.model.User;
 import com.storyart.storyservice.repository.UserRepository;
 import org.slf4j.Logger;
@@ -53,6 +54,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Integer uid = jwtTokenProvider.getUserIdFromToken(jwt);
                 UserDetails userDetails = userDetailsService.loadUserById(uid);
 
+
+
+                User us = userRepository.findByUsername(userDetails.getUsername());
+                if (us != null && us.isDeactiveByAdmin()) {
+                    throw new UnauthorizedException("Tài khoản đã bị khóa. Vui lòng liên hệ với quản trị viên!");
+                }
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails,
                                 null,
