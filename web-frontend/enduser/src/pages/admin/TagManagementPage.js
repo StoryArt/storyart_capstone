@@ -112,7 +112,7 @@ class TagManagementPage extends React.Component {
       console.log(error);
       this.setState({
         open: true,
-        content: error,
+        content: 'Thêm Mới Thất Bại',
         type: 'error'
       });
       this.wait();
@@ -154,7 +154,7 @@ class TagManagementPage extends React.Component {
       console.log(error);
       this.setState({
         open: true,
-        content: error,
+        content: 'Cập Nhật Thất Bại',
         type: 'error'
       });
       this.wait();
@@ -184,7 +184,7 @@ class TagManagementPage extends React.Component {
                 color="purple"
                 size="sm"
               >
-                Cập Nhật
+                Cập Nhật Thẻ
               </MDBBtn>
             )
           }
@@ -216,7 +216,7 @@ class TagManagementPage extends React.Component {
     const datamax = {
       columns: [
         {
-          label: "Tên Nhãn",
+          label: "Tên Thẻ",
           field: "title",
           width: "30%",
           sort: "asc"
@@ -253,8 +253,8 @@ class TagManagementPage extends React.Component {
           <MDBCard>
             <MDBRow type="flex" justify="start">
               <MDBCol span={21}>
-                <h1>Nhãn</h1>
-                <h3>Quản Lí Nhãn</h3>
+                <h1>Thẻ</h1>
+                <h3>Quản Lí Thẻ</h3>
               </MDBCol>
             </MDBRow>
             <br />
@@ -266,7 +266,7 @@ class TagManagementPage extends React.Component {
                 rounded
                 onClick={e => this.showModal(e)}
               >
-                Thêm Nhãn
+                Thêm Thẻ
               </MDBBtn>
             </div>
 
@@ -276,7 +276,7 @@ class TagManagementPage extends React.Component {
                 titleClass="w-100 font-weight-bold"
                 toggle={e => this.showModal(e)}
               >
-                Thêm Nhãn
+                Thêm Thẻ
               </MDBModalHeader>
               <MDBModalBody>
                 <form className="mx-3 grey-text">
@@ -292,7 +292,7 @@ class TagManagementPage extends React.Component {
                 </form>
               </MDBModalBody>
               <MDBModalFooter className="justify-content-center">
-                <MDBBtn onClick={e => this.handleSubmit(e)}>Thêm Nhãn</MDBBtn>
+                <MDBBtn onClick={e => this.handleSubmit(e)}>Thêm Thẻ</MDBBtn>
 
                 <MDBBtn onClick={e => this.handleCancel(e)}>Thoát</MDBBtn>
               </MDBModalFooter>
@@ -304,7 +304,7 @@ class TagManagementPage extends React.Component {
                 titleClass="w-100 font-weight-bold"
                 toggle={e => this.showModal3(e)}
               >
-                Update Tag Status
+                Cập Nhật Thẻ
               </MDBModalHeader>
               <MDBModalBody>
                 <form className="mx-3 grey-text">

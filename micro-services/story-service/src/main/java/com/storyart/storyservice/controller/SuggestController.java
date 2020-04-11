@@ -65,12 +65,13 @@ public class SuggestController {
             List<Integer> total = new ArrayList<>();
             List<Integer> liststoryInteger =  historyRepository.countTopView();
     Optional<Integer> check = ratingRepository.checkRatingById(id);
+            List<Integer> listRatingExceptThisWeek = new ArrayList();
     if(check.isPresent()){
+        listRatingExceptThisWeek = ratingService.getSuggestion(id,false);
         //     List<Integer> listhistory = historyService.jaccardCalculate(id);
         //  List<Integer> listStoryPoint = ratingService.getSuggestByCommentAndReaction();
 
-    //    List<Integer> listRatingthisWeek = ratingService.getSuggestion(id,true);
-        List<Integer> listRatingExceptThisWeek = ratingService.getSuggestion(id,false);
+       // List<Integer> listRatingthisWeek = ratingService.getSuggestion(id,true);
 
     try{
         if(listRatingExceptThisWeek.size() == 0){

@@ -97,7 +97,7 @@ const LoginPage = () => {
       } else if (!res.data.success) {
         setAlert({
           open: true,
-          content: 'Dăng nhập không thành công',
+          content: 'Đăng nhập không thành công',
           type: 'error'
         });
       }

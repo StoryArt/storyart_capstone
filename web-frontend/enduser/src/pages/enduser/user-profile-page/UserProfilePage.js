@@ -180,7 +180,7 @@ const UserProfilePage = (props) => {
 
   const handleDeleteStory = (story) => {
     setStory(story);
-    setDialog({ open: true, content: 'Bạn có chắc muốn xóa ' + story.title + '?' });
+    setDialog({ open: true, content: 'Bạn có chắc chắn muốn xóa ' + story.title + '?' });
   }
 
   const changePublishedStatus = async (story) => {
@@ -281,7 +281,7 @@ const UserProfilePage = (props) => {
                     </div>
                     <div className="col-sm-3">
                       <FormControl style={{ width: '100%' }}>
-                          <InputLabel>Sắp theo</InputLabel>
+                          <InputLabel>Sắp xếp theo</InputLabel>
                           <Select
                               value={filters.orderBy}
                               onChange={(e) => changeFilters('orderBy', e.target.value)}
