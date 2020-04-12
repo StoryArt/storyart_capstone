@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { MenuItem, TextField, Tooltip, Fab, Paper } from '@material-ui/core';
+import { MenuItem, TextField, Tooltip, Fab, Paper, Button } from '@material-ui/core';
 import { Visibility as VisibilityIcon } from '@material-ui/icons';
 
 import ScreensSelect from './ScreensSelect';
@@ -78,11 +78,14 @@ const ScreensList = (props) => {
                             onChangeActions={onChangeActions}
                         />
 
+                            <Button  
+                                style={{ float: "right", marginTop: '10px' }}
+                                onClick={() => onAddAction(currentScreen)}>Thêm hành động</Button>
+                            <div className="clearfix"></div>
                         <div className="text-right mt-2">
                             <MyDropdownMenu >
                                 {/* <MenuItem onClick={(e) => onAddNextScreen(e, screen)}>Them man hinh</MenuItem> */}
                                 <MenuItem onClick={() => onRemoveScreen(currentScreen)}>Xóa màn hình</MenuItem>
-                                <MenuItem onClick={() => onAddAction(currentScreen)}>Thêm hành động</MenuItem>
                             </MyDropdownMenu>
                         </div>
                     </div>
