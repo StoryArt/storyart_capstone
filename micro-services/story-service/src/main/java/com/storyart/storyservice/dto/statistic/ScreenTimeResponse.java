@@ -1,5 +1,6 @@
 package com.storyart.storyservice.dto.statistic;
 
+import com.storyart.storyservice.model.ScreenReadingTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import javax.validation.constraints.Size;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ScreenTimeResponse {
+public class ScreenTimeResponse implements  Comparable<ScreenTimeResponse>{
     String id;
     private int storyId;
 
@@ -26,6 +27,13 @@ public class ScreenTimeResponse {
 
 
     long sumtime;
+
+
+
+    @Override
+    public int compareTo(ScreenTimeResponse o) {
+        return Long.compare(this.getSumtime(), o.getSumtime());
+    }
 
 
 }

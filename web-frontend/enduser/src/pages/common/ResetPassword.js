@@ -8,6 +8,7 @@ import {
 } from "../../config/auth";
 
 import UserService from "../../services/user.service";
+import MainLayout from "../../layouts/main-layout/MainLayout";
 
 import MyAlert from "../../components/common/MyAlert";
 import { makeStyles } from "@material-ui/core/styles";
@@ -49,6 +50,23 @@ const ResetPassword = (props) => {
   const user = getAuthUserInfo();
   const [errorMessage, setErrorMessage] = useState("");
   const resetToken = props.match.params.token;
+
+  const [tokenError, setTokenError] = useState("");
+  useEffect(() => {
+    checkToken();
+  }, []);
+  async function checkToken() {
+    try {
+      let res = await UserService.checkToken(resetToken);
+    } catch (error) {
+      let err;
+      if (typeof error.response.data.message == "string") {
+        err = error.response.data.message;
+      }
+
+      setTokenError(err);
+    }
+  }
 
   async function handleResetPassword(event) {
     event.preventDefault();
@@ -111,12 +129,12 @@ const ResetPassword = (props) => {
     textAlign: "center",
     margin: "0 auto",
   };
-
+  ;
   const closeAlert = () =>
     window.setTimeout(() => setAlert({ ...alert, open: false }), 2000);
 
   return (
-    <>
+    <MainLayout>
       <MyAlert
         open={alert.open}
         setOpen={() => setAlert({ ...alert, open: true })}
@@ -125,50 +143,74 @@ const ResetPassword = (props) => {
       />
 
       <div style={mystyle}>
-        <Typography component="h3" variant="h3" style={{ margin: "40px 0px;" }}>
-          Nhập mật khẩu mới
-        </Typography>
+        {tokenError == "" ? (
+          <>
+            <Typography
+              component="h3"
+              variant="h3"
+              style={{ margin: "40px 0px;" }}
+            >
+              Nhập mật khẩu mới
+          
+          
+          
+            </Typography>
+          
+          
+            <form style={mystyle} onSubmit={handleResetPassword}>
+              <div className="row">
+                <div style={mystyle} className="col-sm-4">
+                  {/* //name */}
+                  <div className="form-group">
+                    {errorMessage}
 
-        <form style={mystyle} onSubmit={handleResetPassword}>
-          <div className="row">
-            <div style={mystyle} className="col-sm-4">
-              {/* //name */}
-              <div className="form-group">
-                {errorMessage}
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      fullWidth
+                      label="Mật khẩu mới"
+                      autoFocus
+                      value={pass}
+                      type="password"
+                      onChange={(e) => setpass(e.target.value)}
+                    />
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      fullWidth
+                      label="Nhập lại mật khẩu mới"
+                      value={repass}
+                      type="password"
+                      onChange={(e) => setRepass(e.target.value)}
+                    />
+                  </div>
 
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  fullWidth
-                  label="Mật khẩu mới"
-                  autoFocus
-                  value={pass}
-                  type="password"
-                  onChange={(e) => setpass(e.target.value)}
-                />
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  fullWidth
-                  label="Nhập lại mật khẩu mới"
-                  value={repass}
-                  type="password"
-                  onChange={(e) => setRepass(e.target.value)}
-                />
+                  {/* //email */}
+
+                  <div className="form-group">
+                    <Button color="primary" variant="contained" type="submit">
+                      <span className="pl-2 capitalize">Lưu thay đổi</span>
+                    </Button>
+                  </div>
+                </div>
               </div>
-
-              {/* //email */}
-
-              <div className="form-group">
-                <Button color="primary" variant="contained" type="submit">
-                  <span className="pl-2 capitalize">Lưu thay đổi</span>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </form>
+            </form>
+         
+         
+         
+         
+          </>
+        ) : (
+          <Typography
+            component="h5"
+            variant="h5"
+            style={{ margin: "40px 0px;" }}
+          >
+            {tokenError} <a href="/forgot-password">,gửi lại yêu cầu tại đây!</a>
+          </Typography>
+        )}
       </div>
-    </>
+    </MainLayout>
   );
 };
 

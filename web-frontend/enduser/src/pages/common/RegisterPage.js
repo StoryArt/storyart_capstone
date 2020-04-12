@@ -61,11 +61,11 @@ const RegisterPage = () => {
       "?options[mood][]=happy&options[mouth][]=smile&options[accessories][]=sunglasses";
 
     let user = {
-      name: name,
-      username: username,
+      name: name.trim(),
+      username: username.trim(),
       password: password,
-      intro_content: intro_content,
-      email: email,
+      intro_content: intro_content.trim(),
+      email: email.trim(),
       avatar: randomImage
     };
 

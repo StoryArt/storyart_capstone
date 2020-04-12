@@ -17,6 +17,8 @@ import java.util.*;
 
 public interface StoryStatisticService {
 
+    boolean checkOwner(Integer id, Integer sid);
+
     StorySummarizeResponse getStorySummarizeResponse(int sid);
 
     StoryReactByRange getReactStatisticInTimeRange(int sid, TimeRangeRequest timeRangeRequest);
@@ -24,10 +26,12 @@ public interface StoryStatisticService {
     List<IRatingClassify> getRatingClassify(int sid);
 
     Rating getRatingByStoryAndUser(int storyId, int userId);
+
 }
 
 @Service
 class StoryStatisticServiceImpl implements StoryStatisticService {
+
 
     @Autowired
     StoryRepository storyRepository;
@@ -43,6 +47,16 @@ class StoryStatisticServiceImpl implements StoryStatisticService {
     CommentRepository commentRepository;
     @Autowired
     EntityManager entityManager;
+
+    @Override
+    public boolean checkOwner(Integer id, Integer sid) {
+        Optional<Story> byId = storyRepository.findById(sid);
+        if (byId.isPresent() && byId.get().getUserId() == id) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     @Override
     public StorySummarizeResponse getStorySummarizeResponse(int sid) {
@@ -66,7 +80,7 @@ class StoryStatisticServiceImpl implements StoryStatisticService {
 
             int clicklinkCount = ((Number) query1.getSingleResult()).intValue();
             int hitpointCount = ((Number) query2.getSingleResult()).intValue();
-            int screenNumber = ((Number) query2.getSingleResult()).intValue();
+            int screenNumber = ((Number) query3.getSingleResult()).intValue();
 
 
             //todo:xoa dong nay
@@ -90,20 +104,19 @@ class StoryStatisticServiceImpl implements StoryStatisticService {
     HistoryService historyService;
     StoryReactByRange storyReactByRange = new StoryReactByRange();
 
+
+
     @Override
     public StoryReactByRange getReactStatisticInTimeRange(int sid, TimeRangeRequest timeRangeRequest) {
         List<NumberOfCommentByDate> commentByDay = commentMicroService.getCommentListResponce(sid, 0, timeRangeRequest.getStart(), timeRangeRequest.getEnd()).getNumberOfCommentByDates();
 
-        List<Integer> shareByDay = new ArrayList<>();
+        List<Integer> viewByDay = historyService.findViewListByRange(sid, timeRangeRequest.getStart(), timeRangeRequest.getEnd());
         List<Integer> hitPointByDay = new ArrayList<>();
         List<Integer> clickLinkByDay = clickService.findClickLinkRange
                 (sid, timeRangeRequest.getStart(), timeRangeRequest.getEnd());
 
 
-        //chua lam share
-        for (int i = 0; i < commentByDay.size(); i++) {
-            shareByDay.add(new Random().nextInt(10));
-        }
+
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         try {
             Date startDate = simpleDateFormat.parse(timeRangeRequest.getStart());
@@ -116,7 +129,7 @@ class StoryStatisticServiceImpl implements StoryStatisticService {
 
         StoryReactByRange storyReactByRange = new StoryReactByRange();
         storyReactByRange.setNumOfClickLink(clickLinkByDay);
-        storyReactByRange.setNumOfShare(shareByDay);
+        storyReactByRange.setNumOfView(viewByDay);
         storyReactByRange.setNumOfHitPoint(hitPointByDay);
         for (NumberOfCommentByDate numberOfCommentByDate : commentByDay) {
             Integer comment = numberOfCommentByDate.getNumberOfComment();

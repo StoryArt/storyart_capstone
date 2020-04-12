@@ -19,7 +19,7 @@ const defaultOption = {
     textStyle: { color: "#fff" },
     height: "50px",
     top: "20px",
-    data:['Bình luận','Click vào link','Hoàn thành']   },
+    data:['Lượt xem','Bình luận','Click vào link','Hoàn thành']   },
   tooltip: {
     show: true,
     trigger: "axis",

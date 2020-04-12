@@ -87,5 +87,9 @@ public class StatisticsController {
         return new ResponseEntity(screenTimeResponses, HttpStatus.OK);
     }
 
+    @GetMapping("/story/{sid}/check")
+    public boolean checkBeforeComeToStatic(@PathVariable("sid") Integer sid, @CurrentUser UserPrincipal userPrincipal) {
+            return  storyStatisticService.checkOwner(userPrincipal.getId() ,sid );
 
+    }
 }

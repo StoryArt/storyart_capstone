@@ -4,6 +4,9 @@ import MainLayout from "../../layouts/main-layout/MainLayout";
 import { setAuthHeader } from "../../config/auth";
 import Icon from "@mdi/react";
 import Tooltip from "@material-ui/core/Tooltip";
+import NotFound from "../../components/common/NotFound";
+import NotFoundPage from "../../pages/common/NotFoundPage";
+import MySpinner from '../../components/common/MySpinner';
 
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import MyRating from "../../components/common/MyRating";
@@ -16,7 +19,9 @@ import TableCard from "./forstoryanalystic/shared/TableCard";
 // import RowCards from "./forstoryanalystic/shared/RowCards";
 import { withStyles } from "@material-ui/styles";
 import Statistic from "../../services/statistic.service";
-
+import UserService from "../../services/user.service";
+import MyBackdrop from "../../components/common/MyBackdrop";
+import { Redirect } from "react-router-dom";
 import axios from "axios";
 import Button from "@material-ui/core/Button";
 import Menu from "@material-ui/core/Menu";
@@ -40,10 +45,14 @@ class Dashboard1 extends React.Component {
       reactStatic: {
         // times: [],
         commentStatic: [],
-        shareStatic: [],
+        viewStatic: [],
         hitPointStatic: [],
         clickLinkStatic: [],
       },
+      openBackdrop: false,
+      timeScreenLoad: false,
+      clickLoad: false,
+      permission: false,
       rating: [],
       ratinguser: 0,
       story: {},
@@ -114,17 +123,19 @@ class Dashboard1 extends React.Component {
   }
   // const [anchorEl, setAnchorEl] = React.useState(null);
 
-  componentDidMount() {
+  async componentDidMount() {
     setAuthHeader(localStorage.getItem("jwt-token"));
 
     console.log(
       "compoent did mount , get story summary set state and loading rating"
     );
-    const storyInfo = this.getStorySummary(this.sid);
-    this.loadRatingStatic();
-    this.handleLoadReactStatic(1);
-    this.handleLoadScreenTime(1);
-    this.handleLoadClickLink(1);
+    if (await this.checkOwner()) {
+      const storyInfo = this.getStorySummary(this.sid);
+      this.loadRatingStatic();
+      this.handleLoadReactStatic(1);
+      this.handleLoadScreenTime(1);
+      this.handleLoadClickLink(1);
+    }
   }
   handleClick = (event) => {
     this.setState({
@@ -142,6 +153,25 @@ class Dashboard1 extends React.Component {
     });
   };
 
+  async checkOwner() {
+    this.setState({ openBackdrop: true });
+    try {
+      let isAllow = await Statistic.checkOwner(this.sid);
+
+      // ko co quyen
+      this.setState({ openBackdrop: false });
+      if (!isAllow.data) {
+        this.props.history.push("/notfound");
+      }
+      return isAllow.data;
+    } catch (error) {
+      //co loi
+      this.props.history.push("/notfound");
+    }
+    this.setState({ openBackdrop: false });
+    this.props.history.push("/notfound");
+    return false;
+  }
   async getStorySummary() {
     const res = await Statistic.getStorySummary(this.sid).then((res) => {
       this.setState({ story: res.data });
@@ -174,7 +204,7 @@ class Dashboard1 extends React.Component {
       }
       console.log(totalStar / totalRateTurn);
       if (totalRateTurn != 0) {
-        this.setState( { avgRate: totalStar / totalRateTurn } );
+        this.setState({ avgRate: totalStar / totalRateTurn });
       }
 
       //cho nao bi rendeẻ lai
@@ -218,8 +248,12 @@ class Dashboard1 extends React.Component {
     return y + "/" + m + "/" + d;
   }
   async getScreenTime(timeRange) {
+    this.setState({timeScreenLoad: true})
+
     setAuthHeader(localStorage.getItem("jwt-token"));
     await Statistic.getScreenTimeData(this.sid, timeRange).then((res) => {
+    this.setState({timeScreenLoad: false})
+
       console.log("screen time");
       console.log(res.data);
       this.convertToScreenTimeList(res.data);
@@ -227,8 +261,12 @@ class Dashboard1 extends React.Component {
   }
 
   async getLinkClick(timeRange) {
+    this.setState({clickLoad: true})
+
     setAuthHeader(localStorage.getItem("jwt-token"));
     await Statistic.getLinkClickData(this.sid, timeRange).then((res) => {
+    this.setState({clickLoad: false})
+
       console.log("clickLink");
       console.log(res.data);
       this.convertToClickList(res.data);
@@ -341,7 +379,7 @@ class Dashboard1 extends React.Component {
           times: res.data.times,
           commentStatic: res.data.numOfComment,
           hitPointStatic: res.data.numOfHitPoint,
-          shareStatic: res.data.numOfShare,
+          viewStatic: res.data.numOfView,
           clickLinkStatic: res.data.numOfClickLink,
         },
       });
@@ -357,6 +395,7 @@ class Dashboard1 extends React.Component {
   }
 
   handleLoadScreenTime(daybefore) {
+   
     this.setState({ anchorE2: null });
     this.setState({ daybeforelabel2: daybefore + " ngày qua" });
     let now = new Date();
@@ -429,7 +468,7 @@ class Dashboard1 extends React.Component {
           dark: "#721b65",
           main: "#b80d57",
           main2: "#f8615a",
-          light: "#f8615a",
+          light: "#ffb300",
           veryl: "#ffd868",
           white: "#f1db9e",
         },
@@ -455,6 +494,11 @@ class Dashboard1 extends React.Component {
 
     return (
       <MainLayout style={{ padding: "0px 0px", opacity: "80%" }}>
+        <MyBackdrop
+          open={this.state.openBackdrop}
+          //  setOpen={() => this.setState({openBackdrop: true})}
+        />
+        {/* { !this.state.permission ? <NotFoundPage/> : ( */}
         <Fragment>
           <div
             //  className="pb-24 pt-7 px-8 "
@@ -462,7 +506,7 @@ class Dashboard1 extends React.Component {
           >
             <div
               className="card-title capitalize  mb-4
-       "
+             "
               style={{ margin: "0 5 0 0", opacity: "80%" }}
             >
               <Typography
@@ -508,11 +552,19 @@ class Dashboard1 extends React.Component {
               option={{
                 series: [
                   {
+                    data: this.state.reactStatic.viewStatic,
+                    // data: [34,12, 31, 45, 31, 43, 26, 43, 31, 45, 33, 40],
+                    name: "Lượt xem",
+                    type: "line",
+                    itemStyle: { color: "#c23531" },
+                    smooth: true,
+                  },
+                  {
                     data: this.state.reactStatic.commentStatic,
                     // data: [34,12, 31, 45, 31, 43, 26, 43, 31, 45, 33, 40],
                     name: "Bình luận",
                     type: "line",
-                    itemStyle: { color: "#c23531" },
+                    itemStyle: { color: "#f4e04d" },
                     smooth: true,
                   },
 
@@ -602,7 +654,9 @@ class Dashboard1 extends React.Component {
                   </CardContent>
                   <CardActions>
                     <Button size="small" color="primary">
-                      <a href="/">Xem chi tiết</a>
+                      <a href={"/stories/edit/" + this.state.story.id}>
+                        Chỉnh sửa
+                      </a>
                     </Button>
                   </CardActions>
                 </Card>
@@ -624,17 +678,18 @@ class Dashboard1 extends React.Component {
                   </div>
                   <div className="card-title" style={{ paddingLeft: "10px" }}>
                     {" "}
-        <Tooltip title={"đánh giá trung bình: "+this.state.avgRate} aria-label="add">
-
-                    <BeautyStars
-                      value={this.state.avgRate}
-                      gap="3px"
-                      size="18px"
-                      inactiveColor="#b0b0b0"
-                    ></BeautyStars>
-                    {/* <MyRating value={this.state.story.avgRate} /> */}
-                  </Tooltip>
-
+                    <Tooltip
+                      title={"đánh giá trung bình: " + this.state.avgRate}
+                      aria-label="add"
+                    >
+                      <BeautyStars
+                        value={this.state.avgRate}
+                        gap="3px"
+                        size="18px"
+                        inactiveColor="#b0b0b0"
+                      ></BeautyStars>
+                      {/* <MyRating value={this.state.story.avgRate} /> */}
+                    </Tooltip>
                   </div>
 
                   <DoughnutChart
@@ -643,9 +698,8 @@ class Dashboard1 extends React.Component {
                       theme.palette.primary.dark,
                       theme.palette.primary.main,
                       theme.palette.primary.main2,
-                      theme.palette.primary.light,
                       theme.palette.primary.veryl,
-                      
+                      theme.palette.primary.light,
                     ]}
                     data1={this.state.rating}
                   />
@@ -680,6 +734,8 @@ class Dashboard1 extends React.Component {
                     onClick={this.handleClick2}
                   >
                     {this.state.daybeforelabel2}
+                    {this.state.timeScreenLoad && <MySpinner/>}
+
                   </Button>
                   <Menu
                     style={{ borderRadius: "8px" }}
@@ -701,8 +757,13 @@ class Dashboard1 extends React.Component {
                     </MenuItem>
                   </Menu>
                   <span
-                    style={{ color: "rgb(162, 144, 144)", fontSize: "14px" }}
+                    style={{
+                      color: "rgb(162, 144, 144)",
+                      fontSize: "14px",
+                    }}
                   >
+
+
                     {this.state.timelable2}
                   </span>
                 </div>
@@ -711,13 +772,14 @@ class Dashboard1 extends React.Component {
                   bordered
                   small
                   noRecordsFoundLabel="Chưa có dữ liệu"
-
                   searching={false}
                   data={this.state.datax}
                   entrieslabel={""}
                   paging={false}
                   displayEntries={false}
                 />
+                <h4> Lượt click {"  "} </h4>
+
                 <div>
                   <Button
                     variant="outlined"
@@ -732,6 +794,9 @@ class Dashboard1 extends React.Component {
                     }}
                     onClick={this.handleClick3}
                   >
+
+                  {this.state.clickLoad && <MySpinner/>}
+
                     {this.state.daybeforelabel3}
                   </Button>
                   <Menu
@@ -751,8 +816,12 @@ class Dashboard1 extends React.Component {
                       28 ngày qua
                     </MenuItem>
                   </Menu>
+
                   <span
-                    style={{ color: "rgb(162, 144, 144)", fontSize: "14px" }}
+                    style={{
+                      color: "rgb(162, 144, 144)",
+                      fontSize: "14px",
+                    }}
                   >
                     {this.state.timelable3}
                   </span>
@@ -770,16 +839,17 @@ class Dashboard1 extends React.Component {
                 />
 
                 {/* <Pagination
-                  // count={pageInfo.totalPages}
-                  count={3}
-                  color="primary"
-                  boundaryCount={2}
-                  // onChange={changePage}
-                /> */}
+                        // count={pageInfo.totalPages}
+                        count={3}
+                        color="primary"
+                        boundaryCount={2}
+                        // onChange={changePage}
+                      /> */}
               </Grid>
             </Grid>
           </div>
         </Fragment>
+        {/* ) */}}
       </MainLayout>
     );
   }

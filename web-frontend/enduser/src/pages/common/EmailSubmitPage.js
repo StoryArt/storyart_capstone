@@ -6,11 +6,12 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-
+import MainLayout from "../../layouts/main-layout/MainLayout";
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import MySpinner from '../../components/common/MySpinner';
 
 
 
@@ -40,33 +41,42 @@ const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const [email, setEmail] = useState("");
+  const [ok, setOk] = useState("");
   const [alert, setAlert] = useState({ open: false, type: 'success', content: '' });
+  
 const [isSendMail, setIsSendMail] = useState(false);
 
 
   const forgotPassword = async (e) => {
     e.preventDefault();
     try {
+      
       setIsSendMail(true);
 
-      const res = await UserService.forgotPassword(email);
-      
-
+      const res = await UserService.forgotPassword(email.trim());
+setErrorMessage("Bạn sẽ sớm nhận được một email hướng dẫn .Nếu bạn vẫn cần hỗ trợ, hãy liên hệ qua mail: storyartcapstone@gmail.com")
       console.log(res.data);
     
     } catch (error) {
-      if (error.response) {
-        setAlert({
-          type: 'error',
-          content: error.response.data.message,
-          open: true
-        });
-      } else {
-        console.log(error);
+
+
+      var err;
+      if (typeof error.response.data.errors != "undefined") {
+        err = error.response.data.errors[0].defaultMessage;
+      } else if (typeof error.response.data.message == "string") {
+        err = error.response.data.message;
       }
-    }
+      // setAlert({
+      //   type: 'error',
+      //   content: err,
+      //   open: true
+      // });
+      setErrorMessage(err)
+      
     closeAlert();
   }
+  setIsSendMail(false)
+}
 
   const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 2000);
 
@@ -76,7 +86,7 @@ const [isSendMail, setIsSendMail] = useState(false);
 
     return (
 
-   <>
+   <MainLayout>
       <div className="pt-5">
         {/* <h3 className="text-center text-bold">D</h3> */}
         <Container component="main" maxWidth="xs">
@@ -88,10 +98,9 @@ const [isSendMail, setIsSendMail] = useState(false);
             <Typography component="h3" variant="h3" style={{margin: "40px 0px"}}>
             Quên mật khẩu
               </Typography>
-            <div> {errorMessage}</div>
 
 
-            {isSendMail? "Bạn sẽ sớm nhận được một email hướng dẫn .Nếu bạn vẫn cần hỗ trợ, hãy liên hệ qua mail: storyartcapstone@gmail.com ": 
+              <h4>{errorMessage}</h4>
 
             <form className={classes.form}noValidate onSubmit={forgotPassword}>
             <TextField
@@ -105,7 +114,7 @@ const [isSendMail, setIsSendMail] = useState(false);
               onChange={e => setEmail(e.target.value)}
               autoFocus
             />
-
+            {isSendMail? <MySpinner/> : 
             <Button
               type="submit"
               fullWidth
@@ -115,10 +124,10 @@ const [isSendMail, setIsSendMail] = useState(false);
             >
               Gửi hướng dẫn
               </Button>
+}
             </form>
 
 
-            }
 
            
           
@@ -133,7 +142,7 @@ const [isSendMail, setIsSendMail] = useState(false);
           content={alert.content}
         />
       </div>
-      </>
+      </MainLayout>
     );
 };
 
