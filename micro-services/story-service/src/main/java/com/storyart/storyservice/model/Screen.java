@@ -38,4 +38,20 @@ public class Screen extends DateAudit{
     @NotBlank
     private String content;
 
+    private int myIndex;
+
+    private Date createdAt;
+
+    private Date updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = new Date();
+    }
+
 }

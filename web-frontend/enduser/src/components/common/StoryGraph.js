@@ -6,7 +6,23 @@ import Graph from "react-graph-vis";
 let options = { 
     physics: { enabled: false, stabilization: { iterations: 5000 } }, 
     clickToUse: true,
-    layout: { hierarchical: true }, 
+    layout: {
+        randomSeed: undefined,
+        improvedLayout:true,
+        clusterThreshold: 150,
+        hierarchical: {
+            enabled: true,
+            levelSeparation: 150,
+            nodeSpacing: 200,
+            treeSpacing: 200,
+            blockShifting: true,
+            edgeMinimization: true,
+            parentCentralization: true,
+            direction: 'UD',        // UD, DU, LR, RL
+            sortMethod: 'hubsize',  // hubsize, directed
+            shakeTowards: 'leaves'  // roots, leaves
+        }, 
+    },
     nodes : { shape : 'square' }, 
     autoResize: false,
     height: '500px', 
@@ -35,7 +51,7 @@ let options = {
         arrows: { 
             to: { enabled: true, scaleFactor: 0.5 } 
         } }, 
-    interaction: { hover: true, keyboard :true, navigationButtons: true, tooltipDelay: 150 } 
+    interaction: { hover: true, keyboard :false, navigationButtons: false, tooltipDelay: 150 } 
 };
 
 const StoryGraph = (props) => {

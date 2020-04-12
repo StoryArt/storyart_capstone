@@ -341,8 +341,10 @@ const CreateStoryPage = (props) => {
         let informationActions = [];
 
         if(storyParameters.length > 0){
-            screens.forEach(screen => {
-                screen.actions.forEach(action => {
+            screens.forEach((screen, i) => {
+                screen.myIndex = i + 1;
+                screen.actions.forEach((action, index) => {
+                    action.myIndex = index + 1;
                     if(action.type === ACTION_TYPES.UPDATE_INFORMATION){
                         informationActions.push({
                             actionId: action.id,
@@ -430,7 +432,6 @@ const CreateStoryPage = (props) => {
                     return `Có thể bạn cần lưu lại những thay đổi trên câu truyện!! \nBạn có chắc muốn rời khỏi trang này hay không?`
                 }}
             />
-           
 
             {(!isLoadingStory && !notfoundStory && !ValidationUtils.isEmpty(story)) && (
                 <div style={{ marginBottom: '150px' }}>
