@@ -1,5 +1,6 @@
 package com.storyart.storyservice.repository;
 
+import com.storyart.storyservice.dto.statistic.ILinkClickCountResponse;
 import com.storyart.storyservice.dto.statistics.ReadStatisticDto;
 import com.storyart.storyservice.model.ReadingHistory;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,7 @@ public interface HistoryRepository extends JpaRepository<ReadingHistory, Integer
     List<ReadStatisticDto> findReadingStatisticsByDateRangeOfUser(Date from, Date to, int userId);
 
     List<ReadingHistory> findAllByStoryIdAndIsReachingEndAndCreatedAtBetweenOrderByCreatedAtDesc(int storyId,boolean reachingEnd, Date startDate, Date endDate );
+    List<ReadingHistory> findAllByStoryIdAndCreatedAtBetweenOrderByCreatedAtDesc(int storyId, Date startDate, Date endDate );
     @Query(value = "SELECT rh1.* FROM storyart_db.reading_history as rh1" +
             " JOIN (select max(id) id, max(created_at) " +
             "from storyart_db.reading_history " +

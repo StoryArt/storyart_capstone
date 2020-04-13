@@ -13,6 +13,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "action")
@@ -33,6 +34,7 @@ public class Action extends DateAudit {
     @NotBlank(message = "Nội dung hành động không được để trống")
     private String content;
 
+
     @Size(max = 255)
     private String nextScreenId;
 //    private String operation;//+ - * /
@@ -43,5 +45,21 @@ public class Action extends DateAudit {
 
     @Enumerated(EnumType.STRING)
     private ACTION_TYPES type;
+
+    private int myIndex;
+
+    private Date createdAt;
+
+    private Date updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = new Date();
+    }
 
 }

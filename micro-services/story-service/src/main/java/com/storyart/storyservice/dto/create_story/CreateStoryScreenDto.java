@@ -28,6 +28,8 @@ public class CreateStoryScreenDto{
     @Size(min = 10, message = "Nội dung màn hình phải có tối thiểu 10 kí tự")
     private String content;
 
+    private int myIndex;
+
     @Valid
     List<CreateStoryActionDto> actions;
 }

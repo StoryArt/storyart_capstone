@@ -120,7 +120,7 @@ let searchTimeout = null;
   return (
     <MainLayout>
         <div className="container-fluid" style={{ marginBottom: '200px' }}>
-            <MyBackdrop open={openBackdrop} setOpen={() => setOpenBackdrop(true)} />
+        <MyBackdrop open={openBackdrop} setOpen={() => setOpenBackdrop(true)} />
 
             
             {(!isloadingUser && !userNotfound && !ValidationUtils.isEmpty(user)) && (

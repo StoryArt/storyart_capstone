@@ -9,8 +9,13 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LinkClickCountResponse {
+public class LinkClickCountResponse implements Comparable<LinkClickCountResponse>{
 
     String link;
     int count;
+
+    @Override
+    public int compareTo(LinkClickCountResponse linkClickCountResponse) {
+        return Integer.compare(this.getCount(),(linkClickCountResponse.getCount()));
+    }
 }

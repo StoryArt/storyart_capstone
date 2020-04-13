@@ -356,7 +356,6 @@ class StoryServiceImpl implements StoryService {
                 List<InformationAction> informationActions = informationActionRepository.findAllByInformationIdIn(informationIds);
 
                 List<Tag> tagList = tagRepository.findAllByStoryId(storyId);
-                System.out.println("tags: " + tagList.size());
                 List<ReadStoryTagDto> readStoryTagDtoList = tagList.stream().map(t -> modelMapper.map(t, ReadStoryTagDto.class)).collect(Collectors.toList());
 
                 readStoryDto.setInformationActions(informationActions);

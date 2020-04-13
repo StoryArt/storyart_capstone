@@ -94,6 +94,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 antMatchers(HttpMethod.POST,"/api/v1/auth/signup").permitAll().
                 antMatchers("/api/v1/forgot-password").permitAll().
                 antMatchers("/api/v1/reset-password").permitAll().
+                antMatchers(HttpMethod.GET,"/api/v1/reset-password/checkToken/**").permitAll().
                 antMatchers("/api/v2/api-docs").permitAll().
                 antMatchers("/api/swagger-ui.html").permitAll().
 

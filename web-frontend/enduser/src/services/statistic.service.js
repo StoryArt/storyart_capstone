@@ -32,6 +32,11 @@ class StatisticService {
     const url = baseUrl + `/story/` + storyId + `/rating`;
     return axios.get(url);
   }
+
+  static async checkOwner(storyId){
+    const url = baseUrl + `/story/` + storyId + `/check`;
+    return axios.get(url);
+  }
 }
 
 export default StatisticService;

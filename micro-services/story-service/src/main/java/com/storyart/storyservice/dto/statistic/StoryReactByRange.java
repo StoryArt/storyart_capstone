@@ -19,7 +19,7 @@ List<String> times= new ArrayList<>();
 //    private int numOfHitPoint;
 //    private int numOfRead;
 private List<Integer> numOfComment= new ArrayList<>();
-    private List<Integer> numOfShare= new ArrayList<>();
+    private List<Integer> numOfView = new ArrayList<>();
     private List<Integer> numOfHitPoint= new ArrayList<>();
     private List<Integer> numOfClickLink= new ArrayList<>();
 //    private int numOfClickLink;
