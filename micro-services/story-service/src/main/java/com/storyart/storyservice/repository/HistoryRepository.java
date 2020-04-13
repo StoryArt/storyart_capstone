@@ -36,7 +36,7 @@ public interface HistoryRepository extends JpaRepository<ReadingHistory, Integer
 
     List<ReadingHistory> findAllByStoryIdAndIsReachingEndAndCreatedAtBetweenOrderByCreatedAtDesc(int storyId,boolean reachingEnd, Date startDate, Date endDate );
     List<ReadingHistory> findAllByStoryIdAndCreatedAtBetweenOrderByCreatedAtDesc(int storyId, Date startDate, Date endDate );
-    @Query(value = "SELECT rh1.* FROM storyart_db.reading_history as rh1" +
+    @Query(value = "SELECT * FROM storyart_db.reading_history as rh1" +
             " JOIN (select max(id) id, max(created_at) " +
             "from storyart_db.reading_history " +
             "where user_id = ?1 group by user_id, story_id) as rh2" +
