@@ -17,31 +17,34 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserProfileUpdateRequest {
-
-
-    @NotBlank(message = "Tên không được để trống")
     @Size(max = 40, min = 3, message = "Tên phải có từ 3 đến 40 ký tự")
+    @NotBlank(message = "Tên phải có từ 3 đến 40 ký tự")
     private String name;
-    @Email(message = "Nhập sai định dạng email!")
-    @NotBlank(message = "Email không được để trống!")
+    @Email(message = "Email không đúng định dạng. Vui lòng nhập lại email")
+    @NotBlank(message = "Email không được để trống")
     @NaturalId
-    String email;
+  private   String email;
 
-    @NotBlank(message = "Tên đăng nhập không được trống")
-    @Size(min=3,max = 15, message = "Tên đăng nhập phải có từ 3 đến 15 ký tự")
+    @Size(min = 3, max = 15, message = "Tên đăng nhập phải có từ 3 đến 15 ký tự")
+    @NotBlank(message = "Tên đăng nhập phải có từ 3 đến 15 ký tự")
     @Column(unique = true)
     private String username;
     @Size(max = 300, message = "Thông tin giới thiệu có độ dài tối đa là 300 ký tự!")
-    String intro_content;
+   private String intro_content;
 
+    public void setName(String name) {
+        this.name = name.trim();
+    }
 
+    public void setEmail(String email) {
+        this.email = email.trim();
+    }
 
+    public void setUsername(String username) {
+        this.username = username.trim();
+    }
 
-
-
-
-
-
-
-
+    public void setIntro_content(String intro_content) {
+        this.intro_content = intro_content.trim();
+    }
 }

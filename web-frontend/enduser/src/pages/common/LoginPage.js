@@ -67,7 +67,9 @@ const LoginPage = () => {
   const login = async (e) => {
     e.preventDefault();
     try {
-      const res = await UserService.login(user);
+      let formatUs= user;
+      formatUs.username= formatUs.username.trim()
+      const res = await UserService.login(formatUs);
 
       console.log(res.data);
       if (res.data.accessToken != null) {
@@ -170,7 +172,7 @@ const LoginPage = () => {
             <Grid container>
               <Grid item>
                 <Link to="/register" variant="body2">
-                  {"Dăng kí!"}
+                  {"Đăng kí!"}
                 </Link>
               </Grid>
               <Grid item style={{ marginLeft: '10px' }}>

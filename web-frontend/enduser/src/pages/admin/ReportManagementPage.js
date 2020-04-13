@@ -10,6 +10,7 @@ import Pagination from '@material-ui/lab/Pagination';
 import ReportService from '../../services/report.service';
 import { getAuthUserInfo } from '../../config/auth';
 import { Tabs, Tab } from '@material-ui/core';
+import { Link } from 'react-router-dom';
 
 const ReportManagementPage = () => {
   const userInfo = getAuthUserInfo();
@@ -86,7 +87,10 @@ const ReportManagementPage = () => {
       row["storyId"] = element["storyId"];
       row["authorName"] = element["authorName"];
 
-      row["storyName"] = element["storyName"];
+      row["storyName"] = <Link target="_blank"
+        to={`/stories/details/${element["storyId"]}`}>
+        {element["storyName"]}
+      </Link>;
       row["numberOfReports"] = element["reportIds"].length;
 
       row["authorEmail"] = element["authorEmail"];
@@ -783,7 +787,12 @@ const ReportManagementPage = () => {
           {activeItem === "2" &&
             <MDBModalBody>
               <p>Tác giả: <strong>{reportContent.authorName}</strong></p>
-              <p>Tên truyện: "<strong>{reportContent.storyName}</strong>"</p>
+              <p>Tên truyện: "
+                <Link target="_blank"
+                  to={`/stories/details/${reportContent.storyId}`}>
+                  <strong>{reportContent.storyName}</strong>"
+                </Link>
+              </p>
               <p>Số lượng báo cáo: <strong>{reportContent.numberOfReports}</strong></p>
               <p>Email: <strong>{reportContent.authorEmail}</strong></p>
               {reportContent.handled &&

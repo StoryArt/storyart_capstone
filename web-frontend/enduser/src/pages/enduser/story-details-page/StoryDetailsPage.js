@@ -15,7 +15,7 @@ import StoryService from '../../../services/story.service';
 import ValidationUtils from '../../../utils/validation';
 
 import NotFound from '../../../components/common/NotFound';
-import MySpinner from '../../../components/common/MySpinner';
+    import MySpinner from '../../../components/common/MySpinner';
 import TagList from '../../../components/common/TagList';
 import StringUtils from '../../../utils/string';
 

@@ -41,6 +41,19 @@ public class ResetPasswordController {
     @Autowired
     JwtTokenProvider jwtTokenProvider;
 
+    @GetMapping("checkToken/{token}")
+    ResponseEntity checkToken(@PathVariable("token") String token) {
+        User user = userRepository.findByToken(token);
+        if (user == null) {
+            throw new BadRequestException("Không thể đặt lại mật khẩu");
+        }
+        if (user.isExpired()) {
+            throw new BadRequestException("Yêu cầu đặt lại mật khẩu đã hết hạn, vui lòng gửi lại");
+        }
+        return new ResponseEntity(new ApiResponse(true, "Token hợp lệ"), HttpStatus.OK);
+    }
+
+
     @PostMapping
     @Transactional
     public ResponseEntity handlePasswordReset(@RequestBody @Valid ResetPasswordRequest form
@@ -65,12 +78,12 @@ public class ResetPasswordController {
 
         Authentication authentication;
 
-            authentication  = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            user.getUsername(),
-                            form.getPassword()
-                    )
-            );
+        authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        user.getUsername(),
+                        form.getPassword()
+                )
+        );
         String jwt = jwtTokenProvider.generateToken(authentication);
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }

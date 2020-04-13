@@ -13,11 +13,11 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmailSubmitRequest {
-@Email(message = "Không đúng dịnh dạng email!")
-        @NotBlank(message = "Email không được để trống!")
+    @Email(message = "Không đúng định dạng email!")
+    @NotBlank(message = "Email không được để trống!")
     String email;
 
-String linkReset;
+    String linkReset;
 
 
 }

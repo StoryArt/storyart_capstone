@@ -185,6 +185,12 @@ class UserService {
     let url1 = baseUrl + "/reset-password";
     return axios.post(url1, passAndRepassAndToken);
   }
+
+  static async checkToken(token){
+    let url1 = baseUrl + "/reset-password/checkToken/"
+    +token;
+    return axios.get(url1);
+  }
 }
 
 export default UserService;

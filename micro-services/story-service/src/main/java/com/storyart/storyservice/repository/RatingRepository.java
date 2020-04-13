@@ -44,7 +44,7 @@ public interface RatingRepository extends JpaRepository<Rating, RatingId> {
 
     int countRatingByStoryId(int storyId);
     @Query(value = "SELECT stars as 'star', count(*) as 'count'\n" +
-            " FROM storyart_db.rating where story_id=:sid group by stars order by stars" , nativeQuery = true)
+            " FROM storyart_db.rating where story_id=:sid group by stars order by stars desc" , nativeQuery = true)
     List<IRatingClassify> countStarByStoryId(@Param("sid") Integer sid);
 
 }

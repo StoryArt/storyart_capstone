@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public interface ScreenReadingTimeService {
@@ -65,6 +66,7 @@ class ScreenReadingTimeImpl implements ScreenReadingTimeService {
             //add
             list.add(screenTimeResponse);
         }
+        Collections.sort(list, Collections.reverseOrder());
         return list;
     }
 }

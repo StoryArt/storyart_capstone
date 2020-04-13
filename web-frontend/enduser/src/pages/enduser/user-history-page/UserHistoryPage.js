@@ -300,6 +300,7 @@ const UserHistoryPage = () => {
                                                 <div className="card-body">
                                                     <h5 className="card-title">{history.storyName}</h5>
                                                     <p className="card-text" >{StringUtils.truncate(StringUtils.removeHtml(history.storyContent), 60)}</p>
+                                                    <small>{moment(history.createdAt).format('HH:mm DD/MM/YYYY')}</small>
                                                     <div>
                                                         <Link target="_blank"
                                                             to={`/stories/details/${history.storyId}`}>
