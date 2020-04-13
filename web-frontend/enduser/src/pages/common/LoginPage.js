@@ -104,15 +104,19 @@ const LoginPage = () => {
         });
       }
     } catch (error) {
-      if (error.response) {
-        setAlert({
-          type: 'error',
-          content: error.response.data.message,
-          open: true
-        });
-      } else {
-        console.log(error);
+
+      var err;
+      if (typeof error.response.data.errors != "undefined") {
+        err = error.response.data.errors[0].defaultMessage;
+      } else if (typeof error.response.data.message == "string") {
+        err = error.response.data.message;
       }
+      setAlert({
+        type: 'error',
+        content:err,
+        open: true
+      });
+      
     }
     closeAlert();
   }
