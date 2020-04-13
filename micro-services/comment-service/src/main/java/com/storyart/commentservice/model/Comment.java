@@ -19,7 +19,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class Comment extends DateAudit {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private int userId;
