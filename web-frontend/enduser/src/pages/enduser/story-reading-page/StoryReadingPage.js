@@ -298,7 +298,7 @@ const ReadStoryPage = (props) => {
                 // >
                     <MyFullScreenShowWrapper informations={informations} storyId={story.id}>
                         <ScreenShow 
-                            animation={ANIMATIONS.GROW}
+                            animation={story.animation}
                             showScreen={showScreen}
                             screen={currentScreen}
                             onSelectAction={handleSelectAction}

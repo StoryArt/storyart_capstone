@@ -24,6 +24,10 @@ public class CreateStoryActionDto{
     @Pattern(regexp = "UPDATE_INFORMATION|NEXT_SCREEN|REDIRECT", message = "Kiểu hành động chỉ 1 trong UPDATE_INFORMATION|NEXT_SCREEN|REDIRECT")
     private String type;
     private int myIndex;
+
+    @NotBlank
+    @Size(max = 255, message = "Chưa có giá trị tác động")
     private String value;
+
     private String nextScreenId;
 }
