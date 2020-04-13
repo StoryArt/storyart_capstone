@@ -187,7 +187,7 @@ class UserService {
   }
 
   static async checkToken(token){
-    let url1 = baseUrl + "/reset-password/checkToken/token"+token;
+    let url1 = baseUrl + "/reset-password/checkToken/"+token;
     return axios.get(url1);
   }
 }
