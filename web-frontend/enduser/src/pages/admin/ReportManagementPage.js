@@ -685,7 +685,7 @@ const ReportManagementPage = () => {
                         type="search"
                         style={searchInput}
                         className="form-control"
-                        placeholder="Tìm kiếm bằng: mã bình luận, tên tài khoản, email"
+                        placeholder="Tìm kiếm bằng: mã truyện, tên tài khoản, email"
                         value={searchStoryString}
                         onChange={e => setSearchStoryString(e.target.value)}></input>
                       {/* <i style={searchClear} class="far fa-times-circle"></i> */}
