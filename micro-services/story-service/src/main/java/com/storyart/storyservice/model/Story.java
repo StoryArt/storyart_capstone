@@ -35,7 +35,7 @@ public class Story extends DateAudit {
     @Size(max = 100)
     private String animation;
 
-    @Size(max = 1000)
+    @Size(max = 1000, message = "Ảnh không quá 1000 kí tự")
     private String image;
 
     private String firstScreenId;

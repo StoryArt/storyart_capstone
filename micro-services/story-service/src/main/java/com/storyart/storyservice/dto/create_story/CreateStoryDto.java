@@ -32,7 +32,7 @@ public class CreateStoryDto implements Serializable {
     @Pattern(regexp = "FADE|SLIDE|GROW|COLLAPSE|ZOOM", message = "Chỉ được chọn 1 trong các animation FADE|SLIDE|GROW|COLLAPSE|ZOOM")
     private String animation;
 
-    @Size(max = 1000)
+    @Size(max = 1000, message = "Ảnh không quá 1000 kí tự")
     private String image;
 
     @NotBlank(message = "Chưa có màn hình đầu tiên")

@@ -15,7 +15,7 @@ public class CreateStoryInformationActionDto {
     private String actionId;
     private String informationId;
 
-    @NotBlank(message = "Tác động thông tin không được để trống")
+    @NotBlank(message = "Ảnh hưởng thông tin không được để trống")
     private String operation;
     private String value;
 }

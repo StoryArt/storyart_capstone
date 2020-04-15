@@ -25,8 +25,8 @@ public class CreateStoryActionDto{
     private String type;
     private int myIndex;
 
-    @NotBlank
-    @Size(max = 255, message = "Chưa có giá trị tác động")
+    @NotBlank(message = "Chưa có giá trị hành động")
+    @Size(max = 255, message = "Giá trị ảnh hưởng thông tin có tối đâ 255 kí tự")
     private String value;
 
     private String nextScreenId;

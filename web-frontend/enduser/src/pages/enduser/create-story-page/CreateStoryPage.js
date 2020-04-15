@@ -25,7 +25,7 @@ import { LayoutContext } from '../../../context/layout.context';
 
 
 import { getParameters, getActions, ANIMATIONS, ACTION_TYPES, 
-    INFORMATION_TYPES, SCREEN_COLORS  }  from '../../../common/constants';
+    INFORMATION_TYPES  }  from '../../../common/constants';
 
 
 import StoryService from '../../../services/story.service';
@@ -41,10 +41,12 @@ import ConfirmDialog from '../../../components/common/ConfirmDialog';
 const parameters = getParameters();
 
 const actions = getActions();
+let isEditPage;
 
 const CreateStoryPage = (props) => {
    
-    let isEditPage = props.location.pathname !== '/stories/create';
+    isEditPage = props.location.pathname !== '/stories/create';
+
     const layoutContext = useContext(LayoutContext)
     const { setOpenSidebar } = layoutContext
 
@@ -91,6 +93,7 @@ const CreateStoryPage = (props) => {
 
         return () => {
             setOpenSidebar(true);
+            
         }
         // window.onbeforeunload = confirmBeforeLeavePage;
        
@@ -319,7 +322,7 @@ const CreateStoryPage = (props) => {
           console.log(error);
         }
         closeAlert();
-      }
+    }
 
     const saveStory = async () =>  {
         setOpenBackdrop(true);
@@ -503,15 +506,15 @@ const CreateStoryPage = (props) => {
                                                     </div>
                                                 </div>
                                                     
-                                                    <StoryParameters 
-                                                        parameters={parameters}
-                                                        storyParameters={storyParameters}
-                                                        screens={screens}
-                                                        onChangeParam={changeParam} 
-                                                        onAddParamConditions={addParamConditions} 
-                                                        onChangeParamConditions={changeParamConditions} 
-                                                        onRemoveParamCondition={removeParamCondition}
-                                                        onRemoveParam={removeParam} />
+                                                <StoryParameters 
+                                                    parameters={parameters}
+                                                    storyParameters={storyParameters}
+                                                    screens={screens}
+                                                    onChangeParam={changeParam} 
+                                                    onAddParamConditions={addParamConditions} 
+                                                    onChangeParamConditions={changeParamConditions} 
+                                                    onRemoveParamCondition={removeParamCondition}
+                                                    onRemoveParam={removeParam} />
                                                 
                                             </div>
                                             <div className="card-body">
@@ -535,8 +538,6 @@ const CreateStoryPage = (props) => {
                                             </div>
                                         </div> */}
                                         <div className="mb-5">
-                                          
-
                                             <FormControlLabel
                                                 control={<Checkbox
                                                     checked={story.published}
@@ -545,7 +546,6 @@ const CreateStoryPage = (props) => {
                                                 />}
                                                 label="Xuất bản truyện"
                                             />
-                                                
                                         </div>
                                     </div>
                                 </div>

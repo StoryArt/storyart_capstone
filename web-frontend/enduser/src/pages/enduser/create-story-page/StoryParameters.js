@@ -55,7 +55,7 @@ const StoryParameters = (props) => {
                                                 style={{ width: '100%' }}
                                                 variant="outlined"
                                                 label=""
-                                                type={param.type === 'number' ? "number" : 'text'}
+                                                type={param.type === INFORMATION_TYPES.NUMBER ? "number" : 'text'}
                                                 value={param.value} 
                                                 onChange={(e) => onChangeParam('value', e.target.value, param)} 
                                             />

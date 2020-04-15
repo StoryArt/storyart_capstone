@@ -3,7 +3,7 @@ import { TextField, Select, FormControl, InputLabel, MenuItem } from '@material-
 import ScreensSelect from './ScreensSelect';
 import ActionsSelect from './ActionsSelect';
 import MyDropdownMenu from '../../../components/common/MyDropdownMenu';
-import { ACTION_TYPES } from '../../../common/constants';
+import { ACTION_TYPES, INFORMATION_TYPES } from '../../../common/constants';
 
 const ActionsList = (props) => {
     const { actions, onRemoveAction, onChangeActions, 
@@ -57,6 +57,7 @@ const ActionsList = (props) => {
                                         style={{ width: '100%' }}
                                         variant="outlined"
                                         label="Giá trị tác động..."
+                                        type={currentParam.type === INFORMATION_TYPES.NUMBER ? "number" : 'text'}
                                         value={action.value} 
                                         onChange={(e) => onChangeActions('value', e.target.value, screen, index)}
                                     />

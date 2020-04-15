@@ -30,7 +30,7 @@ public interface HistoryRepository extends JpaRepository<ReadingHistory, Integer
 
     @Query(value = "select count(id) as readCount, DATE(created_at) as dateCreated from reading_history " +
             "where (story_id IN (select id from story where user_id = ?3) " +
-            "and DATE(created_at) <= (DATE(?2) + INTERVAL 1 DAY) and DATE(created_at) >= (DATE(?1) - INTERVAL 1 DAY) ) GROUP BY DATE(created_at) order by dateCreated ASC",
+            "and DATE(created_at) <= DATE(?2) and DATE(created_at) >= DATE(?1) ) GROUP BY DATE(created_at) order by dateCreated ASC",
             nativeQuery = true)
     List<ReadStatisticDto> findReadingStatisticsByDateRangeOfUser(Date from, Date to, int userId);
 

@@ -1,9 +1,9 @@
 package com.storyart.storyservice.service;
 
-import com.storyart.storyservice.common.constants.ACTION_TYPES;
+import com.storyart.storyservice.common.constants.*;
 import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.TagDto;
-import com.storyart.storyservice.dto.create_story.CreateStoryDto;
+import com.storyart.storyservice.dto.create_story.*;
 import com.storyart.storyservice.dto.ResultDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryInformationDto;
@@ -119,11 +119,125 @@ class StoryServiceImpl implements StoryService {
     @Autowired
     EntityManager entityManager;
 
+    public boolean isNumber(String value){
+        try{
+            double val = Double.parseDouble(value);
+            return true;
+        } catch(Exception ex){
+            return false;
+        }
+    }
+
+    public boolean isNumberCondition(String value){
+        List<String> number_conditions = ConstantsList.getNumberConditionList();
+        return number_conditions.contains(value);
+    }
+
+    public boolean isStringCondition(String value){
+        List<String> string_conditions = ConstantsList.getStringConditionList();
+        return string_conditions.contains(value);
+    }
+
+    public boolean isNumOperation(String value){
+        List<String> number_ops = ConstantsList.getNumberOperationList();
+        return number_ops.contains(value);
+    }
+
+    public boolean isStringOperation(String value){
+        List<String> string_ops = ConstantsList.getStringOperationList();
+        return string_ops.contains(value);
+    }
+
     @Override
     public HashMap<String, String> validateStoryinfo(CreateStoryDto storyDto) {
         HashMap<String, String> errors = new HashMap<>();
         if(storyDto.getTags().size() == 0){
             errors.put("TAGS", "Chưa gắn thẻ cho truyện");
+        } else if(storyDto.getScreens().size() == 0){
+            errors.put("SCREENS", "Chưa có màn hình cho truyện");
+        } else {
+            CreateStoryInformationDto informationDto = storyDto.getInformations().size() > 0 ? storyDto.getInformations().get(0) : null;
+            List<String> screenIds = storyDto.getScreens().stream().map(s -> s.getId()).collect(Collectors.toList());
+
+            //check story information
+            if(storyDto.getInformations().size() > 1){
+                errors.put("INFORMATION", "Chỉ được thêm 1 thông tin cho truyện");
+                return errors;
+            } else if(storyDto.getInformations().size() == 1){
+                String type = informationDto.getType();
+
+                if(type.equals(INFORMATION_TYPES.NUMBER.toString())){
+                   if(!isNumber(informationDto.getValue())){
+                       errors.put("INFORMATION", "Giá trị thông tin truyện không phải là số");
+                       return errors;
+                   }
+                }
+
+                //check information conditions list
+                for(CreateStoryConditionDto cond: informationDto.getConditions()){
+                    if(!screenIds.contains(cond.getNextScreenId())){
+                        errors.put("CONDITION_NEXT_SCREEN_ID", "Chưa có chuyển màn hình cho điều kiện thông tin");
+                    } else if(type.equals(INFORMATION_TYPES.NUMBER.toString())){
+                        if(!isNumber(cond.getValue())){
+                            errors.put("INFORMATION_CONDITION", "Giá trị điều kiện thông tin truyện không phải là số");
+                        } else if(!isNumberCondition(cond.getType())){
+                            errors.put("INFORMATION_CONDITION", "Điều kiện thông tin truyện không tồn tại");
+                        }
+                    } else if(type.equals(INFORMATION_TYPES.STRING.toString())){
+                        if(!isStringCondition(cond.getType())){
+                            errors.put("INFORMATION_CONDITION", "Điều kiện thông tin truyện không tồn tại");
+                        }
+                    }
+                    if(errors.size() > 0) return errors;
+                }
+
+                //check all information actions
+                for(CreateStoryInformationActionDto informationActionDto: storyDto.getInformationActions()){
+                    String value = informationActionDto.getValue();
+                    String operation = informationActionDto.getOperation();
+                    if(type.equals(INFORMATION_TYPES.NUMBER.toString())){
+                        if(!isNumber(value)){
+                            errors.put("INFORMATION_ACTION", "Giá trị ảnh hưởng thông tin không phải là số");
+                        } else if(!isNumOperation(operation)){
+                            errors.put("INFORMATION_ACTION", "Ảnh hưởng thông tin không tồn tại");
+                        }
+                    } else if(type.equals(INFORMATION_TYPES.STRING.toString())){
+                        if(!isStringOperation(operation)){
+                            errors.put("INFORMATION_ACTION", "Ảnh hưởng thông tin không tồn tại");
+                        }
+                    }
+                    if(errors.size() > 0) return errors;
+                }
+            }
+
+
+            //check first screen exist
+            if(!screenIds.contains(storyDto.getFirstScreenId())){
+                errors.put("FIRST_SCREEN_ID", "Chưa có màn hình đầu tiên cho truyện");
+                return errors;
+            }
+
+            //check all screens
+            for(CreateStoryScreenDto screen: storyDto.getScreens()){
+                screen.getActions().stream().forEach(a -> {
+                    if(a.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())){
+                        if(!screenIds.contains(a.getValue())){
+                            errors.put("NEXT_SCREEN_ACTION", "Chưa có màn hình kế tiếp cho hành động chuyển màn hình");
+                        }
+                    } else if(a.getType().equals(ACTION_TYPES.UPDATE_INFORMATION.toString())){
+                        if(!screenIds.contains(a.getNextScreenId())){
+                            errors.put("UPDATE_INFORMATION_ACTION", "Chưa có màn hình kế tiếp cho hành động cập nhật thông tin");
+                        } else if(storyDto.getInformations().size() == 0){
+                            errors.put("UPDATE_INFORMATION_ACTION", "Truyện chưa có thông tin!");
+                        }
+                    } else if(a.getType().equals(ACTION_TYPES.REDIRECT.toString())){
+                        if(StringUtils.isEmpty(a.getValue())){
+                            errors.put("REDIRECT_ACTION", "Chưa có đường dẫn cho hành động đi tới đường dẫn");
+                        }
+                    }
+                });
+                if(errors.size() > 0) break;
+            }
         }
         return errors;
     }

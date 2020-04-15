@@ -548,7 +548,7 @@ const StoryDetailsPage = (props) => {
                                     <div className="form-group">
                                         <textarea
                                             className="form-control"
-                                            rows="3"
+                                            rows="1"
                                             placeholder="Bình luận..."
                                             value={commentContent}
                                             onChange={e => setCommentContent(e.target.value)}></textarea>

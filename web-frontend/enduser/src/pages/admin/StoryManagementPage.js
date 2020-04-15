@@ -126,7 +126,7 @@ const StoryManagementPage =  (props) => {
     if(enable){
       setDialogContent('Bạn có chắc chắn muốn khôi phục truyện này chứ?')
     } else {
-      setDialogContent('Bạn có chắc chắn muốn xóa truyện này chứ?')
+      setDialogContent('Bạn có chắc chắn muốn khóa truyện này chứ?')
     }
     setOpenDialog(true);
   }

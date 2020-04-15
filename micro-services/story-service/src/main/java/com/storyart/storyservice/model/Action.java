@@ -40,7 +40,7 @@ public class Action extends DateAudit {
 //    private String operation;//+ - * /
 
     @NotBlank
-    @Size(max = 255, message = "Chưa có giá trị tác động")
+    @Size(max = 255, message = "Chưa có giá trị hành động")
     private String value; // gia tri tac dong
 
     @Enumerated(EnumType.STRING)

@@ -1,6 +1,6 @@
 package com.storyart.storyservice.common.constants;
 
-public enum PARAMETER_TYPES {
+public enum INFORMATION_TYPES {
     STRING, NUMBER
 }
 

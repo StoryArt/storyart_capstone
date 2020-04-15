@@ -1,6 +1,5 @@
 package com.storyart.storyservice.dto.read_story;
 
-import com.storyart.storyservice.common.constants.PARAMETER_TYPES;
 import com.storyart.storyservice.model.InfoCondition;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
