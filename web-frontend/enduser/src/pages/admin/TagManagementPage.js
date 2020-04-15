@@ -252,10 +252,6 @@ class TagManagementPage extends React.Component {
         <MDBContainer>
           <MDBCard>
             <MDBRow type="flex" justify="start">
-              <MDBCol span={21}>
-                <h1>Thẻ</h1>
-                <h3>Quản Lí Thẻ</h3>
-              </MDBCol>
             </MDBRow>
             <br />
             <br />
