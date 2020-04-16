@@ -52,7 +52,7 @@ public class User extends DateAudit {
     @Size(max = 300, message = "Thông tin giới thiệu có độ dài tối đa là 300 ký tự!")
     @Column(length = 300)
     private String introContent;
-    private boolean isActive;
+    private boolean isActive; 
 
     @Email(message = "Email không đúng định dạng. Vui lòng nhập lại email")
     @NotBlank(message = "Email không được để trống")
