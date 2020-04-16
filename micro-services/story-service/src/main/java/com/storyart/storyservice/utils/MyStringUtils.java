@@ -1,5 +1,7 @@
 package com.storyart.storyservice.utils;
 
+import org.springframework.util.StringUtils;
+
 import java.util.Random;
 import java.util.UUID;
 
@@ -10,15 +12,8 @@ public class MyStringUtils {
         return uuid.toString();
     }
 
-    public static String randomString(int max, int min){
-        String str = "abcdefghi jklmnop qrstuvwxyz";
-        Random r = new Random();
-        int l = r.nextInt((max - min) + 1) + min;
-        String value = "";
-        for(int i = 0; i <= l; i++){
-            int index = r.nextInt(str.length());
-            value += str.charAt(index);
-        }
-        return value;
+    public static String removeHtmlTags(String html){
+        if(StringUtils.isEmpty(html)) return "";
+        return html.replaceAll("\\<[^>]*>","").trim();
     }
 }

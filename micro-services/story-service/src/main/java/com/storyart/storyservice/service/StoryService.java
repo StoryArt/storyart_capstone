@@ -159,6 +159,12 @@ class StoryServiceImpl implements StoryService {
             CreateStoryInformationDto informationDto = storyDto.getInformations().size() > 0 ? storyDto.getInformations().get(0) : null;
             List<String> screenIds = storyDto.getScreens().stream().map(s -> s.getId()).collect(Collectors.toList());
 
+            //check first screen exist
+            if(!screenIds.contains(storyDto.getFirstScreenId())){
+                errors.put("FIRST_SCREEN_ID", "Chưa có màn hình đầu tiên cho truyện");
+                return errors;
+            }
+
             //check story information
             if(storyDto.getInformations().size() > 1){
                 errors.put("INFORMATION", "Chỉ được thêm 1 thông tin cho truyện");
@@ -210,33 +216,33 @@ class StoryServiceImpl implements StoryService {
                 }
             }
 
-
-            //check first screen exist
-            if(!screenIds.contains(storyDto.getFirstScreenId())){
-                errors.put("FIRST_SCREEN_ID", "Chưa có màn hình đầu tiên cho truyện");
-                return errors;
-            }
-
             //check all screens
             for(CreateStoryScreenDto screen: storyDto.getScreens()){
-                screen.getActions().stream().forEach(a -> {
-                    if(a.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())){
-                        if(!screenIds.contains(a.getValue())){
-                            errors.put("NEXT_SCREEN_ACTION", "Chưa có màn hình kế tiếp cho hành động chuyển màn hình");
+                String content = MyStringUtils.removeHtmlTags(screen.getContent());
+                if(StringUtils.isEmpty(content)){
+                    errors.put("SCREEN_CONTENT", "Nội dung màn hình không được để trống");
+                } else {
+                    //check all actions of curent screen
+                    screen.getActions().stream().forEach(a -> {
+                        if(a.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())){
+                            if(!screenIds.contains(a.getValue())){
+                                errors.put("NEXT_SCREEN_ACTION", "Chưa có màn hình kế tiếp cho hành động chuyển màn hình");
+                            }
+                        } else if(a.getType().equals(ACTION_TYPES.UPDATE_INFORMATION.toString())){
+                            if(!screenIds.contains(a.getNextScreenId())){
+                                errors.put("UPDATE_INFORMATION_ACTION", "Chưa có màn hình kế tiếp cho hành động cập nhật thông tin");
+                            } else if(storyDto.getInformations().size() == 0){
+                                errors.put("UPDATE_INFORMATION_ACTION", "Truyện chưa có thông tin!");
+                            }
+                        } else if(a.getType().equals(ACTION_TYPES.REDIRECT.toString())){
+                            if(StringUtils.isEmpty(a.getValue())){
+                                errors.put("REDIRECT_ACTION", "Chưa có đường dẫn cho hành động đi tới đường dẫn");
+                            }
                         }
-                    } else if(a.getType().equals(ACTION_TYPES.UPDATE_INFORMATION.toString())){
-                        if(!screenIds.contains(a.getNextScreenId())){
-                            errors.put("UPDATE_INFORMATION_ACTION", "Chưa có màn hình kế tiếp cho hành động cập nhật thông tin");
-                        } else if(storyDto.getInformations().size() == 0){
-                            errors.put("UPDATE_INFORMATION_ACTION", "Truyện chưa có thông tin!");
-                        }
-                    } else if(a.getType().equals(ACTION_TYPES.REDIRECT.toString())){
-                        if(StringUtils.isEmpty(a.getValue())){
-                            errors.put("REDIRECT_ACTION", "Chưa có đường dẫn cho hành động đi tới đường dẫn");
-                        }
-                    }
-                });
-                if(errors.size() > 0) break;
+                    });
+                }
+
+                if(errors.size() > 0) return errors;
             }
         }
         return errors;

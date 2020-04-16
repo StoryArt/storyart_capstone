@@ -99,10 +99,11 @@ public class JwtAuthenticationController {
         if (userService.findByUsername(signUpRequest.getUsername()) != null) {
             throw new BadCredentialsException("Tên đăng nhập  này đã được đăng ký bởi ai đó!");
         }
+
         if (userService.findByEmail(signUpRequest.getEmail()) != null) {
             throw new BadRequestException("Email này đã được đăng ký bởi người khác");
-
         }
+
         User user = new User();
         user.setActive(true);
         user.setUsername(signUpRequest.getUsername());
@@ -128,6 +129,7 @@ public class JwtAuthenticationController {
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("api/v1/user/username")
                 .buildAndExpand(savedUser.getUsername()).toUri();
+
         return ResponseEntity.created(location).body(new ApiResponse(true, "Đăng ký thành công!"));
 
     }
