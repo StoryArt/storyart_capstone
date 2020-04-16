@@ -16,7 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class ScreenReadingTime {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private int duration;
     private String screenId;
