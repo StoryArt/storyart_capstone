@@ -151,10 +151,14 @@ class StoryServiceImpl implements StoryService {
     @Override
     public HashMap<String, String> validateStoryinfo(CreateStoryDto storyDto) {
         HashMap<String, String> errors = new HashMap<>();
+        String storyIntro = MyStringUtils.removeHtmlTags(storyDto.getIntro());
+
         if(storyDto.getTags().size() == 0){
             errors.put("TAGS", "Chưa gắn thẻ cho truyện");
         } else if(storyDto.getScreens().size() == 0){
             errors.put("SCREENS", "Chưa có màn hình cho truyện");
+        } else if(storyIntro.length() < 10){
+            errors.put("STORY_INTRO", "Nội dung giói thiệu truyện phải ít nhất 10 kí tự");
         } else {
             CreateStoryInformationDto informationDto = storyDto.getInformations().size() > 0 ? storyDto.getInformations().get(0) : null;
             List<String> screenIds = storyDto.getScreens().stream().map(s -> s.getId()).collect(Collectors.toList());
@@ -219,8 +223,8 @@ class StoryServiceImpl implements StoryService {
             //check all screens
             for(CreateStoryScreenDto screen: storyDto.getScreens()){
                 String content = MyStringUtils.removeHtmlTags(screen.getContent());
-                if(StringUtils.isEmpty(content)){
-                    errors.put("SCREEN_CONTENT", "Nội dung màn hình không được để trống");
+                if(content.length() < 10){
+                    errors.put("SCREEN_CONTENT", "Nội dung màn hình phải có tối thiểu 10 kí tự");
                 } else {
                     //check all actions of curent screen
                     screen.getActions().stream().forEach(a -> {
