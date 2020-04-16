@@ -16,7 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class ClickLink {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private int storyId;
     private String link;
