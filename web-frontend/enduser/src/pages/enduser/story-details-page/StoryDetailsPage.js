@@ -23,6 +23,7 @@ import { getAuthUserInfo } from '../../../config/auth';
 import MyRating from '../../../components/common/MyRating';
 import MyAlert from '../../../components/common/MyAlert';
 import SocialShare from '../../../components/common/SocialShare';
+import { TextField } from '@material-ui/core';
 
 const StoryDetailsPage = (props) => {
 
@@ -550,12 +551,21 @@ const StoryDetailsPage = (props) => {
                                 </div>
                                 <form onSubmit={e => { e.preventDefault(); sendComment(); }}>
                                     <div className="form-group">
-                                        <textarea
+                                    <TextField 
+                                        multiline
+                                        variant="outlined"
+                                        rows="3"
+                                        style={{ width: '100%' }}
+                                        label="Bình luận..."
+                                        value={commentContent}
+                                        onChange={e => setCommentContent(e.target.value)} />
+                                                           
+                                        {/* <textarea
                                             className="form-control"
                                             rows="1"
                                             placeholder="Bình luận..."
                                             value={commentContent}
-                                            onChange={e => setCommentContent(e.target.value)}></textarea>
+                                            onChange={e => setCommentContent(e.target.value)}></textarea> */}
                                     </div>
                                     <button className="btn btn-success float-right" type="submit">Gửi</button>
                                 </form>
