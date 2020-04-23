@@ -407,7 +407,17 @@ const UserHistoryPage = () => {
 
                         {reactions.map((reaction, index) => (
                             <div className="clearfix" key={reaction.id}>
-                                Bạn đã <strong>{reaction.type}</strong> bình luận của <Link target="_blank" to={`/user/profile/${reaction.commentOwnerId}`}><strong>{reaction.commentOwnerName}</strong></Link> trong truyện <Link target="_blank"
+                                Bạn đã <strong>{reaction.type}</strong> bình luận của
+                                {reaction.commentOwnerId !== userInfo.id &&
+                                    <Link target="_blank" to={`/user/profile/${reaction.commentOwnerId}`}>
+                                        <strong> {reaction.commentOwnerName} </strong></Link>
+                                }
+                                {reaction.commentOwnerId === userInfo.id &&
+                                    <Link target="_blank" to={`/user/my-profile/`}>
+                                        <strong> {reaction.commentOwnerName} </strong></Link>
+                                }
+
+                                    trong truyện <Link target="_blank"
                                     to={`/stories/details/${reaction.storyId}`}>
                                     <strong>{reaction.storyName}</strong>:</Link>
                                 <div>
