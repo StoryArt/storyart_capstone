@@ -490,8 +490,8 @@ const CreateStoryPage = (props) => {
                                                         <div className="">
                                                             <div>
                                                                 <label 
-                                                                    for="files" 
-                                                                    class="btn btn-block">Chọn ảnh</label>
+                                                                    htmlFor="files" 
+                                                                    className="btn btn-block">Chọn ảnh</label>
                                                                 <input 
                                                                     id="files" 
                                                                     style={{ visibility:"hidden" }} 
