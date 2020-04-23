@@ -15,7 +15,7 @@ import StoryService from '../../../services/story.service';
 import ValidationUtils from '../../../utils/validation';
 
 import NotFound from '../../../components/common/NotFound';
-    import MySpinner from '../../../components/common/MySpinner';
+import MySpinner from '../../../components/common/MySpinner';
 import TagList from '../../../components/common/TagList';
 import StringUtils from '../../../utils/string';
 
@@ -33,6 +33,7 @@ const StoryDetailsPage = (props) => {
     const [isLoadingStory, setIsLoadingStory] = useState(false);
     const [alert, setAlert] = useState({ open: false, type: 'success', content: '' })
     const [rating, setRating] = useState({})
+    const [userIsDeactivated, setUserIsDeactivated] = useState(false);
 
 
     const [modalState, setModalState] = useState({
@@ -67,7 +68,7 @@ const StoryDetailsPage = (props) => {
         commentId: 0,
         content: ''
     });
-    
+
     const [reportCommentModalInfo, setReportCommentModalInfo] = useState({
         userName: '',
         comment: '',
@@ -401,9 +402,12 @@ const StoryDetailsPage = (props) => {
                 setStoryNotfound(true);
             } else {
                 setStory(res.data);
-                if(!ValidationUtils.isEmpty(userInfo)){
+                if (!ValidationUtils.isEmpty(userInfo)) {
                     getRatingByStoryAndUser(res.data.id);
                 }
+            }
+            if (res.data.user.deactiveByAdmin) {
+                setUserIsDeactivated(true);
             }
         } catch (error) {
             console.log(error);
@@ -412,7 +416,7 @@ const StoryDetailsPage = (props) => {
     }
 
     const [reportStoryContent, setReportStoryContent] = useState('');
-   
+
     const reportStory = async () => {
         try {
             const { storyId } = props.match.params;
@@ -451,8 +455,8 @@ const StoryDetailsPage = (props) => {
     }
 
     const rateStory = async (stars) => {
-        if(ValidationUtils.isEmpty(userInfo)) return;
-        if(ValidationUtils.isEmpty(stars)) return;
+        if (ValidationUtils.isEmpty(userInfo)) return;
+        if (ValidationUtils.isEmpty(stars)) return;
         try {
             const res = await StoryService.rateStory(story.id, stars);
             const { success, errors, data } = res.data;
@@ -488,7 +492,7 @@ const StoryDetailsPage = (props) => {
             <div className="container-fluid">
                 {isLoadingStory && (<MySpinner />)}
 
-                {(!storyNotfound && !isLoadingStory && !ValidationUtils.isEmpty(story)) && (
+                {(!storyNotfound && !isLoadingStory && !ValidationUtils.isEmpty(story) && !userIsDeactivated) && (
                     <>
                         <div className="row">
                             <div className="col-sm-3">
@@ -517,8 +521,8 @@ const StoryDetailsPage = (props) => {
                                     <h4>
                                         <Link to={`/user/profile/${story.user.id}`}>
                                             {/* <PersonIcon />   */}
-                                            <img src={story.user.avatar} style={{ width: '30px', height: '30px' }}/>
-                                             {' ' + story.user.name}
+                                            <img src={story.user.avatar} style={{ width: '30px', height: '30px' }} />
+                                            {' ' + story.user.name}
                                         </Link>
                                     </h4>
                                 )}
@@ -742,6 +746,7 @@ const StoryDetailsPage = (props) => {
 
                 )}
                 {storyNotfound && <NotFound message="Không tìm thấy câu truyện này" />}
+                {userIsDeactivated && <NotFound message="Không tìm thấy câu truyện này" />}
                 <MyAlert
                     open={alert.open}
                     setOpen={(open) => setAlert({ ...alert, open: open })}
