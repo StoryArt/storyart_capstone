@@ -364,9 +364,6 @@ const UserHistoryPage = () => {
                             </div>
                         }
 
-
-
-
                     </MDBTabPane>
 
                     <MDBModal isOpen={modalState.deleteModal} toggle={toggleModal('deleteModal')}>
@@ -398,7 +395,7 @@ const UserHistoryPage = () => {
                         <MDBModalFooter>
                             <MDBBtn color='success' onClick={toggleModal('editModal')}>
                                 Hủy
-                    </MDBBtn>
+                            </MDBBtn>
                             <MDBBtn color='warning' onClick={updateComment}>Chỉnh sửa</MDBBtn>
                         </MDBModalFooter>
                     </MDBModal>

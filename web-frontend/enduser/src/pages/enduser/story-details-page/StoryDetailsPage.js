@@ -520,7 +520,7 @@ const StoryDetailsPage = (props) => {
                                 <h2 className="font-weight-bold">{story.title}</h2>
                                 {!ValidationUtils.isEmpty(story.user) && (
                                     <h4>
-                                        <Link to={`/user/profile/${story.user.id}`}>
+                                        <Link style={{ fontWeight: 'bold' }} to={`/user/profile/${story.user.id}`}>
                                             {/* <PersonIcon />   */}
                                             <img 
                                                 src={story.user.avatar} 
@@ -611,15 +611,15 @@ const StoryDetailsPage = (props) => {
                                 </div>
                                 {/* danh sach binh luan */}
                                 {comments.map((comment, index) => (
-                                    <div className="row mb-3" key={comment.id}>
-                                        <div className="col-1">
-                                            <img className="img-fluid comment-avatar"
+                                        <div className="row mb-3 px-3" key={comment.id}>
+                                        <div className="float-left" style={{ minWidth: '60px' }}>
+                                            <img className="comment-avatar"
                                                 onClick={() => props.history.push(`/user/profile/${comment.userId}`)}
                                                 src={comment.userAvatarUrl} />
                                         </div>
-                                        <div className="col-11 px-0">
+                                        <div className="">
                                             <small>
-                                                <strong className="mr-3">{comment.username}</strong>
+                                                <strong className="mr-3" style={{ fontSize: '1.2em' }}>{comment.username}</strong>
                                                 <span>{moment(comment.createdAt).format('HH:mm DD/MM/YYYY')}</span>
                                             </small>
                                             <p>{comment.content}
@@ -643,29 +643,29 @@ const StoryDetailsPage = (props) => {
                                                 <span className="dislikes-count"> {comment.dislikes.length}</span>
                                             </span>
                                             {userId !== comment.userId &&
-                                                <button type="button" className="btn btn-danger" onClick={toggleModal('reportModal', comment.id, index, comment.username, comment.content)}>
-                                                    <i className="far fa-flag" ></i>
+                                                <button type="button" className="btn btn-danger rounded-circle" onClick={toggleModal('reportModal', comment.id, index, comment.username, comment.content)}>
+                                                    <i className="far fa-flag small" ></i>
                                                 </button>
                                             }
                                             {userId === comment.userId &&
-                                                <button type="button" className="btn btn-warning" onClick={toggleModal('editModal', comment.id, index)}>
-                                                    <i className="far fa-edit" ></i>
+                                                <button type="button" className="btn btn-warning rounded-circle" onClick={toggleModal('editModal', comment.id, index)}>
+                                                    <i className="far fa-edit small" ></i>
                                                 </button>
 
                                             }
                                             {userId === comment.userId &&
-                                                <button type="button" className="btn btn-warning" onClick={toggleModal('deleteModal', comment.id, index)}>
-                                                    <i className="far fa-trash-alt" ></i>
+                                                <button type="button" className="btn btn-warning rounded-circle" onClick={toggleModal('deleteModal', comment.id, index)}>
+                                                    <i className="far fa-trash-alt small" ></i>
                                                 </button>
                                             }
 
                                         </div>
                                         <hr />
                                     </div>
-                                ))}
+                               ))}
                                 {comments.length < 1 &&
                                     <div className="text-center mt-4">
-                                        <small>Truyện chưa có bình luận, hãy để lại một bình luận nhé.</small>
+                                        Truyện chưa có bình luận, hãy để lại một bình luận nhé.
                                     </div>
                                 }
                                 <MDBModal isOpen={modalState.editModal} toggle={toggleModal('editModal')}>
