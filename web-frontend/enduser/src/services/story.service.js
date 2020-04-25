@@ -75,11 +75,6 @@ class StoryService {
     return axios.get(url);
   }
 
-  
-  static async updateStoryImage({ storyId, image }) {
-    const url = baseUrl + `/upload_story_image?storyId=${storyId}&image=${image}`;
-    return axios.put(url);
-  }
 
   static async getStoryDetails(storyId) {
     const url = baseUrl + "/public/" + storyId;

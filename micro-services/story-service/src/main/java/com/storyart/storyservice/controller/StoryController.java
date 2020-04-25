@@ -81,25 +81,12 @@ public class StoryController {
         return new ResponseEntity(rating, HttpStatus.OK);
     }
 
-    @PutMapping("public/increase-read")
-    public ResponseEntity increaseStoryRead(@RequestParam int storyId){
-        ResultDto result = storyService.increaseStoryRead(storyId);
-        return new ResponseEntity(result, HttpStatus.OK);
-    }
 
     @PutMapping("rate")
     public ResponseEntity rateStory(@RequestParam int storyId,
                                     @RequestParam double stars,
                                     @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.rateStory(storyId, userPrincipal.getId(), stars);
-        return new ResponseEntity(result, HttpStatus.OK);
-    }
-
-    @PutMapping("upload_story_image")
-    public ResponseEntity uploadStoryImage(@RequestParam int storyId,
-                                    @RequestParam String image,
-                                    @CurrentUser UserPrincipal userPrincipal){
-        ResultDto result = storyService.updateStoryImage(storyId, userPrincipal.getId(), image);
         return new ResponseEntity(result, HttpStatus.OK);
     }
 

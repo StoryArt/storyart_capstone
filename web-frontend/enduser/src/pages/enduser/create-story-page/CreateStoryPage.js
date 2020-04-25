@@ -334,7 +334,6 @@ const CreateStoryPage = (props) => {
              if(res.data.status == 200){
                 story.image = res.data.data.link;
                 setStory({ ...story });
-                //  const res = await StoryService.updateStoryImage(res.data.id, imageLink);
              }
             } catch (error) {
                 console.log(error);
@@ -461,6 +460,7 @@ const CreateStoryPage = (props) => {
                                                                     label="Tiêu đề truyện..."
                                                                     value={story.title} 
                                                                     onChange={(e) => changeStory('title', e.target.value)} />
+                                                           
                                                             </div>
                                                             <div className='col-sm-6'>
                                                                 <ScreensSelect

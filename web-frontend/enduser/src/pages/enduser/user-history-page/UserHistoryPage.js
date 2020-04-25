@@ -49,6 +49,8 @@ const UserHistoryPage = () => {
     const [histories, setHistories] = useState([]);
     const [historyPageNo, setHistoryPageNo] = useState(1);
     const [isLastHistoryPage, setIsLastHistoryPage] = useState(true);
+    const [modalError, setModalError] = useState('');
+
     const getReadingHistory = async () => {
         if (userInfo !== null) {
             setHistoryLoading(true);
@@ -74,6 +76,7 @@ const UserHistoryPage = () => {
             setHistoryLoading(false);
         }
     }
+
     const deleteComment = async () => {
         if (userInfo !== null) {
             try {
@@ -101,6 +104,7 @@ const UserHistoryPage = () => {
         closeAlert();
 
     }
+
     const deleteReaction = async () => {
         if (userInfo !== null) {
             try {
@@ -127,7 +131,7 @@ const UserHistoryPage = () => {
         }
         closeAlert();
     }
-    const [modalError, setModalError] = useState('');
+   
     const updateComment = async () => {
         if (userInfo !== null) {
             try {
@@ -152,7 +156,6 @@ const UserHistoryPage = () => {
         }
         closeAlert();
     }
-
 
     const [updateCommentRequest, setUpdateCommentRequest] = useState({
         content: '',
@@ -260,10 +263,6 @@ const UserHistoryPage = () => {
             }
             setDeleteRequest({ ...deleteRequest, commentId: commentIdSpec });
         }
-
-
-
-
     }
 
     return (

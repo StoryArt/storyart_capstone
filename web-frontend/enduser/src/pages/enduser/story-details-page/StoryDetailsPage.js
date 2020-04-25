@@ -23,7 +23,7 @@ import { getAuthUserInfo } from '../../../config/auth';
 import MyRating from '../../../components/common/MyRating';
 import MyAlert from '../../../components/common/MyAlert';
 import SocialShare from '../../../components/common/SocialShare';
-import { TextField } from '@material-ui/core';
+import { TextField, Paper } from '@material-ui/core';
 
 const StoryDetailsPage = (props) => {
 
@@ -517,28 +517,34 @@ const StoryDetailsPage = (props) => {
                                 </div>
                             </div>
                             <div className="col-sm-9">
-                                <h3 className="font-weight-bold">{story.title}</h3>
+                                <h2 className="font-weight-bold">{story.title}</h2>
                                 {!ValidationUtils.isEmpty(story.user) && (
                                     <h4>
                                         <Link to={`/user/profile/${story.user.id}`}>
                                             {/* <PersonIcon />   */}
-                                            <img src={story.user.avatar} style={{ width: '30px', height: '30px' }} />
+                                            <img 
+                                                src={story.user.avatar} 
+                                                style={{ width: '30px', height: '30px', borderRadius: '50%' }} />
                                             {' ' + story.user.name}
                                         </Link>
                                     </h4>
                                 )}
-                                <strong style={{ fontSize: '1.2em', color: 'orange' }}>Điểm trung bình: {story.avgRate}</strong>
-                                <div>
-                                    <strong>Lượt đánh giá: </strong>{story.numOfRate}
-                                </div>
-                                <div>
-                                    <strong>Lượt đọc: </strong>{story.numOfRead}
-                                </div>
-                                <div className="my-3">
-                                    <strong>Giới thiệu</strong>
-                                    <p>{StringUtils.parseHtml(story.intro)}</p>
-                                </div>
-                                <strong>Tags:</strong> <TagList tags={story.tags} />
+                                <Paper
+                                    style={{ padding:'20px' }}
+                                >
+                                    <strong style={{ fontSize: '1.2em', color: 'orange' }}>Điểm trung bình: {story.avgRate}</strong>
+                                    <div>
+                                        <strong>Lượt đánh giá: </strong>{story.numOfRate}
+                                    </div>
+                                    <div>
+                                        <strong>Lượt đọc: </strong>{story.numOfRead}
+                                    </div>
+                                    <div className="my-3">
+                                        <strong>Giới thiệu</strong>
+                                        <p>{StringUtils.parseHtml(story.intro)}</p>
+                                    </div>
+                                    <strong>Tags:</strong> <TagList tags={story.tags} />
+                                </Paper>
                                 <div className="my-3">
                                     <strong>Đánh giá truyện:</strong>
                                     <br />
@@ -606,11 +612,12 @@ const StoryDetailsPage = (props) => {
                                 {/* danh sach binh luan */}
                                 {comments.map((comment, index) => (
                                     <div className="row mb-3" key={comment.id}>
-                                        <div className="col-1 px-0">
-                                            <img className="img-fluid"
+                                        <div className="col-1">
+                                            <img className="img-fluid comment-avatar"
+                                                onClick={() => props.history.push(`/user/profile/${comment.userId}`)}
                                                 src={comment.userAvatarUrl} />
                                         </div>
-                                        <div className="col-11">
+                                        <div className="col-11 px-0">
                                             <small>
                                                 <strong className="mr-3">{comment.username}</strong>
                                                 <span>{moment(comment.createdAt).format('HH:mm DD/MM/YYYY')}</span>

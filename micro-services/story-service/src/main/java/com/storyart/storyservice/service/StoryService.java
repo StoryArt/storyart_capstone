@@ -33,8 +33,6 @@ public interface StoryService {
 
     GetStoryDto getStoryDetails(int id);
 
-    List<GetStoryDto> getStoriesByUserId(int userId);
-
     ResultDto getReadingStory(int storyId);
 
     ResultDto createStory(CreateStoryDto story, int userId);
@@ -57,10 +55,6 @@ public interface StoryService {
     ResultDto deleteStory(int storyId, int userId);
 
     ResultDto changePublishedStatus(int storyId, int userId, boolean turnOnPublished);
-
-    ResultDto updateStoryImage(int storyId, int userId, String imageUrl);
-
-    ResultDto increaseStoryRead(int storyId);
 
     ResultDto saveReadHistory(int storyId, int userId);
 
@@ -315,40 +309,6 @@ class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public ResultDto updateStoryImage(int storyId, int userId, String imageUrl) {
-        ResultDto result = new ResultDto();
-        Story story = storyRepository.findById(storyId).orElse(null);
-        result.setSuccess(false);
-        if(story == null){
-            result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
-        } else if(!story.isActive() || story.isDeactiveByAdmin()){
-            result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
-        } else if(story.getUserId() != userId){
-            result.getErrors().put("NOT_OWN", "Truyện này không thuộc về bạn");
-        } else {
-            story.setImage(imageUrl);
-            story = storyRepository.save(story);
-            result.setSuccess(true);
-            result.setData(story);
-        }
-        return result;
-    }
-
-    @Override
-    public ResultDto increaseStoryRead(int storyId) {
-        ResultDto result = new ResultDto();
-        result.setSuccess(true);
-        Story story = storyRepository.findById(storyId).orElse(null);
-        if (story != null) {
-            storyRepository.save(story);
-        } else {
-            result.setSuccess(false);
-            result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
-        }
-        return result;
-    }
-
-    @Override
     public ResultDto saveReadHistory(int storyId, int userId) {
         ResultDto result = new ResultDto();
         result.setSuccess(false);
@@ -427,18 +387,6 @@ class StoryServiceImpl implements StoryService {
         return result;
     }
 
-    @Override
-    public List<GetStoryDto> getStoriesByUserId(int userId) {
-        List<Story> stories = storyRepository.findAllByUserId(userId);
-        return stories.stream().map(s -> {
-            GetStoryDto dto = modelMapper.map(s, GetStoryDto.class);
-            List<Tag> tags = tagRepository.findAllByStoryId(dto.getId());
-            List<TagDto> tagDtoList = tagService.mapModelToDto(tags);
-            dto.setTags(tagDtoList);
-            dto.setNumOfRead(historyRepository.countAllByStoryId(s.getId()));
-            return dto;
-        }).collect(Collectors.toList());
-    }
 
     @Override
     public ResultDto getReadingStory(int storyId) {
