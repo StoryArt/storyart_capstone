@@ -52,6 +52,7 @@ class Dashboard1 extends React.Component {
       openBackdrop: false,
       timeScreenLoad: false,
       clickLoad: false,
+      reactLoad: false,
       permission: false,
       rating: [],
       ratinguser: 0,
@@ -121,18 +122,20 @@ class Dashboard1 extends React.Component {
     };
     // this.handleLoadReactStatic= this.handleLoadReactStatic.bind(this,6);
   }
-  // const [anchorEl, setAnchorEl] = React.useState(null);
 
   async componentDidMount() {
     setAuthHeader(localStorage.getItem("jwt-token"));
-
+    window.scrollTo(0, 0);
     console.log(
       "compoent did mount , get story summary set state and loading rating"
     );
     if (await this.checkOwner()) {
       const storyInfo = this.getStorySummary(this.sid);
+      await this.handleLoadReactStatic(5);
+      this.setState({ openBackdrop: false });
+
       this.loadRatingStatic();
-      this.handleLoadReactStatic(1);
+
       this.handleLoadScreenTime(1);
       this.handleLoadClickLink(1);
     }
@@ -154,12 +157,12 @@ class Dashboard1 extends React.Component {
   };
 
   async checkOwner() {
-    this.setState({ openBackdrop: true });
+    // this.setState({ openBackdrop: true });
     try {
       let isAllow = await Statistic.checkOwner(this.sid);
 
       // ko co quyen
-      this.setState({ openBackdrop: false });
+      // this.setState({ openBackdrop: false });
       if (!isAllow.data) {
         this.props.history.push("/notfound");
       }
@@ -168,7 +171,7 @@ class Dashboard1 extends React.Component {
       //co loi
       this.props.history.push("/notfound");
     }
-    this.setState({ openBackdrop: false });
+    // this.setState({ openBackdrop: false });
     this.props.history.push("/notfound");
     return false;
   }
@@ -178,14 +181,13 @@ class Dashboard1 extends React.Component {
       console.log("summary");
       console.log(this.state.story);
       let tags = "";
-      if(this.state.story.tags == null){
-
-      }else {
+      if (this.state.story.tags == null) {
+      } else {
         this.state.story.tags.map((x) => {
           tags = tags + x.title + ",";
         });
       }
-  
+
       this.setState({ tagString: tags });
     });
   }
@@ -356,6 +358,8 @@ class Dashboard1 extends React.Component {
   }
 
   async handleLoadReactStatic(daybefore) {
+    this.setState({ reactLoad: true });
+    this.setState({ anchorEl: null });
     console.log(daybefore);
     let now = new Date();
     let toDate = new Date();
@@ -365,7 +369,6 @@ class Dashboard1 extends React.Component {
     console.log(to);
     let fromDate = new Date();
     let from = "";
-    this.setState({ anchorEl: null });
     this.setState({ daybeforelabel: daybefore + " ngày qua" });
     fromDate.setDate(now.getDate() - daybefore);
 
@@ -390,7 +393,7 @@ class Dashboard1 extends React.Component {
       });
 
       // this.setState(...reactStatic);
-
+      this.setState({ reactLoad: false });
       //bam vao nut do. thi no vao ham nay, set moi reactStatic thoi
       console.log("du lieu react:");
       console.log(this.state.reactStatic);
@@ -494,6 +497,12 @@ class Dashboard1 extends React.Component {
       buttondate: {
         color: "#FFFFFF",
       },
+      spinner: {
+        height: "fit-content",
+        width: "fit-content",
+        float: "left",
+        marginLeft: "10px"
+      },
     };
 
     return (
@@ -521,22 +530,33 @@ class Dashboard1 extends React.Component {
               >
                 {this.state.story.title}
               </Typography>{" "}
-              <Button
-                variant="outlined"
-                style={{ color: "white", outlineColor: "#FFFFF" }}
-                aria-owns={this.state.anchorEl ? "simple-menu" : undefined}
-                aria-haspopup="true"
-                onClick={this.handleClick}
-              >
-                {this.state.daybeforelabel}
-              </Button>
+              <div style={{height:"50px"}}>
+                <Button
+                  endIcon={<ArrowDropDownIcon />}
+                  variant="outlined"
+                  style={{
+                    height: "40px",
+                    color: "white",
+                    outlineColor: "#FFFFFF",
+                    float: "left",
+                  }}
+                  aria-owns={this.state.anchorEl ? "simple-menu" : undefined}
+                  aria-haspopup="true"
+                  onClick={this.handleClick}
+                >
+                  {this.state.daybeforelabel}
+                </Button>
+                { (this.state.reactLoad &&
+                  <MySpinner className={theme.spinner} />
+                )}
+              </div>
               <div>
                 <Menu
                   style={{ borderRadius: "8px" }}
                   id="simple-menu"
                   anchorEl={this.state.anchorEl}
                   open={Boolean(this.state.anchorEl)}
-                  onClose={this.handleLoadReactStatic.bind(this, 1)}
+                  onClose={(e) => this.setState({ anchorEl: null })}
                 >
                   <MenuItem onClick={this.handleLoadReactStatic.bind(this, 1)}>
                     1 ngày qua
@@ -614,17 +634,17 @@ class Dashboard1 extends React.Component {
                     <Typography gutterBottom variant="h5" component="h2">
                       {this.state.story.title}
                     </Typography>
-                    <medium className="border-radius-4 bg-secondary text-white px-2 py-2px ">
+                    <small className="border-radius-4 bg-secondary text-white px-2 py-2px ">
                       {this.state.story.numOfScreen} màn
-                    </medium>
+                    </small>
                     {this.state.story.published ? (
-                      <medium className="border-radius-4 bg-primary text-white px-2 py-2px ">
+                      <small className="border-radius-4 bg-primary text-white px-2 py-2px ">
                         Đã xuất bản
-                      </medium>
+                      </small>
                     ) : (
-                      <medium className="border-radius-4 bg-secondary text-white px-2 py-2px ">
+                      <small className="border-radius-4 bg-secondary text-white px-2 py-2px ">
                         Chưa xuất bản
-                      </medium>
+                      </small>
                     )}
                     <Typography
                       noWrap={false}
@@ -679,12 +699,10 @@ class Dashboard1 extends React.Component {
                         {this.state.story.numOfRate}
                       </strong>{" "}
                       <StarIcon
-                        
-                        style={{ paddingBottom: "2px" ,color:"#ccc"}}
+                        style={{ paddingBottom: "2px", color: "#ccc" }}
                       ></StarIcon>
                       <strong style={{ color: "#b0b0b0", fontSize: "20px" }}>
-                        {
-                        this.state.story.avgRate}
+                        {this.state.story.avgRate}
                       </strong>
                     </h5>{" "}
                   </div>
@@ -755,7 +773,7 @@ class Dashboard1 extends React.Component {
                     id="simple-menu"
                     anchorEl={this.state.anchorE2}
                     open={Boolean(this.state.anchorE2)}
-                    onClose={this.handleLoadScreenTime.bind(this, 1)}
+                    onClose={(e) => this.setState({ anchorE2: null })}
                   >
                     <MenuItem onClick={this.handleLoadScreenTime.bind(this, 1)}>
                       1 ngày qua
@@ -814,7 +832,7 @@ class Dashboard1 extends React.Component {
                     id="simple-menu"
                     anchorEl={this.state.anchorE3}
                     open={Boolean(this.state.anchorE3)}
-                    onClose={this.handleLoadClickLink.bind(this, 1)}
+                    onClose={(e) => this.setState({ anchorE3: null })}
                   >
                     <MenuItem onClick={this.handleLoadClickLink.bind(this, 1)}>
                       1 ngày qua

@@ -496,8 +496,6 @@ const UserManagementPage = () => {
         small
         data={data}
         noRecordsFoundLabel="Chưa có dữ liệu"
-        entriesLabel
-        infoLabel
         searching={false}
         paging={false}
       /> 

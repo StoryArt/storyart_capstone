@@ -18,7 +18,7 @@ const defaultOption = {
     backgroundColor: "rgb(51, 51, 51)",
     textStyle: { color: "#fff" },
     height: "50px",
-    top: "20px",
+    top: "1px",
     data:['Lượt xem','Bình luận','Click vào link','Hoàn thành']   },
   tooltip: {
     show: true,
