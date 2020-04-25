@@ -16,6 +16,7 @@ import ScreenShow from '../../../components/common/ScreenShow';
 import SocialShare from '../../../components/common/SocialShare';
 import MyFullScreenShowWrapper from '../../../components/common/MyFullScreenShowWrapper';
 import ReadingHistoryService from '../../../services/reading_history.service';
+import MyBackdrop from '../../../components/common/MyBackdrop';
 
 
 let readingScreenDuration = 0;
@@ -53,6 +54,7 @@ const ReadStoryPage = (props) => {
     const [notfound, setNotfound] = useState(false);
     const [isFullScreen, setFullScreen] = useState(false);
     const [isPublished, setPublished] = useState(true);
+    const [openBackdrop, setOpenBackdrop] = useState(false);
 
     const [currentScreen, setCurrentScreen] = useState({});
     const [showScreen, setShowScreen] = useState(false);
@@ -169,6 +171,7 @@ const ReadStoryPage = (props) => {
 
     const getReadingStory = async (storyId) => {
         setIsLoading(true);
+        setOpenBackdrop(true);
         try {
             const res = await StoryService.getReadingStory(storyId);    
            
@@ -192,6 +195,7 @@ const ReadStoryPage = (props) => {
         } catch (error) {
             console.log(error);
         }
+        setOpenBackdrop(false);
         setIsLoading(false);
     }
 
@@ -339,7 +343,8 @@ const ReadStoryPage = (props) => {
             
             )}
            
-           { isLoading && <MySpinner/> }
+           {/* { isLoading && <MySpinner/> } */}
+           <MyBackdrop open={openBackdrop} setOpen={setOpenBackdrop}/>
         
         </>
     );

@@ -15,6 +15,20 @@ class DateTimeUtils{
             return 'Chưa xác định';
         }
     }
+
+    static ten = val => (val >= 10) ? val : '0' + val;
+
+    static formatStatisticDate(str){
+
+        try {
+            const d = new Date(str);
+            console.log(d);
+            console.log(d.getMonth());
+            return d.getFullYear() + '-' + DateTimeUtils.ten(d.getMonth() + 1) + '-' + DateTimeUtils.ten(d.getDate());
+        } catch (error) {
+            return '';
+        }
+    }
 }
 
 export default DateTimeUtils;

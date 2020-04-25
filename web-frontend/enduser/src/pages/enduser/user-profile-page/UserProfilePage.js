@@ -54,6 +54,7 @@ const UserProfilePage = (props) => {
   const [totalPages, setTotalPages] = useState(0);
   const [dateRange, setDateRange] = useState({ from: getDateAgo(7), to: new Date() });
   const [readingStatisticData, setReadingStatisticData] = useState([]);
+  const [isLoadingreadingStatisticData, setLoadingReadingStatisticData] = useState(false);
   const [filters, setFilters] = useState({
     keyword: '',
     orderBy: 'avg_rate',
@@ -80,22 +81,27 @@ const UserProfilePage = (props) => {
   const getReadStatistic = async (dateRange) => {
     if(ValidationUtils.isEmpty(dateRange)) dateRange = { from: getDateAgo(7), to: new Date() };
     let { from, to } = dateRange;
-    
+    if(from > to){
+      setReadingStatisticData([]);
+      return; 
+    }
+
     from = from.toLocaleDateString();
     to = to.toLocaleDateString();
-    console.log(from);
-    console.log(to);
+    
+    setLoadingReadingStatisticData(true);
     try {
       const res = await StatisticService.getReadStatisticsOfUser(from, to);
       const { data, success, errors } = res.data;
       
       if(success){
-        console.log(data);
-        setReadingStatisticData(data);
+        const formatedData = formatStatisticData(from, to, data);
+        setReadingStatisticData(formatedData);
       }
     } catch (error) {
       console.log(error);
     }
+    setLoadingReadingStatisticData(false);
   }
 
   const getStoriesByAuthor = async () => {
@@ -218,6 +224,24 @@ const UserProfilePage = (props) => {
     setDialog({ ...dialog, open: false });
   }
 
+  const formatStatisticData = (from, to, data) => {
+    let arr = [];
+    from = new Date(from);
+    to = new Date(to);
+    
+    while(from <= to){
+      let dateCreatedVal = DateTimeUtils.formatStatisticDate(from);
+      arr.push(dateCreatedVal);
+      from = new Date(from.setDate(from.getDate() + 1));
+    }    
+    return arr.map(dateCreated => {
+      const foundItem = data.find(item => item.dateCreated == dateCreated);
+      const readCount = foundItem == null ? 0 : foundItem.readCount
+      return { dateCreated, readCount };
+    })
+  }
+
+
   const changeDateRange = (prop, value) => {
     setDateRange({ ...dateRange, [prop]: value });
     getReadStatistic({ ...dateRange, [prop]: value });
@@ -249,6 +273,11 @@ const UserProfilePage = (props) => {
                       setDate={(value) => changeDateRange('to', value)}
                       label="Đến ngày"
                     />
+                    {isLoadingreadingStatisticData && (
+                      <div className="my-3">
+                        <MySpinner/>
+                      </div>
+                    )}
                     <UserReadingChart
                       data={readingStatisticData.map(item => ({ ...item, name: 'Lượt đọc' }))}
                       dataKeyName="dateCreated"
@@ -328,7 +357,12 @@ const UserProfilePage = (props) => {
 
                   <div className="row mb-5">
                     <div className="col-12">
-                    <TableContainer component={Paper} >
+                      {isLoadingstories && (
+                        <div className="text-center mb-3">
+                          <MySpinner/>
+                        </div>
+                      ) }
+                      <TableContainer component={Paper} >
                         <Table>
                           <caption>Tất cả truyện</caption>
                           <TableHead>
@@ -349,7 +383,8 @@ const UserProfilePage = (props) => {
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            { stories.map((story, index) => (
+                          
+                            { stories.length > 0 && stories.map((story, index) => (
                               <TableRow key={story.id}>
                                 <TableCell align="center">{ index + 1}</TableCell>
                                 <TableCell align="center">{ story.title }</TableCell>
@@ -402,6 +437,8 @@ const UserProfilePage = (props) => {
                                 </TableCell>
                               </TableRow>
                             ))}
+                            {stories.length === 0 && !isLoadingstories (<NotFound message="Không tìm thấy truyện" />)}
+                           
                           </TableBody>
                         </Table>
                       </TableContainer>

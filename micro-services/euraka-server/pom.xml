@@ -51,6 +51,7 @@
 	</dependencyManagement>
 
 	<build>
+		<finalName>storyart_eureka</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
