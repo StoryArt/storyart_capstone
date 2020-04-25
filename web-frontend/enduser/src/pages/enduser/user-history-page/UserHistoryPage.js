@@ -58,7 +58,7 @@ const UserHistoryPage = () => {
                 var array = [...histories];
                 if (array.length > 1) {
                     setHistoryPageNo(historyPageNo + 1);
-                    const res = await ReadingHistoryService.getReadingHistory(userInfo.id, commentPageNo + 1);
+                    const res = await ReadingHistoryService.getReadingHistory(userInfo.id, historyPageNo + 1);
 
                     res.data.content.forEach(element => {
                         setHistories(histories => [...histories, element]);
@@ -131,7 +131,7 @@ const UserHistoryPage = () => {
         }
         closeAlert();
     }
-   
+
     const updateComment = async () => {
         if (userInfo !== null) {
             try {
