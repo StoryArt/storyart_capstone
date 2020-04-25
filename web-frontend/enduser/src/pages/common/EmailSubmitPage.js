@@ -12,6 +12,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import MySpinner from '../../components/common/MySpinner';
+import { MDBAlert } from "mdbreact";
+
 
 
 
@@ -71,7 +73,7 @@ setErrorMessage("Bạn sẽ sớm nhận được một email hướng dẫn .
       //   content: err,
       //   open: true
       // });
-      setErrorMessage(err)
+      setErrorMessage(<MDBAlert color="danger">{err}</MDBAlert>)
       
     closeAlert();
   }

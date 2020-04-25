@@ -56,6 +56,7 @@ const useStyles = makeStyles((theme) => ({
     padding:"2px 5px",
     borderRadius:"10px",
       textTransform: 'lowercase',
+      "&:focus": {outline:0},
 
     "&:hover": {
       backgroundColor: "#53825e",
@@ -71,6 +72,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize:"11px",
     borderRadius:"10px",
 
+    "&:focus": {outline:0},
 
     padding:"2px 2px",
     
@@ -233,6 +235,12 @@ const UserManagementPage = () => {
    
 
     const res = await UserService.setStatusUser(userId, status).then((res) => {
+      setAlert({
+        open: true,
+        content: res.data.message,
+        type: "success",
+      });
+      closeAlert();
       reloadTable();
     });
   }
@@ -480,6 +488,7 @@ const UserManagementPage = () => {
         bordered
         small
         data={data}
+        noRecordsFoundLabel="Chưa có dữ liệu"
         entriesLabel
         infoLabel
         searching={false}

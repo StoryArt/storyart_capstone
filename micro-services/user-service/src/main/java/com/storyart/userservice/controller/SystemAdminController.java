@@ -103,9 +103,6 @@ public class SystemAdminController {
             throw new ResourceNotFoundException("id", "User", uid);
         }
 
-        System.out.println("day la role cua admin:"+systemAdmin.getRoleName());
-
-
         Role roleById = roleService.findRoleById(adminById.getRoleId());
          //check role xem co phải role khac admin hay khong
         // neu khac thi khong cho set status boi ssytemad không có quyền đó

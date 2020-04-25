@@ -97,7 +97,7 @@ public class UserController {
 
     @PutMapping(value = "/{uid}")
     public UserProfileResponse
-    update(@PathVariable("uid") Integer uid,
+    update(@PathVariable("uid") Integer uid,@Valid
            @RequestBody UserProfileUpdateRequest user, @CurrentUser UserPrincipal userPrincipal) {
 
         if (userPrincipal.getId() != uid) {
@@ -110,13 +110,13 @@ public class UserController {
                 throw new BadRequestException("Email đã được đăng ký bởi ai đó!");
             }
         }
-        User userServiceByUsername = userService.findByUsername(user.getUsername());
-
-        if (userServiceByUsername != null) {
-            if (userServiceByUsername.getId() != userPrincipal.getId()) {
-                throw new BadRequestException("Tên đăng nhập đã tồn tại!");
-            }
-        }
+//        User userServiceByUsername = userService.findByUsername(user.getUsername());
+//
+//        if (userServiceByUsername != null) {
+//            if (userServiceByUsername.getId() != userPrincipal.getId()) {
+//                throw new BadRequestException("Tên đăng nhập đã tồn tại!");
+//            }
+//        }
         User userById = userService.findById(uid);
         if (userById == null) {
             throw new ResourceNotFoundException("User", "id", uid);

@@ -81,7 +81,7 @@ public class JwtAuthenticationController {
         }
         User us= userRepository.findByUsername(loginRequest.getUsername()).orElse(null);
         if(us!= null && us.isDeactiveByAdmin()){
-            throw new BadRequestException("Tài khoản đã bị khóa. Vui lòng liên hệ với quản trị viên!");
+            throw new BadRequestException("Tài khoản đã bị khóa, vui lòng liên hệ tới email storyartcapstone@gmail.com!");
         }
 
 

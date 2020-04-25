@@ -25,10 +25,10 @@ public class UserProfileUpdateRequest {
     @NaturalId
   private   String email;
 
-    @Size(min = 3, max = 15, message = "Tên đăng nhập phải có từ 3 đến 15 ký tự")
-    @NotBlank(message = "Tên đăng nhập phải có từ 3 đến 15 ký tự")
-    @Column(unique = true)
-    private String username;
+//    @Size(min = 3, max = 15, message = "Tên đăng nhập phải có từ 3 đến 15 ký tự")
+////    @NotBlank(message = "Tên đăng nhập phải có từ 3 đến 15 ký tự")
+////    @Column(unique = true)
+////    private String username;
     @Size(max = 300, message = "Thông tin giới thiệu có độ dài tối đa là 300 ký tự!")
    private String intro_content;
 
@@ -40,9 +40,9 @@ public class UserProfileUpdateRequest {
         this.email = email.trim();
     }
 
-    public void setUsername(String username) {
-        this.username = username.trim();
-    }
+//    public void setUsername(String username) {
+//        this.username = username.trim();
+//    }
 
     public void setIntro_content(String intro_content) {
         this.intro_content = intro_content.trim();
