@@ -10,7 +10,7 @@ import {
   MDBDataTable, MDBNotification, MDBContainer, MDBRow,MDBCol,
   MDBModal, MDBBtn, MDBModalHeader, MDBModalFooter, MDBModalBody,
   MDBDropdownItem, MDBInput, MDBDropdownToggle, MDBDropdown, MDBDropdownMenu,
-  MDBBadge, MDBCard
+  MDBBadge, MDBCard,
 } from "mdbreact";
 
 class TagManagementPage extends React.Component {
@@ -162,6 +162,12 @@ class TagManagementPage extends React.Component {
     });
   };
 
+  toggleModal = () => {
+    this.setState({
+      open: false
+    });
+  };
+
   renderTab(arr) {
     return arr.map(({ id, title, createdAt, updatedAt, active }) => {
       let check = "";
@@ -173,11 +179,11 @@ class TagManagementPage extends React.Component {
       return {
         rows: [
           {
-            title: <MDBBadge color="default">{title}</MDBBadge>,
+            title: title,
             updatedAt: (
               <div>{ DateTimeUtils.getDateTime(updatedAt) }</div>
             ),
-            active: <MDBBadge color="primary">{active}</MDBBadge>,
+            active: active,
             status: (
               <MDBBtn
                 onClick={e => this.handleIdtoChange(id, title)}
@@ -246,8 +252,9 @@ class TagManagementPage extends React.Component {
     for (let i = 0; i < data.length; i++) {
       datamax.rows.push(this.renderTab(data)[i].rows[0]);
     }
-
+    console.log(datamax);
     return (
+  
       <MainLayout>
         <MDBContainer>
           <MDBCard>
@@ -266,11 +273,11 @@ class TagManagementPage extends React.Component {
               </MDBBtn>
             </div>
 
-            <MDBModal isOpen={visible}>
+            <MDBModal isOpen={visible} toggle={e => this.handleCancel(e)}>
               <MDBModalHeader
                 className="text-center"
                 titleClass="w-100 font-weight-bold"
-                toggle={e => this.showModal(e)}
+                toggle={e => this.handleCancel(e)}
               >
                 Thêm Thẻ
               </MDBModalHeader>
@@ -294,11 +301,11 @@ class TagManagementPage extends React.Component {
               </MDBModalFooter>
             </MDBModal>
 
-            <MDBModal isOpen={visible3}>
+            <MDBModal isOpen={visible3} toggle={e => this.handleCancel(e)}>
               <MDBModalHeader
                 className="text-center"
                 titleClass="w-100 font-weight-bold"
-                toggle={e => this.showModal3(e)}
+                toggle={e => this.handleCancel(e)}
               >
                 Cập Nhật Thẻ
               </MDBModalHeader>
@@ -350,13 +357,12 @@ class TagManagementPage extends React.Component {
               <MDBRow className="py-9">
                 <MDBCol md="12" className="pl-5 pr-5">
                   <MDBDataTable
-                    className="pl-0 pr-0"
                     striped
                     bordered
                     small
-                    paging={true}
-                    displayEntries={true}
                     data={datamax}
+                     searching={true}
+                     paging={true}
                   />
                 </MDBCol>
               </MDBRow>

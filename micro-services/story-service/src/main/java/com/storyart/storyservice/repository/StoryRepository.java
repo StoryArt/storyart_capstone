@@ -137,8 +137,8 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
     Page<Story> findForUserOrderByNumOfReadDESC(int userId, String keyword, Pageable pageable);
     //end for user
 
-    @Query(value = "SELECT story.id FROM storyart_db.story", nativeQuery = true)
-    List<Integer> findAllStory ();
+    @Query(value = "SELECT story.id FROM storyart_db.story where story.published = '1' and story.active ='1' and story.deactive_by_admin ='0'", nativeQuery = true)
+    List<Integer> findAllStoryActive ();
 
     @Query(value = "SELECT * FROM story where id = :storyid", nativeQuery = true)
     Story findStoryById (@Param("storyid") Integer storyid);
