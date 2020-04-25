@@ -522,15 +522,15 @@ const StoryDetailsPage = (props) => {
                                     <h4>
                                         <Link style={{ fontWeight: 'bold' }} to={`/user/profile/${story.user.id}`}>
                                             {/* <PersonIcon />   */}
-                                            <img 
-                                                src={story.user.avatar} 
+                                            <img
+                                                src={story.user.avatar}
                                                 style={{ width: '30px', height: '30px', borderRadius: '50%' }} />
                                             {' ' + story.user.name}
                                         </Link>
                                     </h4>
                                 )}
                                 <Paper
-                                    style={{ padding:'20px' }}
+                                    style={{ padding: '20px' }}
                                 >
                                     <strong style={{ fontSize: '1.2em', color: 'orange' }}>Điểm trung bình: {story.avgRate}</strong>
                                     <div>
@@ -557,15 +557,15 @@ const StoryDetailsPage = (props) => {
                                 </div>
                                 <form onSubmit={e => { e.preventDefault(); sendComment(); }}>
                                     <div className="form-group">
-                                    <TextField 
-                                        multiline
-                                        variant="outlined"
-                                        rows="3"
-                                        style={{ width: '100%' }}
-                                        label="Bình luận..."
-                                        value={commentContent}
-                                        onChange={e => setCommentContent(e.target.value)} />
-                                                           
+                                        <TextField
+                                            multiline
+                                            variant="outlined"
+                                            rows="3"
+                                            style={{ width: '100%' }}
+                                            label="Bình luận..."
+                                            value={commentContent}
+                                            onChange={e => setCommentContent(e.target.value)} />
+
                                         {/* <textarea
                                             className="form-control"
                                             rows="1"
@@ -611,15 +611,23 @@ const StoryDetailsPage = (props) => {
                                 </div>
                                 {/* danh sach binh luan */}
                                 {comments.map((comment, index) => (
-                                        <div className="row mb-3 px-3" key={comment.id}>
+                                    <div className="row mb-3 px-3" key={comment.id}>
                                         <div className="float-left" style={{ minWidth: '60px' }}>
                                             <img className="comment-avatar"
-                                                onClick={() => props.history.push(`/user/profile/${comment.userId}`)}
+
+                                                onClick={userInfo.id === comment.userId ? () => props.history.push(`/user/my-profile/`) : () => props.history.push(`/user/profile/${comment.userId}`)}
                                                 src={comment.userAvatarUrl} />
                                         </div>
                                         <div className="">
                                             <small>
-                                                <strong className="mr-3" style={{ fontSize: '1.2em' }}>{comment.username}</strong>
+                                                <Link to={userInfo.id === comment.userId ? `/user/my-profile/` : `/user/profile/${comment.userId}`}>
+                                                    <strong
+                                                        className="mr-3"
+                                                        style={{ fontSize: '1.2em', cursor: 'pointer' }}>
+                                                        {comment.username}
+                                                    </strong>
+                                                </Link>
+
                                                 <span>{moment(comment.createdAt).format('HH:mm DD/MM/YYYY')}</span>
                                             </small>
                                             <p>{comment.content}
@@ -662,7 +670,7 @@ const StoryDetailsPage = (props) => {
                                         </div>
                                         <hr />
                                     </div>
-                               ))}
+                                ))}
                                 {comments.length < 1 &&
                                     <div className="text-center mt-4">
                                         Truyện chưa có bình luận, hãy để lại một bình luận nhé.

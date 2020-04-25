@@ -69,7 +69,7 @@ const EditUserProfilePage = props => {
     event.preventDefault();
     let user = {
       id: id,
-      username: us,
+      // username: us,
       name: name,
       intro_content: intro_content,
       email: email,
@@ -96,7 +96,7 @@ const EditUserProfilePage = props => {
       }
       setAlert({
         open: true,
-        content: { err },
+        content: err,
         type: "error"
       });
       window.setTimeout(() => {
@@ -211,7 +211,7 @@ const EditUserProfilePage = props => {
                   margin="normal"
                   fullWidth
                   label="Tên đăng nhập"
-                  
+                  disabled
                   value={us}
                   onChange={e => setUs(e.target.value)}
                 />

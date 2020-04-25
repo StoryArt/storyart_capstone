@@ -131,7 +131,7 @@ const AppNavbar = (props) => {
             <MenuIcon />
           </IconButton>
           <Typography style={{ flexGrow: 1 }} edge="end" variant="h6" noWrap>
-            <img src="/assets/img/logo5.png" height="40px" />
+           <Link to ="/home"> <img src="/assets/img/logo5.png" height="40px" /></Link>
           </Typography>
 
 

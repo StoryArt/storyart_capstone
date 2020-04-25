@@ -192,7 +192,7 @@ const Sidebar = (props) => {
                  <ListItemIcon>
                    <AddBoxIcon className={classes.icon} />
                    </ListItemIcon>
-                 <ListItemText primary="Tạo truyên" />
+                 <ListItemText primary="Tạo truyện" />
                </ListItem>
            </List>
         )}

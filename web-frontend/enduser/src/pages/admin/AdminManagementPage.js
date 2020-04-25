@@ -36,7 +36,10 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: "#53825e",
       boxShadow: "none",
     }
+    ,
+
   },
+  
 
   h3: {
     fontWeight: "600",
@@ -57,6 +60,8 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: "#53825e",
       boxShadow: "none",
     },
+
+    "&:focus": {outline:0},
   },
   deactive: {
     
@@ -76,6 +81,8 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: "#ab1d3f",
       boxShadow: "none",
     },
+    "&:focus": {outline:0},
+
   },
 }));
 const AdminManagementPage = (props) => {
@@ -181,6 +188,12 @@ const AdminManagementPage = (props) => {
     let status = openDialog.status;
    
     const res = await UserService.setStatusAdmin(userId, status).then((res) => {
+      setAlert({
+        open: true,
+        content: res.data.message,
+        type: "success",
+      });
+      closeAlert();
       reloadTable();
     });
   }
@@ -356,6 +369,7 @@ const AdminManagementPage = (props) => {
         </DialogTitle>
         <form onSubmit={handleAddAdmin}>
           <DialogContent>
+
             {errorMessage}
 
             <div className="row">
@@ -477,6 +491,8 @@ const AdminManagementPage = (props) => {
         searching={false}
         striped
         bordered
+        noRecordsFoundLabel="Chưa có dữ liệu"
+
         small
         data={data}
         entrieslabel={""}

@@ -18,22 +18,22 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class SignUpRequest {
 
-    @NotBlank(message = "Tên đăng nhập không được trống")
+    @NotBlank(message = "Tên đăng nhập phải có từ 3 đến 15 ký tự")
     @Size(min=3,max = 15, message = "Tên đăng nhập phải có từ 3 đến 15 ký tự")
     @Column(unique = true)
     private String username;
 
-    @NotBlank(message = "Tên không được để trống")
+    @NotBlank(message = "Tên phải có từ 3 đến 40 ký tự")
     @Size(max = 40, min = 3, message = "Tên phải có từ 3 đến 40 ký tự")
     @Column(length = 40)
     private String name;
 
-    @Email(message = "Email không đúng định dạng!")
+    @Email(message = "Email không đúng định dạng. Vui lòng nhập lại email")
     @NaturalId
     @NotBlank(message = "Email không được để trống")
     private String email;
 
-    @NotBlank(message = "Mật khẩu không được để trống")
+    @NotBlank(message = "Mật khẩu phải có từ 8 đến 100 ký tự")
     //size 100 is encoded password,, signup request has passord <=15
     @Size(max = 100, min = 8, message = "Mật khẩu phải có từ 8 đến 100 ký tự")
     private String password;

@@ -76,14 +76,14 @@ public class SuggestController {
     try{
         if(listRatingExceptThisWeek.size() == 0){
             if(liststoryInteger.size() >= 4){
-                List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
+                List<Integer> AfterRandom = getRandomElement(liststoryInteger, 10);
                 total.addAll(AfterRandom);
             }else{
                 total.addAll(liststoryInteger);
             }
         }else{
             if(listRatingExceptThisWeek.size() >=4){
-                List<Integer> listRatingExceptThisWeekR = getRandomElement(listRatingExceptThisWeek, 4);
+                List<Integer> listRatingExceptThisWeekR = getRandomElement(listRatingExceptThisWeek, 10);
                 total.addAll(listRatingExceptThisWeekR);
 
             }else{
@@ -105,7 +105,7 @@ public class SuggestController {
     }catch (Exception ex){
 
         if(liststoryInteger.size() >= 4){
-            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
+            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 10);
             total.addAll(AfterRandom);
         }else{
             total.addAll(liststoryInteger);
@@ -113,7 +113,7 @@ public class SuggestController {
     }
      }else{
         if(liststoryInteger.size() >= 4){
-            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
+            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 10);
             total.addAll(AfterRandom);
         }else{
             total.addAll(liststoryInteger);
@@ -124,10 +124,14 @@ public class SuggestController {
         total.removeAll(listStoryAuthor);
     }
     if(total.size() == 0){
-        List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
+        List<Integer> AfterRandom = getRandomElement(liststoryInteger, 10);
         total.addAll(AfterRandom);
     }
-
+            if(total.size() > 4){
+                List<Integer> AfterRandom = getRandomElement(total, 4);
+                total.removeAll(total);
+                total.addAll(AfterRandom);
+            }
             Page<Story> storyPage = storyRepository.findAllByStoryIds(total, pageable);
             ModelMapper mm = new ModelMapper();
             Page<GetStoryDto> responsePage = storyPage.map(new Function<Story, GetStoryDto>() {
