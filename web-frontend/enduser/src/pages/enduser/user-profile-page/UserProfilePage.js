@@ -241,7 +241,6 @@ const UserProfilePage = (props) => {
     })
   }
 
-
   const changeDateRange = (prop, value) => {
     setDateRange({ ...dateRange, [prop]: value });
     getReadStatistic({ ...dateRange, [prop]: value });

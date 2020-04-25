@@ -37,7 +37,7 @@ const ScreenShow = (props) => {
                     in: showScreen
                 }, (
                     <div className="screen-card">
-                        <div className="screen-card-header">
+                        <div className="screen-card-header mb-4">
                             <h5 className="text-center">{ StringUtils.getObjTitle(screen) }</h5>
                         </div>
                         <div className="screen-card-body" style={props}>

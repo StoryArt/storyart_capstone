@@ -326,7 +326,7 @@ const ReadStoryPage = (props) => {
     
                         {ValidationUtils.isEmpty(currentScreen) && (
                             <div className="">
-                                <h3 className="screen-card-header text-bold text-center"> {story.title}</h3>
+                                <h3 className="screen-card-header text-bold text-center mb-4"> {story.title}</h3>
                                 <p 
                                     className="">
                                     {StringUtils.parseHtml(story.intro)}
@@ -340,7 +340,6 @@ const ReadStoryPage = (props) => {
                         ) }
                     </MyFullScreenShowWrapper>
                 // </Fullscreen>
-            
             )}
            
            {/* { isLoading && <MySpinner/> } */}
