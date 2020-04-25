@@ -178,9 +178,14 @@ class Dashboard1 extends React.Component {
       console.log("summary");
       console.log(this.state.story);
       let tags = "";
-      this.state.story.tags.map((x) => {
-        tags = tags + x.title + ",";
-      });
+      if(this.state.story.tags == null){
+
+      }else {
+        this.state.story.tags.map((x) => {
+          tags = tags + x.title + ",";
+        });
+      }
+  
       this.setState({ tagString: tags });
     });
   }
@@ -203,9 +208,9 @@ class Dashboard1 extends React.Component {
         } catch (error) {}
       }
       console.log(totalStar / totalRateTurn);
-      if (totalRateTurn != 0) {
-        this.setState({ avgRate: Math.round(((totalStar / totalRateTurn) * 10)) / 10 });
-      }
+      // if (totalRateTurn != 0) {
+      //   this.setState({ avgRate: Math.round(((totalStar / totalRateTurn) * 10)) / 10 });
+      // }
 
       //cho nao bi rendeẻ lai
       console.log("load rating");
@@ -679,7 +684,7 @@ class Dashboard1 extends React.Component {
                       ></StarIcon>
                       <strong style={{ color: "#b0b0b0", fontSize: "20px" }}>
                         {
-                        this.state.avgRate}
+                        this.state.story.avgRate}
                       </strong>
                     </h5>{" "}
                   </div>

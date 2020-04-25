@@ -13,6 +13,8 @@ const MyAlert = (props) => {
 
     return (
         <Snackbar 
+        style={{   top: "74px",
+            left: "auto"}}
             anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             open={open} 
             autoHideDuration={2000} 

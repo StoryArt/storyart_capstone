@@ -15,6 +15,7 @@ import { setAuthHeader } from "../../config/auth";
 import Pagination from "@material-ui/lab/Pagination";
 import DateTimeUtils from "../../utils/datetime";
 import MyAlert from "../../components/common/MyAlert";
+import MySpinner from "../../components/common/MySpinner";
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -86,6 +87,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 const UserManagementPage = () => {
   const classes = useStyles();
+  const [errorMessage, setAddAdminMessage] = useState("");
 
   const [convertedList, setConvertedList] = useState([]);
   const [pageInfo, setPageInfo] = useState({
@@ -305,6 +307,7 @@ const UserManagementPage = () => {
     try {
       const res = await UserService.addUser(user);
       if (res.data.success == true) {
+
         setAddAccountMessage(
           <MDBAlert color="success">{res.data.message}</MDBAlert>
         );
@@ -371,7 +374,10 @@ const UserManagementPage = () => {
         <DialogTitle id="form-dialog-title">
           Tạo tài khoản người dùng
         </DialogTitle>
-        <form onSubmit={handleAddAccountUser}>
+
+        <form onSubmit={handleAddAccountUser} noValidate>
+        {addAccountMessage}
+
           <DialogContent>
             <div className="row">
               <div className="col-sm-6">
@@ -393,6 +399,7 @@ const UserManagementPage = () => {
                   value={email}
                   type="email"
                   label="Email"
+                  validate={false}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
@@ -493,7 +500,7 @@ const UserManagementPage = () => {
         infoLabel
         searching={false}
         paging={false}
-      />
+      /> 
 
       <MyAlert
         open={alert.open}

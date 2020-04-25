@@ -97,7 +97,7 @@ public class JwtAuthenticationController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         if (userService.findByUsername(signUpRequest.getUsername()) != null) {
-            throw new BadCredentialsException("Tên đăng nhập  này đã được đăng ký bởi ai đó!");
+            throw new BadRequestException("Tên đăng nhập  này đã được đăng ký bởi ai đó!");
         }
 
         if (userService.findByEmail(signUpRequest.getEmail()) != null) {

@@ -10,6 +10,7 @@ import Button from "@material-ui/core/Button";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
+import MySpinner from "../../../components/common/MySpinner";
 
 import SendIcon from "@material-ui/icons/Send";
 
@@ -45,13 +46,9 @@ const EditUserProfilePage = props => {
   const [is_active, setIsActive] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [avatar, setAvatar] = useState("");
-  const [upfile, setUploadFile] = useState(null);
-  const [banner, setBanner] = useState("");
-  const [upfileBanner, setUploadFileBanner] = useState(null);
-  const [saveAvatarBt, setSaveAvatarBt] = useState("disabled");
-  const [saveBannerBt, setSaveBannerBt] = useState("disabled");
-  const [story, setStory] = useState(null);
 
+  const [banner, setBanner] = useState("");
+const [openSaveBt, setOpenSaveBt] = useState(true)
   const [alert, setAlert] = useState({
     content: "",
     type: "success",
@@ -66,6 +63,8 @@ const EditUserProfilePage = props => {
   }, []);
 
   async function handleUpdateProfile(event) {
+    setOpenSaveBt(false);
+
     event.preventDefault();
     let user = {
       id: id,
@@ -83,9 +82,7 @@ const EditUserProfilePage = props => {
         content: "Lưu thành công",
         type: "success"
       });
-      window.setTimeout(() => {
-        closeAlert();
-      }, 3000);
+      
     } catch (error) {
 
       var err;
@@ -99,11 +96,16 @@ const EditUserProfilePage = props => {
         content: err,
         type: "error"
       });
-      window.setTimeout(() => {
-        closeAlert();
-      }, 3000);
+
     }
+    closeAlert();
+    setOpenSaveBt(true);
+
+
   }
+  const closeAlert = () =>
+  window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
+
 
   const getProfile = async () => {
     try {
@@ -141,7 +143,6 @@ const EditUserProfilePage = props => {
       {profile.active ? "Active" : "Deactivated"}
     </MDBBtn>
   );
-  const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
   return (
     <MainLayout>
       <MyAlert
@@ -255,24 +256,12 @@ const EditUserProfilePage = props => {
               </div>
               {/* save button */}
               <div className="form-group">
-                <Button color="primary" variant="contained" type="submit">
+               { openSaveBt? <Button color="primary" variant="contained" type="submit" >
                   <SendIcon />
                   <span className="pl-2 capitalize">Lưu thay đổi</span>
-                </Button>
+                </Button>:<MySpinner />}
 
-                {/* <button
-                      className="btn float-left"
-                      style={{
-                        clear: "both",
-                        fontSize: "1.1em",
-                        margin: 0,
-                        color: "#fff",
-                        backgroundColor: "#007bff"
-                      }}
-                    >
-                      Lưu thay đổi
-                    </button> */}
-              </div>
+                            </div>
             </div>
           </div>
         </form>

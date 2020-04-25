@@ -83,7 +83,6 @@ const LoginPage = () => {
           content: 'Đăng nhập thành công',
           type: 'success'
         });
-        closeAlert();
         const userInfo = getAuthUserInfo();
 
         let url = '/home';
@@ -112,9 +111,8 @@ const LoginPage = () => {
         content:  "Đã xảy ra lỗi, thử lại!",
         open: true
       });
-      closeAlert();
-      return 
-    }
+      
+    }else
       if (typeof error.response.data.errors != "undefined") {
         err = error.response.data.errors[0].defaultMessage;
       } else if (typeof error.response.data.message == "string") {
@@ -130,7 +128,7 @@ const LoginPage = () => {
     closeAlert();
   }
 
-  const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 2000);
+  const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
 
   return (
     <div className="pt-5">
@@ -199,7 +197,8 @@ const LoginPage = () => {
         </div>
       </Container>
 
-      <MyAlert
+      <MyAlert 
+      style={{margin: "auto"}}
         open={alert.open}
         setOpen={() => setAlert({ ...alert, open: true })}
         type={alert.type}

@@ -52,47 +52,37 @@ const ChangePasswordPage = (props) => {
     try {
       if (repass != pass) {
         setAlert({
-            open: true,
-            content: "Mật khẩu nhập lại chưa trùng. Mời nhập lại!",
-            type: "error",
-          });
-        window.setTimeout(() => {
-          closeAlert();
-        }, 3000);
-        
-      }else{
-        let pr={password: pass, repassword: repass};
-        const res = await UserService.changePassword(pr,user.id ).then((res) => {
+          open: true,
+          content: "Mật khẩu nhập lại chưa trùng. Mời nhập lại!",
+          type: "error",
+        });
+      } else {
+        let pr = { password: pass, repassword: repass };
+        const res = await UserService.changePassword(pr, user.id).then(
+          (res) => {
             setAlert({
               open: true,
               content: "Lưu thành công",
               type: "success",
             });
-          });
-          window.setTimeout(() => {
-            closeAlert();
-          }, 3000);
+          }
+        );
       }
-     
     } catch (error) {
-    
-      
-        var err;
-        if (typeof error.response.data.errors != "undefined") {
-          err = error.response.data.errors[0].defaultMessage;
-        } else if (typeof error.response.data.message == "string") {
-          err = error.response.data.message;
-        }
-        setAlert({
-            open: true,
-            content: err,
-            type: "error",
-          });
-        window.setTimeout(() => {
-          closeAlert();
-        }, 3000);
-     
+      var err;
+      if (typeof error.response.data.errors != "undefined") {
+        err = error.response.data.errors[0].defaultMessage;
+      } else if (typeof error.response.data.message == "string") {
+        err = error.response.data.message;
+      }
+      setAlert({
+        open: true,
+        content: err,
+        type: "error",
+      });
     }
+
+    closeAlert();
   }
 
   const mystyle = {
@@ -119,12 +109,11 @@ const ChangePasswordPage = (props) => {
 
         <form style={mystyle} onSubmit={handleChangePassword}>
           <div className="row">
-
             <div style={mystyle} className="col-sm-4">
               {/* //name */}
               <div className="form-group">
-      {errorMessage}
-                  
+                {errorMessage}
+
                 <TextField
                   variant="outlined"
                   margin="normal"
@@ -144,7 +133,6 @@ const ChangePasswordPage = (props) => {
                   label="Nhập lại mật khẩu mới"
                   value={repass}
                   type="password"
-
                   onChange={(e) => setRepass(e.target.value)}
                 />
               </div>

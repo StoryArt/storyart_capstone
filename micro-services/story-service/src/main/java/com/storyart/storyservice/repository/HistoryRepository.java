@@ -49,5 +49,10 @@ public interface HistoryRepository extends JpaRepository<ReadingHistory, Integer
             "group by r.story_id order by count(r.story_id) DESC limit 10", nativeQuery = true)
     List<Integer>  countTopView();
 
+    @Query(value = "SELECT r.story_id FROM storyart_db.reading_history as r, storyart_db.story as s, storyart_db.user as u " +
+            " where r.story_id = s.id  and s.active = '1' and s.published = '1' and s.deactive_by_admin = '0'  " +
+            "and s.user_id = u.id and u.is_deactive_by_admin = '0' and r.story_id not in (select l.id from storyart_db.story l where l.user_id = :userid)  " +
+            "group by r.story_id order by count(r.story_id) DESC limit 10", nativeQuery = true)
+    List<Integer>  countTopViewById(@Param("userid") Integer userid);
     int countAllByStoryId(int storyId);
 }
