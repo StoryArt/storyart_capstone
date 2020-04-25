@@ -15,7 +15,7 @@ import StoryService from '../../../services/story.service';
 import ValidationUtils from '../../../utils/validation';
 
 import NotFound from '../../../components/common/NotFound';
-    import MySpinner from '../../../components/common/MySpinner';
+import MySpinner from '../../../components/common/MySpinner';
 import TagList from '../../../components/common/TagList';
 import StringUtils from '../../../utils/string';
 
@@ -23,6 +23,7 @@ import { getAuthUserInfo } from '../../../config/auth';
 import MyRating from '../../../components/common/MyRating';
 import MyAlert from '../../../components/common/MyAlert';
 import SocialShare from '../../../components/common/SocialShare';
+import { TextField, Paper } from '@material-ui/core';
 
 const StoryDetailsPage = (props) => {
 
@@ -33,6 +34,7 @@ const StoryDetailsPage = (props) => {
     const [isLoadingStory, setIsLoadingStory] = useState(false);
     const [alert, setAlert] = useState({ open: false, type: 'success', content: '' })
     const [rating, setRating] = useState({})
+    const [userIsDeactivated, setUserIsDeactivated] = useState(false);
 
 
     const [modalState, setModalState] = useState({
@@ -67,7 +69,7 @@ const StoryDetailsPage = (props) => {
         commentId: 0,
         content: ''
     });
-    
+
     const [reportCommentModalInfo, setReportCommentModalInfo] = useState({
         userName: '',
         comment: '',
@@ -401,9 +403,12 @@ const StoryDetailsPage = (props) => {
                 setStoryNotfound(true);
             } else {
                 setStory(res.data);
-                if(!ValidationUtils.isEmpty(userInfo)){
+                if (!ValidationUtils.isEmpty(userInfo)) {
                     getRatingByStoryAndUser(res.data.id);
                 }
+            }
+            if (res.data.user.deactiveByAdmin) {
+                setUserIsDeactivated(true);
             }
         } catch (error) {
             console.log(error);
@@ -412,7 +417,7 @@ const StoryDetailsPage = (props) => {
     }
 
     const [reportStoryContent, setReportStoryContent] = useState('');
-   
+
     const reportStory = async () => {
         try {
             const { storyId } = props.match.params;
@@ -451,8 +456,8 @@ const StoryDetailsPage = (props) => {
     }
 
     const rateStory = async (stars) => {
-        if(ValidationUtils.isEmpty(userInfo)) return;
-        if(ValidationUtils.isEmpty(stars)) return;
+        if (ValidationUtils.isEmpty(userInfo)) return;
+        if (ValidationUtils.isEmpty(stars)) return;
         try {
             const res = await StoryService.rateStory(story.id, stars);
             const { success, errors, data } = res.data;
@@ -488,7 +493,7 @@ const StoryDetailsPage = (props) => {
             <div className="container-fluid">
                 {isLoadingStory && (<MySpinner />)}
 
-                {(!storyNotfound && !isLoadingStory && !ValidationUtils.isEmpty(story)) && (
+                {(!storyNotfound && !isLoadingStory && !ValidationUtils.isEmpty(story) && !userIsDeactivated) && (
                     <>
                         <div className="row">
                             <div className="col-sm-3">
@@ -512,28 +517,34 @@ const StoryDetailsPage = (props) => {
                                 </div>
                             </div>
                             <div className="col-sm-9">
-                                <h3 className="font-weight-bold">{story.title}</h3>
+                                <h2 className="font-weight-bold">{story.title}</h2>
                                 {!ValidationUtils.isEmpty(story.user) && (
                                     <h4>
-                                        <Link to={`/user/profile/${story.user.id}`}>
+                                        <Link style={{ fontWeight: 'bold' }} to={`/user/profile/${story.user.id}`}>
                                             {/* <PersonIcon />   */}
-                                            <img src={story.user.avatar} style={{ width: '30px', height: '30px' }}/>
-                                             {' ' + story.user.name}
+                                            <img 
+                                                src={story.user.avatar} 
+                                                style={{ width: '30px', height: '30px', borderRadius: '50%' }} />
+                                            {' ' + story.user.name}
                                         </Link>
                                     </h4>
                                 )}
-                                <strong style={{ fontSize: '1.2em', color: 'orange' }}>Điểm trung bình: {story.avgRate}</strong>
-                                <div>
-                                    <strong>Lượt đánh giá: </strong>{story.numOfRate}
-                                </div>
-                                <div>
-                                    <strong>Lượt đọc: </strong>{story.numOfRead}
-                                </div>
-                                <div className="my-3">
-                                    <strong>Giới thiệu</strong>
-                                    <p>{StringUtils.parseHtml(story.intro)}</p>
-                                </div>
-                                <strong>Tags:</strong> <TagList tags={story.tags} />
+                                <Paper
+                                    style={{ padding:'20px' }}
+                                >
+                                    <strong style={{ fontSize: '1.2em', color: 'orange' }}>Điểm trung bình: {story.avgRate}</strong>
+                                    <div>
+                                        <strong>Lượt đánh giá: </strong>{story.numOfRate}
+                                    </div>
+                                    <div>
+                                        <strong>Lượt đọc: </strong>{story.numOfRead}
+                                    </div>
+                                    <div className="my-3">
+                                        <strong>Giới thiệu</strong>
+                                        <p>{StringUtils.parseHtml(story.intro)}</p>
+                                    </div>
+                                    <strong>Tags:</strong> <TagList tags={story.tags} />
+                                </Paper>
                                 <div className="my-3">
                                     <strong>Đánh giá truyện:</strong>
                                     <br />
@@ -546,12 +557,21 @@ const StoryDetailsPage = (props) => {
                                 </div>
                                 <form onSubmit={e => { e.preventDefault(); sendComment(); }}>
                                     <div className="form-group">
-                                        <textarea
+                                    <TextField 
+                                        multiline
+                                        variant="outlined"
+                                        rows="3"
+                                        style={{ width: '100%' }}
+                                        label="Bình luận..."
+                                        value={commentContent}
+                                        onChange={e => setCommentContent(e.target.value)} />
+                                                           
+                                        {/* <textarea
                                             className="form-control"
                                             rows="1"
                                             placeholder="Bình luận..."
                                             value={commentContent}
-                                            onChange={e => setCommentContent(e.target.value)}></textarea>
+                                            onChange={e => setCommentContent(e.target.value)}></textarea> */}
                                     </div>
                                     <button className="btn btn-success float-right" type="submit">Gửi</button>
                                 </form>
@@ -591,14 +611,15 @@ const StoryDetailsPage = (props) => {
                                 </div>
                                 {/* danh sach binh luan */}
                                 {comments.map((comment, index) => (
-                                    <div className="row mb-3" key={comment.id}>
-                                        <div className="col-1 px-0">
-                                            <img className="img-fluid"
+                                        <div className="row mb-3 px-3" key={comment.id}>
+                                        <div className="float-left" style={{ minWidth: '60px' }}>
+                                            <img className="comment-avatar"
+                                                onClick={() => props.history.push(`/user/profile/${comment.userId}`)}
                                                 src={comment.userAvatarUrl} />
                                         </div>
-                                        <div className="col-11">
+                                        <div className="">
                                             <small>
-                                                <strong className="mr-3">{comment.username}</strong>
+                                                <strong className="mr-3" style={{ fontSize: '1.2em' }}>{comment.username}</strong>
                                                 <span>{moment(comment.createdAt).format('HH:mm DD/MM/YYYY')}</span>
                                             </small>
                                             <p>{comment.content}
@@ -622,29 +643,29 @@ const StoryDetailsPage = (props) => {
                                                 <span className="dislikes-count"> {comment.dislikes.length}</span>
                                             </span>
                                             {userId !== comment.userId &&
-                                                <button type="button" className="btn btn-danger" onClick={toggleModal('reportModal', comment.id, index, comment.username, comment.content)}>
-                                                    <i className="far fa-flag" ></i>
+                                                <button type="button" className="btn btn-danger rounded-circle" onClick={toggleModal('reportModal', comment.id, index, comment.username, comment.content)}>
+                                                    <i className="far fa-flag small" ></i>
                                                 </button>
                                             }
                                             {userId === comment.userId &&
-                                                <button type="button" className="btn btn-warning" onClick={toggleModal('editModal', comment.id, index)}>
-                                                    <i className="far fa-edit" ></i>
+                                                <button type="button" className="btn btn-warning rounded-circle" onClick={toggleModal('editModal', comment.id, index)}>
+                                                    <i className="far fa-edit small" ></i>
                                                 </button>
 
                                             }
                                             {userId === comment.userId &&
-                                                <button type="button" className="btn btn-warning" onClick={toggleModal('deleteModal', comment.id, index)}>
-                                                    <i className="far fa-trash-alt" ></i>
+                                                <button type="button" className="btn btn-warning rounded-circle" onClick={toggleModal('deleteModal', comment.id, index)}>
+                                                    <i className="far fa-trash-alt small" ></i>
                                                 </button>
                                             }
 
                                         </div>
                                         <hr />
                                     </div>
-                                ))}
+                               ))}
                                 {comments.length < 1 &&
                                     <div className="text-center mt-4">
-                                        <small>Truyện chưa có bình luận, hãy để lại một bình luận nhé.</small>
+                                        Truyện chưa có bình luận, hãy để lại một bình luận nhé.
                                     </div>
                                 }
                                 <MDBModal isOpen={modalState.editModal} toggle={toggleModal('editModal')}>
@@ -742,6 +763,7 @@ const StoryDetailsPage = (props) => {
 
                 )}
                 {storyNotfound && <NotFound message="Không tìm thấy câu truyện này" />}
+                {userIsDeactivated && <NotFound message="Không tìm thấy câu truyện này" />}
                 <MyAlert
                     open={alert.open}
                     setOpen={(open) => setAlert({ ...alert, open: open })}

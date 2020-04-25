@@ -61,7 +61,11 @@ const Sidebar = (props) => {
     const [open, setOpen] = React.useState(true);
   
     const navigateRoute = (route) => {
-      props.history.push(route);
+      if(route === '/stories/create' && currentRoute.indexOf('/stories/edit') === 0){
+        window.location.href = route;
+      } else {
+        props.history.push(route);
+      }
     }
 
     return (

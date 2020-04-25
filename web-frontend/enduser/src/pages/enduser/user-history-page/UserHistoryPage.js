@@ -49,6 +49,8 @@ const UserHistoryPage = () => {
     const [histories, setHistories] = useState([]);
     const [historyPageNo, setHistoryPageNo] = useState(1);
     const [isLastHistoryPage, setIsLastHistoryPage] = useState(true);
+    const [modalError, setModalError] = useState('');
+
     const getReadingHistory = async () => {
         if (userInfo !== null) {
             setHistoryLoading(true);
@@ -74,6 +76,7 @@ const UserHistoryPage = () => {
             setHistoryLoading(false);
         }
     }
+
     const deleteComment = async () => {
         if (userInfo !== null) {
             try {
@@ -101,6 +104,7 @@ const UserHistoryPage = () => {
         closeAlert();
 
     }
+
     const deleteReaction = async () => {
         if (userInfo !== null) {
             try {
@@ -127,7 +131,7 @@ const UserHistoryPage = () => {
         }
         closeAlert();
     }
-    const [modalError, setModalError] = useState('');
+   
     const updateComment = async () => {
         if (userInfo !== null) {
             try {
@@ -152,7 +156,6 @@ const UserHistoryPage = () => {
         }
         closeAlert();
     }
-
 
     const [updateCommentRequest, setUpdateCommentRequest] = useState({
         content: '',
@@ -260,10 +263,6 @@ const UserHistoryPage = () => {
             }
             setDeleteRequest({ ...deleteRequest, commentId: commentIdSpec });
         }
-
-
-
-
     }
 
     return (
@@ -365,9 +364,6 @@ const UserHistoryPage = () => {
                             </div>
                         }
 
-
-
-
                     </MDBTabPane>
 
                     <MDBModal isOpen={modalState.deleteModal} toggle={toggleModal('deleteModal')}>
@@ -399,7 +395,7 @@ const UserHistoryPage = () => {
                         <MDBModalFooter>
                             <MDBBtn color='success' onClick={toggleModal('editModal')}>
                                 Hủy
-                    </MDBBtn>
+                            </MDBBtn>
                             <MDBBtn color='warning' onClick={updateComment}>Chỉnh sửa</MDBBtn>
                         </MDBModalFooter>
                     </MDBModal>
@@ -407,7 +403,17 @@ const UserHistoryPage = () => {
 
                         {reactions.map((reaction, index) => (
                             <div className="clearfix" key={reaction.id}>
-                                Bạn đã <strong>{reaction.type}</strong> bình luận của <Link target="_blank" to={`/user/profile/${reaction.commentOwnerId}`}><strong>{reaction.commentOwnerName}</strong></Link> trong truyện <Link target="_blank"
+                                Bạn đã <strong>{reaction.type}</strong> bình luận của
+                                {reaction.commentOwnerId !== userInfo.id &&
+                                    <Link target="_blank" to={`/user/profile/${reaction.commentOwnerId}`}>
+                                        <strong> {reaction.commentOwnerName} </strong></Link>
+                                }
+                                {reaction.commentOwnerId === userInfo.id &&
+                                    <Link target="_blank" to={`/user/my-profile/`}>
+                                        <strong> {reaction.commentOwnerName} </strong></Link>
+                                }
+
+                                    trong truyện <Link target="_blank"
                                     to={`/stories/details/${reaction.storyId}`}>
                                     <strong>{reaction.storyName}</strong>:</Link>
                                 <div>

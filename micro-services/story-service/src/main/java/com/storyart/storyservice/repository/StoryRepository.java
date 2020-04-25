@@ -41,8 +41,9 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
     Page<Story> findAllByUserProfile(int userId, String title, Set<Integer> tagIds, Pageable pageable);
 
 
-    @Query(value = "select * from story s " +
-            "where s.active = true and s.deactive_by_admin = false and s.published = true order by " +
+    @Query(value = "select * from story s left join user u on s.user_id = u.id " +
+            "where s.active = true and s.deactive_by_admin = false and s.published = true " +
+            "and u.is_deactive_by_admin = false order by " +
             "(select count(id) from reading_history rd where rd.story_id = s.id " +
             "and (DATE(rd.created_at) >= (DATE(NOW()) - INTERVAL 7 DAY) " +
             "and (DATE(rd.created_at) <= DATE(NOW())) )) DESC LIMIT 8", nativeQuery = true)

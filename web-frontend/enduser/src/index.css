@@ -420,3 +420,10 @@ canvas {
 .btn-success, .btn-primary, .btn-warning{
   background-color: #766994!important;
 }
+
+.comment-avatar{
+  width: 50px!important;
+  height: 50px!important;
+  border-radius: 50%;
+  cursor: pointer;
+}
