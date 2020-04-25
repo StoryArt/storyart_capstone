@@ -88,7 +88,7 @@ class TagServiceImpl implements TagService{
     @Override
     public Page<Tag> findAll() {
         Pageable sort =
-                PageRequest.of(0, 50, Sort.by("title").ascending().and(Sort.by("isActive")));
+                PageRequest.of(0, 50, Sort.by("title").ascending().and(Sort.by("title")));
         Page<Tag> list = tagRepository.findAll(sort);
         return list;
     }
