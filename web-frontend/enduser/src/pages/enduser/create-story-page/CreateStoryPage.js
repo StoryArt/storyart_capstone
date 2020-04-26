@@ -161,6 +161,7 @@ const CreateStoryPage = (props) => {
             }
         } catch (error) {
             console.log(error);
+            setNotfoundStory(true);
         }
         setOpenBackdrop(false);
         setLoadingStory(false);
