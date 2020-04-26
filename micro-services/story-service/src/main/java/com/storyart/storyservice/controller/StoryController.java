@@ -175,7 +175,4 @@ public class StoryController {
         ResultDto result = storyService.updateByAdmin(storyId, !enable);
         return new ResponseEntity(result, HttpStatus.OK);
     }
-
-
-
 }
