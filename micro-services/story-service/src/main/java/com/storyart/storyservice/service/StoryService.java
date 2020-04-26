@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public interface StoryService {
     HashMap<String, String> validateStoryinfo(CreateStoryDto story);
 
-    GetStoryDto getStoryDetails(int id);
+    ResultDto getStoryDetails(int id);
 
     ResultDto getReadingStory(int storyId);
 
@@ -253,9 +253,21 @@ class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public GetStoryDto getStoryDetails(int storyId) {
+    public ResultDto getStoryDetails(int storyId) {
+        ResultDto result = new ResultDto();
+        result.setSuccess(false);
         Story story = storyRepository.findById(storyId).orElse(null);
-        if (story == null) return null;
+        if (story == null) {
+            result.getErrors().put("NOT_FOUND", "Truyện này không có trong hệ thống");
+        } else if (story.isDeactiveByAdmin()) {
+            result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa bởi admin");
+        } else if (!story.isActive()) {
+            result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
+        } else if (!story.isActive()){
+            result.getErrors().put("NOT_FOUND", "Truyện này chưa xuất bản");
+        }
+
+        if(result.getErrors().size() > 0) return result;
 
         GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
 
@@ -272,7 +284,10 @@ class StoryServiceImpl implements StoryService {
         dto.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
 
         dto.setNumOfRead(historyRepository.countAllByStoryId(storyId));
-        return dto;
+
+        result.setSuccess(true);
+        result.setData(dto);
+        return result;
     }
 
     @Override

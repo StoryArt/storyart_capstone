@@ -207,7 +207,7 @@ const StoryManagementPage =  (props) => {
                   onChange={changePage} />
             </div>
           </div>
-          {/* {isLoadingStories && <MySpinner/>} */}
+          {isLoadingStories && <MySpinner/>}
           
           <TableContainer component={Paper}>
               <Table className={classes.table} aria-label="caption table">

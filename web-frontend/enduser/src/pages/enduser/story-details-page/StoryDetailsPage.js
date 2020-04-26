@@ -416,16 +416,18 @@ const StoryDetailsPage = (props) => {
         try {
             const res = await StoryService.getStoryDetails(storyId);
             console.log(res);
-            if (ValidationUtils.isEmpty(res.data)) {
+            const { data, success } = res.data;
+            if (ValidationUtils.isEmpty(data)) {
                 setStoryNotfound(true);
-            } else {
-                setStory(res.data);
-                if (!ValidationUtils.isEmpty(userInfo)) {
-                    getRatingByStoryAndUser(res.data.id);
-                }
-            }
-            if (res.data.user.deactiveByAdmin) {
+            } else if(!success && !ValidationUtils.isEmpty(data)) {
+                setStoryNotfound(true);
+            } else if (data.user.deactiveByAdmin) {
                 setUserIsDeactivated(true);
+            } else {
+                setStory(data);
+                if (!ValidationUtils.isEmpty(userInfo)) {
+                    getRatingByStoryAndUser(data.id);
+                }
             }
         } catch (error) {
             console.log(error);

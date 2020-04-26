@@ -127,8 +127,8 @@ public class StoryController {
 
     @GetMapping("public/{storyId}")
     public ResponseEntity getStoryDetails(@PathVariable int storyId){
-        GetStoryDto story = storyService.getStoryDetails(storyId);
-        return new ResponseEntity(story, HttpStatus.OK);
+        ResultDto resultDto = storyService.getStoryDetails(storyId);
+        return new ResponseEntity(resultDto, HttpStatus.OK);
     }
 
     @GetMapping("public/read/{storyId}")

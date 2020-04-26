@@ -150,6 +150,7 @@ public class SuggestController {
 
         return new ResponseEntity(responsePage, HttpStatus.OK);
     }
+
     @GetMapping("/suggeststory")
     public ResponseEntity getSuggestionStory(
                 @RequestParam(defaultValue = "1") Integer pageNo,
@@ -186,9 +187,6 @@ public class SuggestController {
 
         return new ResponseEntity(responsePage, HttpStatus.OK);
     }
-
-
-
 
     public List<Integer> getRandomElement(List<Integer> list,
                                           int totalItems)
