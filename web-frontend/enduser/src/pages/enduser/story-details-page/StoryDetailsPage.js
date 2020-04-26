@@ -615,12 +615,12 @@ const StoryDetailsPage = (props) => {
                                         <div className="float-left" style={{ minWidth: '60px' }}>
                                             <img className="comment-avatar"
 
-                                                onClick={userInfo.id === comment.userId ? () => props.history.push(`/user/my-profile/`) : () => props.history.push(`/user/profile/${comment.userId}`)}
+                                                onClick={userId === comment.userId ? () => props.history.push(`/user/my-profile/`) : () => props.history.push(`/user/profile/${comment.userId}`)}
                                                 src={comment.userAvatarUrl} />
                                         </div>
                                         <div className="">
                                             <small>
-                                                <Link to={userInfo.id === comment.userId ? `/user/my-profile/` : `/user/profile/${comment.userId}`}>
+                                                <Link to={userId === comment.userId ? `/user/my-profile/` : `/user/profile/${comment.userId}`}>
                                                     <strong
                                                         className="mr-3"
                                                         style={{ fontSize: '1.2em', cursor: 'pointer' }}>
