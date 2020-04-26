@@ -35,6 +35,11 @@ const StoryDetailsPage = (props) => {
     const [alert, setAlert] = useState({ open: false, type: 'success', content: '' })
     const [rating, setRating] = useState({})
     const [userIsDeactivated, setUserIsDeactivated] = useState(false);
+    const [isSendingComment, setIsSendingComment] = useState(false);
+    const [isSendingReaction, setIsSendingReaction] = useState(false);
+    const [isSendingReport, setIsSendingReport] = useState(false);
+    const [isUpdatingComment, setIsUpdatingComment] = useState(false);
+    const [isDeletingComment, setIsDeletingComment] = useState(false);
 
 
     const [modalState, setModalState] = useState({
@@ -127,6 +132,7 @@ const StoryDetailsPage = (props) => {
             });
         }
         closeAlert();
+        setIsUpdatingComment(false);
     }
 
     const toggleModal = (modal, commentIdSpec, index, username, content) => e => {
@@ -219,6 +225,7 @@ const StoryDetailsPage = (props) => {
             });
         }
         closeAlert();
+        setIsDeletingComment(false);
     }
 
     const sendComment = async () => {
@@ -256,6 +263,7 @@ const StoryDetailsPage = (props) => {
             }
         }
         closeAlert();
+        setIsSendingComment(false);
     }
 
     const getCommentsBySort = async (sortString) => {
@@ -314,10 +322,14 @@ const StoryDetailsPage = (props) => {
                 open: true
             });
         }
+        setIsSendingReport(false);
         closeAlert();
     }
 
     const like = async (type, commentId) => {
+        if (isSendingReaction) {
+            return;
+        }
         if (userInfo === null) {
             setAlert({
                 content: 'Vui lòng đăng nhập để sử dụng tính năng này',
@@ -354,9 +366,13 @@ const StoryDetailsPage = (props) => {
             }
         }
         closeAlert();
+        setIsSendingReaction(false);
     }
 
     const dislike = async (type, commentId) => {
+        if (isSendingReaction) {
+            return;
+        }
         if (userInfo === null) {
             setAlert({
                 content: 'Vui lòng đăng nhập để sử dụng tính năng này',
@@ -392,6 +408,7 @@ const StoryDetailsPage = (props) => {
             }
         }
         closeAlert();
+        setIsSendingReaction(false);
     }
 
     const getStoryDetails = async (storyId) => {
@@ -443,6 +460,7 @@ const StoryDetailsPage = (props) => {
             });
         }
         closeAlert();
+        setIsSendingReport(false);
     }
 
     const getRatingByStoryAndUser = async (storyId) => {
@@ -555,7 +573,7 @@ const StoryDetailsPage = (props) => {
                                         onChange={(value) => rateStory(value)}
                                         value={ValidationUtils.isEmpty(rating) ? 0 : rating.stars} />
                                 </div>
-                                <form onSubmit={e => { e.preventDefault(); sendComment(); }}>
+                                <form onSubmit={e => { e.preventDefault(); sendComment(); setIsSendingComment(true) }}>
                                     <div className="form-group">
                                         <TextField
                                             multiline
@@ -573,7 +591,7 @@ const StoryDetailsPage = (props) => {
                                             value={commentContent}
                                             onChange={e => setCommentContent(e.target.value)}></textarea> */}
                                     </div>
-                                    <button className="btn btn-success float-right" type="submit">Gửi</button>
+                                    <button disabled={isSendingComment} className="btn btn-success float-right" type="submit">{isSendingComment ? "Đang gửi..." : "Gửi"}</button>
                                 </form>
                             </div>
                         </div>
@@ -615,12 +633,12 @@ const StoryDetailsPage = (props) => {
                                         <div className="float-left" style={{ minWidth: '60px' }}>
                                             <img className="comment-avatar"
 
-                                                onClick={userInfo.id === comment.userId ? () => props.history.push(`/user/my-profile/`) : () => props.history.push(`/user/profile/${comment.userId}`)}
+                                                onClick={userId === comment.userId ? () => props.history.push(`/user/my-profile/`) : () => props.history.push(`/user/profile/${comment.userId}`)}
                                                 src={comment.userAvatarUrl} />
                                         </div>
                                         <div className="">
                                             <small>
-                                                <Link to={userInfo.id === comment.userId ? `/user/my-profile/` : `/user/profile/${comment.userId}`}>
+                                                <Link to={userId === comment.userId ? `/user/my-profile/` : `/user/profile/${comment.userId}`}>
                                                     <strong
                                                         className="mr-3"
                                                         style={{ fontSize: '1.2em', cursor: 'pointer' }}>
@@ -638,14 +656,14 @@ const StoryDetailsPage = (props) => {
                                     </span> */}
                                             <span className="mr-3" >
                                                 <i className={comment.likes.includes(userId) ? "fas fa-thumbs-up" : "far fa-thumbs-up"}
-                                                    onClick={e => like(comment.likes.includes(userId), comment.id)}
+                                                    onClick={e => { setIsSendingReaction(true); like(comment.likes.includes(userId), comment.id) }}
                                                     style={{ cursor: 'pointer' }}>
                                                 </i>
                                                 <span className="likes-count"> {comment.likes.length}</span>
                                             </span>
                                             <span className="mr-3">
                                                 <i className={comment.dislikes.includes(userId) ? "fas fa-thumbs-down" : "far fa-thumbs-down"}
-                                                    onClick={e => dislike(comment.dislikes.includes(userId), comment.id)}
+                                                    onClick={e => { setIsSendingReaction(true); dislike(comment.dislikes.includes(userId), comment.id) }}
                                                     style={{ cursor: 'pointer' }}>
                                                 </i>
                                                 <span className="dislikes-count"> {comment.dislikes.length}</span>
@@ -691,10 +709,10 @@ const StoryDetailsPage = (props) => {
                                         </form>
                                     </MDBModalBody>
                                     <MDBModalFooter>
-                                        <MDBBtn color='success' onClick={toggleModal('editModal')}>
+                                        <MDBBtn disabled={isUpdatingComment} color='success' onClick={toggleModal('editModal')}>
                                             Hủy
                                         </MDBBtn>
-                                        <MDBBtn color='warning' onClick={updateComment}>Chỉnh sửa</MDBBtn>
+                                        <MDBBtn disabled={isUpdatingComment} color='warning' onClick={e => { setIsUpdatingComment(true); updateComment(); }}>{isUpdatingComment ? "Đang chỉnh sửa..." : "Chỉnh sửa"}</MDBBtn>
                                     </MDBModalFooter>
                                 </MDBModal>
                                 <MDBModal isOpen={modalState.deleteModal} toggle={toggleModal('deleteModal')}>
@@ -703,10 +721,10 @@ const StoryDetailsPage = (props) => {
                                         Bạn có muốn xóa bình luận này không?
                         </MDBModalBody>
                                     <MDBModalFooter>
-                                        <MDBBtn color='success' onClick={toggleModal('deleteModal')}>
+                                        <MDBBtn disabled={isDeletingComment} color='success' onClick={toggleModal('deleteModal')}>
                                             Không
                         </MDBBtn>
-                                        <MDBBtn color='danger' onClick={deleteComment}>Có</MDBBtn>
+                                        <MDBBtn disabled={isDeletingComment} color='danger' onClick={e => { setIsDeletingComment(true); deleteComment(); }}>{isDeletingComment ? "Đang xóa..." : "Xóa"}</MDBBtn>
                                     </MDBModalFooter>
                                 </MDBModal>
                                 <MDBModal isOpen={modalState.reportModal} toggle={toggleModal('reportModal')}>
@@ -725,10 +743,10 @@ const StoryDetailsPage = (props) => {
                                         </form>
                                     </MDBModalBody>
                                     <MDBModalFooter>
-                                        <MDBBtn color='success' onClick={toggleModal('reportModal')}>
+                                        <MDBBtn disabled={isSendingReport} color='success' onClick={toggleModal('reportModal')}>
                                             Hủy
                                         </MDBBtn>
-                                        <MDBBtn color='danger' onClick={reportComment}>Gửi</MDBBtn>
+                                        <MDBBtn disabled={isSendingReport} color='danger' onClick={e => { setIsSendingReport(true); reportComment(); }}>{isSendingReport ? "Đang gửi..." : "Gửi"}</MDBBtn>
                                     </MDBModalFooter>
                                 </MDBModal>
 
@@ -748,10 +766,10 @@ const StoryDetailsPage = (props) => {
                                         </form>
                                     </MDBModalBody>
                                     <MDBModalFooter>
-                                        <MDBBtn color='success' onClick={toggleModal('reportStoryModal')}>
+                                        <MDBBtn disabled={isSendingReport} color='success' onClick={toggleModal('reportStoryModal')}>
                                             Hủy
                                         </MDBBtn>
-                                        <MDBBtn color='danger' onClick={reportStory}>Gửi</MDBBtn>
+                                        <MDBBtn disabled={isSendingReport} color='danger' onClick={e => { setIsSendingReport(true); reportStory(); }}>{isSendingReport ? "Đang gửi..." : "Gửi"}</MDBBtn>
                                     </MDBModalFooter>
                                 </MDBModal>
 
