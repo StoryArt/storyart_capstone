@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -33,7 +34,7 @@ public class ReportController {
 
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
-
+    @Secured({"ROLE_ADMIN"})
     @GetMapping("/getCommentReports")
     public Page<ReportCommentResponseDTO> getCommentReports(
             @RequestParam(defaultValue = "") String searchString,
@@ -46,7 +47,7 @@ public class ReportController {
         }
         return reportService.getListReportComment(searchString,isHandled,pageNo, pageSize);
     }
-
+    @Secured({"ROLE_ADMIN"})
     @GetMapping("/getStoryReports")
     public Page<StoryReportResponse> getStoryReports(
             @RequestParam(defaultValue = "") String searchString,
@@ -59,7 +60,7 @@ public class ReportController {
         }
         return reportService.getListReportStory(searchString,isHandled,pageNo, pageSize);
     }
-
+    @Secured({"ROLE_ADMIN"})
     @GetMapping("/getReportsByCommentId")
     public Page<ReportByCommentIdResponse> getRoportsByCommentId(
             @RequestParam(defaultValue = "false") boolean isHandled,
@@ -72,7 +73,7 @@ public class ReportController {
         }
         return reportService.getReportsByCommentId(commentId,isHandled, pageNo, pageSize);
     }
-
+    @Secured({"ROLE_ADMIN"})
     @GetMapping("/getReportsByStoryId")
     public Page<ReportByStoryIdResponse> getRoportsByStoryId(
             @RequestParam(defaultValue = "false") boolean isHandled,
@@ -85,7 +86,7 @@ public class ReportController {
         }
         return reportService.getReportsByStoryId(storyId,isHandled, pageNo, pageSize);
     }
-
+    @Secured({"ROLE_ADMIN"})
     @PostMapping("/handleReport")
     public ResponseEntity<Boolean> handleReport(
             @RequestBody @Valid HandleReportRequestDTO request){

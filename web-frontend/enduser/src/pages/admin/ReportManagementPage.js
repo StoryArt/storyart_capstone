@@ -11,6 +11,8 @@ import ReportService from '../../services/report.service';
 import { getAuthUserInfo } from '../../config/auth';
 import { Tabs, Tab } from '@material-ui/core';
 import { Link } from 'react-router-dom';
+import MyAlert from '../../components/common/MyAlert';
+//import MyAlert from '../../../components/common/MyAlert';
 
 const ReportManagementPage = () => {
   const userInfo = getAuthUserInfo();
@@ -36,6 +38,8 @@ const ReportManagementPage = () => {
 
   const [handledDropdown, setHandledDropdown] = useState('Chưa xử lý');
   const [handledStoryDropdown, setHandledStoryDropdown] = useState('Chưa xử lý');
+  const [alert, setAlert] = useState({ open: false, type: 'success', content: '' })
+  const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
 
   const getCommentReportsData = async (isHandled) => {
     try {
@@ -395,6 +399,7 @@ const ReportManagementPage = () => {
         handleRequest.id = reportContent.storyId;
       }
       const res = await ReportService.handleReport(handleRequest);
+
       if (activeItem === "1") {
         var updateRows = [...dataTable.rows];
         setDataTable({ ...dataTable, rows: updateRows.filter(item => item.commentId !== commentId) });
@@ -403,11 +408,18 @@ const ReportManagementPage = () => {
         var updateRows = [...dataStoryTable.rows];
         setDataStoryTable({ ...dataStoryTable, rows: updateRows.filter(item => item.storyId !== storyId) });
       }
+      setHandleModal(!handleModal);
 
     } catch (error) {
       console.log(error);
+      setAlert({
+        content: error.response.data.message,
+        type: 'error',
+        open: true
+      });
     }
-    setHandleModal(!handleModal);
+
+    closeAlert();
 
 
 
@@ -516,9 +528,13 @@ const ReportManagementPage = () => {
 
       }
     } catch (error) {
-
+      setAlert({
+        content: error.response.data.message,
+        type: 'error',
+        open: true
+      });
     }
-
+    closeAlert();
 
   }
   const [searchString, setSearchString] = useState('');
@@ -860,7 +876,12 @@ const ReportManagementPage = () => {
 
 
       </div>
-
+      <MyAlert
+        content={alert.content}
+        type={alert.type}
+        open={alert.open}
+        setOpen={() => setAlert({ ...alert, open: true })}
+      />
     </MainLayout>
 
   )

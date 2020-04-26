@@ -1,12 +1,10 @@
 package com.storyart.commentservice.service;
 
+import com.storyart.commentservice.common.constants.RoleName;
 import com.storyart.commentservice.dto.comment.ResponseListCommentDTO;
 import com.storyart.commentservice.dto.report.*;
 import com.storyart.commentservice.model.*;
-import com.storyart.commentservice.repository.CommentRepository;
-import com.storyart.commentservice.repository.ReportRepository;
-import com.storyart.commentservice.repository.StoryRepository;
-import com.storyart.commentservice.repository.UserRepository;
+import com.storyart.commentservice.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,6 +30,8 @@ public class ReportServiceImpl implements ReportService {
     CommentRepository commentRepository;
     @Autowired
     StoryRepository storyRepository;
+    @Autowired
+    RoleRepository roleRepository;
 
     @Override
     public void reportComment(ReportCommentRequestDTO reportCommentRequestDTO) {
@@ -375,6 +375,14 @@ public class ReportServiceImpl implements ReportService {
             }
             User u = user.get();
             if (request.getAction().equals("deactivate")) {
+                Optional<Role> role = roleRepository.findRoleById(u.getRoleId());
+                if(!role.isPresent()){
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Role không tồn tại.");
+                }
+                Role r = role.get();
+                if(r.getName() == RoleName.ROLE_ADMIN || r.getName() ==  RoleName.ROLE_SYSTEM_ADMIN){
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Bạn không có quyền vô hiệu hóa tài khoản này, vui lòng liên hệ System Admin tại systemadmin@gmail.com để xử lý");
+                }
                 u.setDeactiveByAdmin(true);
                 userRepository.save(u);
             }
