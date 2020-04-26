@@ -239,6 +239,18 @@ const ReportManagementPage = () => {
     }
   };
 
+  const changeStoryPage = async (event, value) => {
+    if (value !== storyPageNo) {
+      setStoryPageNo(value);
+      try {
+        const res = await ReportService.getStoryReports(searchString, value, storyHandled);
+        convertStoryData(res.data.content);
+      } catch (error) {
+
+      }
+    }
+  };
+
 
 
 
@@ -726,7 +738,7 @@ const ReportManagementPage = () => {
 
                 {dataStoryTable.rows.length > 0 &&
                   <div>
-                    <Pagination page={storyPageNo} className="float-right" count={totalStoryPages} color="primary" boundaryCount={2} onChange={changePage} />
+                    <Pagination page={storyPageNo} className="float-right" count={totalStoryPages} color="primary" boundaryCount={2} onChange={changeStoryPage} />
 
                     <MDBTable striped hover bordered small>
                       <MDBTableHead columns={dataStoryTable.columns} />
