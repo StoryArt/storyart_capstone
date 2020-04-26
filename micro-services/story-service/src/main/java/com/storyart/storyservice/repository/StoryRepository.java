@@ -15,13 +15,13 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
     @Query(value = "select * from story s " +
             "left join user u ON s.user_id = u.id " +
             "WHERE (s.active = true and s.published = true and s.deactive_by_admin = false) " +
-            "and (s.title like %?1% or s.intro like %?1% or " +
+            "and (s.title like %?1% or " +
             "u.name like %?1%) and u.is_active = true and u.is_deactive_by_admin = false " +
             "and s.id in (select distinct story_id from story_tag st where st.tag_id in ?2) order by s.created_at DESC",
 
             countQuery = "select count(*) from story s left join user u ON s.user_id = u.id WHERE " +
                     "(s.active = true and s.published = true and s.deactive_by_admin = false) " +
-                    "and (s.title like %?1% or s.intro like %?1% or " +
+                    "and (s.title like %?1% or " +
                     "u.name like %?1%) and u.is_active = true and u.is_deactive_by_admin = false " +
                     "and s.id in (select distinct story_id from story_tag st where st.tag_id in ?2) order by s.created_at DESC",
 
@@ -29,11 +29,11 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
     Page<Story> findAllBySearchCondition(String title, Set<Integer> tagIds,
                                 boolean active, boolean published, Pageable pageable);
 
-    @Query(value = "select * from story s WHERE s.user_id = ?1 and (s.title like %?2% or s.intro like %?2%) " +
+    @Query(value = "select * from story s WHERE s.user_id = ?1 and (s.title like %?2%) " +
             "and s.active = true and s.published = true and s.deactive_by_admin = false and s.id in " +
             "(select distinct story_id from story_tag st where st.tag_id in ?3) order by s.created_at DESC",
 
-            countQuery = "select count(*) from story s WHERE s.user_id = ?1 and (s.title like %?2% or s.intro like %?2%) " +
+            countQuery = "select count(*) from story s WHERE s.user_id = ?1 and (s.title like %?2%) " +
                     "and s.active = true and s.published = true and s.deactive_by_admin = false and s.id in " +
                     "(select distinct story_id from story_tag st where st.tag_id in ?3) order by s.created_at DESC",
 

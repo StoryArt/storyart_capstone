@@ -1,9 +1,9 @@
 package com.storyart.storyservice.common;
 
 public class MyQueries {
-    public static final String countStoriesByKeyword = "select count(s.id) from story s WHERE (s.title like %?1% or s.intro like %?1%)";
+    public static final String countStoriesByKeyword = "select count(s.id) from story s WHERE (s.title like %?1%)";
     public static final String getStoriesByKeyword = "select * from story s " +
-            "WHERE (s.title like %?1% or s.intro like %?1% " +
+            "WHERE (s.title like %?1% " +
             "or (select name from user u where u.id = s.user_id) like %?1%)";
     public static final String getStoriesByUser = "select * from story s " +
             "WHERE s.user_id = ?1 and s.active = true and s.deactive_by_admin = false " +

@@ -106,14 +106,14 @@ const LoginPage = () => {
     } catch (error) {
 
       var err;
-    if ( typeof error.response == "undefined"){
+    if (typeof error.response == "undefined"){
       setAlert({
         type: 'error',
         content:  "Đã xảy ra lỗi, thử lại!",
         open: true
       });
       closeAlert();
-      return 
+      return;
     }
       if (typeof error.response.data.errors != "undefined") {
         err = error.response.data.errors[0].defaultMessage;
