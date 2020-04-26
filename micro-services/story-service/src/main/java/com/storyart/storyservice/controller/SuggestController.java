@@ -54,55 +54,6 @@ public class SuggestController {
     TagService tagService;
 
 
-    @GetMapping("/suggeststory")
-    public ResponseEntity getSuggestionStory(
-                @RequestParam(defaultValue = "1") Integer pageNo,
-                                        @RequestParam(defaultValue = "10") Integer pageSize)
-    {
-
-        pageNo = pageNo -1;
-        if(pageNo<0){
-            pageNo = 0;
-        }
-        List<Integer> total = new ArrayList<>();
-        List<Integer> liststoryInteger = historyRepository.countTopView();
-        if(liststoryInteger.size() >= 4){
-            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
-            total.addAll(AfterRandom);
-        }else{
-            total.addAll(liststoryInteger);
-        }
-
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<Story> storyPage = storyRepository.findAllByStoryIds(total, pageable);
-        ModelMapper mm = new ModelMapper();
-        Page<GetStoryDto> responsePage = storyPage.map(new Function<Story, GetStoryDto>() {
-            @Override
-            public GetStoryDto apply(Story story) {
-                List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
-                GetStoryDto dto = mm.map(story, GetStoryDto.class);
-                dto.setTags(tagService.mapModelToDto(tagList));
-                dto.setUser(userRepository.findById(story.getUserId()).orElse(null));
-                dto.setNumOfRead(historyRepository.countAllByStoryId(dto.getId()));
-                return dto;
-            }
-        });
-
-        return new ResponseEntity(responsePage, HttpStatus.OK);
-    }
-
-
-
-
-    public List<Integer> getRandomElement(List<Integer> list,
-                                          int totalItems)
-    {
-        Random rand = new Random();
-        Collections.shuffle(list);
-        List<Integer> newList = list.subList(0,totalItems);
-        return newList;
-    }
-
     @GetMapping("/suggest{id}")
     public ResponseEntity getSuggestion(@PathVariable("id") Integer id,
                                         @RequestParam(defaultValue = "1") Integer pageNo,
@@ -198,5 +149,53 @@ public class SuggestController {
         });
 
         return new ResponseEntity(responsePage, HttpStatus.OK);
+    }
+    @GetMapping("/suggeststory")
+    public ResponseEntity getSuggestionStory(
+                @RequestParam(defaultValue = "1") Integer pageNo,
+                                        @RequestParam(defaultValue = "10") Integer pageSize)
+    {
+
+        pageNo = pageNo -1;
+        if(pageNo<0){
+            pageNo = 0;
+        }
+        List<Integer> total = new ArrayList<>();
+        List<Integer> liststoryInteger = historyRepository.countTopView();
+        if(liststoryInteger.size() >= 4){
+            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
+            total.addAll(AfterRandom);
+        }else{
+            total.addAll(liststoryInteger);
+        }
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<Story> storyPage = storyRepository.findAllByStoryIds(total, pageable);
+        ModelMapper mm = new ModelMapper();
+        Page<GetStoryDto> responsePage = storyPage.map(new Function<Story, GetStoryDto>() {
+            @Override
+            public GetStoryDto apply(Story story) {
+                List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
+                GetStoryDto dto = mm.map(story, GetStoryDto.class);
+                dto.setTags(tagService.mapModelToDto(tagList));
+                dto.setUser(userRepository.findById(story.getUserId()).orElse(null));
+                dto.setNumOfRead(historyRepository.countAllByStoryId(dto.getId()));
+                return dto;
+            }
+        });
+
+        return new ResponseEntity(responsePage, HttpStatus.OK);
+    }
+
+
+
+
+    public List<Integer> getRandomElement(List<Integer> list,
+                                          int totalItems)
+    {
+        Random rand = new Random();
+        Collections.shuffle(list);
+        List<Integer> newList = list.subList(0,totalItems);
+        return newList;
     }
 }
