@@ -40,6 +40,10 @@ const ReportManagementPage = () => {
   const [handledStoryDropdown, setHandledStoryDropdown] = useState('Chưa xử lý');
   const [alert, setAlert] = useState({ open: false, type: 'success', content: '' })
   const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
+  const [isHandling, setIsHandling] = useState(false);
+  const [isHandlingAccount, setIsHandlinggAccount] = useState(false);
+  const [isHandlingComment, setIsHandlingComment] = useState(false);
+  const [isHandlingStory, setIsHandlingStory] = useState(false);
 
   const getCommentReportsData = async (isHandled) => {
     try {
@@ -418,7 +422,7 @@ const ReportManagementPage = () => {
         open: true
       });
     }
-
+    setIsHandling(false);
     closeAlert();
 
 
@@ -535,6 +539,9 @@ const ReportManagementPage = () => {
       });
     }
     closeAlert();
+    setIsHandlingStory(false);
+    setIsHandlinggAccount(false);
+    setIsHandlingComment(false);
 
   }
   const [searchString, setSearchString] = useState('');
@@ -757,18 +764,18 @@ const ReportManagementPage = () => {
                     <p className="col-sm-8">Trạng thái bình luận:
                     <strong style={reportContent.commentIsDisableByAdmin ? ({ color: 'red' }) : ({ color: 'green' })}> {reportContent.commentIsDisableByAdmin ? "Đã ẩn" : "Bình thường"} </strong>
                     </p>
-                    <MDBBtn className="col-sm-3 float-right" color="primary"
-                      onClick={e => changeStatusWhenReview('comment', reportContent.commentIsDisableByAdmin)}
-                    >{reportContent.commentIsDisableByAdmin ? "Mở lại" : "Ẩn"}</MDBBtn>
+                    <MDBBtn disabled={isHandlingComment} className="col-sm-3 float-right" color="primary"
+                      onClick={e => { setIsHandlingComment(true); changeStatusWhenReview('comment', reportContent.commentIsDisableByAdmin); }}
+                    >{isHandlingComment ? "Đang xử lý..." : (reportContent.commentIsDisableByAdmin ? "Mở lại" : "Ẩn")}</MDBBtn>
                   </div>
 
                   <div className="row">
                     <p className="col-sm-8">Trạng thái người dùng:
                   <strong style={reportContent.userIsDisableByAdmin ? ({ color: 'red' }) : ({ color: 'green' })}> {reportContent.userIsDisableByAdmin ? "Đã vô hiệu hóa" : "Bình thường"} </strong>
                     </p>
-                    <MDBBtn className="col-sm-3 float-right" color="primary"
-                      onClick={e => changeStatusWhenReview('user', reportContent.userIsDisableByAdmin)}>
-                      {reportContent.userIsDisableByAdmin ? "Mở lại" : "Vô hiệu hóa"}</MDBBtn>
+                    <MDBBtn disabled={isHandlingAccount} className="col-sm-3 float-right" color="primary"
+                      onClick={e => { setIsHandlinggAccount(true); changeStatusWhenReview('user', reportContent.userIsDisableByAdmin); }}>
+                      {isHandlingAccount ? "Đang xử lý..." : (reportContent.userIsDisableByAdmin ? "Mở lại" : "Vô hiệu hóa")}</MDBBtn>
                   </div>
 
                 </div>
@@ -818,9 +825,9 @@ const ReportManagementPage = () => {
                     <p className="col-sm-8">Trạng thái truyện:
                     <strong style={reportContent.storyIsDisableByAdmin ? ({ color: 'red' }) : ({ color: 'green' })}> {reportContent.storyIsDisableByAdmin ? "Đã ẩn" : "Bình thường"} </strong>
                     </p>
-                    <MDBBtn className="col-sm-3 float-right" color="primary"
-                      onClick={e => changeStatusWhenReview('story', reportContent.storyIsDisableByAdmin)}>
-                      {reportContent.storyIsDisableByAdmin ? "Mở lại" : "Ẩn"}
+                    <MDBBtn disabled={isHandlingStory} className="col-sm-3 float-right" color="primary"
+                      onClick={e => { setIsHandlingStory(true); changeStatusWhenReview('story', reportContent.storyIsDisableByAdmin); }}>
+                      {isHandlingStory ? "Đang xử lý..." : (reportContent.storyIsDisableByAdmin ? "Mở lại" : "Ẩn")}
                     </MDBBtn>
                   </div>
 
@@ -828,9 +835,9 @@ const ReportManagementPage = () => {
                     <p className="col-sm-8">Trạng thái người dùng:
                   <strong style={reportContent.userIsDisableByAdmin ? ({ color: 'red' }) : ({ color: 'green' })}> {reportContent.userIsDisableByAdmin ? "Đã vô hiệu hóa" : "Bình thường"} </strong>
                     </p>
-                    <MDBBtn className="col-sm-3 float-right" color="primary"
-                      onClick={e => changeStatusWhenReview('user', reportContent.userIsDisableByAdmin)} >
-                      {reportContent.userIsDisableByAdmin ? "Mở lại" : "Vô hiệu hóa"}
+                    <MDBBtn disabled={isHandlingAccount} className="col-sm-3 float-right" color="primary"
+                      onClick={e => { setIsHandlinggAccount(true); changeStatusWhenReview('user', reportContent.userIsDisableByAdmin); }} >
+                      {isHandlingAccount ? "Đang xử lý..." : (reportContent.userIsDisableByAdmin ? "Mở lại" : "Vô hiệu hóa")}
                     </MDBBtn>
                   </div>
 
@@ -865,10 +872,10 @@ const ReportManagementPage = () => {
           }
           {!reportContent.handled &&
             <MDBModalFooter>
-              <MDBBtn color='success' onClick={e => setHandleModal(!handleModal)}>
+              <MDBBtn disabled={isHandling} color='success' onClick={e => setHandleModal(!handleModal)}>
                 Hủy
                                       </MDBBtn>
-              <MDBBtn color='warning' onClick={handleReportAction} >Xử lý</MDBBtn>
+              <MDBBtn disabled={isHandling} color='warning' onClick={e => { setIsHandling(true); handleReportAction(); }} >{isHandling ? "Đang xử lý..." : "Xử lý"}</MDBBtn>
             </MDBModalFooter>
           }
 

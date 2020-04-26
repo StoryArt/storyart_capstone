@@ -37,6 +37,9 @@ const StoryDetailsPage = (props) => {
     const [userIsDeactivated, setUserIsDeactivated] = useState(false);
     const [isSendingComment, setIsSendingComment] = useState(false);
     const [isSendingReaction, setIsSendingReaction] = useState(false);
+    const [isSendingReport, setIsSendingReport] = useState(false);
+    const [isUpdatingComment, setIsUpdatingComment] = useState(false);
+    const [isDeletingComment, setIsDeletingComment] = useState(false);
 
 
     const [modalState, setModalState] = useState({
@@ -129,6 +132,7 @@ const StoryDetailsPage = (props) => {
             });
         }
         closeAlert();
+        setIsUpdatingComment(false);
     }
 
     const toggleModal = (modal, commentIdSpec, index, username, content) => e => {
@@ -221,6 +225,7 @@ const StoryDetailsPage = (props) => {
             });
         }
         closeAlert();
+        setIsDeletingComment(false);
     }
 
     const sendComment = async () => {
@@ -317,6 +322,7 @@ const StoryDetailsPage = (props) => {
                 open: true
             });
         }
+        setIsSendingReport(false);
         closeAlert();
     }
 
@@ -454,6 +460,7 @@ const StoryDetailsPage = (props) => {
             });
         }
         closeAlert();
+        setIsSendingReport(false);
     }
 
     const getRatingByStoryAndUser = async (storyId) => {
@@ -702,10 +709,10 @@ const StoryDetailsPage = (props) => {
                                         </form>
                                     </MDBModalBody>
                                     <MDBModalFooter>
-                                        <MDBBtn color='success' onClick={toggleModal('editModal')}>
+                                        <MDBBtn disabled={isUpdatingComment} color='success' onClick={toggleModal('editModal')}>
                                             Hủy
                                         </MDBBtn>
-                                        <MDBBtn color='warning' onClick={updateComment}>Chỉnh sửa</MDBBtn>
+                                        <MDBBtn disabled={isUpdatingComment} color='warning' onClick={e => { setIsUpdatingComment(true); updateComment(); }}>{isUpdatingComment ? "Đang chỉnh sửa..." : "Chỉnh sửa"}</MDBBtn>
                                     </MDBModalFooter>
                                 </MDBModal>
                                 <MDBModal isOpen={modalState.deleteModal} toggle={toggleModal('deleteModal')}>
@@ -714,10 +721,10 @@ const StoryDetailsPage = (props) => {
                                         Bạn có muốn xóa bình luận này không?
                         </MDBModalBody>
                                     <MDBModalFooter>
-                                        <MDBBtn color='success' onClick={toggleModal('deleteModal')}>
+                                        <MDBBtn disabled={isDeletingComment} color='success' onClick={toggleModal('deleteModal')}>
                                             Không
                         </MDBBtn>
-                                        <MDBBtn color='danger' onClick={deleteComment}>Có</MDBBtn>
+                                        <MDBBtn disabled={isDeletingComment} color='danger' onClick={e => { setIsDeletingComment(true); deleteComment(); }}>{isDeletingComment ? "Đang xóa..." : "Xóa"}</MDBBtn>
                                     </MDBModalFooter>
                                 </MDBModal>
                                 <MDBModal isOpen={modalState.reportModal} toggle={toggleModal('reportModal')}>
@@ -736,10 +743,10 @@ const StoryDetailsPage = (props) => {
                                         </form>
                                     </MDBModalBody>
                                     <MDBModalFooter>
-                                        <MDBBtn color='success' onClick={toggleModal('reportModal')}>
+                                        <MDBBtn disabled={isSendingReport} color='success' onClick={toggleModal('reportModal')}>
                                             Hủy
                                         </MDBBtn>
-                                        <MDBBtn color='danger' onClick={reportComment}>Gửi</MDBBtn>
+                                        <MDBBtn disabled={isSendingReport} color='danger' onClick={e => { setIsSendingReport(true); reportComment(); }}>{isSendingReport ? "Đang gửi..." : "Gửi"}</MDBBtn>
                                     </MDBModalFooter>
                                 </MDBModal>
 
@@ -759,10 +766,10 @@ const StoryDetailsPage = (props) => {
                                         </form>
                                     </MDBModalBody>
                                     <MDBModalFooter>
-                                        <MDBBtn color='success' onClick={toggleModal('reportStoryModal')}>
+                                        <MDBBtn disabled={isSendingReport} color='success' onClick={toggleModal('reportStoryModal')}>
                                             Hủy
                                         </MDBBtn>
-                                        <MDBBtn color='danger' onClick={reportStory}>Gửi</MDBBtn>
+                                        <MDBBtn disabled={isSendingReport} color='danger' onClick={e => { setIsSendingReport(true); reportStory(); }}>{isSendingReport ? "Đang gửi..." : "Gửi"}</MDBBtn>
                                     </MDBModalFooter>
                                 </MDBModal>
 
