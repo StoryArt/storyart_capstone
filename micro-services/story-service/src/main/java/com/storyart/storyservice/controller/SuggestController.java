@@ -52,46 +52,48 @@ public class SuggestController {
 
     @Autowired
     TagService tagService;
-        @GetMapping("/suggest{id}")
-        public ResponseEntity getSuggestion(@PathVariable("id") Integer id,
-            @RequestParam(defaultValue = "1") Integer pageNo,
-            @RequestParam(defaultValue = "10") Integer pageSize)
-        {
+
+
+    @GetMapping("/suggest{id}")
+    public ResponseEntity getSuggestion(@PathVariable("id") Integer id,
+                                        @RequestParam(defaultValue = "1") Integer pageNo,
+                                        @RequestParam(defaultValue = "10") Integer pageSize)
+    {
         pageNo = pageNo -1;
         if(pageNo<0){
             pageNo = 0;
         }
-            Pageable pageable = PageRequest.of(pageNo, pageSize);
-            List<Integer> total = new ArrayList<>();
-            List<Integer> liststoryInteger =  historyRepository.countTopView();
-    Optional<Integer> check = ratingRepository.checkRatingById(id);
-            List<Integer> listRatingExceptThisWeek = new ArrayList();
-    if(check.isPresent()){
-        listRatingExceptThisWeek = ratingService.getSuggestion(id,false);
-        //     List<Integer> listhistory = historyService.jaccardCalculate(id);
-        //  List<Integer> listStoryPoint = ratingService.getSuggestByCommentAndReaction();
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        List<Integer> total = new ArrayList<>();
+        List<Integer> liststoryInteger =  historyRepository.countTopViewById(id);
+        Optional<Integer> check = ratingRepository.checkRatingById(id);
+        List<Integer> listRatingExceptThisWeek = new ArrayList();
+        if(check.isPresent()){
+            listRatingExceptThisWeek = ratingService.getSuggestion(id,false);
+            //     List<Integer> listhistory = historyService.jaccardCalculate(id);
+            //  List<Integer> listStoryPoint = ratingService.getSuggestByCommentAndReaction();
 
-       // List<Integer> listRatingthisWeek = ratingService.getSuggestion(id,true);
+            // List<Integer> listRatingthisWeek = ratingService.getSuggestion(id,true);
 
-    try{
-        if(listRatingExceptThisWeek.size() == 0){
-            if(liststoryInteger.size() >= 4){
-                List<Integer> AfterRandom = getRandomElement(liststoryInteger, 10);
-                total.addAll(AfterRandom);
-            }else{
-                total.addAll(liststoryInteger);
-            }
-        }else{
-            if(listRatingExceptThisWeek.size() >=4){
-                List<Integer> listRatingExceptThisWeekR = getRandomElement(listRatingExceptThisWeek, 10);
-                total.addAll(listRatingExceptThisWeekR);
+            try{
+                if(listRatingExceptThisWeek.size() == 0){
+                    if(liststoryInteger.size() >= 4){
+                        List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
+                        total.addAll(AfterRandom);
+                    }else{
+                        total.addAll(liststoryInteger);
+                    }
+                }else{
+                    if(listRatingExceptThisWeek.size() >=4){
+                        List<Integer> listRatingExceptThisWeekR = getRandomElement(listRatingExceptThisWeek, 4);
+                        total.addAll(listRatingExceptThisWeekR);
 
-            }else{
-                for (int i =0; i < listRatingExceptThisWeek.size(); i++){
-                    total.add(listRatingExceptThisWeek.get(i));
+                    }else{
+                        for (int i =0; i < listRatingExceptThisWeek.size(); i++){
+                            total.add(listRatingExceptThisWeek.get(i));
+                        }
+                    }
                 }
-            }
-        }
 
    /* if(listRatingthisWeek.size() >=4){
         List<Integer> listlistRatingthisWeek = getRandomElement(listRatingthisWeek, 4);
@@ -102,53 +104,52 @@ public class SuggestController {
             total.add(listRatingthisWeek.get(i));
         }
     }*/
-    }catch (Exception ex){
+            }catch (Exception ex){
 
-        if(liststoryInteger.size() >= 4){
-            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 10);
-            total.addAll(AfterRandom);
-        }else{
-            total.addAll(liststoryInteger);
-        }
-    }
-     }else{
-        if(liststoryInteger.size() >= 4){
-            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 10);
-            total.addAll(AfterRandom);
-        }else{
-            total.addAll(liststoryInteger);
-        }
-    }
-    List<Integer> listStoryAuthor = storyRepository.getAllStoryIdByUserId(id);
-    if(listStoryAuthor.size() >0){
-        total.removeAll(listStoryAuthor);
-    }
-    if(total.size() == 0){
-        List<Integer> AfterRandom = getRandomElement(liststoryInteger, 10);
-        total.addAll(AfterRandom);
-    }
-            if(total.size() > 4){
-                List<Integer> AfterRandom = getRandomElement(total, 4);
-                total.removeAll(total);
-                total.addAll(AfterRandom);
-            }
-            Page<Story> storyPage = storyRepository.findAllByStoryIds(total, pageable);
-            ModelMapper mm = new ModelMapper();
-            Page<GetStoryDto> responsePage = storyPage.map(new Function<Story, GetStoryDto>() {
-                @Override
-                public GetStoryDto apply(Story story) {
-                    List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
-                    GetStoryDto dto = mm.map(story, GetStoryDto.class);
-                    dto.setTags(tagService.mapModelToDto(tagList));
-                    dto.setUser(userRepository.findById(story.getUserId()).orElse(null));
-                    dto.setNumOfRead(historyRepository.countAllByStoryId(dto.getId()));
-                    return dto;
+                if(liststoryInteger.size() >= 4){
+                    List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
+                    total.addAll(AfterRandom);
+                }else{
+                    total.addAll(liststoryInteger);
                 }
-            });
+            }
+        }else{
+            if(liststoryInteger.size() >= 4){
+                List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
+                total.addAll(AfterRandom);
+            }else{
+                total.addAll(liststoryInteger);
+            }
+        }
+        List<Integer> listStoryAuthor = storyRepository.getAllStoryIdByUserId(id);
+        if(listStoryAuthor.size() >0){
+            total.removeAll(listStoryAuthor);
+        }
+        if(total.size() == 0){
+            List<Integer> AfterRandom = getRandomElement(liststoryInteger, 4);
+            total.addAll(AfterRandom);
+        }
+        if(total.size() > 4){
+            List<Integer> AfterRandom = getRandomElement(total, 4);
+            total = new ArrayList<>();
+            total.addAll(AfterRandom);
+        }
+        Page<Story> storyPage = storyRepository.findAllByStoryIds(total, pageable);
+        ModelMapper mm = new ModelMapper();
+        Page<GetStoryDto> responsePage = storyPage.map(new Function<Story, GetStoryDto>() {
+            @Override
+            public GetStoryDto apply(Story story) {
+                List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
+                GetStoryDto dto = mm.map(story, GetStoryDto.class);
+                dto.setTags(tagService.mapModelToDto(tagList));
+                dto.setUser(userRepository.findById(story.getUserId()).orElse(null));
+                dto.setNumOfRead(historyRepository.countAllByStoryId(dto.getId()));
+                return dto;
+            }
+        });
 
-            return new ResponseEntity(responsePage, HttpStatus.OK);
+        return new ResponseEntity(responsePage, HttpStatus.OK);
     }
-
     @GetMapping("/suggeststory")
     public ResponseEntity getSuggestionStory(
                 @RequestParam(defaultValue = "1") Integer pageNo,
