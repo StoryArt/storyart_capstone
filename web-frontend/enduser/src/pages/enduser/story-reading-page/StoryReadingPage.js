@@ -17,6 +17,7 @@ import SocialShare from '../../../components/common/SocialShare';
 import MyFullScreenShowWrapper from '../../../components/common/MyFullScreenShowWrapper';
 import ReadingHistoryService from '../../../services/reading_history.service';
 import MyBackdrop from '../../../components/common/MyBackdrop';
+import ConfirmDialog from '../../../components/common/ConfirmDialog';
 
 
 let readingScreenDuration = 0;
@@ -26,15 +27,19 @@ let listScreenId = [];
 let initialInformations;
 let isEndStory = false;
 let savedStoryId;
+let screenList = [];
 let myCurrentScreen = null;
+let interactionCheck = { duration: 0, isInteracted: true };
+let interactionInterval = null;
 
-const countTimeReading = () => {
-    readingScreenDuration = 0;
+const countTimeReading = (startTime) => {
+    if(ValidationUtils.isEmpty(startTime)) startTime = 0;
+    readingScreenDuration = startTime;
     interval = window.setInterval(() => {
         readingScreenDuration++;
 
-        //if time is more than 5 min, set time for this screen and stop counter
-        if(readingScreenDuration > 60*60) {
+        //if time is more than 15 min, set time for this screen and stop counter
+        if(readingScreenDuration > 15*60) {
             stopCountTimeReading();
         }
     }, 1000);
@@ -59,6 +64,7 @@ const ReadStoryPage = (props) => {
     const [currentScreen, setCurrentScreen] = useState({});
     const [showScreen, setShowScreen] = useState(false);
     const [isEnd, setEnd] = useState(false);
+    const [dialog, setDialog] = useState({ open: false, content: '' });
     
 
     useEffect(() => {
@@ -108,7 +114,7 @@ const ReadStoryPage = (props) => {
 
     const isEndScreen = (screen) => {
         if(ValidationUtils.isEmpty(screen)) return false;
-        if (screen.id === story.firstScreenId) return false;
+        // if (screen.id === story.firstScreenId && screenList.length > 1) return false;
         
         const haveNextScreenAction = ValidationUtils.isEmpty(screen.actions) ? false : screen.actions.some(a => a.type === ACTION_TYPES.NEXT_SCREEN || a.type === ACTION_TYPES.UPDATE_INFORMATION)
         if(haveNextScreenAction) return false;
@@ -125,10 +131,45 @@ const ReadStoryPage = (props) => {
         }
     }
 
+    const handleInteractionEvent = () => {
+        if(interactionCheck.isInteracted) interactionCheck.duration = 0;
+    }
+
+    const setUpCheckUserInteraction = () => {
+        window.addEventListener('mousemove', handleInteractionEvent);
+        window.addEventListener('click', handleInteractionEvent);
+        window.addEventListener('scroll', handleInteractionEvent);
+        window.addEventListener('keypress', handleInteractionEvent);
+
+        startInteractionInterval();
+    }
+
+    const startInteractionInterval = () => {
+        window.clearInterval(interactionInterval);
+        interactionInterval = window.setInterval(() => {
+            interactionCheck.duration++;
+            
+            //if 2min no interaction, system will confirm if the user want to continue reading.
+            if(interactionCheck.duration > 2 * 60 && interactionCheck.isInteracted){
+                interactionCheck.isInteracted = false;
+                stopCountTimeReading();
+                setDialog({ open: true, content: 'Bạn có muốn đọc tiếp câu truyện hay không?' });
+            }
+        }, 1000);
+    }
+
+    const confirmContinueReading = () => {
+        interactionCheck = { duration: 0, isInteracted: true };
+        countTimeReading(readingScreenDuration);
+        setDialog({ ...dialog, open: false });
+    }
+
     const changeCurrentScreen = (screenId) => {
         setShowScreen(false);
         const screen = screens.find(scr => scr.id === screenId);
         if(!ValidationUtils.isEmpty(screen)){
+
+            interactionCheck = { duration: 0, isInteracted: true };
             
             listScreenId.push(screen.id);
             myCurrentScreen = JSON.parse(JSON.stringify(screen));
@@ -184,6 +225,7 @@ const ReadStoryPage = (props) => {
                     setPublished(false);
                 } else {
                     setScreens(data.screens);
+                    screenList = [...data.screens];
                     setInformations(data.informations);
                     initialInformations = JSON.parse(JSON.stringify(data.informations));
     
@@ -283,14 +325,24 @@ const ReadStoryPage = (props) => {
         stopCountTimeReading();
         setEnd(false);
         isEndStory = false;
+        startInteractionInterval();
     }
 
     const startReading = () => {
         changeCurrentScreen(story.firstScreenId);
+        setUpCheckUserInteraction();
     }
 
     return (        
         <>
+            <ConfirmDialog
+                openDialog={dialog.open}
+                cancel={() => props.history.push(`/stories/details/${story.id}`)}
+                ok={confirmContinueReading}
+                setOpenDialog={() => setDialog({ ...dialog, open: true })}
+                content={dialog.content}
+            />
+
             {notfound && (<NotFound message={'Không tìm tháy truyện này'} />)}
 
             {!isPublished && (<NotFound message={'Truyện này chưa được xuất bản! Vui lòng quay lại sau'} />)}
