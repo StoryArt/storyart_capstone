@@ -7,7 +7,10 @@ import com.storyart.storyservice.repository.HistoryRepository;
 import com.storyart.storyservice.repository.UserRepository;
 import com.storyart.storyservice.security.CurrentUser;
 import com.storyart.storyservice.security.UserPrincipal;
-import com.storyart.storyservice.service.*;
+import com.storyart.storyservice.service.LinkClickService;
+import com.storyart.storyservice.service.ScreenReadingTimeService;
+import com.storyart.storyservice.service.StoryService;
+import com.storyart.storyservice.service.StoryStatisticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,11 +51,21 @@ public class StatisticsController {
     @Autowired
     ScreenReadingTimeService screenReadingTimeService;
     // tam thoi de null
-    @GetMapping("story/{sid}/screen")
-    public ResponseEntity getStoryScreenStatistic(@PathVariable int sid,@RequestBody TimeRangeRequest timeRangeRequest){
-        List<ScreenTimeResponse> storySummarizeResponse= screenReadingTimeService.getListDurationOfEachSreenInTimeRangeByStoryId(sid, timeRangeRequest.getStart(), timeRangeRequest.getEnd());
+//    @GetMapping("story/{sid}/screen")
+//    public ResponseEntity getStoryScreenStatistic(@PathVariable int sid,@RequestBody TimeRangeRequest timeRangeRequest){
+//        List<ScreenTimeResponse> storySummarizeResponse= screenReadingTimeService.getListDurationOfEachSreenInTimeRangeByStoryId(sid, timeRangeRequest.getStart(), timeRangeRequest.getEnd());
+//
+//        return new ResponseEntity(storySummarizeResponse, HttpStatus.OK);
+//    }
 
-        return new ResponseEntity(storySummarizeResponse, HttpStatus.OK);
+    @PostMapping("story/{sid}/screen")
+    public ResponseEntity getStoryScreenStatistic(@PathVariable Integer sid,
+                                            @RequestBody ScreenPageRequest req){
+        PagedResponse<IScreenValueResponse> srTimeViewAndAvg =
+                screenReadingTimeService.getSrTimeViewAndAvg(req.getPage(),
+                        req.getSize(), req.getOrderBy(), req.isAsc(),
+                        sid, req.getStart(), req.getEnd());
+        return new ResponseEntity(srTimeViewAndAvg, HttpStatus.OK);
     }
 
 
@@ -90,7 +103,7 @@ public class StatisticsController {
 
     @GetMapping("/story/{sid}/check")
     public boolean checkBeforeComeToStatic(@PathVariable("sid") Integer sid, @CurrentUser UserPrincipal userPrincipal) {
-            return  storyStatisticService.checkOwner(userPrincipal.getId() ,sid );
+            return  storyStatisticService.checkOwnerAndNotDeactiveByAdmin(userPrincipal.getId() ,sid );
 
     }
 

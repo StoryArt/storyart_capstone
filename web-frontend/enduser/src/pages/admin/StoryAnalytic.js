@@ -6,7 +6,7 @@ import Icon from "@mdi/react";
 import Tooltip from "@material-ui/core/Tooltip";
 import NotFound from "../../components/common/NotFound";
 import NotFoundPage from "../../pages/common/NotFoundPage";
-import MySpinner from "../../components/common/MySpinner";
+import MySpinner2 from "../../components/common/MySpinner2";
 import StarIcon from "@material-ui/icons/Star";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import MyRating from "../../components/common/MyRating";
@@ -60,7 +60,8 @@ class Dashboard1 extends React.Component {
       avgRate: 0,
       anchorEl: null,
       anchorE2: null,
-      anchorE3: null,
+      anchorE4: null,
+      anchorE5: null,
       daybeforelabel: "Chọn ngày",
       daybeforelabel2: "Chọn ngày",
       daybeforelabel3: "Chọn ngày",
@@ -70,9 +71,9 @@ class Dashboard1 extends React.Component {
         page: 1,
         size: 10,
         totalElement: 10,
-        totalPages: 1,
         last: true,
       },
+      totalPages: 1,
       timelable2: "",
       timelable3: "",
       pageNo: 1,
@@ -99,6 +100,11 @@ class Dashboard1 extends React.Component {
         ],
         rows: [],
       },
+      days: 5,
+      order: "desc",
+      orderBy: "sumtime",
+      lable4:this.sumtime,
+      lable5:this.desc,
 
       clickData: {
         columns: [
@@ -125,19 +131,20 @@ class Dashboard1 extends React.Component {
 
   async componentDidMount() {
     setAuthHeader(localStorage.getItem("jwt-token"));
-    window.scrollTo(0, 0);
     console.log(
       "compoent did mount , get story summary set state and loading rating"
     );
-    if (await this.checkOwner()) {
+    if (await this.checkOwnerAndNotDeactiveByAdmin()) {
       const storyInfo = this.getStorySummary(this.sid);
       await this.handleLoadReactStatic(5);
       this.setState({ openBackdrop: false });
 
       this.loadRatingStatic();
 
-      this.handleLoadScreenTime(1);
-      this.handleLoadClickLink(1);
+      this.handleLoadScreenTime();
+      this.handleLoadClickLink(5);
+    window.scrollTo(0, 0);
+
     }
   }
   handleClick = (event) => {
@@ -150,16 +157,26 @@ class Dashboard1 extends React.Component {
       anchorE2: event.currentTarget,
     });
   };
+  handleClick4 = (event) => {
+    this.setState({
+      anchorE4: event.currentTarget,
+    });
+  };
+  handleClick5 = (event) => {
+    this.setState({
+      anchorE5: event.currentTarget,
+    });
+  };
   handleClick3 = (event) => {
     this.setState({
       anchorE3: event.currentTarget,
     });
   };
 
-  async checkOwner() {
+  async checkOwnerAndNotDeactiveByAdmin() {
     // this.setState({ openBackdrop: true });
     try {
-      let isAllow = await Statistic.checkOwner(this.sid);
+      let isAllow = await Statistic.checkOwnerAndNotDeactiveByAdmin(this.sid);
 
       // ko co quyen
       // this.setState({ openBackdrop: false });
@@ -263,6 +280,9 @@ class Dashboard1 extends React.Component {
 
       console.log("screen time");
       console.log(res.data);
+      this.setState({ totalPages: res.data.totalPages });
+      this.setState({ pageNo: res.data.page });
+
       this.convertToScreenTimeList(res.data);
     });
   }
@@ -281,7 +301,7 @@ class Dashboard1 extends React.Component {
   }
 
   convertToScreenTimeList(data) {
-    var userList = data;
+    var userList = data.content;
     let rowsData = [];
 
     for (var index = 0; index < userList.length; index++) {
@@ -292,27 +312,36 @@ class Dashboard1 extends React.Component {
       );
       rowItem["title"] = userList[index].title;
       rowItem["sumtime"] = userList[index].sumtime;
+      rowItem["viewcount"] = userList[index].viewcount;
+      rowItem["timeperview"] =Math.round(((userList[index].timeperview) * 10)) / 10 ;
       rowsData.push(rowItem);
     }
 
     this.setState({
       datax: {
         columns: [
-          // {
-          //   label: "ID",
-          //   field: "id",
-          //   sort: "asc",
-          //   width: 50,
-          // },
+        
           {
-            label: "Tiêu đề",
+            label:"Tiêu đề",
             field: "title",
             sort: "asc",
             width: 100,
           },
           {
-            label: "Thời lượng đọc (giây)",
+            label: "Tổng thời gian",
             field: "sumtime",
+            sort: "asc",
+            width: 100,
+          },
+          {
+            label:"Số lượt xem",
+            field: "viewcount",
+            sort: "asc",
+            width: 100,
+          },
+          {
+            label:"Time trung bình/lượt ",
+            field: "timeperview",
             sort: "asc",
             width: 100,
           },
@@ -401,20 +430,74 @@ class Dashboard1 extends React.Component {
 
     // getReactStatic(23,event.target.value, "26/03/2020");
   }
+  async handleClickDayScreen(day) {
+    await this.setState({ days: day });
+    this.handleLoadScreenTime();
+  }
+  async handleClickOrderBy(orderBy) {
+   await this.setState({ orderBy: orderBy });
+    this.setLable4(orderBy);
+    await this.handleLoadScreenTime();
+  }
+  async handleClickOrder(order) {
+   await this.setState({ order: order });
+    this.setLable5(order);
 
-  handleLoadScreenTime(daybefore) {
+    await this.handleLoadScreenTime();
+  }
+
+  sumtime = "Tổng thời gian";
+  viewcount = "Số lượt xem";
+  timeperview = "Time trung bình/lượt";
+  asc = "Tăng dần";
+  desc = "Giảm dần";
+  setLable4(orderBy) {
+    let x = "";
+    switch (orderBy) {
+      case "sumtime":
+        x = this.sumtime;
+        break;
+      case "viewcount":
+        x = this.viewcount;
+        break;
+      case "timeperview":
+        x = this.timeperview;
+        break;
+    }
+    this.setState({lable4: x});
+
+  }
+  setLable5(order) {
+    let x = true;
+    switch (order) {
+      case true:
+        x = this.asc;
+        break;
+      case false:
+        x = this.desc;
+        break;
+     
+    }
+    this.setState({lable5: x});
+  }
+
+  handleLoadScreenTime() {
     this.setState({ anchorE2: null });
-    this.setState({ daybeforelabel2: daybefore + " ngày qua" });
+    this.setState({ anchorE4: null });
+    this.setState({ anchorE5: null });
+    let days = this.state.days;
+    this.setState({ daybeforelabel2: days + " ngày qua" });
+    
+
     let now = new Date();
     let fromDate = new Date();
     let toDate = new Date();
     toDate.setDate(toDate.getDate() + 1);
-    // toDate.setDate(now.getDate()-1);
     let to = this.toyyyyMMdd(toDate);
-    let from = "";
-    fromDate.setDate(now.getDate() - daybefore);
 
-    from = this.toyyyyMMdd(fromDate);
+    fromDate.setDate(now.getDate() - days);
+
+    let from = this.toyyyyMMdd(fromDate);
 
     let time = now.getHours() + "h" + now.getMinutes() + "p";
     this.setState({
@@ -430,9 +513,22 @@ class Dashboard1 extends React.Component {
     const timerange = {
       start: from,
       end: to,
+      orderBy: this.state.orderBy,
+      order: this.state.order,
+      page: this.state.pageNo,
+      size: 5,
     };
 
     this.getScreenTime(timerange);
+  }
+
+  async changePage(event, value) {
+    if (value !== this.state.pageNo) {
+      await this.setState({ pageNo: value });
+      try {
+        this.handleLoadScreenTime();
+      } catch (error) {}
+    }
   }
   handleLoadClickLink(daybefore) {
     this.setState({ anchorE3: null });
@@ -501,7 +597,7 @@ class Dashboard1 extends React.Component {
         height: "fit-content",
         width: "fit-content",
         float: "left",
-        marginLeft: "10px"
+        marginLeft: "10px",
       },
     };
 
@@ -530,7 +626,7 @@ class Dashboard1 extends React.Component {
               >
                 {this.state.story.title}
               </Typography>{" "}
-              <div style={{height:"50px"}}>
+              <div style={{ height: "50px" }}>
                 <Button
                   endIcon={<ArrowDropDownIcon />}
                   variant="outlined"
@@ -546,8 +642,10 @@ class Dashboard1 extends React.Component {
                 >
                   {this.state.daybeforelabel}
                 </Button>
-                { (this.state.reactLoad &&
-                  <MySpinner className={theme.spinner} />
+                {this.state.reactLoad && (
+                  <MySpinner2
+                  //  className={theme.spinner}
+                    size ="1.5rem"/>
                 )}
               </div>
               <div>
@@ -622,7 +720,7 @@ class Dashboard1 extends React.Component {
             <Grid container spacing={3}>
               <Grid item lg={4} md={4} sm={12} xs={12}>
                 {/* thong tin truyen */}
-                <Card style={{ marginBottom: 10, padding: "0px" }}>
+                <Card style={{ marginBottom: 10, padding: "0px" }} elevation={6}>
                   <CardMedia
                     component="img"
                     alt="Ảnh bìa"
@@ -750,7 +848,7 @@ class Dashboard1 extends React.Component {
                   clicklink={this.state.story.numOfClickLink}
                 />
                 {/* <TableCard /> */}
-                <h4>Tổng thời gian đọc {"  "} </h4>
+                <h4 style={{fontWeight:"bold"}}>Thống kê màn hình {"  "} </h4>
                 <div>
                   <Button
                     variant="outlined"
@@ -766,7 +864,6 @@ class Dashboard1 extends React.Component {
                     onClick={this.handleClick2}
                   >
                     {this.state.daybeforelabel2}
-                    {this.state.timeScreenLoad && <MySpinner />}
                   </Button>
                   <Menu
                     style={{ borderRadius: "8px" }}
@@ -775,18 +872,94 @@ class Dashboard1 extends React.Component {
                     open={Boolean(this.state.anchorE2)}
                     onClose={(e) => this.setState({ anchorE2: null })}
                   >
-                    <MenuItem onClick={this.handleLoadScreenTime.bind(this, 1)}>
+                    <MenuItem onClick={this.handleClickDayScreen.bind(this, 1)}>
                       1 ngày qua
                     </MenuItem>
-                    <MenuItem onClick={this.handleLoadScreenTime.bind(this, 5)}>
+                    <MenuItem onClick={this.handleClickDayScreen.bind(this, 5)}>
                       5 ngày qua
                     </MenuItem>
                     <MenuItem
-                      onClick={this.handleLoadScreenTime.bind(this, 28)}
+                      onClick={this.handleClickDayScreen.bind(this, 28)}
                     >
                       28 ngày qua
                     </MenuItem>
                   </Menu>
+                  <Button
+                    variant="outlined"
+                    endIcon={<ArrowDropDownIcon />}
+                    aria-owns={this.state.anchorE4 ? "simple-menu" : undefined}
+                    aria-haspopup="true"
+                    style={{
+                      marginBottom: "10px",
+                      color: "rgba(0, 0, 0, 0.54)",
+                      outlineColor: "#dee2e6",
+                      marginRight: "10px",
+                    }}
+                    onClick={this.handleClick4}
+                  >
+                    {this.state.lable4}
+                    {/* {this.state.timeScreenLoad && <MySpinner />} */}
+                  </Button>
+                  <Menu
+                    style={{ borderRadius: "8px" }}
+                    id="simple-menu"
+                    anchorEl={this.state.anchorE4}
+                    open={Boolean(this.state.anchorE4)}
+                    onClose={(e) => this.setState({ anchorE4: null })}
+                  >
+                    <MenuItem
+                      onClick={this.handleClickOrderBy.bind(this, "sumtime")}
+                    >
+                      Tổng thời gian
+                    </MenuItem>
+                    <MenuItem
+                      onClick={this.handleClickOrderBy.bind(this, "viewcount")}
+                    >
+                      Số lượt xem
+                    </MenuItem>
+                    <MenuItem
+                      onClick={this.handleClickOrderBy.bind(
+                        this,
+                        "timeperview"
+                      )}
+                    >
+                      Time trung bình/lượt
+                    </MenuItem>
+                  </Menu>
+                  <Button
+                    variant="outlined"
+                    endIcon={<ArrowDropDownIcon />}
+                    aria-owns={this.state.anchorE5 ? "simple-menu" : undefined}
+                    aria-haspopup="true"
+                    style={{
+                      marginBottom: "10px",
+                      color: "rgba(0, 0, 0, 0.54)",
+                      outlineColor: "#dee2e6",
+                      marginRight: "10px",
+                    }}
+                    onClick={this.handleClick5}
+                  >
+                    {this.state.lable5}
+
+                    {/* {this.state.timeScreenLoad && <MySpinner />} */}
+                  </Button>
+                  <Menu
+                    style={{ borderRadius: "8px" }}
+                    id="simple-menu"
+                    anchorEl={this.state.anchorE5}
+                    open={Boolean(this.state.anchorE5)}
+                    onClose={(e) => this.setState({ anchorE5: null })}
+                  >
+                    <MenuItem onClick={this.handleClickOrder.bind(this, true)}>
+                      Giảm dần
+                    </MenuItem>
+                    <MenuItem onClick={this.handleClickOrder.bind(this, false)}>
+                      Tăng dần
+                    </MenuItem>
+                  </Menu>
+                  {/* {this.state.timeScreenLoad && <MySpinner2 size ="1.5rem"/>} */}
+
+                  <br/>
                   <span
                     style={{
                       color: "rgb(162, 144, 144)",
@@ -796,9 +969,27 @@ class Dashboard1 extends React.Component {
                     {this.state.timelable2}
                   </span>
                 </div>
+                <div >
+                <Pagination
+                  count={this.state.totalPages}
+                  showFirstButton
+                  showLastButton
+                  color="primary"
+                  onChange={this.changePage.bind(this)}
+                  // onClick={changePage}
+                  variant="outlined"
+                  style={{ marginBottom: "1rem", marginTop: "1rem", width: "fit-content",}}
+                  // className={classes.paging}
+                  >
+
+                  </Pagination>
+                  {this.state.timeScreenLoad && <MySpinner2 size ="1.5rem"/>}
+                </div>
+               
+
                 <MDBDataTable
-                  striped
                   bordered
+                  
                   small
                   noRecordsFoundLabel="Chưa có dữ liệu"
                   searching={false}
@@ -806,8 +997,12 @@ class Dashboard1 extends React.Component {
                   entrieslabel={""}
                   paging={false}
                   displayEntries={false}
-                />
-                <h4> Lượt click {"  "} </h4>
+                  noBottomColumns={true}
+                  hover={true}
+                  >
+                  {this.state.timeScreenLoad && <MySpinner2 size ="1.5rem"/>}
+                  </MDBDataTable>
+                <h4 style={{fontWeight:"bold"}}> Lượt click {"  "} </h4>
 
                 <div>
                   <Button
@@ -823,7 +1018,6 @@ class Dashboard1 extends React.Component {
                     }}
                     onClick={this.handleClick3}
                   >
-                    {this.state.clickLoad && <MySpinner />}
 
                     {this.state.daybeforelabel3}
                   </Button>
@@ -844,6 +1038,7 @@ class Dashboard1 extends React.Component {
                       28 ngày qua
                     </MenuItem>
                   </Menu>
+                  {this.state.clickLoad && <MySpinner2 size="1.5rem"/>}
 
                   <span
                     style={{
@@ -864,6 +1059,9 @@ class Dashboard1 extends React.Component {
                   entrieslabel={""}
                   paging={false}
                   displayEntries={false}
+                  noBottomColumns={true}
+hover={true}
+
                 />
 
                 {/* <Pagination
