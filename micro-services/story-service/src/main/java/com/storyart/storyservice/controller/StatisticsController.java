@@ -3,13 +3,11 @@ package com.storyart.storyservice.controller;
 import com.netflix.discovery.converters.Auto;
 import com.storyart.storyservice.dto.ResultDto;
 import com.storyart.storyservice.dto.statistic.*;
+import com.storyart.storyservice.repository.HistoryRepository;
 import com.storyart.storyservice.repository.UserRepository;
 import com.storyart.storyservice.security.CurrentUser;
 import com.storyart.storyservice.security.UserPrincipal;
-import com.storyart.storyservice.service.LinkClickService;
-import com.storyart.storyservice.service.ScreenReadingTimeService;
-import com.storyart.storyservice.service.StoryService;
-import com.storyart.storyservice.service.StoryStatisticService;
+import com.storyart.storyservice.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +23,9 @@ public class StatisticsController {
 
     @Autowired
     StoryService storyService;
+
+    @Autowired
+    HistoryRepository historyRepository;
 
     @GetMapping("get_read_statistics_of_user")
     public ResponseEntity getReadStatisticsOfUser(@RequestParam Date from,
@@ -92,4 +93,13 @@ public class StatisticsController {
             return  storyStatisticService.checkOwner(userPrincipal.getId() ,sid );
 
     }
+
+    @GetMapping("get_tag_per_view_statistics")
+    public ResponseEntity getTagPerView(@RequestParam Date from,
+                                        @RequestParam Date to){
+
+        List<TagPerView> result = historyRepository.findTagStatisticByDateRange(from,to);
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
+
 }

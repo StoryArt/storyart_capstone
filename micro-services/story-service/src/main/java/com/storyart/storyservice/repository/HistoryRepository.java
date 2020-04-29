@@ -1,6 +1,7 @@
 package com.storyart.storyservice.repository;
 
 import com.storyart.storyservice.dto.statistic.ILinkClickCountResponse;
+import com.storyart.storyservice.dto.statistic.TagPerView;
 import com.storyart.storyservice.dto.statistics.ReadStatisticDto;
 import com.storyart.storyservice.model.ReadingHistory;
 import org.springframework.data.domain.Page;
@@ -54,6 +55,18 @@ public interface HistoryRepository extends JpaRepository<ReadingHistory, Integer
             "and s.user_id = u.id and u.is_deactive_by_admin = '0' and r.story_id not in (select l.id from storyart_db.story l where l.user_id = :userid)  " +
             "group by r.story_id order by count(r.story_id) DESC limit 10", nativeQuery = true)
     List<Integer>  countTopViewById(@Param("userid") Integer userid);
+
+    @Query(value = "select Count(r.id) as readCount, t.title as title " +
+            "from storyart_db.reading_history r, storyart_db.story s, storyart_db.story_tag st, storyart_db.tag t " +
+            "where r.story_id = s.id and s.id = st.story_id and st.tag_id = t.id and " +
+            "Date(r.created_at) <= :datefrom and :dateto >= Date(r.created_at) group by(t.title)", nativeQuery = true)
+    List<TagPerView>  findTagStatisticByDateRange(@Param("datefrom") Date datefrom, @Param("dateto") Date dateto);
+
+
+
+
+
+
 
     int countAllByStoryId(int storyId);
 
