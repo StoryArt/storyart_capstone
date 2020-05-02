@@ -5,6 +5,8 @@ import styled from 'styled-components';
 import { withRouter } from 'react-router-dom';
 import { Tooltip, IconButton } from '@material-ui/core';
 import { ArrowBackRounded } from '@material-ui/icons';
+import { INFORMATION_TYPES } from '../../common/constants';
+import StringUtils from '../../utils/string';
 
 const StyledQuill = styled.div`
    
@@ -948,6 +950,7 @@ const MyFullScreenShowWrapper = (props) => {
       }
     }
 
+    console.log(informations);
     return (
         <div id="fullscreen" style={{ 
             position: 'relative', 
@@ -973,7 +976,9 @@ const MyFullScreenShowWrapper = (props) => {
                 <div  
                     className="text-bold"
                     style={{ fontSize: '1.2em', position: 'absolute', top: 20, left: 20 }} 
-                    key={information.id}>{ information.name }: { information.value }</div>
+                    key={information.id}>
+                      { information.name }: { information.type === INFORMATION_TYPES.NUMBER ? StringUtils.formatMoney(information.value) : information.value }
+                </div>
                 ))}
     
             <div className="container-fluid text-center py-5" style={{ height: '100%' }} >

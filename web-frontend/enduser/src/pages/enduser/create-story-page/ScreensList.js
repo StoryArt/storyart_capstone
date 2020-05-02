@@ -8,6 +8,7 @@ import MyDropdownMenu from '../../../components/common/MyDropdownMenu';
 import ActionsList from './ActionsList';
 import MyEditor from '../../../components/common/MyEditor';
 import ValidationUtils from '../../../utils/validation';
+import StringUtils from '../../../utils/string';
 
 const ScreensList = (props) => {
     
@@ -58,6 +59,8 @@ const ScreensList = (props) => {
                     </div>
 
                     <div className="card-body">
+                        <small className="float-right">Dung lượng: {StringUtils.getByteSize(currentScreen.content)} kb</small>
+                        <div className="clearfix"></div>
                         <MyEditor 
                             onChange={(value) =>  {
                                 onChangeScreen('content', value, currentScreen);

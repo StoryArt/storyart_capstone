@@ -385,7 +385,6 @@ const ReadStoryPage = (props) => {
                                 </p>
                                 <button
                                     onClick={startReading} 
-                                    
                                     style={{ background: '#fffbe8', color: '#000' }}
                                     className="btn float-right mt-3">Bắt đầu đọc truyện</button>
                             </div>

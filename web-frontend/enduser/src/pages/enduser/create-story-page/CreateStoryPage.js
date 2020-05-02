@@ -519,6 +519,8 @@ const CreateStoryPage = (props) => {
                                                 
                                             </div>
                                             <div className="card-body">
+                                            <small className="float-right">Dung lượng: {StringUtils.getByteSize(story.intro)} kb</small>
+                                            <div className="clearfix"></div>
                                                 <MyEditor
                                                     placeholder="Nội dung giới thiệu"
                                                     value={story.intro}

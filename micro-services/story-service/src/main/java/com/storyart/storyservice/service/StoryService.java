@@ -2,7 +2,6 @@ package com.storyart.storyservice.service;
 
 import com.storyart.storyservice.common.constants.*;
 import com.storyart.storyservice.dto.GetStoryDto;
-import com.storyart.storyservice.dto.TagDto;
 import com.storyart.storyservice.dto.create_story.*;
 import com.storyart.storyservice.dto.ResultDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryDto;
@@ -21,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
@@ -147,8 +147,8 @@ class StoryServiceImpl implements StoryService {
     public HashMap<String, String> validateStoryinfo(CreateStoryDto storyDto) {
         HashMap<String, String> errors = new HashMap<>();
 
-        if(storyDto.getIntro().getBytes(StandardCharsets.UTF_8).length > 4 * 1024 * 1024){
-            errors.put("MAX_SIZE_STORY_INTRO", "Nội dung giới thiệu truyện chỉ có tối đa 4MB");
+        if(storyDto.getIntro().getBytes(StandardCharsets.UTF_8).length > 3 * 1024 * 1024){
+            errors.put("MAX_SIZE_STORY_INTRO", "Nội dung giới thiệu truyện chỉ có tối đa 3MB");
             return errors;
         }
 
@@ -228,8 +228,8 @@ class StoryServiceImpl implements StoryService {
             }
 
             for(CreateStoryScreenDto screen: storyDto.getScreens()){
-                if(screen.getContent().getBytes(StandardCharsets.UTF_8).length > 4 * 1024 * 1024){
-                    errors.put("MAX_SIZE_SCREEN_CONTENT", "Nội dung màn hình chỉ có tối đa 4MB");
+                if(screen.getContent().getBytes(StandardCharsets.UTF_8).length > 3 * 1024 * 1024){
+                    errors.put("MAX_SIZE_SCREEN_CONTENT", "Nội dung màn hình chỉ có tối đa 3MB");
                     return errors;
                 }
 
@@ -512,18 +512,15 @@ class StoryServiceImpl implements StoryService {
         int storyId = story.getId();
 
         //insert story tags
-        List<StoryTag> savedStoryTags = createStoryDto.getTags().stream().map(tagId -> {
+        createStoryDto.getTags().stream().forEach(tagId -> {
             StoryTag st = new StoryTag();
             st.setTagId(tagId);
             st.setStoryId(storyId);
-            return st;
-
-        }).collect(Collectors.toList());
-        storyTagRepository.saveAll(savedStoryTags);
+            storyTagRepository.insertStoryTag(st);
+        });
 
         //save all screens
-        List<Action> savedActions = new ArrayList<>();
-        List<Screen> savedScreens = createStoryDto.getScreens().stream().map(screen -> {
+        createStoryDto.getScreens().stream().forEach(screen -> {
             Screen savedScreen = modelMapper.map(screen, Screen.class);
 
             savedScreen.setStoryId(storyId);
@@ -540,19 +537,15 @@ class StoryServiceImpl implements StoryService {
                 savedAction.setNextScreenId(screenIdsMap.get(action.getNextScreenId()));
                 actionIdsMap.put(action.getId(), savedAction.getId());
 
-                savedActions.add(savedAction);
+                actionRepository.insertAction(savedAction);
             });
-            return savedScreen;
 
-        }).collect(Collectors.toList());
-
-        screenRepository.saveAll(savedScreens);
-        actionRepository.saveAll(savedActions);
+            screenRepository.insertScreen(savedScreen);
+        });
 
         //set first screen id for story
         story.setFirstScreenId(screenIdsMap.get(createStoryDto.getFirstScreenId()));
         storyRepository.save(story);
-
 
         //save all informations
         List<InfoCondition> savedInfoConditions = new ArrayList<>();
@@ -579,14 +572,14 @@ class StoryServiceImpl implements StoryService {
         infoConditionRepository.saveAll(savedInfoConditions);
 
         //save information action
-        List<InformationAction> savedInformationActions = createStoryDto.getInformationActions().stream().map(informationAction -> {
+        createStoryDto.getInformationActions().stream().forEach(informationAction -> {
             InformationAction savedInformationAction = modelMapper.map(informationAction, InformationAction.class);
             savedInformationAction.setActionId(actionIdsMap.get(informationAction.getActionId()));
             savedInformationAction.setInformationId(informationIdsMap.get(informationAction.getInformationId()));
-            return savedInformationAction;
-        }).collect(Collectors.toList());
+            informationActionRepository.insertInfoAction(savedInformationAction);
+        });
 
-        informationActionRepository.saveAll(savedInformationActions);
+
 
         result.setSuccess(true);
         result.setErrors(null);
@@ -622,15 +615,19 @@ class StoryServiceImpl implements StoryService {
 
             //delete unused screen
             List<String> screenIdList = storyDto.getScreens().stream().map(scr -> scr.getId()).collect(Collectors.toList());
-            List<Screen> screenList = screenRepository.findByStoryId(story.getId());
 
-            List<Screen> deletedScreens = new ArrayList<>();
-            screenList.stream().forEach(screen -> {
-                if(!screenIdList.contains(screen.getId())){
-                    deletedScreens.add(screen);
+            List<String> screenIds = screenRepository.findScreenIdsByStory(story.getId());
+
+            List<String> deletedScreens = new ArrayList<>();
+            screenIds.stream().forEach(screenId -> {
+                if(!screenIdList.contains(screenId)){
+                    deletedScreens.add(screenId);
                 }
             });
-            screenRepository.deleteInBatch(deletedScreens);
+
+            if(deletedScreens.size() > 0){
+                screenRepository.deleteAllByIds(deletedScreens);
+            }
 
             storyDto.getScreens().stream().forEach(screen -> {
                 if(screenRepository.existsById(screen.getId())){
@@ -650,28 +647,29 @@ class StoryServiceImpl implements StoryService {
             int storyId = story.getId();
 
             //delete all story tags;
-            List<StoryTag> storyTags = storyTagRepository.findAllByStoryId(storyId);
-            storyTagRepository.deleteInBatch(storyTags);
+//            List<StoryTag> storyTags = storyTagRepository.findAllByStoryId(storyId);
+            storyTagRepository.deleteByStoryId(storyId);
 
             //insert story tags
-            List<StoryTag> savedStoryTags = storyDto.getTags().stream().map(tagId -> {
+            storyDto.getTags().stream().forEach(tagId -> {
                 StoryTag st = new StoryTag();
                 st.setTagId(tagId);
                 st.setStoryId(storyId);
-                return st;
-            }).collect(Collectors.toList());
-            storyTagRepository.saveAll(savedStoryTags);
+                storyTagRepository.insertStoryTag(st);
+            });
 
             //insert new screens
-            List<Action> savedActions = new ArrayList<>();
-            List<Screen> savedScreens = storyDto.getScreens().stream().map(screen -> {
+//            List<Action> savedActions = new ArrayList<>();
+            List<String> deletedActions = new ArrayList<>();
+            storyDto.getScreens().stream().forEach(screen -> {
                 Screen savedScreen = modelMapper.map(screen, Screen.class);
 
                 savedScreen.setStoryId(storyId);
                 savedScreen.setId(screenIdsMap.get(screen.getId()));
                 //delete all actions
-                List<Action> actionList = actionRepository.findAllByScreenId(savedScreen.getId());
-                actionRepository.deleteInBatch(actionList);
+                List<String> actionIdList = actionRepository.findActionIdsScreen(savedScreen.getId());
+//                actionRepository.deleteInBatch(actionList);
+                deletedActions.addAll(actionIdList);
 
                 screen.getActions().stream().forEach(action -> {
                     Action savedAction = modelMapper.map(action, Action.class);
@@ -684,15 +682,15 @@ class StoryServiceImpl implements StoryService {
                     savedAction.setNextScreenId(screenIdsMap.get(action.getNextScreenId()));
                     actionIdsMap.put(action.getId(), savedAction.getId());
 
-                    savedActions.add(savedAction);
+                    actionRepository.insertAction(savedAction);
 
                 });
-                screenRepository.save(savedScreen);
-                return savedScreen;
-            }).collect(Collectors.toList());
 
+                screenRepository.updateScreenById(savedScreen);
+            });
 
-            actionRepository.saveAll(savedActions);
+            actionRepository.deleteAllByIds(deletedActions);
+            System.out.println("done screen and action");
 
             //delete all informations
             List<Information> informations = informationRepository.findAllByStoryId(storyId);
@@ -702,6 +700,7 @@ class StoryServiceImpl implements StoryService {
             //delete all information actions
             List<InformationAction> informationActionList = informationActionRepository.findAllByInformationIdIn(informationIds);
             informationActionRepository.deleteInBatch(informationActionList);
+
 
             //insert new informations
             List<InfoCondition> savedInfoConditions = new ArrayList<>();
@@ -729,14 +728,14 @@ class StoryServiceImpl implements StoryService {
 
             //save information action
 
-            List<InformationAction> savedInformationActions = storyDto.getInformationActions().stream().map(informationAction -> {
+            storyDto.getInformationActions().stream().forEach(informationAction -> {
                 InformationAction savedInformationAction = modelMapper.map(informationAction, InformationAction.class);
                 savedInformationAction.setActionId(actionIdsMap.get(informationAction.getActionId()));
                 savedInformationAction.setInformationId(informationIdsMap.get(informationAction.getInformationId()));
 
-                return savedInformationAction;
-            }).collect(Collectors.toList());
-            informationActionRepository.saveAll(savedInformationActions);
+                informationActionRepository.insertInfoAction(savedInformationAction);
+            });
+
 
             resultDto.setSuccess(true);
             resultDto.setData(story);

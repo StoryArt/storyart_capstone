@@ -67,7 +67,9 @@ const getNodesAndEdges = (screens, firstScreenId) => {
       
       const haveNextScreenAction = s.actions.some(a => a.type === ACTION_TYPES.NEXT_SCREEN || a.type === ACTION_TYPES.UPDATE_INFORMATION)
       
-      if(haveNextScreenAction){
+      if(s.id === firstScreenId) {
+        s.first = true;
+      } else if(haveNextScreenAction){
           s.actions.forEach((a, i) => {
               if(a.type === ACTION_TYPES.NEXT_SCREEN){
                   myedges.push({
@@ -83,10 +85,6 @@ const getNodesAndEdges = (screens, firstScreenId) => {
           })
       } else {
         s.ending = true;
-      }
-
-      if(s.id === firstScreenId) {
-        s.first = true;
       }
 
       const newNode = {

@@ -23,6 +23,23 @@ class StringUtils{
         if(ValidationUtils.isEmpty(obj) || ValidationUtils.isEmpty(obj.title)) return 'Chưa có tiêu đề';
         return obj.title;
     }
+
+    static formatMoney(value){
+        if(typeof value !== 'number') value = Number(value);
+        if(isNaN(value)) return '';
+        let formattedVal = value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        if(Number.isInteger(value)){
+            return formattedVal.substring(0, formattedVal.length - 3);
+        } else {
+            return formattedVal;
+        }
+    }
+
+    static getByteSize(str){
+        // return new Blob([str]).size;
+        const size = (new TextEncoder().encode(str)).length / 1024;
+        return size.toFixed(2);
+    }
 }
 
 export default StringUtils;
