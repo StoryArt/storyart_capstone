@@ -263,10 +263,10 @@ class RatingServiceIml implements RatingService {
 
 
         // Step 7
-        // remove all lesser than 2.5
+        // remove all lesser  2.5
         List<Integer> listSuggestStory = new ArrayList<>();
         for (RatedStoryDTO dto : ListAssumRatedStory){
-            if(dto.getRatedPoint() >= 2.5){
+            if(dto.getRatedPoint() > 2.5){
                 listSuggestStory.add(dto.getStoryId());
             }
         }

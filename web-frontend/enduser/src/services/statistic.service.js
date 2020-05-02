@@ -10,7 +10,7 @@ class StatisticService {
   }
 
   static async getScreenTimeData(sid, timeRange) {
-    let screenUrl = baseUrl + "/story/" + sid + "/screen-time";
+    let screenUrl = baseUrl + "/story/" + sid + "/screen";
 
     return axios.post(screenUrl, timeRange);
   }
@@ -33,7 +33,7 @@ class StatisticService {
     return axios.get(url);
   }
 
-  static async checkOwner(storyId){
+  static async checkOwnerAndNotDeactiveByAdmin(storyId){
     const url = baseUrl + `/story/` + storyId + `/check`;
     return axios.get(url);
   }

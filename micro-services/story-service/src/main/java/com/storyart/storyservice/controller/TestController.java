@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/test")
 public class TestController {
+
+    int count=0;
     @GetMapping("")
     public ResponseEntity test(){
-        return new ResponseEntity("test", HttpStatus.OK);
+    return new ResponseEntity(count++, HttpStatus.OK);
     }
 }

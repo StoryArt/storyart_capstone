@@ -17,7 +17,7 @@ import java.util.*;
 
 public interface StoryStatisticService {
 
-    boolean checkOwner(Integer id, Integer sid);
+    boolean checkOwnerAndNotDeactiveByAdmin(Integer id, Integer sid);
 
     StorySummarizeResponse getStorySummarizeResponse(int sid);
 
@@ -49,9 +49,9 @@ class StoryStatisticServiceImpl implements StoryStatisticService {
     EntityManager entityManager;
 
     @Override
-    public boolean checkOwner(Integer id, Integer sid) {
+    public boolean checkOwnerAndNotDeactiveByAdmin(Integer id, Integer sid) {
         Optional<Story> byId = storyRepository.findById(sid);
-        if (byId.isPresent() && byId.get().getUserId() == id) {
+        if (byId.isPresent() && byId.get().getUserId() == id && !byId.get().isDeactiveByAdmin()) {
             return true;
         } else {
             return false;

@@ -3,6 +3,7 @@ package com.storyart.storyservice.controller;
 import com.netflix.discovery.converters.Auto;
 import com.storyart.storyservice.dto.ResultDto;
 import com.storyart.storyservice.dto.statistic.*;
+import com.storyart.storyservice.repository.HistoryRepository;
 import com.storyart.storyservice.repository.UserRepository;
 import com.storyart.storyservice.security.CurrentUser;
 import com.storyart.storyservice.security.UserPrincipal;
@@ -26,6 +27,9 @@ public class StatisticsController {
     @Autowired
     StoryService storyService;
 
+    @Autowired
+    HistoryRepository historyRepository;
+
     @GetMapping("get_read_statistics_of_user")
     public ResponseEntity getReadStatisticsOfUser(@RequestParam Date from,
                                                   @RequestParam Date to,
@@ -47,11 +51,21 @@ public class StatisticsController {
     @Autowired
     ScreenReadingTimeService screenReadingTimeService;
     // tam thoi de null
-    @GetMapping("story/{sid}/screen")
-    public ResponseEntity getStoryScreenStatistic(@PathVariable int sid,@RequestBody TimeRangeRequest timeRangeRequest){
-        List<ScreenTimeResponse> storySummarizeResponse= screenReadingTimeService.getListDurationOfEachSreenInTimeRangeByStoryId(sid, timeRangeRequest.getStart(), timeRangeRequest.getEnd());
+//    @GetMapping("story/{sid}/screen")
+//    public ResponseEntity getStoryScreenStatistic(@PathVariable int sid,@RequestBody TimeRangeRequest timeRangeRequest){
+//        List<ScreenTimeResponse> storySummarizeResponse= screenReadingTimeService.getListDurationOfEachSreenInTimeRangeByStoryId(sid, timeRangeRequest.getStart(), timeRangeRequest.getEnd());
+//
+//        return new ResponseEntity(storySummarizeResponse, HttpStatus.OK);
+//    }
 
-        return new ResponseEntity(storySummarizeResponse, HttpStatus.OK);
+    @PostMapping("story/{sid}/screen")
+    public ResponseEntity getStoryScreenStatistic(@PathVariable Integer sid,
+                                            @RequestBody ScreenPageRequest req){
+        PagedResponse<IScreenValueResponse> srTimeViewAndAvg =
+                screenReadingTimeService.getSrTimeViewAndAvg(req.getPage(),
+                        req.getSize(), req.getOrderBy(), req.isAsc(),
+                        sid, req.getStart(), req.getEnd());
+        return new ResponseEntity(srTimeViewAndAvg, HttpStatus.OK);
     }
 
 
@@ -89,7 +103,16 @@ public class StatisticsController {
 
     @GetMapping("/story/{sid}/check")
     public boolean checkBeforeComeToStatic(@PathVariable("sid") Integer sid, @CurrentUser UserPrincipal userPrincipal) {
-            return  storyStatisticService.checkOwner(userPrincipal.getId() ,sid );
+            return  storyStatisticService.checkOwnerAndNotDeactiveByAdmin(userPrincipal.getId() ,sid );
 
     }
+
+    @GetMapping("get_tag_per_view_statistics")
+    public ResponseEntity getTagPerView(@RequestParam Date from,
+                                        @RequestParam Date to){
+
+        List<TagPerView> result = historyRepository.findTagStatisticByDateRange(from,to);
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
+
 }
