@@ -6,7 +6,7 @@ import Icon from "@mdi/react";
 import Tooltip from "@material-ui/core/Tooltip";
 import NotFound from "../../components/common/NotFound";
 import NotFoundPage from "../../pages/common/NotFoundPage";
-import MySpinner2 from "../../components/common/MySpinner2";
+import MySpinner2 from "../../components/common/MySpinner";
 import StarIcon from "@material-ui/icons/Star";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import MyRating from "../../components/common/MyRating";

@@ -727,7 +727,6 @@ class StoryServiceImpl implements StoryService {
             infoConditionRepository.saveAll(savedInfoConditions);
 
             //save information action
-
             storyDto.getInformationActions().stream().forEach(informationAction -> {
                 InformationAction savedInformationAction = modelMapper.map(informationAction, InformationAction.class);
                 savedInformationAction.setActionId(actionIdsMap.get(informationAction.getActionId()));
