@@ -17,6 +17,7 @@ import MyAlert from '../../../components/common/MyAlert';
 
 
 const UserHistoryPage = () => {
+    const [isLoading, setIsLoading] = useState(false);
     const userInfo = getAuthUserInfo();
 
     const [activeItem, setActiveItem] = useState('1');
@@ -64,6 +65,7 @@ const UserHistoryPage = () => {
                         setHistories(histories => [...histories, element]);
                     });
                     setIsLastHistoryPage(res.data.last);
+
                 }
                 else {
                     setHistoryPageNo(1);
@@ -73,6 +75,7 @@ const UserHistoryPage = () => {
                 }
             } catch (error) {
             }
+            setIsLoading(false);
             setHistoryLoading(false);
         }
     }
@@ -198,6 +201,7 @@ const UserHistoryPage = () => {
                 }
             } catch (error) {
             }
+            setIsLoading(false);
         }
 
     }
@@ -225,6 +229,7 @@ const UserHistoryPage = () => {
 
             } catch (error) {
             }
+            setIsLoading(false);
         }
 
     }
@@ -327,7 +332,7 @@ const UserHistoryPage = () => {
 
                         {!isLastHistoryPage > 0 &&
                             <div className="text-center">
-                                <button className="btn btn-secondary" onClick={getReadingHistory}>Xem thêm</button>
+                                <button disabled={isLoading} className="btn btn-secondary" onClick={e => { setIsLoading(true); getReadingHistory() }}>{isLoading ? "Đang tải..." : "Xem thêm"}</button>
                             </div>
                         }
                     </MDBTabPane>
@@ -360,7 +365,7 @@ const UserHistoryPage = () => {
 
                         {!isLastCommentPage > 0 &&
                             <div className="text-center">
-                                <button className="btn btn-secondary" onClick={getCommentHistory}>Xem thêm</button>
+                                <button disabled={isLoading} className="btn btn-secondary" onClick={e => { setIsLoading(true); getCommentHistory(); }}>{isLoading ? "Đang tải..." : "Xem thêm"}</button>
                             </div>
                         }
 
@@ -434,7 +439,7 @@ const UserHistoryPage = () => {
 
                         {!isLastReactionPage > 0 &&
                             <div className="text-center">
-                                <button className="btn btn-secondary" onClick={getReactionHistory}>Xem thêm</button>
+                                <button disabled={isLoading} className="btn btn-secondary" onClick={e => { setIsLoading(true); getReactionHistory() }}>{isLoading ? "Đang tải..." : "Xem thêm"}</button>
                             </div>
                         }
 
