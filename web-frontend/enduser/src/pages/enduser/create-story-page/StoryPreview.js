@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { Button, Dialog, DialogTitle as MuiDialogTitle, IconButton, Typography,
-    DialogContent as MuiDialogContent, DialogActions as MuiDialogActions  }  from '@material-ui/core';
+import {
+  Button, Dialog, DialogTitle as MuiDialogTitle, IconButton, Typography,
+  DialogContent as MuiDialogContent, DialogActions as MuiDialogActions
+} from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 
 import StringUtils from '../../../utils/string';
@@ -50,7 +52,7 @@ const styles = theme => ({
 // }))(MuiDialogActions);
 
 // const isEqual = (obj1, obj2) => {
-  
+
 //   return !Object.keys(obj1).some(prop => {
 //     if(ValidationUtils.isEmpty(obj2)) return true;
 //     return obj1[prop] !== obj2[prop];
@@ -62,42 +64,45 @@ const getNodesAndEdges = (screens, firstScreenId) => {
   const mynodes = [];
 
   screens.forEach((s, i) => {
-      s.first = false;
-      s.ending = false;
-      
-      const haveNextScreenAction = s.actions.some(a => a.type === ACTION_TYPES.NEXT_SCREEN || a.type === ACTION_TYPES.UPDATE_INFORMATION)
-      
-      if(s.id === firstScreenId) {
-        s.first = true;
-      } else if(haveNextScreenAction){
-          s.actions.forEach((a, i) => {
-              if(a.type === ACTION_TYPES.NEXT_SCREEN){
-                  myedges.push({
-                      from: s.id,
-                      to: a.value
-                  })
-              } else if(a.type === ACTION_TYPES.UPDATE_INFORMATION){
-                myedges.push({
-                      from: s.id,
-                      to: a.nextScreenId
-                  })
-              } 
+    s.first = false;
+    s.ending = false;
+
+    const haveNextScreenAction = s.actions.some(a => a.type === ACTION_TYPES.NEXT_SCREEN || a.type === ACTION_TYPES.UPDATE_INFORMATION)
+
+    if (haveNextScreenAction) {
+      s.actions.forEach((a, i) => {
+        if (a.type === ACTION_TYPES.NEXT_SCREEN) {
+          myedges.push({
+            from: s.id,
+            to: a.value
           })
-      } else {
-        s.ending = true;
-      }
+        } else if (a.type === ACTION_TYPES.UPDATE_INFORMATION) {
+          myedges.push({
+            from: s.id,
+            to: a.nextScreenId
+          })
+        }
+      })
+    } else {
+      s.ending = true;
+    }
 
-      const newNode = {
-          id: s.id,
-          title: `#${i + 1}: ${StringUtils.getObjTitle(s)}`,
-          label: `#${i + 1}: ${StringUtils.getObjTitle(s)}`,
-          // index: i,
-          // ending: s.ending,
-          // first: s.first,
-          color: s.ending ? SCREEN_COLORS.ENDING_SCREEN : (s.first ? SCREEN_COLORS.FIRST_SCREEN: SCREEN_COLORS.NORMAL_SCREEN)
-      }
+    if (s.id === firstScreenId) {
+      s.first = true;
+    }
 
-      mynodes.push(newNode);
+    const newNode = {
+      id: s.id,
+      title: `#${i + 1}: ${StringUtils.getObjTitle(s)}`,
+      label: `#${i + 1}: ${StringUtils.getObjTitle(s)}`,
+      // index: i,
+      // ending: s.ending,
+      // first: s.first,
+      // color: s.ending ? SCREEN_COLORS.ENDING_SCREEN : (s.first ? SCREEN_COLORS.FIRST_SCREEN: SCREEN_COLORS.NORMAL_SCREEN)
+      color: s.first ? SCREEN_COLORS.FIRST_SCREEN : (s.ending ? SCREEN_COLORS.ENDING_SCREEN : SCREEN_COLORS.NORMAL_SCREEN)
+    }
+
+    mynodes.push(newNode);
 
   });
 
@@ -105,39 +110,34 @@ const getNodesAndEdges = (screens, firstScreenId) => {
   return { edges: myedges, nodes: mynodes };
 }
 
-const isEqual = (obj1, obj2) => {
-  if(ValidationUtils.isEmpty(obj1) || ValidationUtils.isEmpty(obj2)) return false;
-  if(Object.keys(obj1) != Object.keys(obj2)) return false;
-  return Object.keys(obj1).some(prop => obj1[prop] != obj2[prop]);
-}
 
 const StoryPreview = (props) => {
-    const { firstScreenId, screens, setCurrentScreen } = props;
-    const [edges, setEdges] = useState([]);
-    const [nodes, setNodes] = useState([]);
+  const { firstScreenId, screens, setCurrentScreen } = props;
+  const [edges, setEdges] = useState([]);
+  const [nodes, setNodes] = useState([]);
 
-    useEffect(() => {
-      // const newEdges = getEdges();
-      // const newNodes = getNodes();
+  useEffect(() => {
+    // const newEdges = getEdges();
+    // const newNodes = getNodes();
 
-      // console.log('run');
-      const data = getNodesAndEdges(screens, firstScreenId);
+    // console.log('run');
+    const data = getNodesAndEdges(screens, firstScreenId);
 
-      //  const isNotEqualNodes = data.nodes.some((n, i) => !isEqual(n, nodes[i]));
-      // if(isNotEqualNodes) 
+    //  const isNotEqualNodes = data.nodes.some((n, i) => !isEqual(n, nodes[i]));
+    // if(isNotEqualNodes) 
 
-      // const isNotEqualEdges = data.edges.some((e, i) => !isEqual(e, edges[i]));
-      // if(isNotEqualEdges) 
+    // const isNotEqualEdges = data.edges.some((e, i) => !isEqual(e, edges[i]));
+    // if(isNotEqualEdges) 
 
-      setEdges(data.edges);
-      setNodes(data.nodes);
-    }, [screens, firstScreenId]);
+    setEdges(data.edges);
+    setNodes(data.nodes);
+  }, [screens, firstScreenId]);
 
-    
 
-    return (
-        <div>
-            {/* <Dialog 
+
+  return (
+    <div>
+      {/* <Dialog 
                 fullScreen={true}
                 onClose={onClose} 
                 open={open}>
@@ -151,13 +151,13 @@ const StoryPreview = (props) => {
                 </DialogContent>
               
             </Dialog> */}
-            <StoryGraph
-                setCurrentScreen={setCurrentScreen}
-                nodes={nodes}
-                edges={edges}
-            />
-        </div>
-    );
+      <StoryGraph
+        setCurrentScreen={setCurrentScreen}
+        nodes={nodes}
+        edges={edges}
+      />
+    </div>
+  );
 };
 
 

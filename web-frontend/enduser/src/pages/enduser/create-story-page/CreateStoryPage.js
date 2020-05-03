@@ -24,8 +24,10 @@ import StoryTabs from './StoryTabs';
 import { LayoutContext } from '../../../context/layout.context';
 
 
-import { getParameters, getActions, ANIMATIONS, ACTION_TYPES, 
-    INFORMATION_TYPES  }  from '../../../common/constants';
+import {
+    getParameters, getActions, ANIMATIONS, ACTION_TYPES,
+    INFORMATION_TYPES
+} from '../../../common/constants';
 
 
 import StoryService from '../../../services/story.service';
@@ -44,7 +46,7 @@ const actions = getActions();
 let isEditPage;
 
 const CreateStoryPage = (props) => {
-   
+
     isEditPage = props.location.pathname !== '/stories/create';
 
     const layoutContext = useContext(LayoutContext)
@@ -83,7 +85,7 @@ const CreateStoryPage = (props) => {
     React.useEffect(() => {
         getTags();
 
-        if(isEditPage){
+        if (isEditPage) {
             getStoryDetails();
         } else {
             handleAddScreen();
@@ -93,18 +95,18 @@ const CreateStoryPage = (props) => {
 
         return () => {
             setOpenSidebar(true);
-            
+
         }
         // window.onbeforeunload = confirmBeforeLeavePage;
-       
+
     }, []);
 
     const confirmBeforeLeavePage = (e) => {
-        if(!e) e = window.event;
+        if (!e) e = window.event;
         //e.cancelBubble is supported by IE - this will kill the bubbling process.
         e.cancelBubble = true;
         e.returnValue = 'Có thể bạn cần lưu lại những thay đổi trên câu truyện. \nBạn có chắc muốn rời khỏi trang này hay không?'; //This is displayed on the dialog
-    
+
         //e.stopPropagation works in Firefox.
         if (e.stopPropagation) {
             e.stopPropagation();
@@ -128,9 +130,9 @@ const CreateStoryPage = (props) => {
         try {
             const res = await StoryService.getReadingStory(storyId);
             console.log(res);
-            if(!ValidationUtils.isEmpty(res.data.data)){
+            if (!ValidationUtils.isEmpty(res.data.data)) {
                 const user = getAuthUserInfo();
-                if(user.id !== res.data.data.userId){
+                if (user.id !== res.data.data.userId) {
                     return props.history.push('/stories/details/' + storyId);
                 } else {
                     setSaveStory(false);
@@ -138,12 +140,12 @@ const CreateStoryPage = (props) => {
 
                 let { screens, informations, informationActions, tags } = res.data.data;
 
-                if(informations.length > 0){
+                if (informations.length > 0) {
                     screens.forEach(screen => {
                         screen.actions.forEach(action => {
-                            if(action.type === ACTION_TYPES.UPDATE_INFORMATION){
+                            if (action.type === ACTION_TYPES.UPDATE_INFORMATION) {
                                 const ia = informationActions.find(ia => ia.actionId === action.id);
-                                if(ia != null) action.operation = ia.operation;
+                                if (ia != null) action.operation = ia.operation;
                             }
                         })
                     });
@@ -154,8 +156,10 @@ const CreateStoryPage = (props) => {
                 console.log(tags);
                 setSelectedTags(tags);
                 setStoryParameters(informations);
-                setStory({  ...res.data.data, screens: null, informations: null, informationActions: null });
-                
+                setStory({ ...res.data.data, screens: null, informations: null, informationActions: null });
+                const firstScreen = screens.find(sc => sc.id = res.data.data.firstScreenId)
+                setCurrentScreen(firstScreen);
+
             } else {
                 setNotfoundStory(true);
             }
@@ -168,15 +172,15 @@ const CreateStoryPage = (props) => {
     }
 
     const changeStory = async (prop, value) => {
-        if(prop === 'image'){
-            if(FileUtils.isFileImage(value)){
+        if (prop === 'image') {
+            if (FileUtils.isFileImage(value)) {
                 setImage(value);
-               try {
+                try {
                     value = await FileUtils.toBase64(value);
-               } catch (error) {
-                   console.log(error);
-               }
-               setStory({ ...story, [prop]: value });
+                } catch (error) {
+                    console.log(error);
+                }
+                setStory({ ...story, [prop]: value });
             } else {
                 setImage(null);
                 setStory({ ...story, image: '' });
@@ -190,21 +194,21 @@ const CreateStoryPage = (props) => {
         const newScreen = {
             id: Math.random().toString(),
             title: '',
-            content: '', 
+            content: '',
             actions: [],
             nextScreenId: '',
         };
         screens.push(newScreen);
         setScreens([...screens]);
 
-        if(screens.length == 1) {
+        if (screens.length == 1) {
             setCurrentScreen(newScreen);
             changeStory('firstScreenId', newScreen.id);
         }
     }
 
     const changeScreen = (prop, value, screen) => {
-        if(prop === 'content' && !canChangeScreenContent) return;
+        if (prop === 'content' && !canChangeScreenContent) return;
         screen[prop] = value;
         setScreens([...screens]);
         canChangeScreenContent = true;
@@ -212,7 +216,7 @@ const CreateStoryPage = (props) => {
 
     const handleRemoveScreen = async (screen) => {
         const newscreens = screens.filter(sec => sec.id !== screen.id);
-        if(currentScreen === screen){
+        if (currentScreen === screen) {
             window.setTimeout(() => setCurrentScreen(null), 0)
         }
         setScreens(newscreens);
@@ -220,10 +224,10 @@ const CreateStoryPage = (props) => {
 
     const changeActions = (prop, value, screen, actionIndex) => {
         screen.actions.forEach((opt, index) => {
-            if(index == actionIndex){
+            if (index == actionIndex) {
                 opt[prop] = value;
-            } 
-        }) 
+            }
+        })
         setScreens([...screens]);
     }
 
@@ -232,11 +236,11 @@ const CreateStoryPage = (props) => {
             id: Math.random().toString(),
             content: '',
             type: ACTION_TYPES.REDIRECT,
-            operation: '',            
+            operation: '',
             value: '',
             nextScreenId: ''
         }
-        
+
         screen.actions.push(newaction);
         setScreens([...screens]);
     }
@@ -244,22 +248,22 @@ const CreateStoryPage = (props) => {
     const handleRemoveAction = (screen, index) => {
         screen.actions.splice(index, 1);
         setScreens([...screens]);
-    } 
+    }
 
     const changeParam = (prop, value, param, cond) => {
         param[prop] = value;
         setStoryParameters([...storyParameters]);
     }
-    
+
     const addParameter = () => {
-        if(storyParameters.length > 0) {
-            setAlert({ 
-                content: 'Chỉ thêm được 1 thông tin!', 
-                type: 'error', 
-                open: true 
+        if (storyParameters.length > 0) {
+            setAlert({
+                content: 'Chỉ thêm được 1 thông tin!',
+                type: 'error',
+                open: true
             });
         } else {
-            const newParam =  {
+            const newParam = {
                 id: Math.random().toString(),
                 type: INFORMATION_TYPES.NUMBER, //string, number, date,
                 name: '',
@@ -311,31 +315,31 @@ const CreateStoryPage = (props) => {
     const deleteStory = async () => {
         setDialog({ ...dialog, open: false })
         try {
-          const res = await StoryService.deleteStory(story.id);
-          const { success, errors } = res.data;
-          if(success){
-            setAlert({ type: 'success', content: 'Xóa thành công', open: true });
-            window.setTimeout(() => props.history.push(`/user/my-profile`), 2000);
-          } else {
-            setAlert({ type: 'error', content: Object.values(errors)[0], open: true });
-          }
+            const res = await StoryService.deleteStory(story.id);
+            const { success, errors } = res.data;
+            if (success) {
+                setAlert({ type: 'success', content: 'Xóa thành công', open: true });
+                window.setTimeout(() => props.history.push(`/user/my-profile`), 2000);
+            } else {
+                setAlert({ type: 'error', content: Object.values(errors)[0], open: true });
+            }
         } catch (error) {
-          console.log(error);
+            console.log(error);
         }
         closeAlert();
     }
 
-    const saveStory = async () =>  {
+    const saveStory = async () => {
         setOpenBackdrop(true);
         //upload image if exist
-        if(FileUtils.isFileImage(image)){
+        if (FileUtils.isFileImage(image)) {
             try {
-             const res = await FIleService.uploadImage(image);
-             console.log(res);
-             if(res.data.status == 200){
-                story.image = res.data.data.link;
-                setStory({ ...story });
-             }
+                const res = await FIleService.uploadImage(image);
+                console.log(res);
+                if (res.data.status == 200) {
+                    story.image = res.data.data.link;
+                    setStory({ ...story });
+                }
             } catch (error) {
                 console.log(error);
             }
@@ -343,12 +347,12 @@ const CreateStoryPage = (props) => {
 
         let informationActions = [];
 
-        if(storyParameters.length > 0){
+        if (storyParameters.length > 0) {
             screens.forEach((screen, i) => {
                 screen.myIndex = i + 1;
                 screen.actions.forEach((action, index) => {
                     action.myIndex = index + 1;
-                    if(action.type === ACTION_TYPES.UPDATE_INFORMATION){
+                    if (action.type === ACTION_TYPES.UPDATE_INFORMATION) {
                         informationActions.push({
                             actionId: action.id,
                             informationId: storyParameters[0].id,
@@ -359,17 +363,17 @@ const CreateStoryPage = (props) => {
                 })
             });
         }
-        
+
         story.screens = screens;
         story.tags = selectedTags.map(t => t.id);
         story.informations = storyParameters;
         story.informationActions = informationActions;
-        
+
         console.log(story);
 
         try {
             let res = null;
-            if(isEditPage){
+            if (isEditPage) {
                 res = await StoryService.updateStory(story);
             } else {
                 res = await StoryService.createStory(story);
@@ -377,27 +381,27 @@ const CreateStoryPage = (props) => {
             console.log(res);
             const { success, data, errors } = res.data;
 
-            if(success) {
-                
-                setAlert({ 
-                    content: 'Lưu thành công', 
-                    type:'success',
+            if (success) {
+
+                setAlert({
+                    content: 'Lưu thành công',
+                    type: 'success',
                     open: true
                 });
 
-                if(!isEditPage){
+                if (!isEditPage) {
                     window.setTimeout(() => window.location.href = `/stories/edit/${data.id}`, 2000);
                 }
             } else {
-                setAlert({ content: Object.values(errors), type:'error', open: true });
+                setAlert({ content: Object.values(errors), type: 'error', open: true });
             }
         } catch (error) {
-            if(!ValidationUtils.isEmpty(error.response)){
-                setAlert({ content: Object.values(error.response.data)[0], type:'error', open: true });
+            if (!ValidationUtils.isEmpty(error.response)) {
+                setAlert({ content: Object.values(error.response.data)[0], type: 'error', open: true });
             } else {
-                setAlert({ content: 'Không thể lưu truyện', type:'error', open: true });
+                setAlert({ content: 'Không thể lưu truyện', type: 'error', open: true });
             }
-           
+
         }
         setOpenBackdrop(false);
         closeAlert();
@@ -407,7 +411,7 @@ const CreateStoryPage = (props) => {
 
     // console.log(storyParameters);
     let actionTypesList = actions.filter(action => {
-        if(action === ACTION_TYPES.UPDATE_INFORMATION && ValidationUtils.isEmpty(storyParameters)) return false;
+        if (action === ACTION_TYPES.UPDATE_INFORMATION && ValidationUtils.isEmpty(storyParameters)) return false;
         return true;
     });
 
@@ -416,17 +420,17 @@ const CreateStoryPage = (props) => {
     // const screenSnapshots = screens.filter((s, index) => {
     //     return index >= (screenSnapshotsPage.page - 1) * 10 && index < screenSnapshotsPage.page * 10;  
     // });
-    
+
     // const numOfPageScreenSnapshots = Math.ceil(screens.length / 10);
 
     return (
         <MainLayout>
-    
+
             <h3 className="text-center my-4">
                 {!isEditPage ? 'Tạo truyện cho riêng bạn' : 'Cập nhật truyện'}
             </h3>
-            
-            <MyBackdrop open={openBackdrop} setOpen={setOpenBackdrop}/>
+
+            <MyBackdrop open={openBackdrop} setOpen={setOpenBackdrop} />
             {/* <MySpinner/> */}
 
             <Prompt
@@ -438,7 +442,7 @@ const CreateStoryPage = (props) => {
 
             {(!isLoadingStory && !notfoundStory && !ValidationUtils.isEmpty(story)) && (
                 <div style={{ marginBottom: '150px' }}>
-                     <StoryTabs
+                    <StoryTabs
                         value={storyTab}
                         onChange={(e, value) => setStoryTab(value)}
                     >
@@ -450,25 +454,25 @@ const CreateStoryPage = (props) => {
                                         <Paper >
                                             <div className="card-header">
                                                 <div className="row">
-                                                  
+
                                                     <div className="col-sm-7">
                                                         <div className="row">
                                                             <div className="col-sm-12 mb-4">
-                                                                <TextField 
+                                                                <TextField
                                                                     size="small"
                                                                     variant="outlined"
                                                                     style={{ width: '100%' }}
                                                                     label="Tiêu đề truyện..."
-                                                                    value={story.title} 
+                                                                    value={story.title}
                                                                     onChange={(e) => changeStory('title', e.target.value)} />
-                                                           
+
                                                             </div>
                                                             <div className='col-sm-6'>
                                                                 <ScreensSelect
                                                                     placeholder={'Chọn màn hình đầu tiên'}
                                                                     screens={screens}
                                                                     value={story.firstScreenId}
-                                                                    onChange={(e) => changeStory('firstScreenId', e.target.value)} 
+                                                                    onChange={(e) => changeStory('firstScreenId', e.target.value)}
                                                                 />
                                                             </div>
 
@@ -490,15 +494,15 @@ const CreateStoryPage = (props) => {
                                                     <div className="col-sm-5">
                                                         <div className="">
                                                             <div>
-                                                                <label 
-                                                                    htmlFor="files" 
+                                                                <label
+                                                                    htmlFor="files"
                                                                     className="btn btn-block">Chọn ảnh</label>
-                                                                <input 
-                                                                    id="files" 
-                                                                    style={{ visibility:"hidden" }} 
+                                                                <input
+                                                                    id="files"
+                                                                    style={{ visibility: "hidden" }}
                                                                     accept=".jpg, .gif, .png, .jpeg"
                                                                     onChange={(e) => changeStory('image', e.target.files[0])}
-                                                                    type="file"/>
+                                                                    type="file" />
                                                             </div>
                                                         </div>
                                                         <div className="text-center">
@@ -506,27 +510,27 @@ const CreateStoryPage = (props) => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                    
-                                                <StoryParameters 
+
+                                                <StoryParameters
                                                     parameters={parameters}
                                                     storyParameters={storyParameters}
                                                     screens={screens}
-                                                    onChangeParam={changeParam} 
-                                                    onAddParamConditions={addParamConditions} 
-                                                    onChangeParamConditions={changeParamConditions} 
+                                                    onChangeParam={changeParam}
+                                                    onAddParamConditions={addParamConditions}
+                                                    onChangeParamConditions={changeParamConditions}
                                                     onRemoveParamCondition={removeParamCondition}
                                                     onRemoveParam={removeParam} />
-                                                
+
                                             </div>
                                             <div className="card-body">
-                                            <small className="float-right">Dung lượng: {StringUtils.getByteSize(story.intro)} kb</small>
-                                            <div className="clearfix"></div>
+                                                <small className="float-right">Dung lượng: {StringUtils.getByteSize(story.intro)} kb</small>
+                                                <div className="clearfix"></div>
                                                 <MyEditor
                                                     placeholder="Nội dung giới thiệu"
                                                     value={story.intro}
                                                     onChange={(value) => changeStory('intro', value)}
                                                 />
-                                                
+
                                                 <div className="text-right mt-2">
                                                     <Button
                                                         onClick={addParameter}
@@ -561,17 +565,17 @@ const CreateStoryPage = (props) => {
                                     <h3 style={{ fontSize: '1.2em' }}>
                                         <span className="mr-2">Tất cả màn hình ({screens.length})</span>
                                         <Tooltip title="Thêm màn hình" aria-label="add" placement="top">
-                                            <Fab 
-                                                color="primary" 
-                                                style={{ width: '35px', height: '35px' }} 
+                                            <Fab
+                                                color="primary"
+                                                style={{ width: '35px', height: '35px' }}
                                                 onClick={handleAddScreen}>
                                                 <AddIcon />
                                             </Fab>
                                         </Tooltip>
-                                    
+
                                     </h3>
                                     <hr style={{ border: '1px solid #ccc' }} />
-                                    
+
                                     {/* <Pagination 
                                         count={numOfPageScreenSnapshots} 
                                         page={screenSnapshotsPage.page}
@@ -600,9 +604,9 @@ const CreateStoryPage = (props) => {
                                         open={openStoryPreview}
                                     />
 
-                                    <br/>
-                                    <ScreenTypes/>
-                                
+                                    <br />
+                                    <ScreenTypes />
+
                                 </div>
                                 <div className="col-sm-7">
                                     <h3 style={{ fontSize: '1.2em' }}>Chi tiết màn hình</h3>
@@ -610,15 +614,15 @@ const CreateStoryPage = (props) => {
                                     {/* Story screens */}
                                     <ScreensList
                                         currentScreen={currentScreen}
-                                        screens={screens} 
+                                        screens={screens}
                                         parameters={parameters}
-                                        actionsList={actionTypesList} 
+                                        actionsList={actionTypesList}
                                         storyParameters={storyParameters}
                                         onShowScreenPreview={() => setOpenScreenPreview(true)}
-                                        onChangeScreen={changeScreen} 
-                                        onChangeActions={changeActions} 
-                                        onRemoveScreen={handleRemoveScreen} 
-                                        onAddAction={handleAddActions} 
+                                        onChangeScreen={changeScreen}
+                                        onChangeActions={changeActions}
+                                        onRemoveScreen={handleRemoveScreen}
+                                        onAddAction={handleAddActions}
                                         onRemoveAction={handleRemoveAction}
                                     />
                                 </div>
@@ -626,17 +630,17 @@ const CreateStoryPage = (props) => {
                         )}
                     </StoryTabs>
                     {isEditPage && (
-                        <button 
-                            className="btn btn-danger float-right" 
+                        <button
+                            className="btn btn-danger float-right"
                             onClick={() => handleDeleteStory()}>
                             Xóa truyện</button>
                     )}
-                    <button 
-                        className="btn btn-warning float-right" 
+                    <button
+                        className="btn btn-warning float-right"
                         onClick={() => saveStory()}>
                         Lưu truyện</button>
-                
-                    <MyAlert 
+
+                    <MyAlert
                         open={alert.open}
                         setOpen={(open) => setAlert({ ...alert, open: open })}
                         type={alert.type}
@@ -653,7 +657,7 @@ const CreateStoryPage = (props) => {
                         />
                     )}
 
-                    <ScreenPreview 
+                    <ScreenPreview
                         animation={story.animation}
                         open={openScreenPreview}
                         onClose={closeScreenPreview}
@@ -663,11 +667,11 @@ const CreateStoryPage = (props) => {
                 </div>
             )}
 
-            { (notfoundStory) && <NotFound message={"Không tìm thấy truyện này"} /> }
-           
+            {(notfoundStory) && <NotFound message={"Không tìm thấy truyện này"} />}
+
         </MainLayout>
-    
-       
+
+
     );
 };
 
