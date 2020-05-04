@@ -7,23 +7,23 @@ import { Grow, Fade, Collapse, Zoom, Slide } from '@material-ui/core';
 const ScreenShow = (props) => {
 
     const { screen, onSelectAction, showScreen, animation } = props;
-    
+
     let animationEle;
 
-    switch(animation){
-        case ANIMATIONS.FADE: 
+    switch (animation) {
+        case ANIMATIONS.FADE:
             animationEle = <Fade></Fade>
             break;
-        case ANIMATIONS.GROW: 
+        case ANIMATIONS.GROW:
             animationEle = <Grow></Grow>
             break;
-        case ANIMATIONS.COLLAPSE: 
+        case ANIMATIONS.COLLAPSE:
             animationEle = <Collapse></Collapse>
             break;
-        case ANIMATIONS.SLIDE: 
+        case ANIMATIONS.SLIDE:
             animationEle = <Slide></Slide>
             break;
-        case ANIMATIONS.ZOOM: 
+        case ANIMATIONS.ZOOM:
             animationEle = <Zoom></Zoom>
             break;
         default: animationEle = <Fade></Fade>
@@ -38,30 +38,31 @@ const ScreenShow = (props) => {
                 }, (
                     <div className="screen-card">
                         <div className="screen-card-header mb-4">
-                            <h5 className="text-center">{ StringUtils.getObjTitle(screen) }</h5>
+                            <h5 className="text-center">{StringUtils.getObjTitle(screen)}</h5>
                         </div>
                         <div className="screen-card-body" style={props}>
                             <div className="">
-                               { StringUtils.parseHtml(screen.content) }
+                                {StringUtils.parseHtml(screen.content)}
                             </div>
-                            <br/>
+                            <br />
                             <div className="row">
                                 {screen.actions.map(action => (
-                                    <div 
-                                        className={`${screen.actions.length > 1 ? 'col-sm-6' : 'col-12'}`} 
+                                    <div
+                                        className={`${screen.actions.length > 1 ? 'col-sm-6' : 'col-12'}`}
                                         key={action.id}>
-                                        <div 
+                                        <div
                                             style={{ fontSize: '1.2em' }}
                                             onClick={() => onSelectAction(action)}
                                             className="action-content text-center">
-                                                
+
                                             {action.type === ACTION_TYPES.REDIRECT && (
-                                                <a href={action.value} target="_blank">
-                                                    { action.content }
-                                                </a>
+                                                // <a href={action.value} target="_blank">
+
+                                                // </a>
+                                                <span>{action.content}</span>
                                             )}
                                             {action.type !== ACTION_TYPES.REDIRECT && (
-                                                <>{ StringUtils.parseHtml(action.content)  }</>
+                                                <>{StringUtils.parseHtml(action.content)}</>
                                             )}
                                         </div>
                                     </div>
@@ -69,7 +70,7 @@ const ScreenShow = (props) => {
                             </div>
                         </div>
                     </div>
-                
+
                 ))
             )}
         </div>

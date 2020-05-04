@@ -7,8 +7,10 @@ import MainLayout from '../../../layouts/main-layout/MainLayout';
 import StoryService from '../../../services/story.service';
 import ValidationUtils from '../../../utils/validation';
 import StringUtils from '../../../utils/string';
-import { ACTION_TYPES, INFORMATION_TYPES, STRING_OPERATIONS,
-     NUMBER_OPERATIONS, STRING_CONDITIONS, NUMBER_CONDITIONS, ANIMATIONS } from '../../../common/constants';
+import {
+    ACTION_TYPES, INFORMATION_TYPES, STRING_OPERATIONS,
+    NUMBER_OPERATIONS, STRING_CONDITIONS, NUMBER_CONDITIONS, ANIMATIONS
+} from '../../../common/constants';
 
 import MySpinner from '../../../components/common/MySpinner';
 import NotFound from '../../../components/common/NotFound';
@@ -31,15 +33,16 @@ let screenList = [];
 let myCurrentScreen = null;
 let interactionCheck = { duration: 0, isInteracted: true };
 let interactionInterval = null;
+let canHandleAction = true;
 
 const countTimeReading = (startTime) => {
-    if(ValidationUtils.isEmpty(startTime)) startTime = 0;
+    if (ValidationUtils.isEmpty(startTime)) startTime = 0;
     readingScreenDuration = startTime;
     interval = window.setInterval(() => {
         readingScreenDuration++;
 
         //if time is more than 15 min, set time for this screen and stop counter
-        if(readingScreenDuration > 15*60) {
+        if (readingScreenDuration > 15 * 60) {
             stopCountTimeReading();
         }
     }, 1000);
@@ -65,10 +68,11 @@ const ReadStoryPage = (props) => {
     const [showScreen, setShowScreen] = useState(false);
     const [isEnd, setEnd] = useState(false);
     const [dialog, setDialog] = useState({ open: false, content: '' });
-    
+
+
 
     useEffect(() => {
-       
+
         const { storyId } = props.match.params;
         savedStoryId = storyId;
         listScreenId = []
@@ -76,7 +80,7 @@ const ReadStoryPage = (props) => {
         interval = null;
         initialInformations = [];
         isEndStory = false;
-        
+
         getReadingStory(storyId);
 
         //save history when reload the page
@@ -86,8 +90,8 @@ const ReadStoryPage = (props) => {
 
         //save history when navigate page
         return () => {
-            if(!notfound){
-                window.addEventListener('beforeunload', () => {});
+            if (!notfound) {
+                window.addEventListener('beforeunload', () => { });
                 saveHistoryBeforeLeavePage();
             }
         };
@@ -96,29 +100,29 @@ const ReadStoryPage = (props) => {
 
     const saveHistoryBeforeLeavePage = () => {
         stopCountTimeReading();
-        if(!isEndStory && listScreenId.length > 0){
+        if (!isEndStory && listScreenId.length > 0) {
             const data = {
                 storyId: savedStoryId,
                 isReachingEnd: false,
                 listScreenId: listScreenId.toString()
             }
             saveReadingHistory(data);
-        } else if(isEndScreen(myCurrentScreen)) {
+        } else if (isEndScreen(myCurrentScreen)) {
             //cal time of end screen
             saveScreenReadTime({
-                screenId: myCurrentScreen.id, 
-                duration: readingScreenDuration 
+                screenId: myCurrentScreen.id,
+                duration: readingScreenDuration
             })
         }
     }
 
     const isEndScreen = (screen) => {
-        if(ValidationUtils.isEmpty(screen)) return false;
+        if (ValidationUtils.isEmpty(screen)) return false;
         // if (screen.id === story.firstScreenId && screenList.length > 1) return false;
-        
+
         const haveNextScreenAction = ValidationUtils.isEmpty(screen.actions) ? false : screen.actions.some(a => a.type === ACTION_TYPES.NEXT_SCREEN || a.type === ACTION_TYPES.UPDATE_INFORMATION)
-        if(haveNextScreenAction) return false;
-        if(!ValidationUtils.isEmpty(screen.nextScreenId)) return false;
+        if (haveNextScreenAction) return false;
+        if (!ValidationUtils.isEmpty(screen.nextScreenId)) return false;
         return true;
     }
 
@@ -132,7 +136,7 @@ const ReadStoryPage = (props) => {
     }
 
     const handleInteractionEvent = () => {
-        if(interactionCheck.isInteracted) interactionCheck.duration = 0;
+        if (interactionCheck.isInteracted) interactionCheck.duration = 0;
     }
 
     const setUpCheckUserInteraction = () => {
@@ -148,9 +152,9 @@ const ReadStoryPage = (props) => {
         window.clearInterval(interactionInterval);
         interactionInterval = window.setInterval(() => {
             interactionCheck.duration++;
-            
+
             //if 2min no interaction, system will confirm if the user want to continue reading.
-            if(interactionCheck.duration > 2 * 60 && interactionCheck.isInteracted){
+            if (interactionCheck.duration > 2 * 60 && interactionCheck.isInteracted) {
                 interactionCheck.isInteracted = false;
                 stopCountTimeReading();
                 setDialog({ open: true, content: 'Bạn có muốn đọc tiếp câu truyện hay không?' });
@@ -167,22 +171,22 @@ const ReadStoryPage = (props) => {
     const changeCurrentScreen = (screenId) => {
         setShowScreen(false);
         const screen = screens.find(scr => scr.id === screenId);
-        if(!ValidationUtils.isEmpty(screen)){
+        if (!ValidationUtils.isEmpty(screen)) {
 
             interactionCheck = { duration: 0, isInteracted: true };
-            
+
             listScreenId.push(screen.id);
             myCurrentScreen = JSON.parse(JSON.stringify(screen));
 
-            if(currentScreen != null){
+            if (currentScreen != null) {
                 stopCountTimeReading();
-                saveScreenReadTime({ 
-                    screenId: currentScreen.id, 
-                    duration: readingScreenDuration 
+                saveScreenReadTime({
+                    screenId: currentScreen.id,
+                    duration: readingScreenDuration
                 });
             }
 
-            if(isEndScreen(screen)){
+            if (isEndScreen(screen)) {
                 setEnd(true);
                 isEndStory = true;
                 const data = {
@@ -195,6 +199,7 @@ const ReadStoryPage = (props) => {
         }
 
         setTimeout(() => {
+            canHandleAction = true;
             setCurrentScreen(screen)
             setShowScreen(true);
             countTimeReading();
@@ -214,23 +219,23 @@ const ReadStoryPage = (props) => {
         setIsLoading(true);
         setOpenBackdrop(true);
         try {
-            const res = await StoryService.getReadingStory(storyId);    
-           
+            const res = await StoryService.getReadingStory(storyId);
+
             const { data } = res.data;
-            if(ValidationUtils.isEmpty(data)){
+            if (ValidationUtils.isEmpty(data)) {
                 setNotfound(true);
             } else {
                 console.log(data);
-                if(!data.published){
+                if (!data.published) {
                     setPublished(false);
                 } else {
                     setScreens(data.screens);
                     screenList = [...data.screens];
                     setInformations(data.informations);
                     initialInformations = JSON.parse(JSON.stringify(data.informations));
-    
+
                     setInformationActions(data.informationActions);
-                    
+
                     setStory({ ...data, screens: null, informations: null, informationActions: null });
                 }
             }
@@ -242,69 +247,78 @@ const ReadStoryPage = (props) => {
     }
 
     const handleSelectAction = (action) => {
-       
-        const foundInformation = informations[0];
-        if(informations.length > 0 && action.type === ACTION_TYPES.UPDATE_INFORMATION){
-            const infoAction = informationActions.find(ia => ia.actionId === action.id);
-            
-            let newValue = '';
-            let canReadMore = true;
-            
-            if(foundInformation.type === INFORMATION_TYPES.NUMBER){
-                if(infoAction.operation === NUMBER_OPERATIONS.REPLACE){
-                    newValue = infoAction.value;
-                } else {
-                    //calculate number
-                    const exp = `${foundInformation.value} ${infoAction.operation} ${infoAction.value}`;
-                    newValue = window.eval(exp);
-                }
 
-                for(let condition of foundInformation.conditions){
-                    let type = condition.type == NUMBER_CONDITIONS.EQUAL ? '==' : condition.type;
-                    const exp = `${newValue} ${type} ${condition.value}`;
-                    if(window.eval(exp)){
-                        changeCurrentScreen(condition.nextScreenId);
-                        canReadMore = false;
-                        break;
+        if (canHandleAction) {
+            canHandleAction = false;
+
+            const foundInformation = informations[0];
+            if (informations.length > 0 && action.type === ACTION_TYPES.UPDATE_INFORMATION) {
+                const infoAction = informationActions.find(ia => ia.actionId === action.id);
+
+                let newValue = '';
+                let canReadMore = true;
+
+                if (foundInformation.type === INFORMATION_TYPES.NUMBER) {
+                    if (infoAction.operation === NUMBER_OPERATIONS.REPLACE) {
+                        newValue = infoAction.value;
+                    } else {
+                        //calculate number
+                        const exp = `${foundInformation.value} ${infoAction.operation} ${infoAction.value}`;
+                        newValue = window.eval(exp);
+                    }
+
+                    for (let condition of foundInformation.conditions) {
+                        let type = condition.type == NUMBER_CONDITIONS.EQUAL ? '==' : condition.type;
+                        const exp = `${newValue} ${type} ${condition.value}`;
+                        if (window.eval(exp)) {
+                            changeCurrentScreen(condition.nextScreenId);
+                            canReadMore = false;
+                            break;
+                        }
+                    }
+
+                } else if (foundInformation.type === INFORMATION_TYPES.STRING) {
+                    if (infoAction.operation === STRING_OPERATIONS.REPLACE) {
+                        newValue = infoAction.value;
+                    } else if (infoAction.operation === STRING_OPERATIONS.PREPEND) {
+                        newValue = '' + infoAction.value + foundInformation.value;
+                    } else if (infoAction.operation === STRING_OPERATIONS.APPEND) {
+                        newValue = '' + foundInformation.value + infoAction.value;
+                    }
+
+                    //check all conditions
+                    for (let condition of foundInformation.conditions) {
+                        if (condition.type === STRING_CONDITIONS.EQUAL && newValue === condition.value) {
+                            changeCurrentScreen(condition.nextScreenId);
+                            canReadMore = false;
+                            break;
+                        }
                     }
                 }
-                
-            } else if(foundInformation.type === INFORMATION_TYPES.STRING){
-                if(infoAction.operation === STRING_OPERATIONS.REPLACE){
-                    newValue = infoAction.value;
-                } else if(infoAction.operation === STRING_OPERATIONS.PREPEND){
-                    newValue = '' + infoAction.value + foundInformation.value; 
-                } else if(infoAction.operation === STRING_OPERATIONS.APPEND){
-                    newValue = '' + foundInformation.value + infoAction.value; 
-                }
 
-                //check all conditions
-                for(let condition of foundInformation.conditions){
-                    if(condition.type === STRING_CONDITIONS.EQUAL && newValue === condition.value){
-                        changeCurrentScreen(condition.nextScreenId);
-                        canReadMore = false;
-                        break;
-                    }
-                }
+                foundInformation.value = newValue;
+
+                setInformations([...informations]);
+
+                if (!canReadMore) return;
+
+                changeCurrentScreen(action.nextScreenId);
+
+            } else if (action.type === ACTION_TYPES.REDIRECT) {
+                //save link when user click
+                saveClickLink({ storyId: story.id, link: action.value });
+
+                window.open(action.value, '_blank');
+                console.log('click');
+                canHandleAction = true;
+
+            } else if (action.type === ACTION_TYPES.NEXT_SCREEN) {
+                changeCurrentScreen(action.value);
             }
-            
-            foundInformation.value = newValue;
-            
-            setInformations([...informations]);
 
-            if(!canReadMore) return;
+        }
 
-            changeCurrentScreen(action.nextScreenId);
-            
-        } else if(action.type === ACTION_TYPES.REDIRECT){
-            //save link when user click
-            saveClickLink({ storyId: story.id, link: action.value });
 
-            window.open(action.value, '_blank');
-           
-        } else if (action.type === ACTION_TYPES.NEXT_SCREEN){
-            changeCurrentScreen(action.value);
-        } 
     }
 
     const saveClickLink = async (link) => {
@@ -333,7 +347,7 @@ const ReadStoryPage = (props) => {
         setUpCheckUserInteraction();
     }
 
-    return (        
+    return (
         <>
             <ConfirmDialog
                 openDialog={dialog.open}
@@ -352,50 +366,50 @@ const ReadStoryPage = (props) => {
                 //     enabled={isFullScreen}
                 //     onChange={isFull => setFullScreen(isFull)}
                 // >
-                    <MyFullScreenShowWrapper informations={informations} storyId={story.id}>
-                        <ScreenShow 
-                            animation={story.animation}
-                            showScreen={showScreen}
-                            screen={currentScreen}
-                            onSelectAction={handleSelectAction}
-                        />
-    
-                        {isEnd && (
-                            <>
-                                <button
-                                    onClick={() => resetStory()} 
-                                    style={{ background: '#fffbe8',  color: '#000' }}
-                                    className="btn float-right mt-3">Đọc lại từ đâu</button>
+                <MyFullScreenShowWrapper informations={informations} storyId={story.id}>
+                    <ScreenShow
+                        animation={story.animation}
+                        showScreen={showScreen}
+                        screen={currentScreen}
+                        onSelectAction={handleSelectAction}
+                    />
 
-                                <button
-                                    onClick={() => props.history.push('/stories/details/' + story.id)} 
-                                    style={{ background: '#fffbe8',  color: '#000' }}
-                                    className="btn float-right mt-3">Quay lại trang chi tiết</button>
+                    {isEnd && (
+                        <>
+                            <button
+                                onClick={() => resetStory()}
+                                style={{ background: '#fffbe8', color: '#000' }}
+                                className="btn float-right mt-3">Đọc lại từ đâu</button>
 
-                                    <SocialShare shareUrl={window.location.href} />
-                            </>
-                        )}
-    
-                        {ValidationUtils.isEmpty(currentScreen) && (
-                            <div className="">
-                                <h3 className="screen-card-header text-bold text-center mb-4"> {story.title}</h3>
-                                <p 
-                                    className="">
-                                    {StringUtils.parseHtml(story.intro)}
-                                </p>
-                                <button
-                                    onClick={startReading} 
-                                    style={{ background: '#fffbe8', color: '#000' }}
-                                    className="btn float-right mt-3">Bắt đầu đọc truyện</button>
-                            </div>
-                        ) }
-                    </MyFullScreenShowWrapper>
+                            <button
+                                onClick={() => props.history.push('/stories/details/' + story.id)}
+                                style={{ background: '#fffbe8', color: '#000' }}
+                                className="btn float-right mt-3">Quay lại trang chi tiết</button>
+
+                            <SocialShare shareUrl={window.location.href} />
+                        </>
+                    )}
+
+                    {ValidationUtils.isEmpty(currentScreen) && (
+                        <div className="">
+                            <h3 className="screen-card-header text-bold text-center mb-4"> {story.title}</h3>
+                            <p
+                                className="">
+                                {StringUtils.parseHtml(story.intro)}
+                            </p>
+                            <button
+                                onClick={startReading}
+                                style={{ background: '#fffbe8', color: '#000' }}
+                                className="btn float-right mt-3">Bắt đầu đọc truyện</button>
+                        </div>
+                    )}
+                </MyFullScreenShowWrapper>
                 // </Fullscreen>
             )}
-           
-           {/* { isLoading && <MySpinner/> } */}
-           <MyBackdrop open={openBackdrop} setOpen={setOpenBackdrop}/>
-        
+
+            {/* { isLoading && <MySpinner/> } */}
+            <MyBackdrop open={openBackdrop} setOpen={setOpenBackdrop} />
+
         </>
     );
 };

@@ -151,6 +151,8 @@ const CreateStoryPage = (props) => {
                     });
                 }
 
+                console.log('screens load');
+                console.log(screens);
 
                 setScreens(screens);
                 console.log(tags);

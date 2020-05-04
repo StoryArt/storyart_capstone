@@ -63,9 +63,11 @@ const getNodesAndEdges = (screens, firstScreenId) => {
   const myedges = [];
   const mynodes = [];
 
+  console.log(screens);
   screens.forEach((s, i) => {
     s.first = false;
     s.ending = false;
+
 
     const haveNextScreenAction = s.actions.some(a => a.type === ACTION_TYPES.NEXT_SCREEN || a.type === ACTION_TYPES.UPDATE_INFORMATION)
 
@@ -105,6 +107,9 @@ const getNodesAndEdges = (screens, firstScreenId) => {
     mynodes.push(newNode);
 
   });
+
+  console.log(mynodes);
+  console.log(myedges);
 
 
   return { edges: myedges, nodes: mynodes };
