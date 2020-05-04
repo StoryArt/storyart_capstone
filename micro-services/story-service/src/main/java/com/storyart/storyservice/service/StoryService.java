@@ -147,8 +147,8 @@ class StoryServiceImpl implements StoryService {
     public HashMap<String, String> validateStoryinfo(CreateStoryDto storyDto) {
         HashMap<String, String> errors = new HashMap<>();
 
-        if(storyDto.getIntro().getBytes(StandardCharsets.UTF_8).length > 3 * 1024 * 1024){
-            errors.put("MAX_SIZE_STORY_INTRO", "Nội dung giới thiệu truyện chỉ có tối đa 3MB");
+        if(storyDto.getIntro().getBytes(StandardCharsets.UTF_8).length > 2 * 1024 * 1024){
+            errors.put("MAX_SIZE_STORY_INTRO", "Nội dung giới thiệu truyện chỉ có tối đa 2MB");
             return errors;
         }
 
@@ -228,8 +228,8 @@ class StoryServiceImpl implements StoryService {
             }
 
             for(CreateStoryScreenDto screen: storyDto.getScreens()){
-                if(screen.getContent().getBytes(StandardCharsets.UTF_8).length > 3 * 1024 * 1024){
-                    errors.put("MAX_SIZE_SCREEN_CONTENT", "Nội dung màn hình chỉ có tối đa 3MB");
+                if(screen.getContent().getBytes(StandardCharsets.UTF_8).length > 2 * 1024 * 1024){
+                    errors.put("MAX_SIZE_SCREEN_CONTENT", "Nội dung màn hình chỉ có tối đa 2MB");
                     return errors;
                 }
 
