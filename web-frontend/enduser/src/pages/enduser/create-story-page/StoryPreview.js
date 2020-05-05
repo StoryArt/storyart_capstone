@@ -67,7 +67,6 @@ const getNodesAndEdges = (screens, firstScreenId) => {
     s.first = false;
     s.ending = false;
 
-
     const haveNextScreenAction = s.actions.some(a => a.type === ACTION_TYPES.NEXT_SCREEN || a.type === ACTION_TYPES.UPDATE_INFORMATION)
 
     if (haveNextScreenAction) {
@@ -94,9 +93,9 @@ const getNodesAndEdges = (screens, firstScreenId) => {
 
     const newNode = {
       id: s.id,
-      title: `#${i + 1}: ${StringUtils.getObjTitle(s)}`,
+      title: `#${i + 1}: ${StringUtils.getObjTitle(s)} title`,
       label: `#${i + 1}: ${StringUtils.getObjTitle(s)}`,
-      // index: i,
+      index: i,
       // ending: s.ending,
       // first: s.first,
       // color: s.ending ? SCREEN_COLORS.ENDING_SCREEN : (s.first ? SCREEN_COLORS.FIRST_SCREEN: SCREEN_COLORS.NORMAL_SCREEN)

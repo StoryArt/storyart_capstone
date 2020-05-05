@@ -257,7 +257,7 @@ const UserProfilePage = (props) => {
                 </div> 
               </div>
 
-                <h3 className="text-bold">Thống kê lượt đọc tất cả các truyện</h3> 
+                <h3 className="text-bold">Thống kê lượt đọc các truyện của bạn</h3> 
                 <hr style={{ border: "1px solid #ccc" }} /> 
                 <div className="row my-5">
                   <div className="col-12">
@@ -391,12 +391,23 @@ const UserProfilePage = (props) => {
                                   <img style={{ width: '80px' }}  src={story.image}/>
                                 </TableCell>
                                 <TableCell align="center">{DateTimeUtils.getDateTime(story.createdAt)}</TableCell>
-                                <TableCell align="center">{story.numOfScreen}</TableCell>
-                                <TableCell align="center">{story.numOfRead}</TableCell>
-                                <TableCell align="center">{story.numOfComment}</TableCell>
-                                <TableCell align="center">{story.numOfRate}</TableCell>
-                                <TableCell align="center">{story.avgRate}</TableCell>
-                                <TableCell align="center">{story.published ? <span className="text-success">Đã xuất bản</span> : <span className="text-danger">Chưa xuát bản</span>}</TableCell>
+                                <TableCell align="center">
+                                  <strong style={{ fontSize: '1.2em' }}>{story.numOfScreen}</strong>
+                                </TableCell>
+                                <TableCell align="center">
+                                  <strong style={{ fontSize: '1.2em' }}>{story.numOfRead}</strong>
+                                </TableCell>
+                                <TableCell align="center">
+                                  <strong style={{ fontSize: '1.2em' }}>{story.numOfComment}</strong>
+                                </TableCell>
+                                <TableCell align="center">
+                                  <strong style={{ fontSize: '1.2em' }}>{story.numOfRate}</strong>
+                                </TableCell>
+                                <TableCell align="center">
+                                  <strong style={{ fontSize: '1.2em' }}>{story.avgRate}</strong>
+                                </TableCell>
+                                <TableCell align="center">
+                                  {story.published ? <span className="text-success font-weight-bold">Đã xuất bản</span> : <span className="text-danger font-weight-bold">Chưa xuát bản</span>}</TableCell>
                                 <TableCell align="center">
                                   <div style={{ maxWidth: '150px' }}>
                                     <small>
