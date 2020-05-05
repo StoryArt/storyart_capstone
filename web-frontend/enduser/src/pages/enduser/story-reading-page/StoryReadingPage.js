@@ -39,11 +39,12 @@ const countTimeReading = (startTime) => {
     if (ValidationUtils.isEmpty(startTime)) startTime = 0;
     readingScreenDuration = startTime;
     interval = window.setInterval(() => {
-        readingScreenDuration++;
-
+        
         //if time is more than 15 min, set time for this screen and stop counter
         if (readingScreenDuration > 15 * 60) {
             stopCountTimeReading();
+        } else {
+            readingScreenDuration++;
         }
     }, 1000);
 }
@@ -317,8 +318,6 @@ const ReadStoryPage = (props) => {
             }
 
         }
-
-
     }
 
     const saveClickLink = async (link) => {

@@ -63,7 +63,6 @@ const getNodesAndEdges = (screens, firstScreenId) => {
   const myedges = [];
   const mynodes = [];
 
-  console.log(screens);
   screens.forEach((s, i) => {
     s.first = false;
     s.ending = false;
@@ -108,10 +107,6 @@ const getNodesAndEdges = (screens, firstScreenId) => {
 
   });
 
-  console.log(mynodes);
-  console.log(myedges);
-
-
   return { edges: myedges, nodes: mynodes };
 }
 
@@ -122,22 +117,12 @@ const StoryPreview = (props) => {
   const [nodes, setNodes] = useState([]);
 
   useEffect(() => {
-    // const newEdges = getEdges();
-    // const newNodes = getNodes();
-
-    // console.log('run');
+    
     const data = getNodesAndEdges(screens, firstScreenId);
-
-    //  const isNotEqualNodes = data.nodes.some((n, i) => !isEqual(n, nodes[i]));
-    // if(isNotEqualNodes) 
-
-    // const isNotEqualEdges = data.edges.some((e, i) => !isEqual(e, edges[i]));
-    // if(isNotEqualEdges) 
 
     setEdges(data.edges);
     setNodes(data.nodes);
   }, [screens, firstScreenId]);
-
 
 
   return (

@@ -151,16 +151,13 @@ const CreateStoryPage = (props) => {
                     });
                 }
 
-                console.log('screens load');
-                console.log(screens);
-
                 setScreens(screens);
-                console.log(tags);
                 setSelectedTags(tags);
                 setStoryParameters(informations);
                 setStory({ ...res.data.data, screens: null, informations: null, informationActions: null });
-                const firstScreen = screens.find(sc => sc.id = res.data.data.firstScreenId)
-                setCurrentScreen(firstScreen);
+
+                const firstScreen = screens.find(sc => sc.id == res.data.data.firstScreenId);
+                if(firstScreen != null) setCurrentScreen(firstScreen);
 
             } else {
                 setNotfoundStory(true);
