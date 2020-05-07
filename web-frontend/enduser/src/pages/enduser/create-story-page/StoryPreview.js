@@ -63,7 +63,9 @@ const getNodesAndEdges = (screens, firstScreenId) => {
   const myedges = [];
   const mynodes = [];
 
-  screens.forEach((s, i) => {
+  const myScreens = JSON.parse(JSON.stringify(screens));
+
+  myScreens.forEach((s, i) => {
     s.first = false;
     s.ending = false;
 

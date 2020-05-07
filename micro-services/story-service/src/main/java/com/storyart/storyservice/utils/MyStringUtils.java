@@ -15,4 +15,10 @@ public class MyStringUtils {
         if(StringUtils.isEmpty(html)) return "";
         return html.replaceAll("\\<[^>]*>","").trim();
     }
+
+    public static boolean isValidUrl(String url){
+        if(StringUtils.isEmpty(url)) return false;
+        String regex = "^(http:\\/\\/|https:\\/\\/)?(www.)?([a-zA-Z0-9]+).[a-zA-Z0-9]*.[a-z]{3}.?([a-z]+)?$";
+        return url.matches(regex);
+    }
 }

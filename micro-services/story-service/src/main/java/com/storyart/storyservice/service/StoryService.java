@@ -143,6 +143,10 @@ class StoryServiceImpl implements StoryService {
         return string_ops.contains(value);
     }
 
+    public List<String> getItemsInAButNotInB(List<String> arr1, List<String> arr2){
+        return arr1.stream().filter(item -> arr2.contains(item)).collect(Collectors.toList());
+    }
+
     @Override
     public HashMap<String, String> validateStoryinfo(CreateStoryDto storyDto) {
         HashMap<String, String> errors = new HashMap<>();
@@ -258,6 +262,8 @@ class StoryServiceImpl implements StoryService {
                         } else if(a.getType().equals(ACTION_TYPES.REDIRECT.toString())){
                             if(StringUtils.isEmpty(a.getValue())){
                                 errors.put("REDIRECT_ACTION", "Chưa có đường dẫn cho hành động đi tới đường dẫn");
+                            } else if (!MyStringUtils.isValidUrl(a.getValue())){
+                                errors.put("REDIRECT_ACTION", "Đường dẫn không hợp lệ");
                             }
                         }
                     });
@@ -526,6 +532,8 @@ class StoryServiceImpl implements StoryService {
             savedScreen.setStoryId(storyId);
             savedScreen.setId(screenIdsMap.get(screen.getId()));
 
+            screenRepository.insertScreen(savedScreen);
+
             screen.getActions().stream().forEach(action -> {
                 Action savedAction = modelMapper.map(action, Action.class);
 
@@ -539,13 +547,11 @@ class StoryServiceImpl implements StoryService {
 
                 actionRepository.insertAction(savedAction);
             });
-
-            screenRepository.insertScreen(savedScreen);
         });
 
         //set first screen id for story
         story.setFirstScreenId(screenIdsMap.get(createStoryDto.getFirstScreenId()));
-        storyRepository.save(story);
+        storyRepository.updateFirstScreen(story);
 
         //save all informations
         List<InfoCondition> savedInfoConditions = new ArrayList<>();
@@ -578,7 +584,6 @@ class StoryServiceImpl implements StoryService {
             savedInformationAction.setInformationId(informationIdsMap.get(informationAction.getInformationId()));
             informationActionRepository.insertInfoAction(savedInformationAction);
         });
-
 
 
         result.setSuccess(true);
@@ -670,9 +675,15 @@ class StoryServiceImpl implements StoryService {
                 List<String> actionIdList = actionRepository.findActionIdsScreen(savedScreen.getId());
 //                actionRepository.deleteInBatch(actionList);
                 deletedActions.addAll(actionIdList);
+                if(screenIds.contains(savedScreen.getId())){
+                    screenRepository.updateScreenById(savedScreen);
+                } else {
+                    screenRepository.insertScreen(savedScreen);
+                }
 
                 screen.getActions().stream().forEach(action -> {
                     Action savedAction = modelMapper.map(action, Action.class);
+                    System.out.println("Index: " + savedAction.getMyIndex());
 
                     savedAction.setId(MyStringUtils.generateUniqueId());
                     savedAction.setScreenId(savedScreen.getId());
@@ -686,11 +697,9 @@ class StoryServiceImpl implements StoryService {
 
                 });
 
-                screenRepository.updateScreenById(savedScreen);
             });
 
             actionRepository.deleteAllByIds(deletedActions);
-            System.out.println("done screen and action");
 
             //delete all informations
             List<Information> informations = informationRepository.findAllByStoryId(storyId);

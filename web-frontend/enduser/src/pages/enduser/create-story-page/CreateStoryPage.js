@@ -346,23 +346,22 @@ const CreateStoryPage = (props) => {
 
         let informationActions = [];
 
-        if (storyParameters.length > 0) {
-            screens.forEach((screen, i) => {
-                screen.myIndex = i + 1;
-                screen.actions.forEach((action, index) => {
-                    action.myIndex = index + 1;
-                    if (action.type === ACTION_TYPES.UPDATE_INFORMATION) {
-                        informationActions.push({
-                            actionId: action.id,
-                            informationId: storyParameters[0].id,
-                            value: action.value,
-                            operation: action.operation
-                        })
-                    }
-                })
-            });
-        }
+        screens.forEach((screen, i) => {
+            screen.myIndex = i + 1;
+            screen.actions.forEach((action, index) => {
+                action.myIndex = index + 1;
+                if (storyParameters.length > 0 && action.type === ACTION_TYPES.UPDATE_INFORMATION) {
+                    informationActions.push({
+                        actionId: action.id,
+                        informationId: storyParameters[0].id,
+                        value: action.value,
+                        operation: action.operation
+                    })
+                }
+            })
+        });
 
+        
         story.screens = screens;
         story.tags = selectedTags.map(t => t.id);
         story.informations = storyParameters;

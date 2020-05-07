@@ -74,7 +74,7 @@ const UserProfilePage = (props) => {
     await getUserInfo();
     if(!userNotfound){
       getStoriesByAuthor();
-      getReadStatistic();
+      // getReadStatistic();
     }
   }
 
@@ -257,7 +257,7 @@ const UserProfilePage = (props) => {
                 </div> 
               </div>
 
-                <h3 className="text-bold">Thống kê lượt đọc các truyện của bạn</h3> 
+                {/* <h3 className="text-bold">Thống kê lượt đọc các truyện của bạn</h3> 
                 <hr style={{ border: "1px solid #ccc" }} /> 
                 <div className="row my-5">
                   <div className="col-12">
@@ -283,7 +283,7 @@ const UserProfilePage = (props) => {
                       dataKeyArea="readCount"
                     />
                   </div>
-                </div>
+                </div> */}
 
                 <h3 className="text-bold"> Truyện của bạn </h3> 
                 <hr style={{ border: "1px solid #ccc" }} /> 
