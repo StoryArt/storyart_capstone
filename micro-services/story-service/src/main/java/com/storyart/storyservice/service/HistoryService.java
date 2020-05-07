@@ -159,7 +159,6 @@ class HistoryServiceIml implements HistoryService {
             rh.setStoryId(faker.number().numberBetween(1, 300));
             historyRepository.save(rh);
         }
-
     }
 
     @Override
@@ -175,8 +174,8 @@ class HistoryServiceIml implements HistoryService {
             ReadingHistory rh = modelMapper.map(readingHistoryDto, ReadingHistory.class);
             rh.setUserId(userId);
             rh = historyRepository.save(rh);
-            int id = rh.getId();
-            storyRepository.save(story);
+//            int id = rh.getId();
+//            storyRepository.save(story);
 
             result.setSuccess(true);
             result.setData(rh);

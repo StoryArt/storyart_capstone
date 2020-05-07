@@ -950,7 +950,6 @@ const MyFullScreenShowWrapper = (props) => {
       }
     }
 
-    console.log(informations);
     return (
         <div id="fullscreen" style={{ 
             position: 'relative', 

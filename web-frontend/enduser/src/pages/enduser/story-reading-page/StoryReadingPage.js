@@ -85,14 +85,17 @@ const ReadStoryPage = (props) => {
         getReadingStory(storyId);
 
         //save history when reload the page
-        window.addEventListener('beforeunload', () => {
+        
+        window.onbeforeunload = () => {
             saveHistoryBeforeLeavePage();
-        });
+            window.onbeforeunload = null;
+        }
 
         //save history when navigate page
         return () => {
+            window.onbeforeunload = null;
+           
             if (!notfound) {
-                window.addEventListener('beforeunload', () => { });
                 saveHistoryBeforeLeavePage();
             }
         };
@@ -208,6 +211,7 @@ const ReadStoryPage = (props) => {
     }
 
     const saveReadingHistory = async (data) => {
+      
         try {
             const res = await ReadingHistoryService.saveReadingHistory(data);
             console.log(res);
