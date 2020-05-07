@@ -262,8 +262,8 @@ const StoryDetailsPage = (props) => {
                 });
             }
         }
-        closeAlert();
         setIsSendingComment(false);
+        closeAlert();
     }
 
     const getCommentsBySort = async (sortString) => {
@@ -419,7 +419,7 @@ const StoryDetailsPage = (props) => {
             const { data, success } = res.data;
             if (ValidationUtils.isEmpty(data)) {
                 setStoryNotfound(true);
-            } else if(!success && !ValidationUtils.isEmpty(data)) {
+            } else if (!success && !ValidationUtils.isEmpty(data)) {
                 setStoryNotfound(true);
             } else if (data.user.deactiveByAdmin) {
                 setUserIsDeactivated(true);
@@ -575,7 +575,7 @@ const StoryDetailsPage = (props) => {
                                         onChange={(value) => rateStory(value)}
                                         value={ValidationUtils.isEmpty(rating) ? 0 : rating.stars} />
                                 </div>
-                                <form onSubmit={e => { e.preventDefault(); sendComment(); setIsSendingComment(true) }}>
+                                <form onSubmit={e => { e.preventDefault(); sendComment(); { userId !== 0 && setIsSendingComment(true) } }}>
                                     <div className="form-group">
                                         <TextField
                                             multiline
