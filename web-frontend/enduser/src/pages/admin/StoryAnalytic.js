@@ -100,7 +100,7 @@ class Dashboard1 extends React.Component {
         ],
         rows: [],
       },
-      days: 5,
+      days: 7,
       order: "desc",
       orderBy: "sumtime",
       lable4:this.sumtime,
@@ -136,13 +136,13 @@ class Dashboard1 extends React.Component {
     );
     if (await this.checkOwnerAndNotDeactiveByAdmin()) {
       const storyInfo = this.getStorySummary(this.sid);
-      await this.handleLoadReactStatic(5);
+      await this.handleLoadReactStatic(7);
       this.setState({ openBackdrop: false });
 
       this.loadRatingStatic();
 
       this.handleLoadScreenTime();
-      this.handleLoadClickLink(5);
+      this.handleLoadClickLink(7);
     window.scrollTo(0, 0);
 
     }
@@ -340,7 +340,7 @@ class Dashboard1 extends React.Component {
             width: 100,
           },
           {
-            label:"Time trung bình/lượt(s) ",
+            label:"Time trung bình/lượt(s/luợt) ",
             field: "timeperview",
             sort: "asc",
             width: 100,
