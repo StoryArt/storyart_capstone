@@ -17,7 +17,7 @@ public interface ClickLinkRepository extends JpaRepository<ClickLink, Integer> {
 
 @Query(value = "select link , count(*) as 'count' from click_link\n" +
         " where \n" +
-        "story_id=:storyId and (created_at between :start and  :end) group By link", nativeQuery = true)
+        "story_id=:storyId and (created_at between :start and  :end) group By link order by count desc", nativeQuery = true)
     List<ILinkClickCountResponse> countLinkClickNumberByLinkByStoryIdInTimeRange(@Param("storyId") Integer storyId,
                                                                                  @Param("start") String start,@Param("end") String end);
 
