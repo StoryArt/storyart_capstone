@@ -157,7 +157,7 @@ const CreateStoryPage = (props) => {
                 setStory({ ...res.data.data, screens: null, informations: null, informationActions: null });
 
                 const firstScreen = screens.find(sc => sc.id == res.data.data.firstScreenId);
-                if(firstScreen != null) setCurrentScreen(firstScreen);
+                if (firstScreen != null) setCurrentScreen(firstScreen);
 
             } else {
                 setNotfoundStory(true);
@@ -361,7 +361,7 @@ const CreateStoryPage = (props) => {
             })
         });
 
-        
+
         story.screens = screens;
         story.tags = selectedTags.map(t => t.id);
         story.informations = storyParameters;
@@ -559,7 +559,7 @@ const CreateStoryPage = (props) => {
 
                         {storyTab === 1 && (
                             <div className="row">
-                                <div className="col-sm-5 px-1">
+                                <div className="col-sm-6 px-1">
                                     <h3 style={{ fontSize: '1.2em' }}>
                                         <span className="mr-2">Tất cả màn hình ({screens.length})</span>
                                         <Tooltip title="Thêm màn hình" aria-label="add" placement="top">
@@ -606,7 +606,7 @@ const CreateStoryPage = (props) => {
                                     <ScreenTypes />
 
                                 </div>
-                                <div className="col-sm-7">
+                                <div className="col-sm-6">
                                     <h3 style={{ fontSize: '1.2em' }}>Chi tiết màn hình</h3>
                                     <hr style={{ border: '1px solid #ccc' }} />
                                     {/* Story screens */}
