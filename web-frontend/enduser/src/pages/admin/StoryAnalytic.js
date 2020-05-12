@@ -328,19 +328,19 @@ class Dashboard1 extends React.Component {
             width: 100,
           },
           {
-            label: "Tổng thời gian",
+            label: "Tổng thời gian(s)",
             field: "sumtime",
             sort: "asc",
             width: 100,
           },
           {
-            label:"Số lượt xem",
+            label:"Số lượt xem(lượt)",
             field: "viewcount",
             sort: "asc",
             width: 100,
           },
           {
-            label:"Time trung bình/lượt ",
+            label:"Time trung bình/lượt(s) ",
             field: "timeperview",
             sort: "asc",
             width: 100,
@@ -375,7 +375,7 @@ class Dashboard1 extends React.Component {
             width: 100,
           },
           {
-            label: "Lượt click",
+            label: "Lượt click(lượt)",
             field: "count",
             sort: "asc",
             width: 100,
@@ -659,8 +659,8 @@ class Dashboard1 extends React.Component {
                   <MenuItem onClick={this.handleLoadReactStatic.bind(this, 1)}>
                     1 ngày qua
                   </MenuItem>
-                  <MenuItem onClick={this.handleLoadReactStatic.bind(this, 5)}>
-                    5 ngày qua
+                  <MenuItem onClick={this.handleLoadReactStatic.bind(this, 7)}>
+                    7 ngày qua
                   </MenuItem>
                   <MenuItem onClick={this.handleLoadReactStatic.bind(this, 28)}>
                     28 ngày qua
@@ -875,8 +875,8 @@ class Dashboard1 extends React.Component {
                     <MenuItem onClick={this.handleClickDayScreen.bind(this, 1)}>
                       1 ngày qua
                     </MenuItem>
-                    <MenuItem onClick={this.handleClickDayScreen.bind(this, 5)}>
-                      5 ngày qua
+                    <MenuItem onClick={this.handleClickDayScreen.bind(this, 7)}>
+                      7 ngày qua
                     </MenuItem>
                     <MenuItem
                       onClick={this.handleClickDayScreen.bind(this, 28)}
@@ -1011,7 +1011,7 @@ class Dashboard1 extends React.Component {
                     aria-owns={this.state.anchorE3 ? "simple-menu" : undefined}
                     aria-haspopup="true"
                     style={{
-                      marginBottom: "10px",
+                      marginBottom: "10px", 
                       color: "rgba(0, 0, 0, 0.54)",
                       outlineColor: "#dee2e6",
                       marginRight: "10px",
@@ -1031,8 +1031,8 @@ class Dashboard1 extends React.Component {
                     <MenuItem onClick={this.handleLoadClickLink.bind(this, 1)}>
                       1 ngày qua
                     </MenuItem>
-                    <MenuItem onClick={this.handleLoadClickLink.bind(this, 5)}>
-                      5 ngày qua
+                    <MenuItem onClick={this.handleLoadClickLink.bind(this, 7)}>
+                      7 ngày qua
                     </MenuItem>
                     <MenuItem onClick={this.handleLoadClickLink.bind(this, 28)}>
                       28 ngày qua
