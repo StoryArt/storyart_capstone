@@ -97,9 +97,9 @@ class ScreenReadingTimeImpl implements ScreenReadingTimeService {
             throw new BadRequestException("Không tìm thấy dữ liệu!");
         }
         if (!asc) {
-            pageable = PageRequest.of(page, size, Sort.by(timeViewOrPer).descending());
+            pageable = PageRequest.of(page-1, size, Sort.by(timeViewOrPer).descending());
         } else {
-            pageable = PageRequest.of(page, size, Sort.by(timeViewOrPer).ascending());
+            pageable = PageRequest.of(page-1, size, Sort.by(timeViewOrPer).ascending());
         }
         List<Screen> screensByStoryId = screenService.getScreensByStoryId(sid);
         List<String> screenIds = new ArrayList<>();
@@ -113,7 +113,7 @@ class ScreenReadingTimeImpl implements ScreenReadingTimeService {
         return new PagedResponse<IScreenValueResponse>(viewResponses,
                 viewResponsePage.getNumber(), viewResponsePage.getSize(),
                 viewResponsePage.getTotalElements(),
-                viewResponsePage.getTotalPages()-1, viewResponsePage.isLast());
+                viewResponsePage.getTotalPages(), viewResponsePage.isLast());
     }
 
     private void validatePageNumberAndSize(int page, int size) {
