@@ -23,4 +23,6 @@ public class CreateStoryConditionDto{
 
     @NotBlank(message = "Màn hình mặc định đi tới không được để trống")
     private String nextScreenId;
+
+    private int myIndex;
 }

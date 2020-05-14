@@ -36,4 +36,6 @@ public class InfoCondition extends DateAudit {
     @Size(max = 255)
     @NotBlank(message = "Màn hình chuyển tiếp của điều kiện không được để trống")
     private String nextScreenId;
+
+    private int myIndex;
 }

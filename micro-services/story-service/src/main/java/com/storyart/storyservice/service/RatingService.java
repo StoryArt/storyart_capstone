@@ -52,8 +52,7 @@ class RatingServiceIml implements RatingService {
         List<Integer> listStory = new ArrayList<>();
         if(flagcheck){
             listStory = storyRepository.findStoryThisWeek();
-
-        }else{
+        } else {
             listStory = storyRepository.findAllStoryActive();
         }
         List<RatedStoryDTO> ListAssumRatedStory = new ArrayList<>();

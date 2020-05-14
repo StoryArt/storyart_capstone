@@ -361,13 +361,16 @@ const CreateStoryPage = (props) => {
             })
         });
 
+        
+        storyParameters.forEach(param => {
+            param.conditions.forEach((c, index) => c.myIndex = index + 1);
+        })
 
         story.screens = screens;
         story.tags = selectedTags.map(t => t.id);
         story.informations = storyParameters;
         story.informationActions = informationActions;
 
-        console.log(story);
 
         try {
             let res = null;

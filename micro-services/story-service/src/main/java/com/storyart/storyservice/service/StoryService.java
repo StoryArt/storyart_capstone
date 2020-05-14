@@ -666,26 +666,36 @@ class StoryServiceImpl implements StoryService {
             //insert new screens
 //            List<Action> savedActions = new ArrayList<>();
             List<String> deletedActions = new ArrayList<>();
+
+//            List<Thread> threads = new ArrayList<>();
             storyDto.getScreens().stream().forEach(screen -> {
+
                 Screen savedScreen = modelMapper.map(screen, Screen.class);
 
                 savedScreen.setStoryId(storyId);
                 savedScreen.setId(screenIdsMap.get(screen.getId()));
                 //delete all actions
-                List<String> actionIdList = actionRepository.findActionIdsScreen(savedScreen.getId());
-//                actionRepository.deleteInBatch(actionList);
-                deletedActions.addAll(actionIdList);
+
+
+//                deletedActions.addAll(actionIdList);
                 if(screenIds.contains(savedScreen.getId())){
                     screenRepository.updateScreenById(savedScreen);
                 } else {
                     screenRepository.insertScreen(savedScreen);
                 }
 
+                List<String> newActionIds = screen.getActions().stream().map(a -> a.getId()).collect(Collectors.toList());
+                List<String> actionIdList = actionRepository.findActionIdsScreen(savedScreen.getId());
+                for(String actionId: actionIdList){
+                    if(!newActionIds.contains(actionId)) deletedActions.add(actionId);
+                }
+
                 screen.getActions().stream().forEach(action -> {
                     Action savedAction = modelMapper.map(action, Action.class);
-                    System.out.println("Index: " + savedAction.getMyIndex());
 
-                    savedAction.setId(MyStringUtils.generateUniqueId());
+                    if(!actionIdList.contains(action.getId())){
+                        savedAction.setId(MyStringUtils.generateUniqueId());
+                    }
                     savedAction.setScreenId(savedScreen.getId());
                     if (action.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())) {
                         savedAction.setValue(screenIdsMap.get(action.getValue()));
@@ -693,10 +703,9 @@ class StoryServiceImpl implements StoryService {
                     savedAction.setNextScreenId(screenIdsMap.get(action.getNextScreenId()));
                     actionIdsMap.put(action.getId(), savedAction.getId());
 
-                    actionRepository.insertAction(savedAction);
+                    actionRepository.save(savedAction);
 
                 });
-
             });
 
             actionRepository.deleteAllByIds(deletedActions);

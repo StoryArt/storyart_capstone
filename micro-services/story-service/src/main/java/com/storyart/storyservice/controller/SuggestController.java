@@ -122,7 +122,7 @@ public class SuggestController {
             }
         }
         List<Integer> listStoryAuthor = storyRepository.getAllStoryIdByUserId(id);
-        if(listStoryAuthor.size() >0){
+        if(listStoryAuthor.size() > 0){
             total.removeAll(listStoryAuthor);
         }
         if(total.size() == 0){
