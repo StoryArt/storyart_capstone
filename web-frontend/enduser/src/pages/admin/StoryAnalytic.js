@@ -281,7 +281,7 @@ class Dashboard1 extends React.Component {
       console.log("screen time");
       console.log(res.data);
       this.setState({ totalPages: res.data.totalPages });
-      this.setState({ pageNo: res.data.page });
+      this.setState({ pageNo: res.data.page+1 });
 
       this.convertToScreenTimeList(res.data);
     });
@@ -898,7 +898,7 @@ class Dashboard1 extends React.Component {
                     onClick={this.handleClick4}
                   >
                     {this.state.lable4}
-                    {/* {this.state.timeScreenLoad && <MySpinner />} */}
+                    {/* {this.state.timeScreenLoad && <MySpinner />} */}-
                   </Button>
                   <Menu
                     style={{ borderRadius: "8px" }}
