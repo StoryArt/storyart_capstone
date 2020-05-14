@@ -60,6 +60,7 @@ class RatingServiceIml implements RatingService {
 
         List<Rating> ratingUser = ratingRepository.findRatingByStoryIdEXceptId(listStory, id);
 
+        double normalizeNumberSelf = 0.0;
         //----------------------
 
         RatingDTO currUser = new RatingDTO();
@@ -71,6 +72,7 @@ class RatingServiceIml implements RatingService {
         }
         double normalizeCurrUser = sumCurr / currUserRating.size();
 
+        normalizeNumberSelf = normalizeCurrUser;
         List<RatedStoryDTO> listCurrRated = new ArrayList<>();
         for (Integer storyid : listStory) {
             boolean flag = true;
@@ -263,10 +265,10 @@ class RatingServiceIml implements RatingService {
 
 
         // Step 7
-        // remove all lesser  2.5
+        // remove all story below average
         List<Integer> listSuggestStory = new ArrayList<>();
         for (RatedStoryDTO dto : ListAssumRatedStory){
-            if(dto.getRatedPoint() > 2.5){
+            if(dto.getRatedPoint() > normalizeNumberSelf){
                 listSuggestStory.add(dto.getStoryId());
             }
         }
