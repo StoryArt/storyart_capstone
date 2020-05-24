@@ -121,6 +121,11 @@ class StoryService {
     return axios.delete(url);
   }
 
+  static async saveCensorship(censorship) {
+    const url = baseUrl + "/censorship";
+    return axios.put(url, censorship);
+  }
+
   static async changePublishedStatus(storyId, turnOnPublished) {
     const url =
       baseUrl +
@@ -131,10 +136,10 @@ class StoryService {
     return axios.put(url);
   }
 
-  static getStoriesForAdmin({ page, itemsPerPage, asc, orderBy, keyword }) {
+  static getStoriesForAdmin({ page, itemsPerPage, asc, orderBy, keyword, censorshipStatus }) {
     const url =
       baseUrl +
-      `/get_for_admin?page=${page}&itemsPerPage=${itemsPerPage}&asc=${asc}&orderBy=${orderBy}&keyword=${keyword}`;
+      `/get_for_admin?page=${page}&itemsPerPage=${itemsPerPage}&asc=${asc}&orderBy=${orderBy}&keyword=${keyword}&censorshipStatus=${censorshipStatus}`;
     return axios.get(url);
   }
 }

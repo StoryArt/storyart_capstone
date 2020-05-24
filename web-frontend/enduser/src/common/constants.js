@@ -122,3 +122,23 @@ export const getOrderBys = () => {
     ]
 }
 
+
+export const CENSORSHIP_STATUS = {
+    APPROVED: "APPROVED",
+    PENDING: "PENDING",
+    REJECTED: "REJECTED",
+}
+
+export const getCensorshipStatus = () => {
+    return [
+        { value: CENSORSHIP_STATUS.APPROVED, title: 'Đã được kiểm duyệt'},
+        { value: CENSORSHIP_STATUS.PENDING, title: 'Chờ kiểm duyệt' },
+        { value: CENSORSHIP_STATUS.REJECTED, title: 'Kiểm duyệt thất bại' },
+    ]
+}
+
+export const getCensorshipTitle = (value) => {
+    const arr = getCensorshipStatus();
+    const found = arr.find(item => item.value === value);
+    return found != null ? found.title : '';
+}

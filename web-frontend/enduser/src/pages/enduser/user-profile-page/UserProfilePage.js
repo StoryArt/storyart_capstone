@@ -8,7 +8,7 @@ import {
 import UserService from "../../../services/user.service";
 import { UserContext } from "../../../context/user.context";
 import { getAuthUserInfo, setAuthHeader, getTokenFromLocal } from "../../../config/auth";
-import { getOrderBys } from '../../../common/constants';
+import { getOrderBys, CENSORSHIP_STATUS } from '../../../common/constants';
 
 import DateTimeUtils from "../../../utils/datetime";
 import StoryService from "../../../services/story.service";
@@ -30,6 +30,9 @@ import UserProfileHeader from './UserProfileHeader';
 import Typography from '@material-ui/core/Typography';
 import UserReadingChart from "./UserReadingChart";
 import StatisticService from '../../../services/statistic.service';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import CancelIcon from '@material-ui/icons/Cancel';
+import PauseIcon from '@material-ui/icons/Pause';
 
 
 const orderBys = getOrderBys();
@@ -375,6 +378,8 @@ const UserProfilePage = (props) => {
                               <TableCell align="center">Lượt bình luận</TableCell>
                               <TableCell align="center">Lượt đánh giá</TableCell>
                               <TableCell align="center">Đánh giá trung bình</TableCell>
+                              <TableCell align="center">Admin ghi chú</TableCell>
+                              <TableCell align="center">Kiểm duyệt</TableCell>
                               <TableCell align="center">Trạng thái</TableCell>
                               <TableCell align="center">Nhãn</TableCell>
                               <TableCell align="center"></TableCell>
@@ -405,6 +410,12 @@ const UserProfilePage = (props) => {
                                 </TableCell>
                                 <TableCell align="center">
                                   <strong style={{ fontSize: '1.2em' }}>{story.avgRate}</strong>
+                                </TableCell>
+                                <TableCell align="center">{story.adminNote}</TableCell>
+                                <TableCell align="center">
+                                  { story.censorshipStatus == CENSORSHIP_STATUS.APPROVED && (<CheckCircleIcon color="primary"/>) }
+                                  { story.censorshipStatus == CENSORSHIP_STATUS.REJECTED && (<CancelIcon color="error"/>) }
+                                  { story.censorshipStatus == CENSORSHIP_STATUS.PENDING && (<PauseIcon color="action" />) }
                                 </TableCell>
                                 <TableCell align="center">
                                   {story.published ? <span className="text-success font-weight-bold">Đã xuất bản</span> : <span className="text-danger font-weight-bold">Chưa xuát bản</span>}</TableCell>

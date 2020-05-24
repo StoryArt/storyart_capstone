@@ -1,6 +1,7 @@
 package com.storyart.storyservice.service;
 
 import com.storyart.storyservice.common.constants.*;
+import com.storyart.storyservice.dto.CensorshipDto;
 import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.create_story.*;
 import com.storyart.storyservice.dto.ResultDto;
@@ -47,7 +48,7 @@ public interface StoryService {
 
     List<GetStoryDto> getTheMostReadingStories();
 
-    Page<GetStoryDto> getStoriesForAdmin(String keyword, String orderBy, boolean asc, int page, int itemsPerPage);
+    Page<GetStoryDto> getStoriesForAdmin(String keyword, String orderBy, String censorshipStatus, boolean asc, int page, int itemsPerPage);
 
     Page<GetStoryDto> getStoriesForUser(int userId, String keyword, String orderBy, boolean asc, int page, int itemsPerPage);
 
@@ -64,6 +65,8 @@ public interface StoryService {
     ResultDto getReadStatisticsByDateRangeOfUser(Date from, Date to, int userId);
 
     Rating getRatingByStoryAndUser(int storyId, int userId);
+
+    ResultDto saveCensorship(CensorshipDto censorshipDto);
 
 }
 
@@ -282,6 +285,29 @@ class StoryServiceImpl implements StoryService {
     }
 
     @Override
+    public ResultDto saveCensorship(CensorshipDto censorshipDto) {
+        ResultDto result = new ResultDto();
+        result.setSuccess(false);
+        Story story = storyRepository.findById(censorshipDto.getStoryId()).orElse(null);
+        if (story == null) {
+            result.getErrors().put("NOT_FOUND", "Truyện này không có trong hệ thống");
+        } else if (story.isDeactiveByAdmin()) {
+            result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa bởi admin");
+        } else if (!story.isActive()) {
+            result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
+        } else if (!story.isPublished()){
+            result.getErrors().put("NOT_FOUND", "Truyện này chưa xuất bản");
+        } else {
+            story.setAdminNote(censorshipDto.getAdminNote());
+            story.setCensorshipStatus(censorshipDto.getCensorshipStatus());
+            storyRepository.save(story);
+            result.setSuccess(true);
+        }
+
+        return result;
+    }
+
+    @Override
     public ResultDto getStoryDetails(int storyId) {
         ResultDto result = new ResultDto();
         result.setSuccess(false);
@@ -292,7 +318,7 @@ class StoryServiceImpl implements StoryService {
             result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa bởi admin");
         } else if (!story.isActive()) {
             result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
-        } else if (!story.isActive()){
+        } else if (!story.isPublished()){
             result.getErrors().put("NOT_FOUND", "Truyện này chưa xuất bản");
         }
 
@@ -513,6 +539,9 @@ class StoryServiceImpl implements StoryService {
         story.setDeactiveByAdmin(false);
         story.setUpdatedAt(new Date());
         story.setUserId(userId);
+        if(story.isPublished()){
+            story.setCensorshipStatus(CensorshipStatus.PENDING);
+        }
 
         story = storyRepository.save(story);
         int storyId = story.getId();
@@ -648,11 +677,12 @@ class StoryServiceImpl implements StoryService {
             story.setDeactiveByAdmin(foundStory.isDeactiveByAdmin());
             story.setAvgRate(foundStory.getAvgRate());
             story.setUserId(foundStory.getUserId());
+            if(story.isPublished()){
+                story.setCensorshipStatus(CensorshipStatus.PENDING);
+            }
             storyRepository.save(story);
             int storyId = story.getId();
 
-            //delete all story tags;
-//            List<StoryTag> storyTags = storyTagRepository.findAllByStoryId(storyId);
             storyTagRepository.deleteByStoryId(storyId);
 
             //insert story tags
@@ -836,34 +866,34 @@ class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public Page<GetStoryDto> getStoriesForAdmin(String keyword, String orderBy, boolean asc, int page, int itemsPerPage) {
+    public Page<GetStoryDto> getStoriesForAdmin(String keyword, String orderBy, String censorshipStatus, boolean asc, int page, int itemsPerPage) {
 
         Pageable pageable = PageRequest.of(page - 1, itemsPerPage);
         Page<Story> page1 = null;
         switch (orderBy) {
             case "avg_rate":
-                if (asc) page1 = storyRepository.findForAdminOrderByAvgRateASC(keyword, pageable);
-                else page1 = storyRepository.findForAdminOrderByAvgRateDESC(keyword, pageable);
+                if (asc) page1 = storyRepository.findForAdminOrderByAvgRateASC(keyword, censorshipStatus, pageable);
+                else page1 = storyRepository.findForAdminOrderByAvgRateDESC(keyword, censorshipStatus, pageable);
                 break;
             case "comment":
-                if (asc) page1 = storyRepository.findForAdminOrderByNumOfCommentASC(keyword, pageable);
-                else page1 = storyRepository.findForAdminOrderByNumOfCommentDESC(keyword, pageable);
+                if (asc) page1 = storyRepository.findForAdminOrderByNumOfCommentASC(keyword, censorshipStatus, pageable);
+                else page1 = storyRepository.findForAdminOrderByNumOfCommentDESC(keyword, censorshipStatus, pageable);
                 break;
             case "rating":
-                if (asc) page1 = storyRepository.findForAdminOrderByNumOfRatingASC(keyword, pageable);
-                else page1 = storyRepository.findForAdminOrderByNumOfRatingDESC(keyword, pageable);
+                if (asc) page1 = storyRepository.findForAdminOrderByNumOfRatingASC(keyword, censorshipStatus, pageable);
+                else page1 = storyRepository.findForAdminOrderByNumOfRatingDESC(keyword, censorshipStatus, pageable);
                 break;
             case "screen":
-                if (asc) page1 = storyRepository.findForAdminOrderByNumOfScreenASC(keyword, pageable);
-                else page1 = storyRepository.findForAdminOrderByNumOfScreenDESC(keyword, pageable);
+                if (asc) page1 = storyRepository.findForAdminOrderByNumOfScreenASC(keyword, censorshipStatus, pageable);
+                else page1 = storyRepository.findForAdminOrderByNumOfScreenDESC(keyword, censorshipStatus, pageable);
                 break;
             case "read":
-                if (asc) page1 = storyRepository.findForAdminOrderByNumOfReadASC(keyword, pageable);
-                else page1 = storyRepository.findForAdminOrderByNumOfReadDESC(keyword, pageable);
+                if (asc) page1 = storyRepository.findForAdminOrderByNumOfReadASC(keyword, censorshipStatus, pageable);
+                else page1 = storyRepository.findForAdminOrderByNumOfReadDESC(keyword, censorshipStatus, pageable);
                 break;
             case "date":
-                if(asc) page1 = storyRepository.findForAdminOrderDateASC(keyword, pageable);
-                else page1 = storyRepository.findForAdminOrderDateDESC(keyword, pageable);
+                if(asc) page1 = storyRepository.findForAdminOrderDateASC(keyword, censorshipStatus, pageable);
+                else page1 = storyRepository.findForAdminOrderDateDESC(keyword, censorshipStatus, pageable);
                 break;
         }
 

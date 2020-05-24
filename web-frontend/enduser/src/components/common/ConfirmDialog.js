@@ -16,15 +16,15 @@ const ConfirmDialog = (props) => {
     const { openDialog, cancel, ok, setOpenDialog, content } = props;
 
     return (
-            <Dialog
-                open={openDialog}
-                TransitionComponent={Transition}
-                keepMounted
-                onClose={() => setOpenDialog(false)}
-                aria-labelledby="alert-dialog-slide-title"
-                aria-describedby="alert-dialog-slide-description"
-            >
-            {/* <DialogTitle id="alert-dialog-slide-title">{"Use Google's location service?"}</DialogTitle> */}
+        <Dialog
+            open={openDialog}
+            TransitionComponent={Transition}
+            keepMounted
+            onClose={() => setOpenDialog(false)}
+            aria-labelledby="alert-dialog-slide-title"
+            aria-describedby="alert-dialog-slide-description"
+        >
+        {/* <DialogTitle id="alert-dialog-slide-title">{"Use Google's location service?"}</DialogTitle> */}
             <DialogContent>
                 <DialogContentText id="alert-dialog-slide-description">
                     { content }

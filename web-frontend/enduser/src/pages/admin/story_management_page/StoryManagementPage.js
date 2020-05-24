@@ -1,20 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react';
-import MainLayout from '../../layouts/main-layout/MainLayout';
+import React, { useState, useEffect, useRef,useContext } from 'react';
+import MainLayout from '../../../layouts/main-layout/MainLayout';
 import { TableContainer, Table, TableHead, TableBody, Divider,
-  TableCell, TableRow, Paper, FormControl, TextField, InputAdornment, InputLabel, MenuItem, Select } from '@material-ui/core';
+  TableCell, TableRow, Paper, FormControl, TextField, InputAdornment, InputLabel, MenuItem, Select, Button } from '@material-ui/core';
 import { Search as SearchIcon, Book as BookIcon } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 import { Pagination } from '@material-ui/lab';
-import StoryService from '../../services/story.service';
-import { getOrderBys } from '../../common/constants';
-import MyDropdownMenu from '../../components/common/MyDropdownMenu';
-import MySpinner from '../../components/common/MySpinner';
-import ConfirmDialog from '../../components/common/ConfirmDialog';
-import TagList from '../../components/common/TagList';
-import MyAlert from '../../components/common/MyAlert';
-import ValidationUtils from '../../utils/validation';
-import DateTimeUtils from '../../utils/datetime';
+import StoryService from '../../../services/story.service';
+import { getOrderBys, ORDER_BYS, getCensorshipTitle, CENSORSHIP_STATUS } from '../../../common/constants';
+import MyDropdownMenu from '../../../components/common/MyDropdownMenu';
+import MySpinner from '../../../components/common/MySpinner';
+import ConfirmDialog from '../../../components/common/ConfirmDialog';
+import TagList from '../../../components/common/TagList';
+import MyAlert from '../../../components/common/MyAlert';
+import MyBackdrop from '../../../components/common/MyBackdrop';
+import ValidationUtils from '../../../utils/validation';
+import DateTimeUtils from '../../../utils/datetime';
 import { Link } from 'react-router-dom';
+import { LayoutContext } from '../../../context/layout.context';
+import StoryView from './StoryView';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import CancelIcon from '@material-ui/icons/Cancel';
+import PauseIcon from '@material-ui/icons/Pause';
+import CensorshipSelect from './CensorshipSelect';
 
 let searchTimeout = null;
 let currentStory = null;
@@ -29,47 +36,53 @@ const orderBys = getOrderBys()
 
 const StoryManagementPage =  (props) => {
   const classes = useStyles();
-  
+
+  const layoutContext = useContext(LayoutContext);
+
 
   const [stories, setStories] = useState([]);
   const [isLoadingStories, setIsLoadingStories] = useState(false);
+  const [story, setStory] = useState({});
+  const [isLoadingStory, setLoadingStory] = useState(false);
+  const [openBackdrop, setOpenBackdrop] = useState(false);
+  const [openStoryDialog, setOpenStoryDialog] = useState(false);
+  
   const [totalPages, setTotalPages] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogContent, setDialogContent] = useState('');
   // const [story, setStory] = useState(null);
   
-  const [openAlert, setOpenAlert] = useState(false);
-  const [alert, setAlert] = useState({ content: '', type: 'success' });
+  const [alert, setAlert] = useState({ content: '', type: 'success', open: false });
   const [filters, setFilters] = useState({
       keyword: '',
-      orderBy: 'avg_rate',
+      orderBy: ORDER_BYS.DATE,
       asc: false,
+      censorshipStatus: CENSORSHIP_STATUS.PENDING,
       page: 1,
       itemsPerPage: 10,
   });
 
   useEffect(() => {
     searchStories();
+
+    layoutContext.setOpenSidebar(false);
+
+    return () => {
+      setStory(null);
+      setStories([]);
+      layoutContext.setOpenSidebar(true);
+    }
   }, []);
 
 
   const changeFilters = (prop, value) => {
-      filters[prop] = value;
-      setFilters({ ...filters });
-      if(prop === 'keyword'){
-          clearTimeout(searchTimeout);
-          searchTimeout = window.setTimeout(() => {
-              setFilters({ ...filters, page: 1 });
-              searchStories();
-          }, 300);
-      } else {
-          searchStories();
-      }
+    filters[prop] = value;
+    setFilters({ ...filters });
   }
 
-  const changePage = (e, value) => {
-  console.log(value);
-  changeFilters('page', value);
+    const changePage = (e, value) => {
+    console.log(value);
+    changeFilters('page', value);
   }
 
   const getStories = async () => {
@@ -88,13 +101,35 @@ const StoryManagementPage =  (props) => {
       return data;
   }
 
+  const getReadingStory = async (storyId) => {
+    setLoadingStory(true);
+    setOpenBackdrop(true);
+    try {
+        const res = await StoryService.getReadingStory(storyId);
+
+        const { data } = res.data;
+        if (ValidationUtils.isEmpty(data)) {
+            // setNotfound(true);
+        } else {
+            console.log(data);
+            setStory({ ...data });
+            setOpenStoryDialog(true);
+        }
+    } catch (error) {
+        console.log(error);
+    }
+    setOpenBackdrop(false);
+    setLoadingStory(false);
+}
+
   const searchStories = async () => {
       const stories = await getStories();
       setStories(stories);
   }
 
   const viewStory = (story) => {
-    window.open('/stories/details/' + story.id);
+    getReadingStory(story.id);
+    // window.open('/stories/details/' + story.id);
   }
 
   const updateStory = async () => {
@@ -107,16 +142,20 @@ const StoryManagementPage =  (props) => {
         const s = stories.find(st => st.id === currentStory.id);
         s.deactiveByAdmin = enable ? false : true;
         setStories([...stories]);
-        setAlert({ content: 'Cập nhật thành công', type: 'success' });
+        setAlert({ content: 'Cập nhật thành công', type: 'success', open: true });
       } else {
-        setAlert({ content: Object.values(res.data.errors)[0], type: 'error' });
+        setAlert({ content: Object.values(res.data.errors)[0], type: 'error', open: true });
       }
     } catch (error) {
       console.log(error);
     }
     currentStory = null;
-    setOpenAlert(true);
+    closeAlert();
     setOpenDialog(false);
+  }
+
+  const closeAlert = () => {
+    window.setTimeout(() => {setAlert({ ...alert, open: false })}, 3000);
   }
 
   const handleUpdateByAdmin = (story) => {
@@ -136,67 +175,87 @@ const StoryManagementPage =  (props) => {
     currentStory = null;
   }
 
+  const changeCurrentStory = (censorship) => {
+      const index = stories.findIndex(s => s.id === censorship.storyId);
+      if(index > -1) {
+        stories[index].censorshipStatus = censorship.censorshipStatus;
+        stories[index].adminNote = censorship.adminNote;
+        setStories([...stories]);
+      }
+  }
+
   return (
     <MainLayout>
       <h3 className="text-center">Quản lý truyện</h3>
-      <div className="container">
+      <div className="container-fluid">
       
         <div className="row mt-5">
           <div className="col-12">
           <h3 className="">Tất cả truyện</h3>
           <hr style={{ border: '1px solid #ccc' }} />
-          <div className="row">
-            <div className="col-sm-3">
-              <FormControl>
-                <TextField
-                  // variant="outlined"
-                  style={{ width: '100%' }}
-                  label="Tìm truyện..."
-                  value={filters.keyword} 
-                  onChange={(e) => changeFilters('keyword', e.target.value)} 
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-              </FormControl>
-            </div>
-            <div className="col-sm-3">
-              <FormControl style={{ width: '100%' }}>
-                  <InputLabel>Sắp xếp theo</InputLabel>
-                  <Select
-                      value={filters.orderBy}
-                      onChange={(e) => changeFilters('orderBy', e.target.value)}
-                  >
-                      {orderBys.map((orderBy) => (
-                          <MenuItem key={orderBy.value} value={orderBy.value}>
-                              {orderBy.title}
+          <Paper style={{ padding: '20px' }}>
+            <div className="row">
+              <div className="col-sm-3">
+                <FormControl style={{ width: '100%' }}>
+                  <TextField
+                    // variant="outlined"
+                    
+                    label="Tìm truyện, tác giả..."
+                    value={filters.keyword} 
+                    onChange={(e) => changeFilters('keyword', e.target.value)} 
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                </FormControl>
+              </div>
+              <div className="col-sm-2">
+                <FormControl style={{ width: '100%' }}>
+                    <InputLabel>Sắp xếp theo</InputLabel>
+                    <Select
+                        value={filters.orderBy}
+                        onChange={(e) => changeFilters('orderBy', e.target.value)}
+                    >
+                        {orderBys.map((orderBy) => (
+                            <MenuItem key={orderBy.value} value={orderBy.value}>
+                                {orderBy.title}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+              </div>
+              <div className="col-sm-1">
+                <FormControl style={{ width: '100%' }}>
+                    <InputLabel>Thứ tự</InputLabel>
+                    <Select
+                        value={filters.asc}
+                        onChange={(e) => changeFilters('asc', e.target.value)}
+                    >
+                          <MenuItem value={true}>
+                              Tăng dần
                           </MenuItem>
-                      ))}
-                  </Select>
-              </FormControl>
+                          <MenuItem value={false}>
+                              Giảm dần
+                          </MenuItem>
+                    </Select>
+                </FormControl>
+              </div>
+              <div className="col-sm-2">
+                <CensorshipSelect 
+                  onChange={(e) => changeFilters('censorshipStatus', e.target.value)} 
+                  value={filters.censorshipStatus} />
+              </div>
             </div>
-            <div className="col-sm-3">
-              <FormControl >
-                  <InputLabel>Thứ tự</InputLabel>
-                  <Select
-                      value={filters.asc}
-                      onChange={(e) => changeFilters('asc', e.target.value)}
-                  >
-                        <MenuItem value={true}>
-                            Tăng dần
-                        </MenuItem>
-                        <MenuItem value={false}>
-                            Giảm dần
-                        </MenuItem>
-                  </Select>
-              </FormControl>
+            <div className="row">
+              <div className="col-12 text-right">
+                <Button color="primary" onClick={searchStories}>Tìm kiếm</Button>
+              </div>
             </div>
-          </div>
-         
+          </Paper>
           <div className="row my-3">
             <div className="col-12">
               <Pagination 
@@ -223,6 +282,8 @@ const StoryManagementPage =  (props) => {
                     <TableCell align="center">Lượt bình luận</TableCell>
                     <TableCell align="center">Lượt đánh giá</TableCell>
                     <TableCell align="center">Đánh giá trung bình</TableCell>
+                    <TableCell align="center">Admin ghi chú</TableCell>
+                    <TableCell align="center">Kiểm duyệt</TableCell>
                     <TableCell align="center">Trạng thái</TableCell>
                     <TableCell align="center">Tác giả</TableCell>
                     <TableCell align="center">Nhãn</TableCell>
@@ -245,7 +306,14 @@ const StoryManagementPage =  (props) => {
                       <TableCell align="center">{story.numOfComment}</TableCell>
                       <TableCell align="center">{story.numOfRate}</TableCell>
                       <TableCell align="center">{story.avgRate}</TableCell>
-                      <TableCell align="center">{story.deactiveByAdmin ? <span className="text-danger">ĐÃ BỊ KHÓA</span> : <span className="text-success">CHƯA KHÓA</span>}</TableCell>
+                      <TableCell align="center">{story.adminNote}</TableCell>
+                      <TableCell align="center">
+                        { story.censorshipStatus == CENSORSHIP_STATUS.APPROVED && (<CheckCircleIcon color="primary"/>) }
+                        { story.censorshipStatus == CENSORSHIP_STATUS.REJECTED && (<CancelIcon color="error"/>) }
+                        { story.censorshipStatus == CENSORSHIP_STATUS.PENDING && (<PauseIcon color="action" />) }
+                      </TableCell>
+                      <TableCell align="center" style={{ whiteSpace: 'nowrap' }}>
+                        {story.deactiveByAdmin ? <strong className="text-danger">ĐÃ BỊ KHÓA</strong> : <strong className="text-success">CHƯA KHÓA</strong>}</TableCell>
                       <TableCell align="center">
                         {ValidationUtils.isEmpty(story.user) ? '' : <a href={`/user/profile/${story.user.id}`} target="_blank">{story.user.name}</a>}
                       </TableCell>
@@ -293,8 +361,8 @@ const StoryManagementPage =  (props) => {
           />
 
           <MyAlert 
-              open={openAlert}
-              setOpen={setOpenAlert}
+              open={alert.open}
+              setOpen={() => setAlert({ ...alert, open: true })}
               type={alert.type}
               content={alert.content}
           />
@@ -302,6 +370,14 @@ const StoryManagementPage =  (props) => {
           </div>
         </div>
       </div>
+
+      <StoryView 
+        setAlert={setAlert}
+        changeCurrentStory={changeCurrentStory}
+        story={story} 
+        open={openStoryDialog} 
+        onClose={() => setOpenStoryDialog(false)} />
+      <MyBackdrop open={openBackdrop} setOpen={setOpenBackdrop} />
      
     </MainLayout>
   )

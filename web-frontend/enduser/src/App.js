@@ -23,7 +23,7 @@ import RegisterPage from './pages/common/RegisterPage';
 
 import UserManagementPage from './pages/admin/UserManagementPage';
 
-import StoryManagementPage from './pages/admin/StoryManagementPage';
+import StoryManagementPage from './pages/admin/story_management_page/StoryManagementPage';
 import StoryAnalytic from './pages/admin/StoryAnalytic';
 import TagManagementPage from './pages/admin/TagManagementPage';
 import ReportManagementPage from './pages/admin/ReportManagementPage';
@@ -141,5 +141,8 @@ function App() {
   );
   }
 
+
+
+  
 
 export default withStyles(styles)(App);

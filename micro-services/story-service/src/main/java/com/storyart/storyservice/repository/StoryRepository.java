@@ -54,53 +54,53 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
     @Query(value = MyQueries. getStoriesForAdminOrderByDate+ " ASC",
             countQuery = MyQueries.countStoriesByKeyword,
             nativeQuery = true)
-    Page<Story> findForAdminOrderDateASC(String keyword, Pageable pageable);
+    Page<Story> findForAdminOrderDateASC(String keyword, String censorshipStatus, Pageable pageable);
 
     @Query(value = MyQueries. getStoriesForAdminOrderByDate+ " DESC",
             countQuery = MyQueries.countStoriesByKeyword,
             nativeQuery = true)
-    Page<Story> findForAdminOrderDateDESC(String keyword, Pageable pageable);
+    Page<Story> findForAdminOrderDateDESC(String keyword, String censorshipStatus, Pageable pageable);
 
     @Query(value = MyQueries.getStoriesForAdminOrderByComment + " ASC",
             countQuery = MyQueries.countStoriesByKeyword,
             nativeQuery = true)
-    Page<Story> findForAdminOrderByNumOfCommentASC(String keyword, Pageable pageable);
+    Page<Story> findForAdminOrderByNumOfCommentASC(String keyword, String censorshipStatus, Pageable pageable);
 
     @Query(value = MyQueries.getStoriesForAdminOrderByComment + " DESC",
             countQuery = MyQueries.countStoriesByKeyword, nativeQuery = true)
-    Page<Story> findForAdminOrderByNumOfCommentDESC(String keyword, Pageable pageable);
+    Page<Story> findForAdminOrderByNumOfCommentDESC(String keyword, String censorshipStatus, Pageable pageable);
 
     @Query(value = MyQueries.getStoriesForAdminOrderByRating + " DESC",
             countQuery = MyQueries.countStoriesByKeyword, nativeQuery = true)
-    Page<Story> findForAdminOrderByNumOfRatingDESC(String keyword, Pageable pageable);
+    Page<Story> findForAdminOrderByNumOfRatingDESC(String keyword, String censorshipStatus, Pageable pageable);
 
     @Query(value = MyQueries.getStoriesForAdminOrderByRating + " ASC",
             countQuery = MyQueries.countStoriesByKeyword, nativeQuery = true)
-    Page<Story> findForAdminOrderByNumOfRatingASC(String keyword, Pageable pageable);
+    Page<Story> findForAdminOrderByNumOfRatingASC(String keyword, String censorshipStatus, Pageable pageable);
 
     @Query(value = MyQueries.getStoriesForAdminOrderByScreen + " DESC",
             countQuery = MyQueries.countStoriesByKeyword, nativeQuery = true)
-    Page<Story> findForAdminOrderByNumOfScreenDESC(String keyword, Pageable pageable);
+    Page<Story> findForAdminOrderByNumOfScreenDESC(String keyword, String censorshipStatus, Pageable pageable);
 
     @Query(value = MyQueries.getStoriesForAdminOrderByScreen + " ASC",
             countQuery = MyQueries.countStoriesByKeyword, nativeQuery = true)
-    Page<Story> findForAdminOrderByNumOfScreenASC(String keyword, Pageable pageable);
+    Page<Story> findForAdminOrderByNumOfScreenASC(String keyword, String censorshipStatus, Pageable pageable);
 
     @Query(value = MyQueries.getStoriesForAdminOrderByAvgRate + " DESC",
             countQuery = MyQueries.countStoriesByKeyword, nativeQuery = true)
-    Page<Story> findForAdminOrderByAvgRateDESC(String keyword, Pageable pageable);
+    Page<Story> findForAdminOrderByAvgRateDESC(String keyword, String censorshipStatus, Pageable pageable);
 
     @Query(value = MyQueries.getStoriesForAdminOrderByAvgRate + " ASC",
             countQuery = MyQueries.countStoriesByKeyword, nativeQuery = true)
-    Page<Story> findForAdminOrderByAvgRateASC(String keyword, Pageable pageable);
+    Page<Story> findForAdminOrderByAvgRateASC(String keyword, String censorshipStatus, Pageable pageable);
 
     @Query(value = MyQueries.getStoriesForAdminOrderByRead + " ASC",
             countQuery = MyQueries.countStoriesByKeyword, nativeQuery = true)
-    Page<Story> findForAdminOrderByNumOfReadASC(String keyword, Pageable pageable);
+    Page<Story> findForAdminOrderByNumOfReadASC(String keyword, String censorshipStatus, Pageable pageable);
 
     @Query(value = MyQueries.getStoriesForAdminOrderByRead + " DESC",
             countQuery = MyQueries.countStoriesByKeyword, nativeQuery = true)
-    Page<Story> findForAdminOrderByNumOfReadDESC(String keyword, Pageable pageable);
+    Page<Story> findForAdminOrderByNumOfReadDESC(String keyword, String censorshipStatus, Pageable pageable);
 
     //for users
     @Query(value = MyQueries.getStoriesForUserOrderByDate + " ASC", nativeQuery = true)

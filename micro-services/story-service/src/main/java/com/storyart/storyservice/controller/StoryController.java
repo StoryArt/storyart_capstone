@@ -1,5 +1,6 @@
 package com.storyart.storyservice.controller;
 
+import com.storyart.storyservice.dto.CensorshipDto;
 import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.create_story.CreateStoryDto;
 import com.storyart.storyservice.dto.ResultDto;
@@ -137,15 +138,23 @@ public class StoryController {
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
+    @PutMapping("censorship")
+    @Secured({"ROLE_ADMIN"})
+    public ResponseEntity getStoryToRead(@RequestBody CensorshipDto censorshipDto){
+        ResultDto result = storyService.saveCensorship(censorshipDto);
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
+
     @GetMapping("get_for_admin")
     @Secured({"ROLE_ADMIN"})
     public ResponseEntity getStoriesForAdmin(
             @RequestParam String keyword,
             @RequestParam String orderBy,
+            @RequestParam String censorshipStatus,
             @RequestParam boolean asc,
             @RequestParam int page,
             @RequestParam int itemsPerPage){
-        Page<GetStoryDto> stories = storyService.getStoriesForAdmin(keyword, orderBy, asc, page, itemsPerPage);
+        Page<GetStoryDto> stories = storyService.getStoriesForAdmin(keyword, orderBy, censorshipStatus, asc, page, itemsPerPage);
         return new ResponseEntity(stories, HttpStatus.OK);
     }
 

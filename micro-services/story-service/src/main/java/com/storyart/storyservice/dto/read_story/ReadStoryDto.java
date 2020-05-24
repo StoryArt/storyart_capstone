@@ -27,6 +27,8 @@ public class ReadStoryDto {
     private boolean active;
     private boolean deactiveByAdmin;
     private String firstScreenId;
+    private String censorshipStatus;
+    private String adminNote;
 
     private User user;
     private List<ReadStoryScreenDto> screens;

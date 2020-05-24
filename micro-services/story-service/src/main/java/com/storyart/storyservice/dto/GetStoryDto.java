@@ -31,6 +31,8 @@ public class GetStoryDto {
     private int numOfScreen;
     private int numOfRate;
     private int numOfRead;
+    private String censorshipStatus;
+    private String adminNote;
 
     private User user;
     private Rating rating;
