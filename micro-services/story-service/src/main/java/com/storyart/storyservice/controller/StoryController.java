@@ -88,12 +88,6 @@ public class StoryController {
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
-    @PostMapping("read_history")
-    public ResponseEntity saveReadHistory(@RequestParam int storyId, @CurrentUser UserPrincipal userPrincipal){
-        ResultDto result = storyService.saveReadHistory(storyId, userPrincipal.getId());
-        return new ResponseEntity(result, HttpStatus.OK);
-    }
-
     @DeleteMapping("{storyId}")
     public ResponseEntity deleteStory(@PathVariable int storyId, @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.changeStoryStatusByUser(storyId, userPrincipal.getId());
