@@ -3,6 +3,7 @@ package com.storyart.storyservice.service;
 import com.storyart.storyservice.common.constants.*;
 import com.storyart.storyservice.dto.CensorshipDto;
 import com.storyart.storyservice.dto.GetStoryDto;
+import com.storyart.storyservice.dto.create_reading_history.ReadingHistoryDto;
 import com.storyart.storyservice.dto.create_story.*;
 import com.storyart.storyservice.dto.ResultDto;
 import com.storyart.storyservice.dto.read_story.ReadStoryDto;
@@ -35,7 +36,11 @@ public interface StoryService {
 
     ResultDto getStoryDetails(int id);
 
-    ResultDto getReadingStory(int storyId);
+    ResultDto getReadingStoryForAdmin(int storyId);
+
+    ResultDto getReadingStoryForUser(int storyId);
+
+    ResultDto getReadingStoryForReading(int storyId);
 
     ResultDto createStory(CreateStoryDto story, int userId);
 
@@ -52,13 +57,12 @@ public interface StoryService {
 
     Page<GetStoryDto> getStoriesForUser(int userId, String keyword, String orderBy, boolean asc, int page, int itemsPerPage);
 
-    ResultDto updateByAdmin(int storyId, boolean disable);
+    ResultDto changeStoryStatusByAdmin(int storyId, boolean disable);
 
-    ResultDto deleteStory(int storyId, int userId);
+    ResultDto changeStoryStatusByUser(int storyId, int userId);
 
     ResultDto changePublishedStatus(int storyId, int userId, boolean turnOnPublished);
 
-    ResultDto saveReadHistory(int storyId, int userId);
 
     ResultDto rateStory(int storyId, int userId, double stars);
 
@@ -114,8 +118,6 @@ class StoryServiceImpl implements StoryService {
     @Autowired
     ModelMapper modelMapper;
 
-    @Autowired
-    EntityManager entityManager;
 
     public boolean isNumber(String value){
         try{
@@ -144,10 +146,6 @@ class StoryServiceImpl implements StoryService {
     public boolean isStringOperation(String value){
         List<String> string_ops = ConstantsList.getStringOperationList();
         return string_ops.contains(value);
-    }
-
-    public List<String> getItemsInAButNotInB(List<String> arr1, List<String> arr2){
-        return arr1.stream().filter(item -> arr2.contains(item)).collect(Collectors.toList());
     }
 
     @Override
@@ -320,16 +318,24 @@ class StoryServiceImpl implements StoryService {
             result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
         } else if (!story.isPublished()){
             result.getErrors().put("NOT_FOUND", "Truyện này chưa xuất bản");
+        } else if (!story.getCensorshipStatus().equals(CensorshipStatus.APPROVED)){
+            result.getErrors().put("NOT_FOUND", "Truyện này chưa được kiểm duyệt");
         }
 
         if(result.getErrors().size() > 0) return result;
+
+        User user = userRepository.findById(story.getUserId()).orElse(null);
+        if(user == null || (!user.isActive() || user.isDeactiveByAdmin())){
+            result.getErrors().put("DELETED", "Truyện này thuộc về người dùng bị vô hiệu tài khoản");
+            return result;
+        }
 
         GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
 
         List<Tag> tags = tagRepository.findAllByStoryId(story.getId());
         dto.setTags(tagService.mapModelToDto(tags));
-        User user = userRepository.findById(story.getUserId()).orElse(null);
-        if (user != null) user.setPassword(null);
+
+        user.setPassword(null);
         dto.setUser(user);
 
         //get user rating
@@ -379,21 +385,6 @@ class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public ResultDto saveReadHistory(int storyId, int userId) {
-        ResultDto result = new ResultDto();
-        result.setSuccess(false);
-        Story story = storyRepository.findById(storyId).orElse(null);
-        if (story == null) {
-            result.getErrors().put("NOT_FOUND", "Truyện này không tồn tại");
-        } else if (!story.isActive() || story.isDeactiveByAdmin()) {
-            result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
-        } else {
-
-        }
-        return result;
-    }
-
-    @Override
     public ResultDto rateStory(int storyId, int userId, double stars) {
         ResultDto result = new ResultDto();
         result.setSuccess(false);
@@ -433,7 +424,7 @@ class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public ResultDto deleteStory(int storyId, int userId) {
+    public ResultDto changeStoryStatusByUser(int storyId, int userId) {
         ResultDto result = new ResultDto();
         Optional<Story> story = storyRepository.findById(storyId);
         result.setSuccess(false);
@@ -458,13 +449,78 @@ class StoryServiceImpl implements StoryService {
     }
 
 
+    public ReadStoryDto getReadingStory(Story story) {
+
+        ReadStoryDto readStoryDto = modelMapper.map(story, ReadStoryDto.class);
+        List<Screen> screens = screenRepository.findByStoryId(story.getId());
+
+        List<ReadStoryScreenDto> screenDtoList = screens.stream().map(screen -> {
+            ReadStoryScreenDto screenDto = modelMapper.map(screen, ReadStoryScreenDto.class);
+            screenDto.setActions(actionRepository.findAllByScreenId(screen.getId()));
+            return screenDto;
+        }).collect(Collectors.toList());
+
+        List<Information> informations = informationRepository.findAllByStoryId(story.getId());
+
+        List<ReadStoryInformationDto> informationDtos = informations.stream().map(info -> {
+            ReadStoryInformationDto informationDto = modelMapper.map(info, ReadStoryInformationDto.class);
+            List<InfoCondition> conditions = infoConditionRepository.findAllByInformationId(informationDto.getId());
+            informationDto.setConditions(conditions);
+            return informationDto;
+        }).collect(Collectors.toList());
+
+        List<String> informationIds = informations.stream().map(info -> info.getId())
+                .collect(Collectors.toList());
+
+        List<InformationAction> informationActions = informationActionRepository.findAllByInformationIdIn(informationIds);
+
+        List<Tag> tagList = tagRepository.findAllByStoryId(story.getId());
+        List<ReadStoryTagDto> readStoryTagDtoList = tagList.stream().map(t -> modelMapper.map(t, ReadStoryTagDto.class)).collect(Collectors.toList());
+
+        readStoryDto.setInformationActions(informationActions);
+        readStoryDto.setScreens(screenDtoList);
+        readStoryDto.setInformations(informationDtos);
+        readStoryDto.setTags(readStoryTagDtoList);
+
+        return readStoryDto;
+    }
+
     @Override
-    public ResultDto getReadingStory(int storyId) {
+    public ResultDto getReadingStoryForAdmin(int storyId) {
         ResultDto result = new ResultDto();
         result.setSuccess(false);
         result.setData(null);
 
         Story story = storyRepository.findById(storyId).orElse(null);
+
+        if (story == null) {
+            result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
+        } else if (!story.isActive() || story.isDeactiveByAdmin()) {
+            result.getErrors().put("DELETED", "Truyện này đã bị xóa");
+        } else if(!story.isPublished()){
+            result.getErrors().put("NOT_PUBLISHED", "Truyện này chưa xuất bản");
+        } else {
+            User user = userRepository.findById(story.getUserId()).orElse(null);
+            if(user == null || (!user.isActive() || user.isDeactiveByAdmin())){
+                result.getErrors().put("DELETED", "Truyện này thuộc về người dùng bị vô hiệu tài khoản");
+            } else {
+                ReadStoryDto readStoryDto = getReadingStory(story);
+                readStoryDto.setUser(user);
+                result.setData(readStoryDto);
+                result.setSuccess(true);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public ResultDto getReadingStoryForUser(int storyId) {
+        ResultDto result = new ResultDto();
+        result.setSuccess(false);
+        result.setData(null);
+
+        Story story = storyRepository.findById(storyId).orElse(null);
+
         if (story == null) {
             result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
         } else if (!story.isActive() || story.isDeactiveByAdmin()) {
@@ -472,39 +528,40 @@ class StoryServiceImpl implements StoryService {
         } else {
             User user = userRepository.findById(story.getUserId()).orElse(null);
             if(user == null || (!user.isActive() || user.isDeactiveByAdmin())){
-                result.getErrors().put("DELETED", "Truyện này đã bị xóa");
+                result.getErrors().put("DELETED", "Truyện này thuộc về người dùng bị vô hiệu tài khoản");
             } else {
-                ReadStoryDto readStoryDto = modelMapper.map(story, ReadStoryDto.class);
-                List<Screen> screens = screenRepository.findByStoryId(storyId);
+                ReadStoryDto readStoryDto = getReadingStory(story);
+                readStoryDto.setUser(user);
+                result.setData(readStoryDto);
+                result.setSuccess(true);
+            }
+        }
+        return result;
+    }
 
-                List<ReadStoryScreenDto> screenDtoList = screens.stream().map(screen -> {
-                    ReadStoryScreenDto screenDto = modelMapper.map(screen, ReadStoryScreenDto.class);
-                    screenDto.setActions(actionRepository.findAllByScreenId(screen.getId()));
-                    return screenDto;
-                }).collect(Collectors.toList());
+    @Override
+    public ResultDto getReadingStoryForReading(int storyId) {
+        ResultDto result = new ResultDto();
+        result.setSuccess(false);
+        result.setData(null);
 
-                List<Information> informations = informationRepository.findAllByStoryId(storyId);
+        Story story = storyRepository.findById(storyId).orElse(null);
 
-                List<ReadStoryInformationDto> informationDtos = informations.stream().map(info -> {
-                    ReadStoryInformationDto informationDto = modelMapper.map(info, ReadStoryInformationDto.class);
-                    List<InfoCondition> conditions = infoConditionRepository.findAllByInformationId(informationDto.getId());
-                    informationDto.setConditions(conditions);
-                    return informationDto;
-                }).collect(Collectors.toList());
-
-                List<String> informationIds = informations.stream().map(info -> info.getId())
-                        .collect(Collectors.toList());
-
-                List<InformationAction> informationActions = informationActionRepository.findAllByInformationIdIn(informationIds);
-
-                List<Tag> tagList = tagRepository.findAllByStoryId(storyId);
-                List<ReadStoryTagDto> readStoryTagDtoList = tagList.stream().map(t -> modelMapper.map(t, ReadStoryTagDto.class)).collect(Collectors.toList());
-
-                readStoryDto.setInformationActions(informationActions);
-                readStoryDto.setScreens(screenDtoList);
-                readStoryDto.setInformations(informationDtos);
-                readStoryDto.setTags(readStoryTagDtoList);
-
+        if (story == null) {
+            result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
+        } else if (!story.isActive() || story.isDeactiveByAdmin()) {
+            result.getErrors().put("DELETED", "Truyện này đã bị xóa");
+        } else if(!story.isPublished()){
+            result.getErrors().put("NOT_PUBLISHED", "Truyện này chưa xuất bản");
+        } else if(!story.getCensorshipStatus().equals(CensorshipStatus.APPROVED)){
+            result.getErrors().put("NOT_CENSORED", "Truyện này chưa được kiểm duyệt");
+        } else {
+            User user = userRepository.findById(story.getUserId()).orElse(null);
+            if(user == null || (!user.isActive() || user.isDeactiveByAdmin())){
+                result.getErrors().put("DELETED", "Truyện này thuộc về người dùng bị vô hiệu tài khoản");
+            } else {
+                ReadStoryDto readStoryDto = getReadingStory(story);
+                readStoryDto.setUser(user);
                 result.setData(readStoryDto);
                 result.setSuccess(true);
             }
@@ -965,7 +1022,7 @@ class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public ResultDto updateByAdmin(int storyId, boolean disable) {
+    public ResultDto changeStoryStatusByAdmin(int storyId, boolean disable) {
         ResultDto result = new ResultDto();
         Story story = storyRepository.findById(storyId).orElse(null);
         if (story == null) {
@@ -985,18 +1042,5 @@ class StoryServiceImpl implements StoryService {
     }
 
 
-
-    @Autowired
-    CommentMicroService commentService;
-
-    StoryReactByRange storyReactByRange = new StoryReactByRange();
-
-    @Autowired
-    HistoryService historyService;
-    //lấy so lieu cho do thi reaction(share, view, click link, hitpoint, comment)
-
-
-    @Autowired
-    LinkClickService clickService;
 
 }

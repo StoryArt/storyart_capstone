@@ -32,6 +32,16 @@ class StoryService {
     return axios.get(url);
   }
 
+  static async getStoryForCensorship(storyId) {
+    const url = baseUrl + "/public/censorship/" + storyId;
+    return axios.get(url);
+  }
+
+  static async getStoryForUserToEdit(storyId) {
+    const url = baseUrl + "/public/user_edit/" + storyId;
+    return axios.get(url);
+  }
+
   static async getStoriesByAuthor(
     userId,
     { orderBy, asc, keyword, page, itemsPerPage }
@@ -111,7 +121,7 @@ class StoryService {
     }
   }
 
-  static async updateStoryByAdmin(storyId, enable) {
+  static async changeStoryStatusByAdmin(storyId, enable) {
     const url = baseUrl + "/update_by_admin/" + storyId + "/" + enable;
     return axios.put(url);
   }

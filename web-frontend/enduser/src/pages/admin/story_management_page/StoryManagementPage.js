@@ -78,10 +78,12 @@ const StoryManagementPage =  (props) => {
   const changeFilters = (prop, value) => {
     filters[prop] = value;
     setFilters({ ...filters });
+    if(prop === 'page'){
+      searchStories();
+    } 
   }
 
-    const changePage = (e, value) => {
-    console.log(value);
+  const changePage = (e, value) => {
     changeFilters('page', value);
   }
 
@@ -105,7 +107,7 @@ const StoryManagementPage =  (props) => {
     setLoadingStory(true);
     setOpenBackdrop(true);
     try {
-        const res = await StoryService.getReadingStory(storyId);
+        const res = await StoryService.getStoryForCensorship(storyId);
 
         const { data } = res.data;
         if (ValidationUtils.isEmpty(data)) {
@@ -129,14 +131,13 @@ const StoryManagementPage =  (props) => {
 
   const viewStory = (story) => {
     getReadingStory(story.id);
-    // window.open('/stories/details/' + story.id);
   }
 
-  const updateStory = async () => {
+  const changeStoryStatus = async () => {
     // console.log(currentStory);
     const enable = currentStory.deactiveByAdmin ? true : false;
     try {
-      const res = await StoryService.updateStoryByAdmin(currentStory.id, enable);
+      const res = await StoryService.changeStoryStatusByAdmin(currentStory.id, enable);
       console.log(res);
       if(res.data.success){
         const s = stories.find(st => st.id === currentStory.id);
@@ -263,7 +264,10 @@ const StoryManagementPage =  (props) => {
                   count={totalPages} 
                   page={filters.page}
                   color="primary" 
-                  onChange={changePage} />
+                  onChange={() => {
+                    setFilters({ ...filters, page: 1 });
+                    changePage();
+                  }} />
             </div>
           </div>
           {isLoadingStories && <MySpinner/>}
@@ -355,7 +359,7 @@ const StoryManagementPage =  (props) => {
             <ConfirmDialog
               openDialog={openDialog}
               cancel={cancel}
-              ok={updateStory}
+              ok={changeStoryStatus}
               setOpenDialog={setOpenDialog}
               content={dialogContent}
           />

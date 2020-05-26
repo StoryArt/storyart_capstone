@@ -128,7 +128,7 @@ const CreateStoryPage = (props) => {
         setLoadingStory(true);
         setOpenBackdrop(true);
         try {
-            const res = await StoryService.getReadingStory(storyId);
+            const res = await StoryService.getStoryForUserToEdit(storyId);
             console.log(res);
             if (!ValidationUtils.isEmpty(res.data.data)) {
                 const user = getAuthUserInfo();

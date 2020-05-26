@@ -4,12 +4,9 @@ import com.storyart.storyservice.dto.CensorshipDto;
 import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.create_story.CreateStoryDto;
 import com.storyart.storyservice.dto.ResultDto;
-import com.storyart.storyservice.dto.statistic.*;
 import com.storyart.storyservice.model.Rating;
 import com.storyart.storyservice.security.CurrentUser;
 import com.storyart.storyservice.security.UserPrincipal;
-import com.storyart.storyservice.service.LinkClickService;
-import com.storyart.storyservice.service.ScreenReadingTimeService;
 import com.storyart.storyservice.service.StoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -99,7 +96,7 @@ public class StoryController {
 
     @DeleteMapping("{storyId}")
     public ResponseEntity deleteStory(@PathVariable int storyId, @CurrentUser UserPrincipal userPrincipal){
-        ResultDto result = storyService.deleteStory(storyId, userPrincipal.getId());
+        ResultDto result = storyService.changeStoryStatusByUser(storyId, userPrincipal.getId());
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
@@ -134,7 +131,19 @@ public class StoryController {
 
     @GetMapping("public/read/{storyId}")
     public ResponseEntity getStoryToRead(@PathVariable int storyId){
-        ResultDto result = storyService.getReadingStory(storyId);
+        ResultDto result = storyService.getReadingStoryForReading(storyId);
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
+
+    @GetMapping("public/censorship/{storyId}")
+    public ResponseEntity getStoryToCensor(@PathVariable int storyId){
+        ResultDto result = storyService.getReadingStoryForAdmin(storyId);
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
+
+    @GetMapping("public/user_edit/{storyId}")
+    public ResponseEntity getStoryUserToEdit(@PathVariable int storyId){
+        ResultDto result = storyService.getReadingStoryForUser(storyId);
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
@@ -181,7 +190,7 @@ public class StoryController {
     @Secured({"ROLE_ADMIN"})
     public ResponseEntity disableOrEnableByAdmin(@PathVariable int storyId,
                                                  @PathVariable boolean enable){
-        ResultDto result = storyService.updateByAdmin(storyId, !enable);
+        ResultDto result = storyService.changeStoryStatusByAdmin(storyId, !enable);
         return new ResponseEntity(result, HttpStatus.OK);
     }
 }
