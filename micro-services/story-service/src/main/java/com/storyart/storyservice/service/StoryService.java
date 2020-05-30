@@ -596,9 +596,8 @@ class StoryServiceImpl implements StoryService {
         story.setDeactiveByAdmin(false);
         story.setUpdatedAt(new Date());
         story.setUserId(userId);
-        if(story.isPublished()){
-            story.setCensorshipStatus(CensorshipStatus.PENDING);
-        }
+        story.setCensorshipStatus(CensorshipStatus.PENDING);
+
 
         story = storyRepository.save(story);
         int storyId = story.getId();
