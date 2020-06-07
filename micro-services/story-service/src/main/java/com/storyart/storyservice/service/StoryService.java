@@ -1176,6 +1176,7 @@ class StoryServiceImpl implements StoryService {
         dto.setUser(user);
         dto.setNumOfRead(historyRepository.countAllByStoryId(story.getId()));
         dto.setCensorshipStatus(draftStoryRepository.getCensorshipStatusOfStoryDraft(dto.getId()));
+        dto.setCensorships(censorshipRepository.findAllByStory(dto.getId()));
         return dto;
     }
 

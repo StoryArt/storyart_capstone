@@ -156,8 +156,8 @@ const ReadStoryPage = (props) => {
         interactionInterval = window.setInterval(() => {
             interactionCheck.duration++;
 
-            //if 2min no interaction, system will confirm if the user want to continue reading.
-            if (interactionCheck.duration > 2 * 60 && interactionCheck.isInteracted) {
+            //if 3.5 min no interaction, system will confirm if the user want to continue reading.
+            if (interactionCheck.duration > 3.5 * 60 && interactionCheck.isInteracted) {
                 interactionCheck.isInteracted = false;
                 stopCountTimeReading();
                 setDialog({ open: true, content: 'Bạn có muốn đọc tiếp câu truyện hay không?' });

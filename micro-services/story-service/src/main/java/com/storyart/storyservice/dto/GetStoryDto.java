@@ -1,5 +1,6 @@
 package com.storyart.storyservice.dto;
 
+import com.storyart.storyservice.model.Censorship;
 import com.storyart.storyservice.model.Rating;
 import com.storyart.storyservice.model.Tag;
 import com.storyart.storyservice.model.User;
@@ -37,4 +38,5 @@ public class GetStoryDto {
     private User user;
     private Rating rating;
     List<TagDto> tags;
+    List<Censorship> censorships;
 }

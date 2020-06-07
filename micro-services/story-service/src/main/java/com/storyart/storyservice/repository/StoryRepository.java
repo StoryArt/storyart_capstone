@@ -32,11 +32,11 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
                                 boolean active, boolean published, Pageable pageable);
 
     @Query(value = "select * from story s WHERE s.user_id = ?1 and (s.title like %?2%) " +
-            "and s.active = true and s.published = true and s.deactive_by_admin = false and s.id in " +
+            "and s.active = true and s.published = true and s.deactive_by_admin = false and s.censorship_status = APPROVED and s.id in " +
             "(select distinct story_id from story_tag st where st.tag_id in ?3) order by s.created_at DESC",
 
             countQuery = "select count(*) from story s WHERE s.user_id = ?1 and (s.title like %?2%) " +
-                    "and s.active = true and s.published = true and s.deactive_by_admin = false and s.id in " +
+                    "and s.active = true and s.published = true and s.deactive_by_admin = false and s.censorship_status = APPROVED and s.id in " +
                     "(select distinct story_id from story_tag st where st.tag_id in ?3) order by s.created_at DESC",
 
             nativeQuery = true)

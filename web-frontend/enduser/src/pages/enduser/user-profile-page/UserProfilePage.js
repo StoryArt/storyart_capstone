@@ -33,6 +33,7 @@ import UserStoriesTabs from "./UserStoriesTabs";
 import UserStoriesList from "./UserStoriesList";
 import UserNoteDialog from "../create-story-page/UserNoteDialog";
 import CensorshipService from "../../../services/censorship.service";
+import CensorshipHistoryDialog from "./CensorshipHistoryDialog";
 
 
 const orderBys = getOrderBys();
@@ -467,8 +468,8 @@ const UserProfilePage = (props) => {
                         handleDeleteStory={handleDeleteStory}
                         editStory={editStory}
                         onRequestCensorship={(story) => {
-                          setStory({ ...story })
-                          setNoteDialog({ ...noteDialog, open: true })
+                          setStory({ ...story });
+                          setNoteDialog({ ...noteDialog, open: true });
                         }}  />
                     )}
                               
@@ -497,12 +498,23 @@ const UserProfilePage = (props) => {
         content={dialog.content}
       />
 
-        <UserNoteDialog 
+        {/* <UserNoteDialog 
               open={noteDialog.open}
               onClose={() => setNoteDialog({ ...noteDialog, open: false })}
               note={noteDialog.note}
               onChange={(value) => setNoteDialog({ ...noteDialog, note: value })}
-              onSaveRequestCensorship={requestCensorship} />
+              onSaveRequestCensorship={requestCensorship} /> */}
+
+       {!ValidationUtils.isEmpty(story) && (
+          <CensorshipHistoryDialog
+            story={story}
+            open={noteDialog.open}
+            onClose={() => setNoteDialog({ ...noteDialog, open: false })}
+            note={noteDialog.note}
+            onChange={(value) => setNoteDialog({ ...noteDialog, note: value })}
+            onSaveRequestCensorship={requestCensorship} 
+          />
+       )}
 
       <MyBackdrop open={openBackdrop} setOpen={setOpenBackdrop}/>
 

@@ -1,3 +1,5 @@
+import ValidationUtils from "./validation";
+
 class DateTimeUtils{
     static getDate(datetime){
         try {
@@ -8,6 +10,7 @@ class DateTimeUtils{
     }
 
     static getDateTime(datetime){
+        if(ValidationUtils.isEmpty(datetime)) return '';
         try {
             const d = new Date(datetime);
             return d.toLocaleDateString() + ' ' + d.toLocaleTimeString();

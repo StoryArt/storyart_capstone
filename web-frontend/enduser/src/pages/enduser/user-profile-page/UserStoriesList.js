@@ -94,15 +94,16 @@ const UserStoriesList = (props) => {
                                             <MenuItem onClick={() => changePublishedStatus(story)}>
                                                 {story.published ? 'Ẩn truyện' : 'Hiện truyện trên hệ thống'}
                                             </MenuItem>
+                                            {/* {story.censorshipStatus == null && ( */}
+                                                <MenuItem onClick={() => onRequestCensorship(story)}>
+                                                    Xem kiểm duyệt
+                                                </MenuItem>
+                                            {/* )} */}
                                             <Divider/>
                                             <MenuItem onClick={() => handleDeleteStory(story)}>
                                                 Xóa truyện
                                             </MenuItem>
-                                            {story.censorshipStatus == null && (
-                                                <MenuItem onClick={() => onRequestCensorship(story)}>
-                                                    Yêu cầu kiểm duyệt
-                                                </MenuItem>
-                                            )}
+                                           
                                         </MyDropdownMenu>
                                     </TableCell>
                                 </TableRow>
