@@ -62,14 +62,18 @@ const StoryViewTabs = (props) => {
             textColor="primary"
             aria-label="scrollable force tabs example"
           >
-            <Tab label="Chi tiết truyện" icon={<MenuBookIcon />} {...a11yProps(0)} />
-            <Tab label="Kiểm duyệt" icon={<SupervisorAccountIcon />} {...a11yProps(1)} />
+            <Tab label="Nội dung đã kiểm duyệt lần trước" icon={<MenuBookIcon />} {...a11yProps(0)} />
+            <Tab label="Nội dung kiểm duyệt" icon={<SupervisorAccountIcon />} {...a11yProps(1)} />
+            <Tab label="Kiểm duyệt" icon={<SupervisorAccountIcon />} {...a11yProps(2)} />
           </Tabs>
         </AppBar>
         <TabPanel value={value} index={0}>
           {props.children}
         </TabPanel>
         <TabPanel value={value} index={1}>
+            {props.children}
+        </TabPanel>
+        <TabPanel value={value} index={2}>
             {props.children}
         </TabPanel>
         

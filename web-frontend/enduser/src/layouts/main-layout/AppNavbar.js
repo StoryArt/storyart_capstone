@@ -184,9 +184,9 @@ const AppNavbar = (props) => {
                   if(user.role == ROLE_NAMES.ROLE_USER){
                     navigateRoute('/user/my-profile') 
                   } else if(user.role == ROLE_NAMES.ROLE_ADMIN){
-                    navigateRoute('/admin/my-profile')
+                    navigateRoute('/admin/edit-profile')
                   } else if(user.role == ROLE_NAMES.ROLE_SYSTEM_ADMIN){
-                    navigateRoute('/sysadmin/my-profile')
+                    navigateRoute('/sysadmin/edit-profile')
                   }
                 }}
                 color="inherit">{user.username}</Button>

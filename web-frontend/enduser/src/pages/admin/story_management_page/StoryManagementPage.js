@@ -43,6 +43,7 @@ const StoryManagementPage =  (props) => {
   const [stories, setStories] = useState([]);
   const [isLoadingStories, setIsLoadingStories] = useState(false);
   const [story, setStory] = useState({});
+  const [oldStory, setOldStory] = useState({});
   const [isLoadingStory, setLoadingStory] = useState(false);
   const [openBackdrop, setOpenBackdrop] = useState(false);
   const [openStoryDialog, setOpenStoryDialog] = useState(false);
@@ -61,6 +62,7 @@ const StoryManagementPage =  (props) => {
       page: 1,
       itemsPerPage: 10,
   });
+
 
   useEffect(() => {
     searchStories();
@@ -113,8 +115,8 @@ const StoryManagementPage =  (props) => {
         if (ValidationUtils.isEmpty(data)) {
             // setNotfound(true);
         } else {
-            
-            setStory({ ...data });
+            setStory({ ...data.currentStory });
+            setOldStory({ ...data.oldStory });
             setOpenStoryDialog(true);
         }
     } catch (error) {
@@ -372,6 +374,7 @@ const StoryManagementPage =  (props) => {
         setAlert={setAlert}
         changeCurrentStory={changeCurrentStory}
         story={story} 
+        oldStory={oldStory} 
         open={openStoryDialog} 
         setOpenBackdrop={setOpenBackdrop}
         onClose={() => setOpenStoryDialog(false)} />

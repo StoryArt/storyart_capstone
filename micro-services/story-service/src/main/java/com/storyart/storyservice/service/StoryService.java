@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.discovery.converters.Auto;
 import com.storyart.storyservice.common.constants.*;
+import com.storyart.storyservice.dto.AdminCensorshipStory;
 import com.storyart.storyservice.dto.CensorshipDto;
 import com.storyart.storyservice.dto.GetStoryDto;
 import com.storyart.storyservice.dto.create_reading_history.ReadingHistoryDto;
@@ -461,7 +462,6 @@ class StoryServiceImpl implements StoryService {
         return result;
     }
 
-
     public ReadStoryDto getReadingStory(Story story) {
 
         ReadStoryDto readStoryDto = modelMapper.map(story, ReadStoryDto.class);
@@ -525,7 +525,19 @@ class StoryServiceImpl implements StoryService {
                 ReadStoryDto readStoryDto = mapCreateStoryToReadStory(createStoryDto);
                 readStoryDto.setUser(user);
                 readStoryDto.setCensorships(censorshipRepository.findAllByStory(readStoryDto.getId()));
-                result.setData(readStoryDto);
+                readStoryDto.setCensorshipStatus(draftStory.getCensorshipStatus());
+
+                ReadStoryDto oldStory = null;
+                if(CensorshipStatus.APPROVED.equals(story.getCensorshipStatus())){
+                    oldStory = getReadingStory(story);
+                    oldStory.setUser(userRepository.findById(oldStory.getUserId()).orElse(null));
+                }
+                AdminCensorshipStory data = new AdminCensorshipStory();
+                data.setCurrentStory(readStoryDto);
+                data.setOldStory(oldStory);
+
+
+                result.setData(data);
                 result.setSuccess(true);
             }
         }
@@ -1244,7 +1256,4 @@ class StoryServiceImpl implements StoryService {
         }
         return result;
     }
-
-
-
 }

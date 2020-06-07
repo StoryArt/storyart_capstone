@@ -122,6 +122,11 @@ class CensorshipServiceImpl implements CensorshipService{
             String currentCensorshipStatus = draftStoryRepository.getCensorshipStatusOfStoryDraft(requestCensorshipDto.getStoryId());
             if(CensorshipStatus.PENDING.equals(currentCensorshipStatus)){
                 result.getErrors().put("REQUESTED", "Truyện này đã yêu cầu kiểm duyệt rồi");
+            } else if(CensorshipStatus.APPROVED.equals(currentCensorshipStatus) || CensorshipStatus.REJECTED.equals(currentCensorshipStatus)){
+                result.getErrors().put("REQUESTED", "Truyện này đã kiểm duyệt rồi");
+            }
+
+            if(result.getErrors().size() > 0){
                 return result;
             }
 

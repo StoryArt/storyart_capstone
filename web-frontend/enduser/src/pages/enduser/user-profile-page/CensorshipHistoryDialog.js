@@ -32,7 +32,7 @@ const CensorshipHistoryDialog = (props) => {
                         onChange={(e) => onChange(e.target.value)}
                     />
                     <Button style={{ float: 'right' }} onClick={onSaveRequestCensorship} color="primary">
-                        Lưu 
+                        Gửi yêu cầu kiểm duyệt 
                     </Button>
 
                 </form>

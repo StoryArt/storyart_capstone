@@ -89,6 +89,7 @@ function App() {
               exact 
               path="/user/settings/password" 
               component={ChangePasswordPage}/>
+
             <PrivateRoute 
               exact 
               path="/stories/create" 
@@ -123,7 +124,7 @@ function App() {
             {/* system admin routes */}
             <Route exact path="/sysadmin" render={() => <Redirect to="/sysadmin/admin" /> }/>
             <PrivateRoute exact path="/sysadmin/admin" component={AdminManagementPage}/>
-            <PrivateRoute exact path="/sysadmin/my-profile" component={UserProfilePage}/>
+             <PrivateRoute exact path="/sysadmin/edit-profile" component={EditUserProfilePage}/>
 
 
             {/* admin routes */}            
@@ -132,7 +133,7 @@ function App() {
             <PrivateRoute exact path="/admin/stories" component={StoryManagementPage}/>
             <PrivateRoute exact path="/admin/tags" component={TagManagementPage}/>
             <PrivateRoute exact path="/admin/reports" component={ReportManagementPage}/>
-            <PrivateRoute exact path="/admin/my-profile" component={UserProfilePage}/>
+            <PrivateRoute exact path="/admin/edit-profile" component={EditUserProfilePage}/>
             
 
             {/* other routes */}
