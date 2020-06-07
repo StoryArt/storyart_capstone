@@ -1,5 +1,8 @@
 package com.storyart.storyservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.discovery.converters.Auto;
 import com.storyart.storyservice.common.constants.*;
 import com.storyart.storyservice.dto.CensorshipDto;
 import com.storyart.storyservice.dto.GetStoryDto;
@@ -16,6 +19,7 @@ import com.storyart.storyservice.model.*;
 import com.storyart.storyservice.repository.*;
 import com.storyart.storyservice.utils.MyStringUtils;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -55,14 +59,13 @@ public interface StoryService {
 
     Page<GetStoryDto> getStoriesForAdmin(String keyword, String orderBy, String censorshipStatus, boolean asc, int page, int itemsPerPage);
 
-    Page<GetStoryDto> getStoriesForUser(int userId, String keyword, String orderBy, boolean asc, int page, int itemsPerPage);
-
+//    Page<GetStoryDto> getStoriesForUser(int userId, String keyword, boolean censored, String orderBy, boolean asc, int page, int itemsPerPage);
+    List<GetStoryDto> getStoriesForUser(int userId);
     ResultDto changeStoryStatusByAdmin(int storyId, boolean disable);
 
     ResultDto changeStoryStatusByUser(int storyId, int userId);
 
     ResultDto changePublishedStatus(int storyId, int userId, boolean turnOnPublished);
-
 
     ResultDto rateStory(int storyId, int userId, double stars);
 
@@ -71,6 +74,8 @@ public interface StoryService {
     Rating getRatingByStoryAndUser(int storyId, int userId);
 
     ResultDto saveCensorship(CensorshipDto censorshipDto);
+
+    CreateStoryDto saveStory(CreateStoryDto storyDto, Story foundStory);
 
 }
 
@@ -116,7 +121,16 @@ class StoryServiceImpl implements StoryService {
     HistoryRepository historyRepository;
 
     @Autowired
+    CensorshipRepository censorshipRepository;
+
+    @Autowired
+    DraftStoryRepository draftStoryRepository;
+
+    @Autowired
     ModelMapper modelMapper;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
 
     public boolean isNumber(String value){
@@ -296,7 +310,6 @@ class StoryServiceImpl implements StoryService {
         } else if (!story.isPublished()){
             result.getErrors().put("NOT_FOUND", "Truyện này chưa xuất bản");
         } else {
-            story.setAdminNote(censorshipDto.getAdminNote());
             story.setCensorshipStatus(censorshipDto.getCensorshipStatus());
             storyRepository.save(story);
             result.setSuccess(true);
@@ -497,15 +510,21 @@ class StoryServiceImpl implements StoryService {
             result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
         } else if (!story.isActive() || story.isDeactiveByAdmin()) {
             result.getErrors().put("DELETED", "Truyện này đã bị xóa");
-        } else if(!story.isPublished()){
-            result.getErrors().put("NOT_PUBLISHED", "Truyện này chưa xuất bản");
         } else {
             User user = userRepository.findById(story.getUserId()).orElse(null);
             if(user == null || (!user.isActive() || user.isDeactiveByAdmin())){
                 result.getErrors().put("DELETED", "Truyện này thuộc về người dùng bị vô hiệu tài khoản");
             } else {
-                ReadStoryDto readStoryDto = getReadingStory(story);
+                DraftStory draftStory = draftStoryRepository.findById(storyId).orElse(null);
+                CreateStoryDto createStoryDto = null;
+                try {
+                    createStoryDto = objectMapper.readValue(draftStory.getContent(), CreateStoryDto.class);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+                ReadStoryDto readStoryDto = mapCreateStoryToReadStory(createStoryDto);
                 readStoryDto.setUser(user);
+                readStoryDto.setCensorships(censorshipRepository.findAllByStory(readStoryDto.getId()));
                 result.setData(readStoryDto);
                 result.setSuccess(true);
             }
@@ -530,7 +549,15 @@ class StoryServiceImpl implements StoryService {
             if(user == null || (!user.isActive() || user.isDeactiveByAdmin())){
                 result.getErrors().put("DELETED", "Truyện này thuộc về người dùng bị vô hiệu tài khoản");
             } else {
-                ReadStoryDto readStoryDto = getReadingStory(story);
+                DraftStory draftStory = draftStoryRepository.findById(storyId).orElse(null);
+                CreateStoryDto createStoryDto = null;
+                try {
+                    createStoryDto = objectMapper.readValue(draftStory.getContent(), CreateStoryDto.class);
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+                ReadStoryDto readStoryDto = mapCreateStoryToReadStory(createStoryDto);
+                readStoryDto.setCensorshipStatus(draftStory.getCensorshipStatus());
                 readStoryDto.setUser(user);
                 result.setData(readStoryDto);
                 result.setSuccess(true);
@@ -553,7 +580,7 @@ class StoryServiceImpl implements StoryService {
             result.getErrors().put("DELETED", "Truyện này đã bị xóa");
         } else if(!story.isPublished()){
             result.getErrors().put("NOT_PUBLISHED", "Truyện này chưa xuất bản");
-        } else if(!story.getCensorshipStatus().equals(CensorshipStatus.APPROVED)){
+        } else if(!CensorshipStatus.APPROVED.equals(story.getCensorshipStatus())){
             result.getErrors().put("NOT_CENSORED", "Truyện này chưa được kiểm duyệt");
         } else {
             User user = userRepository.findById(story.getUserId()).orElse(null);
@@ -569,61 +596,219 @@ class StoryServiceImpl implements StoryService {
         return result;
     }
 
-    @Override
-    public ResultDto createStory(CreateStoryDto createStoryDto, int userId) {
-        ResultDto result = new ResultDto();
-        HashMap<String, String> errors = validateStoryinfo(createStoryDto);
+    public ReadStoryDto mapCreateStoryToReadStory(CreateStoryDto createStoryDto){
+        ReadStoryDto readStoryDto = modelMapper.map(createStoryDto, ReadStoryDto.class);
+        List<ReadStoryScreenDto> screens = createStoryDto.getScreens().stream().map(sc -> {
+            ReadStoryScreenDto screenDto = modelMapper.map(sc, ReadStoryScreenDto.class);
+            List<Action> actions = sc.getActions().stream().map(ac -> modelMapper.map(ac, Action.class)).collect(Collectors.toList());
+            screenDto.setActions(actions);
+            return screenDto;
+        }).collect(Collectors.toList());
+        readStoryDto.setScreens(screens);
 
-        if(errors.size() > 0){
-            result.setSuccess(false);
-            result.setErrors(errors);
-            return result;
+        List<ReadStoryInformationDto> informationDtos = createStoryDto.getInformations().stream().map(info -> {
+            ReadStoryInformationDto readStoryInformationDto = modelMapper.map(info, ReadStoryInformationDto.class);
+            List<InfoCondition> infoConditions = info.getConditions().stream().map(cond -> modelMapper.map(cond, InfoCondition.class)).collect(Collectors.toList());
+            readStoryInformationDto.setConditions(infoConditions);
+            return readStoryInformationDto;
+        }).collect(Collectors.toList());
+        readStoryDto.setInformations(informationDtos);
+
+        List<ReadStoryTagDto> tags = createStoryDto.getTags().stream().map(tagId -> {
+            Tag tag = tagRepository.findById(tagId).orElse(null);
+            ReadStoryTagDto readStoryTagDto = modelMapper.map(tag, ReadStoryTagDto.class);
+            return readStoryTagDto;
+        }).collect(Collectors.toList());
+        readStoryDto.setTags(tags);
+
+        List<InformationAction> informationActions = createStoryDto.getInformationActions().stream().map(ia -> modelMapper.map(ia, InformationAction.class)).collect(Collectors.toList());
+        readStoryDto.setInformationActions(informationActions);
+
+        return readStoryDto;
+    }
+
+//    public void saveStory(CreateStoryDto createStoryDto, Story story){
+//        HashMap<String, String> screenIdsMap = new HashMap<>();
+//        HashMap<String, String> actionIdsMap = new HashMap<>();
+//        HashMap<String, String> informationIdsMap = new HashMap<>();
+//
+//        createStoryDto.getScreens().stream().forEach(screen -> {
+//            screenIdsMap.put(screen.getId(), MyStringUtils.generateUniqueId());
+//        });
+//
+//        //insert story tags
+//        createStoryDto.getTags().stream().forEach(tagId -> {
+//            StoryTag st = new StoryTag();
+//            st.setTagId(tagId);
+//            st.setStoryId(createStoryDto.getId());
+//            storyTagRepository.insertStoryTag(st);
+//        });
+//
+//        //save all screens
+//        createStoryDto.getScreens().stream().forEach(screen -> {
+//            Screen savedScreen = modelMapper.map(screen, Screen.class);
+//
+//            savedScreen.setStoryId(createStoryDto.getId());
+//            savedScreen.setId(screenIdsMap.get(screen.getId()));
+//
+//            screenRepository.insertScreen(savedScreen);
+//
+//            screen.getActions().stream().forEach(action -> {
+//                Action savedAction = modelMapper.map(action, Action.class);
+//
+//                savedAction.setId(MyStringUtils.generateUniqueId());
+//                savedAction.setScreenId(savedScreen.getId());
+//                if (action.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())) {
+//                    savedAction.setValue(screenIdsMap.get(action.getValue()));
+//                }
+//                savedAction.setNextScreenId(screenIdsMap.get(action.getNextScreenId()));
+//                actionIdsMap.put(action.getId(), savedAction.getId());
+//
+//                actionRepository.insertAction(savedAction);
+//            });
+//        });
+//
+//        //set first screen id for story
+//        story.setFirstScreenId(screenIdsMap.get(createStoryDto.getFirstScreenId()));
+//        storyRepository.updateFirstScreen(story);
+//
+//        //save all informations
+//        List<InfoCondition> savedInfoConditions = new ArrayList<>();
+//        List<Information> savedInforomations = createStoryDto.getInformations().stream().map(information -> {
+//            Information savedInformation = modelMapper.map(information, Information.class);
+//            savedInformation.setStoryId(story.getId());
+//            savedInformation.setId(MyStringUtils.generateUniqueId());
+//            informationIdsMap.put(information.getId(), savedInformation.getId());
+//
+//            information.getConditions().stream().forEach(condition -> {
+//                InfoCondition savedInfoCondition = modelMapper.map(condition, InfoCondition.class);
+//
+//                savedInfoCondition.setInformationId(savedInformation.getId());
+//                savedInfoCondition.setId(MyStringUtils.generateUniqueId());
+//                savedInfoCondition.setNextScreenId(screenIdsMap.get(condition.getNextScreenId()));
+//
+//                savedInfoConditions.add(savedInfoCondition);
+//            });
+//
+//            return savedInformation;
+//        }).collect(Collectors.toList());
+//
+//        informationRepository.saveAll(savedInforomations);
+//        infoConditionRepository.saveAll(savedInfoConditions);
+//
+//        //save information action
+//        createStoryDto.getInformationActions().stream().forEach(informationAction -> {
+//            InformationAction savedInformationAction = modelMapper.map(informationAction, InformationAction.class);
+//            savedInformationAction.setActionId(actionIdsMap.get(informationAction.getActionId()));
+//            savedInformationAction.setInformationId(informationIdsMap.get(informationAction.getInformationId()));
+//            informationActionRepository.insertInfoAction(savedInformationAction);
+//        });
+//    }
+
+    public String parseObjectToJson(CreateStoryDto createStoryDto){
+        String json = "";
+        try {
+            json = objectMapper.writeValueAsString(createStoryDto);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
+        return json;
+    }
 
-        Story story = modelMapper.map(createStoryDto, Story.class);
-
+    @Override
+    public CreateStoryDto saveStory(CreateStoryDto storyDto, Story foundStory){
+        Story story = modelMapper.map(storyDto, Story.class);
         HashMap<String, String> screenIdsMap = new HashMap<>();
         HashMap<String, String> actionIdsMap = new HashMap<>();
         HashMap<String, String> informationIdsMap = new HashMap<>();
 
-        createStoryDto.getScreens().stream().forEach(screen -> {
-            screenIdsMap.put(screen.getId(), MyStringUtils.generateUniqueId());
+        //delete unused screen
+        List<String> screenIdList = storyDto.getScreens().stream().map(scr -> scr.getId()).collect(Collectors.toList());
+
+        List<String> screenIds = screenRepository.findScreenIdsByStory(story.getId());
+
+        List<String> deletedScreens = new ArrayList<>();
+        screenIds.stream().forEach(screenId -> {
+            if(!screenIdList.contains(screenId)){
+                deletedScreens.add(screenId);
+            }
         });
 
-        story.setFirstScreenId(null);
-        story.setActive(true);
-        story.setPublished(createStoryDto.isPublished());
-        story.setDeactiveByAdmin(false);
-        story.setUpdatedAt(new Date());
-        story.setUserId(userId);
-        if(story.isPublished()){
-            story.setCensorshipStatus(CensorshipStatus.PENDING);
+        if(deletedScreens.size() > 0){
+            screenRepository.deleteAllByIds(deletedScreens);
         }
 
-        story = storyRepository.save(story);
+        storyDto.getScreens().stream().forEach(screen -> {
+            if(screenRepository.existsById(screen.getId())){
+                screenIdsMap.put(screen.getId(), screen.getId());
+            } else {
+                screenIdsMap.put(screen.getId(), MyStringUtils.generateUniqueId());
+            }
+        });
+
+        story.setFirstScreenId(screenIdsMap.get(storyDto.getFirstScreenId()));
+//        story.setCreatedAt(foundStory.getCreatedAt());
+        story.setActive(true);
+        story.setDeactiveByAdmin(foundStory.isDeactiveByAdmin());
+        story.setAvgRate(foundStory.getAvgRate());
+        story.setUserId(foundStory.getUserId());
+        story.setCensorshipStatus(foundStory.getCensorshipStatus());
+        story.setCreatedAt(foundStory.getCreatedAt());
+
+//        if(storyDto.isRequestCensorship() && !CensorshipStatus.PENDING.equals(story.getCensorshipStatus())){
+//            Censorship censorship = new Censorship();
+//            censorship.setCensorshipStatus(CensorshipStatus.PENDING);
+//            censorship.setUserNote(storyDto.getUserNote());
+//            censorship.setStoryId(storyDto.getId());
+//            censorshipRepository.save(censorship);
+//        }
+
+        storyRepository.save(story);
         int storyId = story.getId();
 
+        storyTagRepository.deleteByStoryId(storyId);
+
         //insert story tags
-        createStoryDto.getTags().stream().forEach(tagId -> {
+        storyDto.getTags().stream().forEach(tagId -> {
             StoryTag st = new StoryTag();
             st.setTagId(tagId);
             st.setStoryId(storyId);
             storyTagRepository.insertStoryTag(st);
         });
 
-        //save all screens
-        createStoryDto.getScreens().stream().forEach(screen -> {
+        //insert new screens
+//            List<Action> savedActions = new ArrayList<>();
+        List<String> deletedActions = new ArrayList<>();
+
+//            List<Thread> threads = new ArrayList<>();
+        storyDto.getScreens().stream().forEach(screen -> {
+
             Screen savedScreen = modelMapper.map(screen, Screen.class);
 
             savedScreen.setStoryId(storyId);
             savedScreen.setId(screenIdsMap.get(screen.getId()));
+            //delete all actions
 
-            screenRepository.insertScreen(savedScreen);
+
+//                deletedActions.addAll(actionIdList);
+            if(screenIds.contains(savedScreen.getId())){
+                screenRepository.updateScreenById(savedScreen);
+            } else {
+                screenRepository.insertScreen(savedScreen);
+            }
+
+            List<String> newActionIds = screen.getActions().stream().map(a -> a.getId()).collect(Collectors.toList());
+            List<String> actionIdList = actionRepository.findActionIdsScreen(savedScreen.getId());
+            for(String actionId: actionIdList){
+                if(!newActionIds.contains(actionId)) deletedActions.add(actionId);
+            }
 
             screen.getActions().stream().forEach(action -> {
                 Action savedAction = modelMapper.map(action, Action.class);
 
-                savedAction.setId(MyStringUtils.generateUniqueId());
+                if(!actionIdList.contains(action.getId())){
+                    savedAction.setId(MyStringUtils.generateUniqueId());
+                }
                 savedAction.setScreenId(savedScreen.getId());
                 if (action.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())) {
                     savedAction.setValue(screenIdsMap.get(action.getValue()));
@@ -631,17 +816,25 @@ class StoryServiceImpl implements StoryService {
                 savedAction.setNextScreenId(screenIdsMap.get(action.getNextScreenId()));
                 actionIdsMap.put(action.getId(), savedAction.getId());
 
-                actionRepository.insertAction(savedAction);
+                actionRepository.save(savedAction);
             });
         });
 
-        //set first screen id for story
-        story.setFirstScreenId(screenIdsMap.get(createStoryDto.getFirstScreenId()));
-        storyRepository.updateFirstScreen(story);
+        actionRepository.deleteAllByIds(deletedActions);
 
-        //save all informations
+        //delete all informations
+        List<Information> informations = informationRepository.findAllByStoryId(storyId);
+        List<String> informationIds = informations.stream().map((i -> i.getId())).collect(Collectors.toList());
+        informationRepository.deleteInBatch(informations);
+
+        //delete all information actions
+        List<InformationAction> informationActionList = informationActionRepository.findAllByInformationIdIn(informationIds);
+        informationActionRepository.deleteInBatch(informationActionList);
+
+
+        //insert new informations
         List<InfoCondition> savedInfoConditions = new ArrayList<>();
-        List<Information> savedInforomations = createStoryDto.getInformations().stream().map(information -> {
+        List<Information> savedInformations = storyDto.getInformations().stream().map(information -> {
             Information savedInformation = modelMapper.map(information, Information.class);
             savedInformation.setStoryId(storyId);
             savedInformation.setId(MyStringUtils.generateUniqueId());
@@ -653,24 +846,95 @@ class StoryServiceImpl implements StoryService {
                 savedInfoCondition.setInformationId(savedInformation.getId());
                 savedInfoCondition.setId(MyStringUtils.generateUniqueId());
                 savedInfoCondition.setNextScreenId(screenIdsMap.get(condition.getNextScreenId()));
-
                 savedInfoConditions.add(savedInfoCondition);
+
             });
 
             return savedInformation;
         }).collect(Collectors.toList());
 
-        informationRepository.saveAll(savedInforomations);
+        informationRepository.saveAll(savedInformations);
         infoConditionRepository.saveAll(savedInfoConditions);
 
         //save information action
-        createStoryDto.getInformationActions().stream().forEach(informationAction -> {
+        storyDto.getInformationActions().stream().forEach(informationAction -> {
             InformationAction savedInformationAction = modelMapper.map(informationAction, InformationAction.class);
             savedInformationAction.setActionId(actionIdsMap.get(informationAction.getActionId()));
             savedInformationAction.setInformationId(informationIdsMap.get(informationAction.getInformationId()));
+
             informationActionRepository.insertInfoAction(savedInformationAction);
         });
 
+        storyDto.getScreens().stream().forEach(sc -> {
+            sc.setId(screenIdsMap.get(sc.getId()));
+            sc.getActions().stream().forEach(a -> {
+                a.setId(actionIdsMap.get(a.getId()));
+                a.setNextScreenId(screenIdsMap.get(a.getNextScreenId()));
+                if(a.getType().equals(ACTION_TYPES.NEXT_SCREEN)){
+                    a.setValue(screenIdsMap.get(a.getValue()));
+                }
+            });
+        });
+        storyDto.getInformations().stream().forEach(i -> {
+            i.setId(informationIdsMap.get(i.getId()));
+            i.getConditions().stream().forEach(cond -> {
+                cond.setNextScreenId(screenIdsMap.get(cond.getNextScreenId()));
+            });
+        });
+
+        storyDto.setFirstScreenId(screenIdsMap.get(storyDto.getFirstScreenId()));
+        storyDto.getInformationActions().stream().forEach(ia -> {
+            ia.setActionId(actionIdsMap.get(ia.getActionId()));
+            ia.setInformationId(informationIdsMap.get(ia.getInformationId()));
+        });
+
+        return storyDto;
+    }
+
+    @Override
+    public ResultDto createStory(CreateStoryDto createStoryDto, int userId) {
+        ResultDto result = new ResultDto();
+        HashMap<String, String> errors = validateStoryinfo(createStoryDto);
+
+
+        if(errors.size() > 0){
+            result.setSuccess(false);
+            result.setErrors(errors);
+            return result;
+        }
+
+        Story story = modelMapper.map(createStoryDto, Story.class);
+
+        story.setFirstScreenId(null);
+        story.setActive(true);
+        story.setPublished(createStoryDto.isPublished());
+        story.setDeactiveByAdmin(false);
+        story.setUpdatedAt(new Date());
+        story.setUserId(userId);
+
+        story = storyRepository.save(story);
+        int storyId = story.getId();
+
+        createStoryDto.setId(storyId);
+        createStoryDto.getScreens().stream().forEach(sc -> sc.setStoryId(storyId));
+        createStoryDto.getInformations().forEach(i -> i.setStoryId(storyId));
+
+        DraftStory draftStory = new DraftStory();
+
+        if(createStoryDto.isRequestCensorship()){
+            Censorship censorship = new Censorship();
+            censorship.setCensorshipStatus(CensorshipStatus.PENDING);
+            censorship.setUserNote(createStoryDto.getUserNote());
+            censorship.setStoryId(storyId);
+            censorshipRepository.save(censorship);
+            draftStory.setCensorshipStatus(CensorshipStatus.PENDING);
+        } else {
+            draftStory.setCensorshipStatus(null);
+        }
+
+        draftStory.setId(storyId);
+        draftStory.setContent(parseObjectToJson(createStoryDto));
+        draftStoryRepository.save(draftStory);
 
         result.setSuccess(true);
         result.setErrors(null);
@@ -699,152 +963,88 @@ class StoryServiceImpl implements StoryService {
         } else if (userId != foundStory.getUserId()) {
             resultDto.getErrors().put("NOT_OWN", "Truyện này không thuộc về bạn");
         } else {
-            Story story = modelMapper.map(storyDto, Story.class);
-            HashMap<String, String> screenIdsMap = new HashMap<>();
-            HashMap<String, String> actionIdsMap = new HashMap<>();
-            HashMap<String, String> informationIdsMap = new HashMap<>();
 
-            //delete unused screen
-            List<String> screenIdList = storyDto.getScreens().stream().map(scr -> scr.getId()).collect(Collectors.toList());
-
-            List<String> screenIds = screenRepository.findScreenIdsByStory(story.getId());
-
-            List<String> deletedScreens = new ArrayList<>();
-            screenIds.stream().forEach(screenId -> {
-                if(!screenIdList.contains(screenId)){
-                    deletedScreens.add(screenId);
+            DraftStory draftStory = draftStoryRepository.findById(storyDto.getId()).orElse(null);
+            draftStory.setContent(parseObjectToJson(storyDto));
+            if(storyDto.isRequestCensorship()){
+                if(!CensorshipStatus.PENDING.equals(draftStory.getCensorshipStatus())){
+                    Censorship censorship = new Censorship();
+                    censorship.setCensorshipStatus(CensorshipStatus.PENDING);
+                    censorship.setUserNote(storyDto.getUserNote());
+                    censorship.setStoryId(storyDto.getId());
+                    censorshipRepository.save(censorship);
                 }
-            });
-
-            if(deletedScreens.size() > 0){
-                screenRepository.deleteAllByIds(deletedScreens);
+                draftStory.setCensorshipStatus(CensorshipStatus.PENDING);
+            } else {
+                draftStory.setCensorshipStatus(null);
             }
-
-            storyDto.getScreens().stream().forEach(screen -> {
-                if(screenRepository.existsById(screen.getId())){
-                    screenIdsMap.put(screen.getId(), screen.getId());
-                } else {
-                    screenIdsMap.put(screen.getId(), MyStringUtils.generateUniqueId());
-                }
-            });
-
-            story.setFirstScreenId(screenIdsMap.get(storyDto.getFirstScreenId()));
-            story.setCreatedAt(foundStory.getCreatedAt());
-            story.setActive(true);
-            story.setDeactiveByAdmin(foundStory.isDeactiveByAdmin());
-            story.setAvgRate(foundStory.getAvgRate());
-            story.setUserId(foundStory.getUserId());
-            if(story.isPublished()){
-                story.setCensorshipStatus(CensorshipStatus.PENDING);
-            }
-            storyRepository.save(story);
-            int storyId = story.getId();
-
-            storyTagRepository.deleteByStoryId(storyId);
-
-            //insert story tags
-            storyDto.getTags().stream().forEach(tagId -> {
-                StoryTag st = new StoryTag();
-                st.setTagId(tagId);
-                st.setStoryId(storyId);
-                storyTagRepository.insertStoryTag(st);
-            });
-
-            //insert new screens
-//            List<Action> savedActions = new ArrayList<>();
-            List<String> deletedActions = new ArrayList<>();
-
-//            List<Thread> threads = new ArrayList<>();
-            storyDto.getScreens().stream().forEach(screen -> {
-
-                Screen savedScreen = modelMapper.map(screen, Screen.class);
-
-                savedScreen.setStoryId(storyId);
-                savedScreen.setId(screenIdsMap.get(screen.getId()));
-                //delete all actions
-
-
-//                deletedActions.addAll(actionIdList);
-                if(screenIds.contains(savedScreen.getId())){
-                    screenRepository.updateScreenById(savedScreen);
-                } else {
-                    screenRepository.insertScreen(savedScreen);
-                }
-
-                List<String> newActionIds = screen.getActions().stream().map(a -> a.getId()).collect(Collectors.toList());
-                List<String> actionIdList = actionRepository.findActionIdsScreen(savedScreen.getId());
-                for(String actionId: actionIdList){
-                    if(!newActionIds.contains(actionId)) deletedActions.add(actionId);
-                }
-
-                screen.getActions().stream().forEach(action -> {
-                    Action savedAction = modelMapper.map(action, Action.class);
-
-                    if(!actionIdList.contains(action.getId())){
-                        savedAction.setId(MyStringUtils.generateUniqueId());
-                    }
-                    savedAction.setScreenId(savedScreen.getId());
-                    if (action.getType().equals(ACTION_TYPES.NEXT_SCREEN.toString())) {
-                        savedAction.setValue(screenIdsMap.get(action.getValue()));
-                    }
-                    savedAction.setNextScreenId(screenIdsMap.get(action.getNextScreenId()));
-                    actionIdsMap.put(action.getId(), savedAction.getId());
-
-                    actionRepository.save(savedAction);
-
-                });
-            });
-
-            actionRepository.deleteAllByIds(deletedActions);
-
-            //delete all informations
-            List<Information> informations = informationRepository.findAllByStoryId(storyId);
-            List<String> informationIds = informations.stream().map((i -> i.getId())).collect(Collectors.toList());
-            informationRepository.deleteInBatch(informations);
-
-            //delete all information actions
-            List<InformationAction> informationActionList = informationActionRepository.findAllByInformationIdIn(informationIds);
-            informationActionRepository.deleteInBatch(informationActionList);
-
-
-            //insert new informations
-            List<InfoCondition> savedInfoConditions = new ArrayList<>();
-            List<Information> savedInformations = storyDto.getInformations().stream().map(information -> {
-                Information savedInformation = modelMapper.map(information, Information.class);
-                savedInformation.setStoryId(storyId);
-                savedInformation.setId(MyStringUtils.generateUniqueId());
-                informationIdsMap.put(information.getId(), savedInformation.getId());
-
-                information.getConditions().stream().forEach(condition -> {
-                    InfoCondition savedInfoCondition = modelMapper.map(condition, InfoCondition.class);
-
-                    savedInfoCondition.setInformationId(savedInformation.getId());
-                    savedInfoCondition.setId(MyStringUtils.generateUniqueId());
-                    savedInfoCondition.setNextScreenId(screenIdsMap.get(condition.getNextScreenId()));
-                    savedInfoConditions.add(savedInfoCondition);
-
-                });
-
-                return savedInformation;
-            }).collect(Collectors.toList());
-
-            informationRepository.saveAll(savedInformations);
-            infoConditionRepository.saveAll(savedInfoConditions);
-
-            //save information action
-            storyDto.getInformationActions().stream().forEach(informationAction -> {
-                InformationAction savedInformationAction = modelMapper.map(informationAction, InformationAction.class);
-                savedInformationAction.setActionId(actionIdsMap.get(informationAction.getActionId()));
-                savedInformationAction.setInformationId(informationIdsMap.get(informationAction.getInformationId()));
-
-                informationActionRepository.insertInfoAction(savedInformationAction);
-            });
-
+            draftStoryRepository.save(draftStory);
 
             resultDto.setSuccess(true);
-            resultDto.setData(story);
+            resultDto.setData(foundStory);
         }
         return resultDto;
+    }
+
+    public void mapStoryToStoryDraftInDB(){
+        List<Story> stories = storyRepository.findAll();
+//        Story story = storyRepository.findById(419).orElse(null);
+
+        for(Story story: stories){
+            if(story.getId() != 422 && story.getId() != 419){
+                ReadStoryDto readStoryDto = getReadingStory(story);
+                CreateStoryDto createStoryDto = mapReadStoryToCreateStoryDto(readStoryDto);
+                DraftStory draftStory = new DraftStory();
+                draftStory.setId(createStoryDto.getId());
+                draftStory.setCensorshipStatus(CensorshipStatus.APPROVED);
+                draftStory.setContent(parseObjectToJson(createStoryDto));
+                draftStoryRepository.save(draftStory);
+                System.out.println("ok: " + story.getId());
+            }
+        }
+        System.out.println("Done mapping story to storydraft in DB");
+    }
+
+    public CreateStoryDto mapReadStoryToCreateStoryDto(ReadStoryDto readStoryDto){
+//        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
+
+//        CreateStoryDto createStoryDto = modelMapper.map(readStoryDto, CreateStoryDto.class);
+        CreateStoryDto createStoryDto = new CreateStoryDto();
+        createStoryDto.setId(readStoryDto.getId());
+        createStoryDto.setUserId(readStoryDto.getUserId());
+        createStoryDto.setFirstScreenId(readStoryDto.getFirstScreenId());
+        createStoryDto.setAnimation(readStoryDto.getAnimation());
+        createStoryDto.setImage(readStoryDto.getImage());
+        createStoryDto.setIntro(readStoryDto.getIntro());
+        createStoryDto.setPublished(readStoryDto.isPublished());
+        createStoryDto.setTitle(readStoryDto.getTitle());
+
+
+        List<CreateStoryScreenDto> createStoryScreenDtos = readStoryDto.getScreens().stream().map(sc -> {
+            CreateStoryScreenDto createStoryScreenDto = modelMapper.map(sc, CreateStoryScreenDto.class);
+            List<CreateStoryActionDto> actionDtos = sc.getActions().stream().map(a -> modelMapper.map(a, CreateStoryActionDto.class)).collect(Collectors.toList());
+            createStoryScreenDto.setActions(actionDtos);
+            return createStoryScreenDto;
+        }).collect(Collectors.toList());
+        createStoryDto.setScreens(createStoryScreenDtos);
+
+        List<CreateStoryInformationDto> createStoryInformationDtos = readStoryDto.getInformations().stream().map(info -> {
+            CreateStoryInformationDto createStoryInformationDto = modelMapper.map(info, CreateStoryInformationDto.class);
+            List<CreateStoryConditionDto> createStoryConditionDtos = createStoryInformationDto.getConditions().stream().map(cond -> modelMapper.map(cond, CreateStoryConditionDto.class)).collect(Collectors.toList());
+            createStoryInformationDto.setConditions(createStoryConditionDtos);
+            createStoryInformationDto.getStoryId();
+            return createStoryInformationDto;
+        }).collect(Collectors.toList());
+        createStoryDto.setInformations(createStoryInformationDtos);
+
+        List<CreateStoryInformationActionDto> createStoryInformationActionDtos = readStoryDto.getInformationActions().stream().map(ia -> modelMapper.map(ia, CreateStoryInformationActionDto.class)).collect(Collectors.toList());
+        createStoryDto.setInformationActions(createStoryInformationActionDtos);
+
+        Set<Integer> tags = readStoryDto.getTags().stream().map(tag -> tag.getId()).collect(Collectors.toSet());
+        createStoryDto.setTags(tags);
+
+        return createStoryDto;
     }
 
     @Override
@@ -897,7 +1097,6 @@ class StoryServiceImpl implements StoryService {
                 return dto;
             }
         });
-
         return page2;
     }
 
@@ -976,49 +1175,53 @@ class StoryServiceImpl implements StoryService {
         if(user != null) user.setPassword(null);
         dto.setUser(user);
         dto.setNumOfRead(historyRepository.countAllByStoryId(story.getId()));
+        dto.setCensorshipStatus(draftStoryRepository.getCensorshipStatusOfStoryDraft(dto.getId()));
         return dto;
     }
 
     @Override
-    public Page<GetStoryDto> getStoriesForUser(int userId, String keyword, String orderBy, boolean asc, int page, int itemsPerPage) {
-        Pageable pageable = PageRequest.of(page - 1, itemsPerPage);
-        Page<Story> page1 = null;
-        switch (orderBy) {
-            case "avg_rate":
-                if (asc) page1 = storyRepository.findForUserOrderByAvgRateASC(userId, keyword, pageable);
-                else page1 = storyRepository.findForUserOrderByAvgRateDESC(userId, keyword, pageable);
-                break;
-            case "read":
-                if (asc) page1 = storyRepository.findForUserOrderByNumOfReadASC(userId, keyword, pageable);
-                else page1 = storyRepository.findForUserOrderByNumOfReadDESC(userId, keyword, pageable);
-                break;
-            case "comment":
-                if (asc) page1 = storyRepository.findForUserOrderByNumOfCommentASC(userId, keyword, pageable);
-                else page1 = storyRepository.findForUserOrderByNumOfCommentDESC(userId, keyword, pageable);
-                break;
-            case "rating":
-                if (asc) page1 = storyRepository.findForUserOrderByNumOfRatingASC(userId, keyword, pageable);
-                else page1 = storyRepository.findForUserOrderByNumOfRatingDESC(userId, keyword, pageable);
-                break;
-            case "screen":
-                if (asc) page1 = storyRepository.findForUserOrderByNumOfScreenASC(userId, keyword, pageable);
-                else page1 = storyRepository.findForUserOrderByNumOfScreenDESC(userId, keyword, pageable);
-                break;
-            case "date":
-                if(asc) page1 = storyRepository.findForUserOrderByDateASC(userId, keyword,  pageable);
-                else page1 = storyRepository.findForUserOrderByDateDESC(userId, keyword, pageable);
-                break;
-        }
-
-        if (page1 == null) return null;
-
-        Page<GetStoryDto> page2 = page1.map(new Function<Story, GetStoryDto>() {
-            @Override
-            public GetStoryDto apply(Story story) {
-                return mapStoryModelToGetStoryDto(story);
-            }
-        });
-        return page2;
+    public List<GetStoryDto> getStoriesForUser(int userId) {
+//        Pageable pageable = PageRequest.of(page - 1, itemsPerPage);
+//        Page<Story> page1 = null;
+//        switch (orderBy) {
+//            case "avg_rate":
+//                if (asc) page1 = storyRepository.findForUserOrderByAvgRateASC(userId, keyword, pageable);
+//                else page1 = storyRepository.findForUserOrderByAvgRateDESC(userId, keyword, pageable);
+//                break;
+//            case "read":
+//                if (asc) page1 = storyRepository.findForUserOrderByNumOfReadASC(userId, keyword, pageable);
+//                else page1 = storyRepository.findForUserOrderByNumOfReadDESC(userId, keyword, pageable);
+//                break;
+//            case "comment":
+//                if (asc) page1 = storyRepository.findForUserOrderByNumOfCommentASC(userId, keyword, pageable);
+//                else page1 = storyRepository.findForUserOrderByNumOfCommentDESC(userId, keyword, pageable);
+//                break;
+//            case "rating":
+//                if (asc) page1 = storyRepository.findForUserOrderByNumOfRatingASC(userId, keyword, pageable);
+//                else page1 = storyRepository.findForUserOrderByNumOfRatingDESC(userId, keyword, pageable);
+//                break;
+//            case "screen":
+//                if (asc) page1 = storyRepository.findForUserOrderByNumOfScreenASC(userId, keyword, pageable);
+//                else page1 = storyRepository.findForUserOrderByNumOfScreenDESC(userId, keyword, pageable);
+//                break;
+//            case "date":
+//                if(asc) page1 = storyRepository.findForUserOrderByDateASC(userId, keyword,  pageable);
+//                else page1 = storyRepository.findForUserOrderByDateDESC(userId, keyword, pageable);
+//                break;
+//        }
+//
+//        if (page1 == null) return null;
+//
+//        Page<GetStoryDto> page2 = page1.map(new Function<Story, GetStoryDto>() {
+//            @Override
+//            public GetStoryDto apply(Story story) {
+//                return mapStoryModelToGetStoryDto(story);
+//            }
+//        });
+//        return page2;
+        List<Story> stories = storyRepository.findAllByUserId(userId);
+        List<GetStoryDto> getStoryDtos = stories.stream().map(st -> mapStoryModelToGetStoryDto(st)).collect(Collectors.toList());
+        return getStoryDtos;
     }
 
     @Override

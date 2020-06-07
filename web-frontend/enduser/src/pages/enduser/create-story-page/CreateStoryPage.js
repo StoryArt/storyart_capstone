@@ -39,6 +39,7 @@ import { getAuthUserInfo } from '../../../config/auth';
 import ScreenTypes from './ScreenTypes';
 import FIleService from '../../../services/file.service';
 import ConfirmDialog from '../../../components/common/ConfirmDialog';
+import UserNoteDialog from './UserNoteDialog';
 
 const parameters = getParameters();
 
@@ -78,6 +79,7 @@ const CreateStoryPage = (props) => {
     const [image, setImage] = useState(null);
 
     const [dialog, setDialog] = useState({ content: '', open: false });
+    const [noteDialog, setNoteDialog] = useState({ open: false, note: '' });
 
     let canChangeScreenContent = true;
 
@@ -132,7 +134,7 @@ const CreateStoryPage = (props) => {
             console.log(res);
             if (!ValidationUtils.isEmpty(res.data.data)) {
                 const user = getAuthUserInfo();
-                if (user.id !== res.data.data.userId) {
+                if (user.id !== res.data.data.user.id) {
                     return props.history.push('/stories/details/' + storyId);
                 } else {
                     setSaveStory(false);
@@ -230,6 +232,7 @@ const CreateStoryPage = (props) => {
         setScreens([...screens]);
     }
 
+
     const handleAddActions = (screen) => {
         const newaction = {
             id: Math.random().toString(),
@@ -300,9 +303,6 @@ const CreateStoryPage = (props) => {
 
     const closeScreenPreview = () => setOpenScreenPreview(false);
 
-    const saveStoryImage = () => {
-        console.log(image);
-    }
 
     const handleDeleteStory = () => {
         setDialog({
@@ -328,8 +328,9 @@ const CreateStoryPage = (props) => {
         closeAlert();
     }
 
-    const saveStory = async () => {
+    const saveStory = async (requestCensorship) => {
         setOpenBackdrop(true);
+
         //upload image if exist
         if (FileUtils.isFileImage(image)) {
             try {
@@ -364,13 +365,16 @@ const CreateStoryPage = (props) => {
         
         storyParameters.forEach(param => {
             param.conditions.forEach((c, index) => c.myIndex = index + 1);
-        })
+        });
 
         story.screens = screens;
         story.tags = selectedTags.map(t => t.id);
         story.informations = storyParameters;
         story.informationActions = informationActions;
-
+        if(requestCensorship){
+            story.requestCensorship = true;
+            story.userNote = noteDialog.note;
+        }
 
         try {
             let res = null;
@@ -402,7 +406,6 @@ const CreateStoryPage = (props) => {
             } else {
                 setAlert({ content: 'Không thể lưu truyện', type: 'error', open: true });
             }
-
         }
         setOpenBackdrop(false);
         closeAlert();
@@ -418,12 +421,11 @@ const CreateStoryPage = (props) => {
 
     const findScreenById = (id) => screens.find(s => s.id === id);
 
-    // const screenSnapshots = screens.filter((s, index) => {
-    //     return index >= (screenSnapshotsPage.page - 1) * 10 && index < screenSnapshotsPage.page * 10;  
-    // });
-
-    // const numOfPageScreenSnapshots = Math.ceil(screens.length / 10);
-
+    const saveAndRequestCensorship = () => {
+        setNoteDialog({ ...noteDialog, open: false });
+        saveStory(true);
+    }
+ 
     return (
         <MainLayout>
 
@@ -440,6 +442,13 @@ const CreateStoryPage = (props) => {
                     return `Có thể bạn cần lưu lại những thay đổi trên câu truyện!! \nBạn có chắc muốn rời khỏi trang này hay không?`
                 }}
             />
+
+            <UserNoteDialog 
+                open={noteDialog.open}
+                onClose={() => setNoteDialog({ ...noteDialog, open: false })}
+                note={noteDialog.note}
+                onChange={(value) => setNoteDialog({ ...noteDialog, note: value })}
+                onSaveRequestCensorship={saveAndRequestCensorship} />
 
             {(!isLoadingStory && !notfoundStory && !ValidationUtils.isEmpty(story)) && (
                 <div style={{ marginBottom: '150px' }}>
@@ -545,7 +554,7 @@ const CreateStoryPage = (props) => {
                                                 <MyUploadImage/>
                                             </div>
                                         </div> */}
-                                        <div className="mb-5">
+                                        {/* <div className="mb-5">
                                             <FormControlLabel
                                                 control={<Checkbox
                                                     checked={story.published}
@@ -554,7 +563,7 @@ const CreateStoryPage = (props) => {
                                                 />}
                                                 label="Xuất bản truyện"
                                             />
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             </div>
@@ -577,23 +586,7 @@ const CreateStoryPage = (props) => {
                                     </h3>
                                     <hr style={{ border: '1px solid #ccc' }} />
 
-                                    {/* <Pagination 
-                                        count={numOfPageScreenSnapshots} 
-                                        page={screenSnapshotsPage.page}
-                                        color="primary" 
-                                        onChange={(e, value) => setScreenSnapshotsPage({ page: value })} 
-                                        size="small" />
-
-                                    <ScreenSnapshots
-                                        page={screenSnapshotsPage.page}
-                                        screens={screenSnapshots}
-                                        setCurrentScreen={(id) => {
-                                            canChangeScreenContent = false;
-                                            setCurrentScreen(findScreenById(id));
-                                        }}
-                                        currentScreen={currentScreen}
-                                        onRemoveScreen={id => handleRemoveScreen(findScreenById(id))}
-                                    /> */}
+                                 
                                     <StoryPreview
                                         firstScreenId={story.firstScreenId}
                                         setCurrentScreen={(id) => {
@@ -640,6 +633,10 @@ const CreateStoryPage = (props) => {
                         className="btn btn-warning float-right"
                         onClick={() => saveStory()}>
                         Lưu truyện</button>
+                    <button
+                        className="btn btn-warning float-right"
+                        onClick={() => setNoteDialog({ ...noteDialog, open: true })}>
+                        Lưu và đề nghị kiểm duyệt</button>
 
                     <MyAlert
                         open={alert.open}

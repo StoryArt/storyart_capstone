@@ -105,15 +105,17 @@ public class StoryController {
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
-    @GetMapping("get_by_author")//cai nay van chay dc ne, ko bi sao
+    @GetMapping("get_by_author")
     public ResponseEntity getStoriesByAuthor(
-            @RequestParam String keyword,
-            @RequestParam boolean asc,
-            @RequestParam String orderBy,
-            @RequestParam int page,
-            @RequestParam int itemsPerPage,
+//            @RequestParam String keyword,
+//            @RequestParam boolean asc,
+//            @RequestParam String orderBy,
+//            @RequestParam boolean censored,
+//            @RequestParam int page,
+//            @RequestParam int itemsPerPage,
             @CurrentUser UserPrincipal userPrincipal){
-        Page<GetStoryDto> stories = storyService.getStoriesForUser(userPrincipal.getId(), keyword, orderBy, asc, page, itemsPerPage);
+//        Page<GetStoryDto> stories = storyService.getStoriesForUser(userPrincipal.getId(), keyword, censored, orderBy, asc, page, itemsPerPage);
+        List<GetStoryDto> stories = storyService.getStoriesForUser(userPrincipal.getId());
         return new ResponseEntity(stories, HttpStatus.OK);
     }
 

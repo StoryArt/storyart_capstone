@@ -56,7 +56,7 @@ const StoryManagementPage =  (props) => {
   const [filters, setFilters] = useState({
       keyword: '',
       orderBy: ORDER_BYS.DATE,
-      asc: false,
+      asc: true,
       censorshipStatus: CENSORSHIP_STATUS.PENDING,
       page: 1,
       itemsPerPage: 10,
@@ -108,12 +108,12 @@ const StoryManagementPage =  (props) => {
     setOpenBackdrop(true);
     try {
         const res = await StoryService.getStoryForCensorship(storyId);
-
+        console.log(res);
         const { data } = res.data;
         if (ValidationUtils.isEmpty(data)) {
             // setNotfound(true);
         } else {
-            console.log(data);
+            
             setStory({ ...data });
             setOpenStoryDialog(true);
         }
@@ -181,6 +181,7 @@ const StoryManagementPage =  (props) => {
       if(index > -1) {
         stories[index].censorshipStatus = censorship.censorshipStatus;
         stories[index].adminNote = censorship.adminNote;
+        stories.splice(index, 1);
         setStories([...stories]);
       }
   }
@@ -287,7 +288,6 @@ const StoryManagementPage =  (props) => {
                     <TableCell align="center">Lượt đánh giá</TableCell>
                     <TableCell align="center">Đánh giá trung bình</TableCell>
                     <TableCell align="center">Admin ghi chú</TableCell>
-                    <TableCell align="center">Kiểm duyệt</TableCell>
                     <TableCell align="center">Trạng thái</TableCell>
                     <TableCell align="center">Tác giả</TableCell>
                     <TableCell align="center">Nhãn</TableCell>
@@ -311,11 +311,6 @@ const StoryManagementPage =  (props) => {
                       <TableCell align="center">{story.numOfRate}</TableCell>
                       <TableCell align="center">{story.avgRate}</TableCell>
                       <TableCell align="center">{story.adminNote}</TableCell>
-                      <TableCell align="center">
-                        { story.censorshipStatus == CENSORSHIP_STATUS.APPROVED && (<CheckCircleIcon color="primary"/>) }
-                        { story.censorshipStatus == CENSORSHIP_STATUS.REJECTED && (<CancelIcon color="error"/>) }
-                        { story.censorshipStatus == CENSORSHIP_STATUS.PENDING && (<PauseIcon color="action" />) }
-                      </TableCell>
                       <TableCell align="center" style={{ whiteSpace: 'nowrap' }}>
                         {story.deactiveByAdmin ? <strong className="text-danger">ĐÃ BỊ KHÓA</strong> : <strong className="text-success">CHƯA KHÓA</strong>}</TableCell>
                       <TableCell align="center">
@@ -380,7 +375,9 @@ const StoryManagementPage =  (props) => {
         changeCurrentStory={changeCurrentStory}
         story={story} 
         open={openStoryDialog} 
+        setOpenBackdrop={setOpenBackdrop}
         onClose={() => setOpenStoryDialog(false)} />
+
       <MyBackdrop open={openBackdrop} setOpen={setOpenBackdrop} />
      
     </MainLayout>

@@ -8,12 +8,11 @@ import {
 import UserService from "../../../services/user.service";
 import { UserContext } from "../../../context/user.context";
 import { getAuthUserInfo, setAuthHeader, getTokenFromLocal } from "../../../config/auth";
-import { getOrderBys, CENSORSHIP_STATUS } from '../../../common/constants';
+import { getOrderBys, CENSORSHIP_STATUS, ORDER_BYS } from '../../../common/constants';
 
 import DateTimeUtils from "../../../utils/datetime";
 import StoryService from "../../../services/story.service";
-import { FormControl, TextField, InputLabel, Select, MenuItem, TableContainer, 
-  Table, TableHead, TableRow, TableCell, TableBody, Divider, InputAdornment, Paper, IconButton, Tooltip } from "@material-ui/core";
+import { FormControl, TextField, InputLabel, Select, MenuItem, InputAdornment } from "@material-ui/core";
 import { Search as SearchIcon, DataUsage as DataUsageIcon } from '@material-ui/icons';
 import { Pagination } from '@material-ui/lab';
 import TagList from '../../../components/common/TagList';
@@ -30,9 +29,10 @@ import UserProfileHeader from './UserProfileHeader';
 import Typography from '@material-ui/core/Typography';
 import UserReadingChart from "./UserReadingChart";
 import StatisticService from '../../../services/statistic.service';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import CancelIcon from '@material-ui/icons/Cancel';
-import PauseIcon from '@material-ui/icons/Pause';
+import UserStoriesTabs from "./UserStoriesTabs";
+import UserStoriesList from "./UserStoriesList";
+import UserNoteDialog from "../create-story-page/UserNoteDialog";
+import CensorshipService from "../../../services/censorship.service";
 
 
 const orderBys = getOrderBys();
@@ -44,6 +44,8 @@ const getDateAgo = (numOfDays) => {
   return new Date(d.setDate(d.getDate() - numOfDays));
 }
 
+
+
 const UserProfilePage = (props) => {
 
   const [user, setUser] = useState({});
@@ -53,8 +55,8 @@ const UserProfilePage = (props) => {
   const [userNotfoundMessage, setUserNotfoundMessage] = useState('');
   const [stories, setStories] = useState([]);
   const [story, setStory] = useState(null);
+  const [allStories, setAllStories] = useState([]);
   const [isLoadingstories, setIsLoadingStories] = useState(false);
-  const [totalPages, setTotalPages] = useState(0);
   const [dateRange, setDateRange] = useState({ from: getDateAgo(7), to: new Date() });
   const [readingStatisticData, setReadingStatisticData] = useState([]);
   const [isLoadingreadingStatisticData, setLoadingReadingStatisticData] = useState(false);
@@ -64,10 +66,13 @@ const UserProfilePage = (props) => {
     asc: false,
     page: 1,
     itemsPerPage: 10,
+    censored: true
   });
 
   const [alert, setAlert] = useState({ content: '', type: 'success', open: false });
   const [dialog, setDialog] = useState({ content: '', open: false });
+  const [userStoryTab, setUserStoryTab] = useState(0);
+  const [noteDialog, setNoteDialog] = useState({ open: false, note: '' });
 
   useEffect(() => {
     initData();
@@ -113,9 +118,8 @@ const UserProfilePage = (props) => {
     try {
       const res = await StoryService.getStoriesByAuthor(user.id, filters);
       console.log(res);
-      const { content, totalPages } = res.data;
-      setStories(content);
-      setTotalPages(totalPages)
+      setAllStories(res.data);
+      setStories(res.data.filter(item => item.censorshipStatus == null));
     } catch (error) {
       console.log(error);
     }
@@ -150,11 +154,10 @@ const UserProfilePage = (props) => {
     if(prop === 'keyword'){
         clearTimeout(searchTimeout);
         searchTimeout = window.setTimeout(() => {
-            setFilters({ ...filters, page: 1 });
-            getStoriesByAuthor();
+          filterStories(filters);
         }, 300);
     } else {
-      getStoriesByAuthor();
+      filterStories(filters);
     }
   }
 
@@ -249,6 +252,83 @@ const UserProfilePage = (props) => {
     getReadStatistic({ ...dateRange, [prop]: value });
   }
 
+  const changeStoryTab = (value) => {
+    setUserStoryTab(value);
+    let arr = [];
+    switch(value){
+      case 0: 
+        arr = allStories.filter(s => s.censorshipStatus == null);
+        break;
+      case 1: 
+        arr = allStories.filter(s => s.censorshipStatus == CENSORSHIP_STATUS.APPROVED);
+        break;
+      case 2: 
+        arr = allStories.filter(s => s.censorshipStatus == CENSORSHIP_STATUS.PENDING);
+        break;
+      case 3: 
+        arr = allStories.filter(s => s.censorshipStatus == CENSORSHIP_STATUS.REJECTED);
+        break;
+    }
+    setStories(arr);
+  }
+
+  const filterStories = (filters) => {
+    const { keyword, orderBy, asc } = filters;
+    console.log(orderBy);
+    
+    let newStories = stories.filter(s => {
+      return s.title.toLowerCase().indexOf(keyword.toLowerCase()) > -1;
+    });
+
+    newStories.sort((a, b) => {
+      let exp = 0;
+      switch(orderBy){
+        case ORDER_BYS.DATE: 
+          exp = new Date(a.createdAt) - new Date(b.createdAt);
+          break;
+        case ORDER_BYS.AVG_RATE: exp = a.avgRate - b.avgRate; break;
+        case ORDER_BYS.READ: exp = a.numOfRead - b.numOfRead; break;
+        case ORDER_BYS.COMEMENT: exp = a.numOfComment - b.numOfComment; break;
+        case ORDER_BYS.RATING: exp = a.numOfRate - b.numOfRate;break;
+        case ORDER_BYS.SCREEN: exp = a.numOfScreen - b.numOfScreen; break;
+      }
+      return asc ? exp : -exp;
+    });
+
+    setStories([...newStories]);
+  }
+
+  const requestCensorship = async () => {
+    setOpenBackdrop(true);
+    try {
+      const res = await CensorshipService.requestCensorshipByUSser({ storyId: story.id, userNote: noteDialog.note });
+        console.log(res);
+        const { success, errors } = res.data;
+        if(success){
+            setAlert({ content: 'Cập nhật thành công', type: "success", open: true });  
+           
+            const index = allStories.findIndex(s => s.id == story.id);
+            allStories[index].censorshipStatus = CENSORSHIP_STATUS.PENDING;
+            setAllStories([...allStories]);
+            let i = stories.findIndex(s => s.id == story.id);
+            stories.splice(i, 1);
+            setStories([...stories]);
+        } else {
+            setAlert({ content: Object.values(errors), type: 'error', open: true });
+        }
+    } catch (error) {
+        console.log(error);
+        if (!ValidationUtils.isEmpty(error.response)) {
+            setAlert({ content: Object.values(error.response.data)[0], type: 'error', open: true });
+        } else {
+            setAlert({ content: 'Không thể lưu kiểm duyệt', type: 'error', open: true });
+        }
+    }
+    setNoteDialog({ ...noteDialog, open: false });
+    setOpenBackdrop(false);
+    closeAlert();
+  }
+
   return (
     <MainLayout>
       <div className="container-fluid" style={{ paddingBottom: '100px' }}>
@@ -291,62 +371,10 @@ const UserProfilePage = (props) => {
                 <h3 className="text-bold"> Truyện của bạn </h3> 
                 <hr style={{ border: "1px solid #ccc" }} /> 
                                     
-                <div className="row my-5">
-                    <div className="col-sm-3">
-                      <FormControl>
-                        <TextField
-                          // variant="outlined"
-                          style={{ width: '100%' }}
-                          label="Tìm truyện..."
-                          value={filters.keyword} 
-                          onChange={(e) => changeFilters('keyword', e.target.value)} 
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <SearchIcon />
-                                </InputAdornment>
-                              ),
-                            }}
-                          />
-                      </FormControl>
-                    </div>
-                    <div className="col-sm-3">
-                      <FormControl style={{ width: '100%' }}>
-                          <InputLabel>Sắp xếp theo</InputLabel>
-                          <Select
-                              value={filters.orderBy}
-                              onChange={(e) => changeFilters('orderBy', e.target.value)}
-                          >
-                              {orderBys.map((orderBy) => (
-                                  <MenuItem key={orderBy.value} value={orderBy.value}>
-                                      {orderBy.title}
-                                  </MenuItem>
-                              ))}
-                          </Select>
-                      </FormControl>
-                    </div>
-                    <div className="col-sm-3">
-                      <FormControl >
-                          <InputLabel>Thứ tự</InputLabel>
-                          <Select
-                              value={filters.asc}
-                              onChange={(e) => changeFilters('asc', e.target.value)}
-                          >
-                                <MenuItem value={true}>
-                                    Tăng dần
-                                </MenuItem>
-                                <MenuItem value={false}>
-                                    Giảm dần
-                                </MenuItem>
-                          </Select>
-                      </FormControl>
-                    </div>
-                  </div>
+               
                 {/* {isLoadingstories && <MySpinner/>} */}
-
-              {stories.length > 0 && (
-                  <>
-                  <div className="row my-3">
+                
+                  {/* <div className="row my-3">
                     <div className="col-12">
                       <Pagination 
                           style={{float: 'right'}}
@@ -355,118 +383,110 @@ const UserProfilePage = (props) => {
                           color="primary"
                           onChange={changePage} />
                     </div>
+                  </div> */}
+                {isLoadingstories && (
+                    <div className="text-center mb-3">
+                      <MySpinner/>
+                    </div>
+                  ) }
+                  <UserStoriesTabs
+                      value={userStoryTab}
+                      onChange={(e, value) => changeStoryTab(value)}
+                    ></UserStoriesTabs>
+
+                      <div className="row mb-5">
+                        <div className="col-12">
+                        
+  
+                        
+                        <div className="row my-5">
+                          <div className="col-sm-3">
+                            <FormControl>
+                              <TextField
+                                // variant="outlined"
+                                style={{ width: '100%' }}
+                                label="Tìm truyện..."
+                                value={filters.keyword} 
+                                onChange={(e) => changeFilters('keyword', e.target.value)} 
+                                  InputProps={{
+                                    startAdornment: (
+                                      <InputAdornment position="start">
+                                        <SearchIcon />
+                                      </InputAdornment>
+                                    ),
+                                  }}
+                                />
+                            </FormControl>
+                          </div>
+                          <div className="col-sm-3">
+                            <FormControl style={{ width: '100%' }}>
+                                <InputLabel>Sắp xếp theo</InputLabel>
+                                <Select
+                                    value={filters.orderBy}
+                                    onChange={(e) => changeFilters('orderBy', e.target.value)}
+                                >
+                                    {orderBys.map((orderBy) => (
+                                        <MenuItem key={orderBy.value} value={orderBy.value}>
+                                            {orderBy.title}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                          </div>
+                          <div className="col-sm-2">
+                            <FormControl style={{ width: '100%' }}>
+                                <InputLabel>Thứ tự</InputLabel>
+                                <Select
+                                    value={filters.asc}
+                                    onChange={(e) => changeFilters('asc', e.target.value)}
+                                >
+                                      <MenuItem value={true}>
+                                          Tăng dần
+                                      </MenuItem>
+                                      <MenuItem value={false}>
+                                          Giảm dần
+                                      </MenuItem>
+                                </Select>
+                            </FormControl>
+                          </div>
+                          <div className="col-sm-3">
+                            {/* <FormControl >
+                                <InputLabel>Kiểm duyệt</InputLabel>
+                                <Select
+                                    value={filters.censored}
+                                    onChange={(e) => changeFilters('censored', e.target.value)}
+                                >
+                                      <MenuItem value={true}>
+                                          Đã kiểm duyệt
+                                      </MenuItem>
+                                      <MenuItem value={false}>
+                                          Chờ kiểm duyệt
+                                      </MenuItem>
+                                </Select>
+                            </FormControl> */}
+                          </div>
+                    </div>
+                 
+               
+                     
+                        
+                    </div>
                   </div>
 
-                  <div className="row mb-5">
-                    <div className="col-12">
-                      {isLoadingstories && (
-                        <div className="text-center mb-3">
-                          <MySpinner/>
-                        </div>
-                      ) }
-                      <TableContainer component={Paper} >
-                        <Table>
-                          <caption>Tất cả truyện</caption>
-                          <TableHead>
-                            <TableRow>
-                              <TableCell>#</TableCell>
-                              <TableCell align="center">Tiêu đề</TableCell>
-                              <TableCell align="center">Ảnh</TableCell>
-                              <TableCell align="center">Ngày tạo</TableCell>
-                              <TableCell align="center">Số màn hình</TableCell>
-                              <TableCell align="center">Lượt đọc</TableCell>
-                              <TableCell align="center">Lượt bình luận</TableCell>
-                              <TableCell align="center">Lượt đánh giá</TableCell>
-                              <TableCell align="center">Đánh giá trung bình</TableCell>
-                              <TableCell align="center">Admin ghi chú</TableCell>
-                              <TableCell align="center">Kiểm duyệt</TableCell>
-                              <TableCell align="center">Trạng thái</TableCell>
-                              <TableCell align="center">Nhãn</TableCell>
-                              <TableCell align="center"></TableCell>
-                              <TableCell align="center"></TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                          
-                            { stories.length > 0 && stories.map((story, index) => (
-                              <TableRow key={story.id}>
-                                <TableCell align="center">{ index + 1}</TableCell>
-                                <TableCell align="center">{ story.title }</TableCell>
-                                <TableCell align="center">
-                                  <img style={{ width: '80px' }}  src={story.image}/>
-                                </TableCell>
-                                <TableCell align="center">{DateTimeUtils.getDateTime(story.createdAt)}</TableCell>
-                                <TableCell align="center">
-                                  <strong style={{ fontSize: '1.2em' }}>{story.numOfScreen}</strong>
-                                </TableCell>
-                                <TableCell align="center">
-                                  <strong style={{ fontSize: '1.2em' }}>{story.numOfRead}</strong>
-                                </TableCell>
-                                <TableCell align="center">
-                                  <strong style={{ fontSize: '1.2em' }}>{story.numOfComment}</strong>
-                                </TableCell>
-                                <TableCell align="center">
-                                  <strong style={{ fontSize: '1.2em' }}>{story.numOfRate}</strong>
-                                </TableCell>
-                                <TableCell align="center">
-                                  <strong style={{ fontSize: '1.2em' }}>{story.avgRate}</strong>
-                                </TableCell>
-                                <TableCell align="center">{story.adminNote}</TableCell>
-                                <TableCell align="center">
-                                  { story.censorshipStatus == CENSORSHIP_STATUS.APPROVED && (<CheckCircleIcon color="primary"/>) }
-                                  { story.censorshipStatus == CENSORSHIP_STATUS.REJECTED && (<CancelIcon color="error"/>) }
-                                  { story.censorshipStatus == CENSORSHIP_STATUS.PENDING && (<PauseIcon color="action" />) }
-                                </TableCell>
-                                <TableCell align="center">
-                                  {story.published ? <span className="text-success font-weight-bold">Đã xuất bản</span> : <span className="text-danger font-weight-bold">Chưa xuát bản</span>}</TableCell>
-                                <TableCell align="center">
-                                  <div style={{ maxWidth: '150px' }}>
-                                    <small>
-                                      <TagList tags={story.tags} />
-                                    </small>
-                                  </div>
-                                </TableCell>
-                                <TableCell>
-                                      <Tooltip title="Xem thống kê" style={{ display: 'inline-block' }}>
-                                        <IconButton
-                                          style={{ display: 'inline-block' }}
-                                          color="inherit"
-                                          onClick={() => { props.history.push('/story/analystics/' + story.id) }}
-                                        >
-                                          <DataUsageIcon />
-                                        </IconButton>
-                                      </Tooltip>
-                                </TableCell>
-                               
-                                <TableCell align="center">
-                                   
-                                  <MyDropdownMenu>
-                                    <MenuItem onClick={() => readStory(story)}>
-                                      Đọc truyên
-                                    </MenuItem>
-                                    <MenuItem onClick={() => editStory(story)}>
-                                      Cập nhật
-                                    </MenuItem>
-                                    <MenuItem onClick={() => changePublishedStatus(story)}>
-                                      {story.published ? 'Hủy xuất bản truyện' : 'Xuất bản truyện'}
-                                    </MenuItem>
-                                    <Divider/>
-                                    <MenuItem onClick={() => handleDeleteStory(story)}>
-                                      Xóa truyện
-                                    </MenuItem>
-                                  </MyDropdownMenu>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                            {stories.length === 0 && !isLoadingstories (<NotFound message="Không tìm thấy truyện" />)}
-                           
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    </div>
-                </div>
+                  {!isLoadingstories && (
+                      <UserStoriesList 
+                        stories={stories}
+                        readStory={readStory}
+                        changePublishedStatus={changePublishedStatus}
+                        handleDeleteStory={handleDeleteStory}
+                        editStory={editStory}
+                        onRequestCensorship={(story) => {
+                          setStory({ ...story })
+                          setNoteDialog({ ...noteDialog, open: true })
+                        }}  />
+                    )}
                               
-                  <div className="row my-3">
+                  {/* <div className="row my-3">
                     <div className="col-12">
                       <Pagination 
                           style={{float: 'right'}}
@@ -475,13 +495,7 @@ const UserProfilePage = (props) => {
                           color="primary"
                           onChange={changePage} />
                     </div>
-                  </div>
-                </>
-              )}
-              
-
-              {(!isLoadingstories && stories.length == 0) && <NotFound message="Không tìm thấy truyện nào..." />}
-              
+                  </div> */}
           </>
         )}
 
@@ -495,6 +509,13 @@ const UserProfilePage = (props) => {
           setOpenDialog={() => setDialog({ ...dialog, open: true })}
           content={dialog.content}
       />
+
+        <UserNoteDialog 
+              open={noteDialog.open}
+              onClose={() => setNoteDialog({ ...noteDialog, open: false })}
+              note={noteDialog.note}
+              onChange={(value) => setNoteDialog({ ...noteDialog, note: value })}
+              onSaveRequestCensorship={requestCensorship} />
 
       <MyBackdrop open={openBackdrop} setOpen={setOpenBackdrop}/>
 

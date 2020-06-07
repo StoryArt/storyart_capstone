@@ -10,4 +10,5 @@ public class StoryServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(StoryServiceApplication.class, args);
 	}
+
 }

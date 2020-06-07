@@ -60,9 +60,8 @@ const ReadStoryPage = (props) => {
     const [informations, setInformations] = useState([]);
     const [informationActions, setInformationActions] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [notfound, setNotfound] = useState(false);
+    const [notfound, setNotfound] = useState({ value: false, message: '' });
     const [isFullScreen, setFullScreen] = useState(false);
-    const [isPublished, setPublished] = useState(true);
     const [openBackdrop, setOpenBackdrop] = useState(false);
 
     const [currentScreen, setCurrentScreen] = useState({});
@@ -95,7 +94,7 @@ const ReadStoryPage = (props) => {
         return () => {
             window.onbeforeunload = null;
            
-            if (!notfound) {
+            if (!notfound.value) {
                 saveHistoryBeforeLeavePage();
             }
         };
@@ -225,24 +224,19 @@ const ReadStoryPage = (props) => {
         setOpenBackdrop(true);
         try {
             const res = await StoryService.getReadingStory(storyId);
-
+            console.log(res);
             const { data } = res.data;
             if (ValidationUtils.isEmpty(data)) {
-                setNotfound(true);
+                setNotfound({ value: true, message: Object.values(res.data.errors)[0] });
             } else {
-                console.log(data);
-                if (!data.published) {
-                    setPublished(false);
-                } else {
-                    setScreens(data.screens);
-                    screenList = [...data.screens];
-                    setInformations(data.informations);
-                    initialInformations = JSON.parse(JSON.stringify(data.informations));
+                setScreens(data.screens);
+                screenList = [...data.screens];
+                setInformations(data.informations);
+                initialInformations = JSON.parse(JSON.stringify(data.informations));
 
-                    setInformationActions(data.informationActions);
+                setInformationActions(data.informationActions);
 
-                    setStory({ ...data, screens: null, informations: null, informationActions: null });
-                }
+                setStory({ ...data, screens: null, informations: null, informationActions: null });
             }
         } catch (error) {
             console.log(error);
@@ -360,11 +354,10 @@ const ReadStoryPage = (props) => {
                 content={dialog.content}
             />
 
-            {notfound && (<NotFound message={'Không tìm tháy truyện này'} />)}
+            {notfound.value && (<NotFound message={notfound.message} />)}
 
-            {!isPublished && (<NotFound message={'Truyện này chưa được xuất bản! Vui lòng quay lại sau'} />)}
 
-            {(!isLoading && !notfound && isPublished && !ValidationUtils.isEmpty(story)) && (
+            {(!isLoading && !notfound.value && !ValidationUtils.isEmpty(story)) && (
                 //  <Fullscreen
                 //     enabled={isFullScreen}
                 //     onChange={isFull => setFullScreen(isFull)}

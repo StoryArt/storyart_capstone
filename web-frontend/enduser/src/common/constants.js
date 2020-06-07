@@ -131,9 +131,9 @@ export const CENSORSHIP_STATUS = {
 
 export const getCensorshipStatus = () => {
     return [
-        { value: CENSORSHIP_STATUS.APPROVED, title: 'Đã được kiểm duyệt'},
-        { value: CENSORSHIP_STATUS.PENDING, title: 'Chờ kiểm duyệt' },
-        { value: CENSORSHIP_STATUS.REJECTED, title: 'Kiểm duyệt thất bại' },
+        { value: CENSORSHIP_STATUS.APPROVED, title: 'Chấp thuận kiểm duyệt', text: 'Kiểm duyệt OK!'},
+        { value: CENSORSHIP_STATUS.PENDING, title: 'Xem xét kiểm duyệt' },
+        { value: CENSORSHIP_STATUS.REJECTED, title: 'Từ chối kiểm duyệt', text: 'Nội dung không phù hợp, cần chỉnh sửa lại!' },
     ]
 }
 

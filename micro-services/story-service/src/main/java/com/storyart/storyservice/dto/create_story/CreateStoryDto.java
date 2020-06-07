@@ -1,5 +1,6 @@
 package com.storyart.storyservice.dto.create_story;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.storyart.storyservice.common.constants.ANIMATION_TYPES;
 import lombok.*;
 
@@ -15,6 +16,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties
 public class CreateStoryDto implements Serializable {
 
     private int id;
@@ -39,6 +41,10 @@ public class CreateStoryDto implements Serializable {
     private String firstScreenId;
 
     private boolean published;
+
+    private boolean requestCensorship;
+    @Size(max = 1000, message = "Ghi chú không quá 1000 kí tự")
+    private String userNote;
 
     @Valid
     private List<CreateStoryScreenDto> screens;

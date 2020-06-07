@@ -1,9 +1,6 @@
 package com.storyart.storyservice.dto.read_story;
 
-import com.storyart.storyservice.model.Information;
-import com.storyart.storyservice.model.InformationAction;
-import com.storyart.storyservice.model.Screen;
-import com.storyart.storyservice.model.User;
+import com.storyart.storyservice.model.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,4 +32,5 @@ public class ReadStoryDto {
     private List<ReadStoryTagDto> tags;
     private List<ReadStoryInformationDto> informations;
     private List<InformationAction> informationActions;
+    private List<Censorship> censorships;
 }

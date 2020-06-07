@@ -51,10 +51,7 @@ public class Story extends DateAudit {
 
     @Column(columnDefinition="tinyint(1) default 0")
     private boolean deactiveByAdmin;
-
-
     private String censorshipStatus;
-    private String adminNote;
 
     private Date createdAt;
 

@@ -13,6 +13,8 @@ import StoryViewTabs from './StoryViewTabs';
 import TagList from '../../../components/common/TagList';
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
 import StoryService from '../../../services/story.service';
+import CensorshipService from '../../../services/censorship.service';
+import CensorshipHistory from './CensorshipHistory';
 
 
 const styles = theme => ({
@@ -86,15 +88,15 @@ const censorShips = getCensorshipStatus();
 
 const StoryView = (props) => {
 
-    const { open, onClose, story, changeCurrentStory, setAlert } = props;
+    const { open, onClose, story, changeCurrentStory, setAlert, setOpenBackdrop } = props;
     const classes = withStyles(styles);
 
     useEffect(() => {
         if(!ValidationUtils.isEmpty(story)){
             changeCurrentScreen(story.firstScreenId);
             setCensorship({ 
-                adminNote: story.adminNote, 
-                censorshipStatus: story.censorshipStatus, 
+                adminNote: '', 
+                censorshipStatus: story.censorshipStatus === CENSORSHIP_STATUS.PENDING ? CENSORSHIP_STATUS.APPROVED : story.censorshipStatus, 
                 storyId: story.id 
             })
         }
@@ -137,13 +139,16 @@ const StoryView = (props) => {
 
     const changeCensorship = (prop, value) => {
         setCensorship({ ...censorShip, [prop]: value });
+        if(prop === 'censorshipStatus'){
+           
+        }
     }
 
-    const saveCensorship = async (e) => {
+    const handleCensorshipByAdmin = async (e) => {
         e.preventDefault();
-        console.log(censorShip);
+        setOpenBackdrop(true);
         try {
-            const res = await StoryService.saveCensorship(censorShip);
+            const res = await CensorshipService.handleCensorshipByAdmin(censorShip);
             console.log(res);
             const { success, errors } = res.data;
             if(success){
@@ -161,7 +166,7 @@ const StoryView = (props) => {
                 setAlert({ content: 'Không thể lưu kiểm duyệt', type: 'error', open: true });
             }
         }
-
+        setOpenBackdrop(false);
         closeAlert();
     }
 
@@ -182,12 +187,12 @@ const StoryView = (props) => {
                       dividers>
                        {!ValidationUtils.isEmpty(story) && (
                            
-                           <StoryViewTabs
+                            <StoryViewTabs
                                 value={storyTab}
                                 onChange={(e, value) => setStoryTab(value)}
                             >
                                 {storyTab === 0 && (
-                                   <div className="container">
+                                   <div className="container-fluid">
                                        <div className="row">
                                             <div className="col-sm-4">
                                                 <img src={story.image} className="img-fluid" />
@@ -247,10 +252,6 @@ const StoryView = (props) => {
                                             </div>
                                     
                                        </div>
-                                   </div>
-                                )}
-                                {storyTab === 1 && (
-                                    <div className="container-fluid">
                                         <div className="row my-5">
                                             <div className="col-sm-5">
                                                 <StoryPreview 
@@ -286,64 +287,76 @@ const StoryView = (props) => {
                                                     </Paper>
                                                 )}
                                             </div>
-                                        
                                         </div>
-                                    </div>
+                                   </div>
                                 )}
                                 
-                                {storyTab === 2 && (
-                                     <Container component="main" maxWidth="xs">
-                                     <CssBaseline />
-                                     <div className={classes.paper}>
-                                       <Avatar className={classes.avatar}>
-                                         <SupervisorAccountIcon />
-                                       </Avatar>
-                                        <Typography component="h1" variant="h5">
-                                            Bản Kiểm Duyệt
-                                        </Typography>
-                                       <form className={classes.form} noValidate onSubmit={saveCensorship}>
+                                {storyTab === 1 && (
+                                   <div>
+                                        <Container component="main" maxWidth="xs">
+                                        <CssBaseline />
+                                        <div className={classes.paper}>
+                                        <Avatar className={classes.avatar}>
+                                            <SupervisorAccountIcon />
+                                        </Avatar>
+                                            <Typography component="h1" variant="h5">
+                                                Kiểm Duyệt
+                                            </Typography>
+                                        <form className={classes.form} noValidate 
+                                            onSubmit={handleCensorshipByAdmin}>
 
-                                            <FormControl variant="outlined" style={{ width: '100%', marginTop: '20px' }}>
-                                                <InputLabel>Trạng thái kiểm duyệt</InputLabel>
-                                                <Select
-                                                    value={censorShip.censorshipStatus}
-                                                    onChange={(e) => changeCensorship('censorshipStatus', e.target.value)}
-                                                >
-                                                    {censorShips.map((censorship) => (
-                                                        <MenuItem key={censorship.value} value={censorship.value}>
-                                                            {censorship.title}
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
+                                                <FormControl variant="outlined" style={{ width: '100%', marginTop: '20px' }}>
+                                                    <InputLabel>Trạng thái kiểm duyệt</InputLabel>
+                                                    <Select
+                                                        value={censorShip.censorshipStatus}
+                                                        onChange={(e) => changeCensorship('censorshipStatus', e.target.value)}
+                                                    >
+                                                        {censorShips.map((censorship) => {
+                                                            return censorship.value !== CENSORSHIP_STATUS.PENDING ? (
+                                                                <MenuItem 
+                                                                    key={censorship.value} 
+                                                                    value={censorship.value}>
+                                                                    {censorship.title}
+                                                                </MenuItem>
+                                                            ) : null
+                                                        })}
+                                                    </Select>
+                                                </FormControl>
+                                            
+                                                <TextField
+                                                    variant="outlined"
+                                                    margin="normal"
+                                                    style={{ marginTop: '20px', marginBottom: '20px' }}
+                                                    multiline={true}
+                                                    rows={2}
+                                                    fullWidth
+                                                    value={censorShip.adminNote}
+                                                    label="Admin note"
+                                                    onChange={e => changeCensorship("adminNote", e.target.value)}
+                                                    autoFocus
+                                                />
+
                                         
-                                            <TextField
-                                                variant="outlined"
-                                                margin="normal"
-                                                style={{ marginTop: '20px', marginBottom: '20px' }}
-                                                multiline={true}
-                                                rows={2}
-                                                fullWidth
-                                                value={censorShip.adminNote}
-                                                label="Admin note"
-                                                onChange={e => changeCensorship("adminNote", e.target.value)}
-                                                autoFocus
-                                            />
-
-                                       
-                                            <Button
-                                                type="submit"
-                                                fullWidth
-                                                variant="contained"
-                                                color="primary"
-                                                className={classes.submit}
-                                            >
-                                             Lưu
-                                            </Button>
-                                       </form>
-                                    
-                                     </div>
-                                   </Container>
+                                                <Button
+                                                    type="submit"
+                                                    fullWidth
+                                                    variant="contained"
+                                                    color="primary"
+                                                    className={classes.submit}
+                                                >
+                                                Lưu
+                                                </Button>
+                                        </form>
+                                        
+                                        </div>
+                                    </Container>
+                                        <div className="container mt-5">
+                                        
+                                            <div className="col-sm-8 mx-auto">
+                                                <CensorshipHistory censorships={story.censorships} />
+                                            </div>
+                                        </div>
+                                   </div>
                                 )}
                             </StoryViewTabs>
                           

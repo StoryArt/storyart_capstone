@@ -44,12 +44,12 @@ class StoryService {
 
   static async getStoriesByAuthor(
     userId,
-    { orderBy, asc, keyword, page, itemsPerPage }
+    { orderBy, asc, keyword, page, itemsPerPage, censored }
   ) {
     const url =
       baseUrl +
       "/get_by_author" +
-      `?orderBy=${orderBy}&asc=${asc}&keyword=${keyword}&page=${page}&itemsPerPage=${itemsPerPage}`;
+      `?orderBy=${orderBy}&asc=${asc}&keyword=${keyword}&page=${page}&itemsPerPage=${itemsPerPage}$censored=${censored}`;
     return axios.get(url);
   }
 
@@ -131,7 +131,7 @@ class StoryService {
     return axios.delete(url);
   }
 
-  static async saveCensorship(censorship) {
+  static async handleCensorshipByAdmin(censorship) {
     const url = baseUrl + "/censorship";
     return axios.put(url, censorship);
   }
