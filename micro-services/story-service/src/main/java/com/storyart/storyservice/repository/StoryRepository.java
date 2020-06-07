@@ -160,7 +160,9 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
     @Query(value = "select * from storyart_db.story where story.id in (:storyIds) and story.published = '1' and story.active ='1' and story.deactive_by_admin ='0'", nativeQuery = true)
     Page<Story> findAllByStoryIds(@Param("storyIds") List<Integer> storyIds, Pageable pageable);
 
-    @Query(value = "SELECT * FROM story s where s.user_id = ?1 order by s.created_at desc", nativeQuery = true)
+    @Query(value = "SELECT * FROM story s where s.user_id = ?1 " +
+            "and s.active = true and s.deactive_by_admin = false " +
+            "order by s.created_at desc", nativeQuery = true)
     List<Story> findAllByUserId(int userId);
 
    //ta: use for get comment
