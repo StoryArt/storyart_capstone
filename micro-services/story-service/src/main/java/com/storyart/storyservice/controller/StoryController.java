@@ -74,6 +74,7 @@ public class StoryController {
     }
 
     @GetMapping("rate/{storyId}")
+    @Secured({"ROLE_USER"})
     public ResponseEntity getRating(@CurrentUser UserPrincipal user, @PathVariable int storyId){
         Rating rating = storyService.getRatingByStoryAndUser(storyId, user.getId());
         return new ResponseEntity(rating, HttpStatus.OK);
@@ -81,6 +82,7 @@ public class StoryController {
 
 
     @PutMapping("rate")
+    @Secured({"ROLE_USER"})
     public ResponseEntity rateStory(@RequestParam int storyId,
                                     @RequestParam double stars,
                                     @CurrentUser UserPrincipal userPrincipal){
@@ -89,23 +91,25 @@ public class StoryController {
     }
 
     @DeleteMapping("{storyId}")
+    @Secured({"ROLE_USER"})
     public ResponseEntity deleteStory(@PathVariable int storyId, @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.changeStoryStatusByUser(storyId, userPrincipal.getId());
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
     @PutMapping("change_published")
+    @Secured({"ROLE_USER"})
 //    @PreAuthorize("hasAuthority('ROLE_USER')")
     public ResponseEntity changePublishedStory(
             @RequestParam int storyId,
             @RequestParam boolean turnOnPublished,
             @CurrentUser UserPrincipal userPrincipal){
-        System.out.println("change_publsihed");
         ResultDto result = storyService.changePublishedStatus(storyId, userPrincipal.getId(), turnOnPublished);
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
     @GetMapping("get_by_author")
+    @Secured({"ROLE_USER"})
     public ResponseEntity getStoriesByAuthor(
 //            @RequestParam String keyword,
 //            @RequestParam boolean asc,
@@ -164,6 +168,7 @@ public class StoryController {
     }
 
     @PostMapping("")
+    @Secured({"ROLE_USER"})
     public ResponseEntity addStory(@Valid @RequestBody CreateStoryDto story,
                                    @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.createStory(story, userPrincipal.getId());
@@ -177,6 +182,7 @@ public class StoryController {
     }
 
     @PutMapping("")
+    @Secured({"ROLE_USER"})
     public ResponseEntity updateStory(@Valid @RequestBody CreateStoryDto story, @CurrentUser UserPrincipal userPrincipal){
         ResultDto result = storyService.updateStory(story, userPrincipal.getId());
         return new ResponseEntity(result, HttpStatus.OK);

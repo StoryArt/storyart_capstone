@@ -331,7 +331,7 @@ class StoryServiceImpl implements StoryService {
             result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
         } else if (!story.isPublished()){
             result.getErrors().put("NOT_FOUND", "Truyện này chưa xuất bản");
-        } else if (!story.getCensorshipStatus().equals(CensorshipStatus.APPROVED)){
+        } else if (!CensorshipStatus.APPROVED.equals(story.getCensorshipStatus())){
             result.getErrors().put("NOT_FOUND", "Truyện này chưa được kiểm duyệt");
         }
 

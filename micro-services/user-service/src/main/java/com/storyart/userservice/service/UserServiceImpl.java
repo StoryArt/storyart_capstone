@@ -224,6 +224,7 @@ public class UserServiceImpl implements UserService {
         Optional<Role> role = roleRepository.findRoleByName(RoleName.ROLE_SYSTEM_ADMIN);
         user.setRoleId(role.get().getId());
         create(user);
+        System.out.println("sysadmin created");
     }
 
     @Override

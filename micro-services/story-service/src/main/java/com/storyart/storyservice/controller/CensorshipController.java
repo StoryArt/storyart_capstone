@@ -55,7 +55,7 @@ public class CensorshipController {
     }
 
     @PostMapping("")
-//    @Secured({"ROLE_USER"})
+    @Secured({"ROLE_USER"})
     public ResponseEntity requestCensorship(@Valid @RequestBody RequestCensorshipDto censorshipDto){
         ResultDto result = censorshipService.requestCensorship(censorshipDto);
         return new ResponseEntity(result, HttpStatus.OK);

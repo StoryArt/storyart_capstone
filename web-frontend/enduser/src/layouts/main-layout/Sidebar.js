@@ -165,7 +165,7 @@ const Sidebar = (props) => {
         <Divider />
 
         {/* auth user routes navigation */}
-        {(!isRouteAdmin && (isUserAuth(user) || isSysAdminAuth(user) || isAdminAuth(user))) && (
+        {(!isRouteAdmin && isUserAuth(user)) && (
             <List>
              <ListItem 
                button 

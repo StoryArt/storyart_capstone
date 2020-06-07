@@ -19,22 +19,23 @@ import MySpinner from '../../../components/common/MySpinner';
 import TagList from '../../../components/common/TagList';
 import StringUtils from '../../../utils/string';
 
-import { getAuthUserInfo } from '../../../config/auth';
+import { getAuthUserInfo, isUserAuth } from '../../../config/auth';
 import MyRating from '../../../components/common/MyRating';
 import MyAlert from '../../../components/common/MyAlert';
 import SocialShare from '../../../components/common/SocialShare';
 import { TextField, Paper } from '@material-ui/core';
+import { ROLE_NAMES, ADMIN_ACCESS_ERRORS } from '../../../common/constants';
 
 const StoryDetailsPage = (props) => {
 
     const userInfo = getAuthUserInfo();
+    console.log(userInfo);
 
     const [story, setStory] = useState({});
-    const [storyNotfound, setStoryNotfound] = useState(false);
+    const [storyNotfound, setStoryNotfound] = useState({ message: '', value: false });
     const [isLoadingStory, setIsLoadingStory] = useState(false);
     const [alert, setAlert] = useState({ open: false, type: 'success', content: '' })
     const [rating, setRating] = useState({})
-    const [userIsDeactivated, setUserIsDeactivated] = useState(false);
     const [isSendingComment, setIsSendingComment] = useState(false);
     const [isSendingReaction, setIsSendingReaction] = useState(false);
     const [isSendingReport, setIsSendingReport] = useState(false);
@@ -96,6 +97,7 @@ const StoryDetailsPage = (props) => {
     //const closeAlert = () => window.setTimeout(() => setAlert({ ...alert, open: false }), 3000);
 
     const [isLastPage, setIsLastPage] = useState(true);
+    const [reportStoryContent, setReportStoryContent] = useState('');
 
     useEffect(() => {
         getComments();
@@ -417,12 +419,8 @@ const StoryDetailsPage = (props) => {
             const res = await StoryService.getStoryDetails(storyId);
             console.log(res);
             const { data, success } = res.data;
-            if (ValidationUtils.isEmpty(data)) {
-                setStoryNotfound(true);
-            } else if (!success && !ValidationUtils.isEmpty(data)) {
-                setStoryNotfound(true);
-            } else if (data.user.deactiveByAdmin) {
-                setUserIsDeactivated(true);
+            if (!success) {
+                setStoryNotfound({ value: true, message: Object.values(res.data.errors)[0] });
             } else {
                 setStory(data);
                 if (!ValidationUtils.isEmpty(userInfo)) {
@@ -434,8 +432,6 @@ const StoryDetailsPage = (props) => {
         }
         setIsLoadingStory(false);
     }
-
-    const [reportStoryContent, setReportStoryContent] = useState('');
 
     const reportStory = async () => {
         try {
@@ -466,6 +462,11 @@ const StoryDetailsPage = (props) => {
     }
 
     const getRatingByStoryAndUser = async (storyId) => {
+        // check role
+        if(!isUserAuth(userInfo)){
+            return;
+        }
+
         try {
             const res = await StoryService.getRatingByStoryAndUser(storyId);
             console.log(res);
@@ -477,6 +478,11 @@ const StoryDetailsPage = (props) => {
 
     const rateStory = async (stars) => {
         if (ValidationUtils.isEmpty(userInfo)) return;
+        
+        if(!isUserAuth(userInfo)){
+            return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true  });
+        }
+        
         if (ValidationUtils.isEmpty(stars)) return;
         try {
             const res = await StoryService.rateStory(story.id, stars);
@@ -513,7 +519,7 @@ const StoryDetailsPage = (props) => {
             <div className="container-fluid">
                 {isLoadingStory && (<MySpinner />)}
 
-                {(!storyNotfound && !isLoadingStory && !ValidationUtils.isEmpty(story) && !userIsDeactivated) && (
+                {(!storyNotfound.value && !isLoadingStory && !ValidationUtils.isEmpty(story)) && (
                     <>
                         <div className="row">
                             <div className="col-sm-3">
@@ -790,8 +796,7 @@ const StoryDetailsPage = (props) => {
                     </>
 
                 )}
-                {storyNotfound && <NotFound message="Không tìm thấy câu truyện này" />}
-                {userIsDeactivated && <NotFound message="Không tìm thấy câu truyện này" />}
+                {storyNotfound.value && <NotFound message={storyNotfound.message} />}
                 <MyAlert
                     open={alert.open}
                     setOpen={(open) => setAlert({ ...alert, open: open })}

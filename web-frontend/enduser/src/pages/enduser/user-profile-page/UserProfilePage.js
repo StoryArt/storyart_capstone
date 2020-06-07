@@ -7,7 +7,7 @@ import {
 
 import UserService from "../../../services/user.service";
 import { UserContext } from "../../../context/user.context";
-import { getAuthUserInfo, setAuthHeader, getTokenFromLocal } from "../../../config/auth";
+import { getAuthUserInfo, setAuthHeader, getTokenFromLocal, isUserAuth } from "../../../config/auth";
 import { getOrderBys, CENSORSHIP_STATUS, ORDER_BYS } from '../../../common/constants';
 
 import DateTimeUtils from "../../../utils/datetime";
@@ -45,8 +45,6 @@ const getDateAgo = (numOfDays) => {
   return new Date(d.setDate(d.getDate() - numOfDays));
 }
 
-
-
 const UserProfilePage = (props) => {
 
   const [user, setUser] = useState({});
@@ -74,6 +72,7 @@ const UserProfilePage = (props) => {
   const [dialog, setDialog] = useState({ content: '', open: false });
   const [userStoryTab, setUserStoryTab] = useState(0);
   const [noteDialog, setNoteDialog] = useState({ open: false, note: '' });
+  const userInfo = getAuthUserInfo();
 
   useEffect(() => {
     initData();
@@ -81,7 +80,8 @@ const UserProfilePage = (props) => {
 
   const initData = async () => {
     await getUserInfo();
-    if (!userNotfound) {
+    
+    if (!userNotfound && isUserAuth(userInfo)) {
       getStoriesByAuthor();
       // getReadStatistic();
     }
@@ -375,7 +375,9 @@ const UserProfilePage = (props) => {
                     />
                   </div>
                 </div> */}
-
+            {isUserAuth(userInfo) && (
+              <div>
+                
                 <h3 className="text-bold"> Truyện của bạn </h3> 
                 <hr style={{ border: "1px solid #ccc" }} /> 
                                     
@@ -490,6 +492,8 @@ const UserProfilePage = (props) => {
                           onChange={changePage} />
                     </div>
                   </div> */}
+              </div>
+            )}
 
           </>
         )}

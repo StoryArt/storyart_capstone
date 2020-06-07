@@ -142,3 +142,5 @@ export const getCensorshipTitle = (value) => {
     const found = arr.find(item => item.value === value);
     return found != null ? found.title : '';
 }
+
+export const ADMIN_ACCESS_ERRORS = 'Quản trị viên không thể thực hiện tính năng của người dùng!';

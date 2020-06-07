@@ -50,13 +50,17 @@ const PrivateRoute = ({ component: Component, roleNames, location, ...rest }) =>
             render={props => {
                 if((isAdminRoute && adminAuth) 
                 || (isSysAdminRoute && sysAdminAuth) 
-                || (isUserRoute && (userAuth || adminAuth || sysAdminAuth))){
+                || (isUserRoute && userAuth)){
                     return <Component {...props} />
                 } else if((isAdminRoute && !adminAuth) 
                 || (isSysAdminRoute && !sysAdminAuth)) {
                     return <Redirect to="/login" />
                 } else if((isUserRoute && (!userAuth && !adminAuth && !sysAdminAuth))){
                     return <Redirect to="/home" />;
+                } else if(isUserRoute && adminAuth){
+                    return <Redirect to="/admin" />;
+                } else if(isUserRoute && sysAdminAuth){
+                    return <Redirect to="/sysadmin" />;
                 }
             }}
         />

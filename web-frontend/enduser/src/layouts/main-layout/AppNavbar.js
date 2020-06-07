@@ -17,6 +17,7 @@ import {
 
 import UserService from '../../services/user.service';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
+import { ROLE_NAMES } from '../../common/constants';
 
 const drawerWidth = 240;
 
@@ -179,7 +180,15 @@ const AppNavbar = (props) => {
           {(isUserAuth(user) || isAdminAuth(user) || isSysAdminAuth(user)) && (
             <>
               <Button
-                onClick={() => { navigateRoute('/user/my-profile') }}
+                onClick={() => { 
+                  if(user.role == ROLE_NAMES.ROLE_USER){
+                    navigateRoute('/user/my-profile') 
+                  } else if(user.role == ROLE_NAMES.ROLE_ADMIN){
+                    navigateRoute('/admin/my-profile')
+                  } else if(user.role == ROLE_NAMES.ROLE_SYSTEM_ADMIN){
+                    navigateRoute('/sysadmin/my-profile')
+                  }
+                }}
                 color="inherit">{user.username}</Button>
               <div>
                 <IconButton

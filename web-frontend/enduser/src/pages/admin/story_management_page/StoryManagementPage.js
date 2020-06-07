@@ -287,7 +287,6 @@ const StoryManagementPage =  (props) => {
                     <TableCell align="center">Lượt bình luận</TableCell>
                     <TableCell align="center">Lượt đánh giá</TableCell>
                     <TableCell align="center">Đánh giá trung bình</TableCell>
-                    <TableCell align="center">Admin ghi chú</TableCell>
                     <TableCell align="center">Trạng thái</TableCell>
                     <TableCell align="center">Tác giả</TableCell>
                     <TableCell align="center">Nhãn</TableCell>
@@ -310,7 +309,6 @@ const StoryManagementPage =  (props) => {
                       <TableCell align="center">{story.numOfComment}</TableCell>
                       <TableCell align="center">{story.numOfRate}</TableCell>
                       <TableCell align="center">{story.avgRate}</TableCell>
-                      <TableCell align="center">{story.adminNote}</TableCell>
                       <TableCell align="center" style={{ whiteSpace: 'nowrap' }}>
                         {story.deactiveByAdmin ? <strong className="text-danger">ĐÃ BỊ KHÓA</strong> : <strong className="text-success">CHƯA KHÓA</strong>}</TableCell>
                       <TableCell align="center">
