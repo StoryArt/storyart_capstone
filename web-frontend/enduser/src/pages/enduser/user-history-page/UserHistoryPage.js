@@ -9,11 +9,12 @@ import CommentService from '../../../services/comment.service';
 import ReactionService from '../../../services/reaction.service';
 import ReadingHistoryService from '../../../services/reading_history.service';
 import moment from 'moment';
-import { getAuthUserInfo } from '../../../config/auth';
+import { getAuthUserInfo, isUserAuth } from '../../../config/auth';
 import StringUtils from '../../../utils/string';
 import MySpinner from '../../../components/common/MySpinner';
 
 import MyAlert from '../../../components/common/MyAlert';
+import { ROLE_NAMES, ADMIN_ACCESS_ERRORS } from '../../../common/constants';
 
 
 const UserHistoryPage = () => {
@@ -54,6 +55,9 @@ const UserHistoryPage = () => {
 
     const getReadingHistory = async () => {
         if (userInfo !== null) {
+            if (!isUserAuth(userInfo)) {
+                return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true });
+            }
             setHistoryLoading(true);
             try {
                 var array = [...histories];
@@ -82,6 +86,9 @@ const UserHistoryPage = () => {
 
     const deleteComment = async () => {
         if (userInfo !== null) {
+            if (!isUserAuth(userInfo)) {
+                return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true });
+            }
             try {
                 var deleteComment = { ...deleteRequest };
                 deleteComment.userId = userInfo.id;
@@ -110,6 +117,9 @@ const UserHistoryPage = () => {
 
     const deleteReaction = async () => {
         if (userInfo !== null) {
+            if (!isUserAuth(userInfo)) {
+                return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true });
+            }
             try {
                 var deleteReact = { ...deleteRequest };
                 deleteReact.userId = userInfo.id;
@@ -137,6 +147,9 @@ const UserHistoryPage = () => {
 
     const updateComment = async () => {
         if (userInfo !== null) {
+            if (!isUserAuth(userInfo)) {
+                return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true });
+            }
             try {
                 var updateComment = { ...updateCommentRequest };
                 updateComment.userId = userInfo.id;
@@ -182,6 +195,9 @@ const UserHistoryPage = () => {
     const [isLastCommentPage, setIsLastCommentPage] = useState(true);
     const getCommentHistory = async () => {
         if (userInfo !== null) {
+            if (!isUserAuth(userInfo)) {
+                return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true });
+            }
             try {
                 var array = [...comments];
                 if (array.length > 1) {
@@ -209,6 +225,9 @@ const UserHistoryPage = () => {
     const [isLastReactionPage, setIsLastReactionPage] = useState(true);
     const getReactionHistory = async () => {
         if (userInfo !== null) {
+            if (!isUserAuth(userInfo)) {
+                return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true });
+            }
             try {
                 var array = [...reactions];
                 if (array.length > 1) {

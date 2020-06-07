@@ -96,7 +96,7 @@ const ReportManagementPage = () => {
       row["authorName"] = element["authorName"];
 
       row["storyName"] = <Link target="_blank"
-        to={`/stories/details/${element["storyId"]}`}>
+        to={`/stories/read/${element["storyId"]}`}>
         {element["storyName"]}
       </Link>;
       row["numberOfReports"] = element["reportIds"].length;
@@ -824,7 +824,7 @@ const ReportManagementPage = () => {
               <p>Tác giả: <strong>{reportContent.authorName}</strong></p>
               <p>Tên truyện: "
                 <Link target="_blank"
-                  to={`/stories/details/${reportContent.storyId}`}>
+                  to={`/stories/read/${reportContent.storyId}`}>
                   <strong>{reportContent.storyName}</strong>"
                 </Link>
               </p>

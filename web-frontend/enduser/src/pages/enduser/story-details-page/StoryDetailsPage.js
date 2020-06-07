@@ -113,6 +113,10 @@ const StoryDetailsPage = (props) => {
 
 
     const updateComment = async () => {
+        if (!isUserAuth(userInfo)) {
+            setIsUpdatingComment(false);
+            return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true });
+        }
         try {
             var updateComment = { ...updateCommentRequest };
             updateComment.userId = userInfo.id;
@@ -204,6 +208,10 @@ const StoryDetailsPage = (props) => {
     }
 
     const deleteComment = async () => {
+        if (!isUserAuth(userInfo)) {
+            setIsDeletingComment(false);
+            return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true });
+        }
         try {
             var deleteComment = { ...deleteRequest };
             deleteComment.userId = userInfo.id;
@@ -232,11 +240,16 @@ const StoryDetailsPage = (props) => {
 
     const sendComment = async () => {
         if (userId === 0) {
-            setAlert({
+            setIsSendingComment(false);
+            return setAlert({
                 content: 'Vui lòng đăng nhập để sử dụng tính năng này',
                 type: 'error',
                 open: true
             });
+        }
+        if (!isUserAuth(userInfo)) {
+            setIsSendingComment(false);
+            return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true });
         }
         else {
             try {
@@ -304,6 +317,10 @@ const StoryDetailsPage = (props) => {
     }
 
     const reportComment = async () => {
+        if (!isUserAuth(userInfo)) {
+            setIsSendingReport(false);
+            return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true });
+        }
         try {
             var reportComment = { ...reportCommentRequest };
             reportComment.userId = userInfo.id;
@@ -333,11 +350,16 @@ const StoryDetailsPage = (props) => {
             return;
         }
         if (userInfo === null) {
-            setAlert({
+            setIsSendingReaction(false);
+            return setAlert({
                 content: 'Vui lòng đăng nhập để sử dụng tính năng này',
                 type: 'error',
                 open: true
             });
+        }
+        if (!isUserAuth(userInfo)) {
+            setIsSendingReaction(false);
+            return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true });
         }
         else {
             try {
@@ -376,11 +398,16 @@ const StoryDetailsPage = (props) => {
             return;
         }
         if (userInfo === null) {
-            setAlert({
+            setIsSendingReaction(false);
+            return setAlert({
                 content: 'Vui lòng đăng nhập để sử dụng tính năng này',
                 type: 'error',
                 open: true
             });
+        }
+        if (!isUserAuth(userInfo)) {
+            setIsSendingReaction(false);
+            return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true });
         }
         else {
             try {
@@ -434,6 +461,10 @@ const StoryDetailsPage = (props) => {
     }
 
     const reportStory = async () => {
+        if (!isUserAuth(userInfo)) {
+            setIsSendingReport(false);
+            return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true });
+        }
         try {
             const { storyId } = props.match.params;
             var request = {
@@ -463,7 +494,7 @@ const StoryDetailsPage = (props) => {
 
     const getRatingByStoryAndUser = async (storyId) => {
         // check role
-        if(!isUserAuth(userInfo)){
+        if (!isUserAuth(userInfo)) {
             return;
         }
 
@@ -478,11 +509,11 @@ const StoryDetailsPage = (props) => {
 
     const rateStory = async (stars) => {
         if (ValidationUtils.isEmpty(userInfo)) return;
-        
-        if(!isUserAuth(userInfo)){
-            return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true  });
+
+        if (!isUserAuth(userInfo)) {
+            return setAlert({ content: ADMIN_ACCESS_ERRORS, type: 'error', open: true });
         }
-        
+
         if (ValidationUtils.isEmpty(stars)) return;
         try {
             const res = await StoryService.rateStory(story.id, stars);
@@ -581,7 +612,7 @@ const StoryDetailsPage = (props) => {
                                         onChange={(value) => rateStory(value)}
                                         value={ValidationUtils.isEmpty(rating) ? 0 : rating.stars} />
                                 </div>
-                                <form onSubmit={e => { e.preventDefault(); sendComment(); { userId !== 0 && setIsSendingComment(true) } }}>
+                                <form onSubmit={e => { e.preventDefault(); sendComment(); { userId !== 0 && setIsSendingComment(true); } }}>
                                     <div className="form-group">
                                         <TextField
                                             multiline

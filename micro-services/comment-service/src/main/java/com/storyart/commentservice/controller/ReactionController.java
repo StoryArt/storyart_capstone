@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -19,6 +20,7 @@ public class ReactionController {
     @Autowired
     ReactionService reactionService;
 
+    @Secured({"ROLE_USER"})
     @PostMapping("/react")
     public ResponseEntity<Boolean> react(@RequestBody @Valid ReactionCommentDTO reactionDTO){
         reactionService.react(reactionDTO);
@@ -36,13 +38,13 @@ public class ReactionController {
     //    reactionService.dislike(reactionDTO);
     //    return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     //}
-
+    @Secured({"ROLE_USER"})
     @PostMapping("/delete")
     public ResponseEntity<Boolean> removeReaction(@RequestBody @Valid ReactionCommentDTO reactionDTO){
         reactionService.removeReaction(reactionDTO);
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
-
+    @Secured({"ROLE_USER"})
     @GetMapping("/getReactionHistory")
     public Page<ReactionHistoryResponseDTO> getReactionHistory(
             @RequestParam(defaultValue = "0") Integer userId,

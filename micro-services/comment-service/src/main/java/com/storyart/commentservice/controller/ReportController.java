@@ -20,14 +20,14 @@ import java.util.List;
 public class ReportController {
     @Autowired
     ReportService reportService;
-
+    @Secured({"ROLE_USER"})
     @PostMapping("/reportComment")
     public ResponseEntity<Boolean> reportComment(@RequestBody @Valid ReportCommentRequestDTO reportCommentRequestDTO) {
         reportService.reportComment(reportCommentRequestDTO);
 
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
-
+    @Secured({"ROLE_USER"})
     @PostMapping("/reportStory")
     public ResponseEntity<Boolean> reportStory(@RequestBody @Valid ReportStoryRequest request) {
         reportService.reportStory(request);
