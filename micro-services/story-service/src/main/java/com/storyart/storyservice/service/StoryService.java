@@ -734,6 +734,7 @@ class StoryServiceImpl implements StoryService {
             }
         });
 
+
         if(deletedScreens.size() > 0){
             screenRepository.deleteAllByIds(deletedScreens);
         }
@@ -767,7 +768,6 @@ class StoryServiceImpl implements StoryService {
         int storyId = story.getId();
 
         storyTagRepository.deleteByStoryId(storyId);
-
         //insert story tags
         storyDto.getTags().stream().forEach(tagId -> {
             StoryTag st = new StoryTag();

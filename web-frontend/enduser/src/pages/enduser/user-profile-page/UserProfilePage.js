@@ -80,29 +80,29 @@ const UserProfilePage = (props) => {
 
   const initData = async () => {
     await getUserInfo();
-    if(!userNotfound){
+    if (!userNotfound) {
       getStoriesByAuthor();
       // getReadStatistic();
     }
   }
 
   const getReadStatistic = async (dateRange) => {
-    if(ValidationUtils.isEmpty(dateRange)) dateRange = { from: getDateAgo(7), to: new Date() };
+    if (ValidationUtils.isEmpty(dateRange)) dateRange = { from: getDateAgo(7), to: new Date() };
     let { from, to } = dateRange;
-    if(from > to){
+    if (from > to) {
       setReadingStatisticData([]);
-      return; 
+      return;
     }
 
     from = from.toLocaleDateString();
     to = to.toLocaleDateString();
-    
+
     setLoadingReadingStatisticData(true);
     try {
       const res = await StatisticService.getReadStatisticsOfUser(from, to);
       const { data, success, errors } = res.data;
-      
-      if(success){
+
+      if (success) {
         const formatedData = formatStatisticData(from, to, data);
         setReadingStatisticData(formatedData);
       }
@@ -130,19 +130,19 @@ const UserProfilePage = (props) => {
     setLoadingUser(true);
     setOpenBackdrop(true);
     try {
-        const token = getTokenFromLocal();
-        const res = await UserService.getCurrentUser(token);
-        console.log(res);
-        const { data, success, errors } = res.data;
-        if(success){
-          setUser(data);
-        } else {
-          setUserNotfound(true);
-          setUserNotfoundMessage(Object.values(errors)[0]);
-        }
+      const token = getTokenFromLocal();
+      const res = await UserService.getCurrentUser(token);
+      console.log(res);
+      const { data, success, errors } = res.data;
+      if (success) {
+        setUser(data);
+      } else {
+        setUserNotfound(true);
+        setUserNotfoundMessage(Object.values(errors)[0]);
+      }
     } catch (error) {
       setUserNotfound(true);
-      console.log(error);   
+      console.log(error);
     }
     setLoadingUser(false);
     setOpenBackdrop(false);
@@ -175,13 +175,13 @@ const UserProfilePage = (props) => {
       const res = await StoryService.deleteStory(story.id);
       console.log(res);
       const { success, errors } = res.data;
-      if(success){
+      if (success) {
         setAlert({ type: 'success', content: 'Xóa thành công', open: true });
         getStoriesByAuthor();
       } else {
         setAlert({ type: 'error', content: Object.values(errors)[0], open: true });
       }
-      
+
       closeAlert();
     } catch (error) {
       console.log(error);
@@ -196,25 +196,25 @@ const UserProfilePage = (props) => {
   }
 
   const changePublishedStatus = async (story) => {
-    
+
     setAuthHeader(getTokenFromLocal());
     const turnOnPublished = !story.published;
     try {
       const res = await StoryService.changePublishedStatus(story.id, turnOnPublished);
       const { success, errors } = res.data;
       console.log(res);
-      if(success){
-        setAlert({ 
-          type: 'success', 
+      if (success) {
+        setAlert({
+          type: 'success',
           content: 'Đổi trạng thái xuất bản thành công',
           open: true
-       });
+        });
         const index = stories.findIndex(s => s.id === story.id);
         stories[index].published = !story.published;
         setStories([...stories]);
       } else {
-        setAlert({ 
-          type: 'error', 
+        setAlert({
+          type: 'error',
           content: Object.values(errors)[0],
           open: true
         });
@@ -234,12 +234,12 @@ const UserProfilePage = (props) => {
     let arr = [];
     from = new Date(from);
     to = new Date(to);
-    
-    while(from <= to){
+
+    while (from <= to) {
       let dateCreatedVal = DateTimeUtils.formatStatisticDate(from);
       arr.push(dateCreatedVal);
       from = new Date(from.setDate(from.getDate() + 1));
-    }    
+    }
     return arr.map(dateCreated => {
       const foundItem = data.find(item => item.dateCreated == dateCreated);
       const readCount = foundItem == null ? 0 : foundItem.readCount
@@ -334,13 +334,13 @@ const UserProfilePage = (props) => {
       <div className="container-fluid" style={{ paddingBottom: '100px' }}>
         {(!isloadingUser && !userNotfound && !ValidationUtils.isEmpty(user)) && (
           <>
-              <div className="row mb-5">
-                <div className="col-12">
-                  <UserProfileHeader user={user} canEdit={true} />
-                </div> 
+            <div className="row mb-5">
+              <div className="col-12">
+                <UserProfileHeader user={user} canEdit={true} />
               </div>
+            </div>
 
-                {/* <h3 className="text-bold">Thống kê lượt đọc các truyện của bạn</h3> 
+            {/* <h3 className="text-bold">Thống kê lượt đọc các truyện của bạn</h3> 
                 <hr style={{ border: "1px solid #ccc" }} /> 
                 <div className="row my-5">
                   <div className="col-12">
@@ -384,12 +384,12 @@ const UserProfilePage = (props) => {
                           onChange={changePage} />
                     </div>
                   </div> */}
-                {isLoadingstories && (
+                  {isLoadingstories && (
                     <div className="text-center mb-3">
                       <MySpinner/>
                     </div>
                   ) }
-                  <UserStoriesTabs
+                    <UserStoriesTabs
                       value={userStoryTab}
                       onChange={(e, value) => changeStoryTab(value)}
                     ></UserStoriesTabs>
@@ -449,29 +449,15 @@ const UserProfilePage = (props) => {
                                 </Select>
                             </FormControl>
                           </div>
-                          <div className="col-sm-3">
-                            {/* <FormControl >
-                                <InputLabel>Kiểm duyệt</InputLabel>
-                                <Select
-                                    value={filters.censored}
-                                    onChange={(e) => changeFilters('censored', e.target.value)}
-                                >
-                                      <MenuItem value={true}>
-                                          Đã kiểm duyệt
-                                      </MenuItem>
-                                      <MenuItem value={false}>
-                                          Chờ kiểm duyệt
-                                      </MenuItem>
-                                </Select>
-                            </FormControl> */}
-                          </div>
+                         
                     </div>
                  
                
                      
                         
                     </div>
-                  </div>
+                     </div>
+               
 
                   {!isLoadingstories && (
                       <UserStoriesList 
@@ -496,18 +482,19 @@ const UserProfilePage = (props) => {
                           onChange={changePage} />
                     </div>
                   </div> */}
+
           </>
         )}
 
-        {!userNotfound && <NotFound message={ userNotfoundMessage } />}
-      </div> 
+        {!userNotfound && <NotFound message={userNotfoundMessage} />}
+      </div>
 
       <ConfirmDialog
-          openDialog={dialog.open}
-          cancel={cancel}
-          ok={deleteStory}
-          setOpenDialog={() => setDialog({ ...dialog, open: true })}
-          content={dialog.content}
+        openDialog={dialog.open}
+        cancel={cancel}
+        ok={deleteStory}
+        setOpenDialog={() => setDialog({ ...dialog, open: true })}
+        content={dialog.content}
       />
 
         <UserNoteDialog 
@@ -519,11 +506,12 @@ const UserProfilePage = (props) => {
 
       <MyBackdrop open={openBackdrop} setOpen={setOpenBackdrop}/>
 
-      <MyAlert 
-          open={alert.open}
-          setOpen={() => setAlert({ ...alert, open: true })}
-          type={alert.type}
-          content={alert.content}
+
+      <MyAlert
+        open={alert.open}
+        setOpen={() => setAlert({ ...alert, open: true })}
+        type={alert.type}
+        content={alert.content}
       />
     </MainLayout>
   );
