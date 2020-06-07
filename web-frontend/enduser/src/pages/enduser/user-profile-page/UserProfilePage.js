@@ -263,7 +263,7 @@ const UserProfilePage = (props) => {
     let arr = [];
     switch(statusValue){
       case 0: 
-        arr = allStories.filter(s => s.censorshipStatus == null);
+        arr = allStories.filter(s => ValidationUtils.isEmpty(s.censorshipStatus));
         break;
       case 1: 
         arr = allStories.filter(s => s.censorshipStatus == CENSORSHIP_STATUS.APPROVED);

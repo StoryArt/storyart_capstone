@@ -78,7 +78,7 @@ const CreateStoryPage = (props) => {
     const [storyTab, setStoryTab] = useState(0);
     const [image, setImage] = useState(null);
 
-    const [dialog, setDialog] = useState({ content: '', open: false });
+    const [dialog, setDialog] = useState({ content: '', open: false, deleteStory: false });
     const [noteDialog, setNoteDialog] = useState({ open: false, note: '' });
 
     let canChangeScreenContent = true;
@@ -307,12 +307,37 @@ const CreateStoryPage = (props) => {
     const handleDeleteStory = () => {
         setDialog({
             open: true,
-            content: 'Bạn có chắc muốn xóa truyện này chứ?'
+            content: 'Bạn có chắc muốn xóa truyện này chứ?',
+            deleteStory: true
         })
     }
 
-    const deleteStory = async () => {
+    const ok = () => {
         setDialog({ ...dialog, open: false })
+        if(dialog.deleteStory){
+            deleteStory();
+        } else {
+            revertOldCensoredVersion();
+        }
+    }
+
+    const revertOldCensoredVersion = async () => {
+        try {
+            const res = await StoryService.revertOldCensoredVersion(story.id);
+            console.log(res);
+            const { success, errors } = res.data;
+            if (success) {
+                setAlert({ type: 'success', content: 'Quay lại bản cũ thành công', open: true });
+                getStoryDetails();
+            } else {
+                setAlert({ type: 'error', content: Object.values(errors)[0], open: true });
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const deleteStory = async () => {
         try {
             const res = await StoryService.deleteStory(story.id);
             const { success, errors } = res.data;
@@ -637,6 +662,12 @@ const CreateStoryPage = (props) => {
                         className="btn btn-warning float-right"
                         onClick={() => setNoteDialog({ ...noteDialog, open: true })}>
                         Lưu và đề nghị kiểm duyệt</button>
+                    {isEditPage && (
+                        <button
+                            className="btn btn-warning float-right"
+                            onClick={() => setDialog({ ...dialog, open: true, content: 'Bạn có chắc muốn quay lại bản kiểm duyệt cũ không?', deleteStory: false })}>
+                            Quay lại bản kiểm duyệt gần nhất</button>
+                    )}
 
                     <MyAlert
                         open={alert.open}
@@ -649,7 +680,7 @@ const CreateStoryPage = (props) => {
                         <ConfirmDialog
                             openDialog={dialog.open}
                             cancel={() => setDialog({ ...dialog, open: false })}
-                            ok={deleteStory}
+                            ok={ok}
                             setOpenDialog={() => setDialog({ ...dialog, open: true })}
                             content={dialog.content}
                         />

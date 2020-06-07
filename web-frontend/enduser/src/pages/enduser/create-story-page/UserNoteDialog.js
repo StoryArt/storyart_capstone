@@ -23,7 +23,7 @@ const UserNoteDialog = (props) => {
                 <TextField
                     autoFocus
                     margin="dense"
-                    label="Nội dung..."
+                    label="Nội dung yêu cầu kiểm duyệt..."
                     multiline
                     rows="2"
                     fullWidth

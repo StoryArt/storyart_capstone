@@ -70,6 +70,8 @@ public interface StoryService {
 
     ResultDto rateStory(int storyId, int userId, double stars);
 
+    ResultDto revertOldCensoredVersion(int storyId, int userId);
+
     ResultDto getReadStatisticsByDateRangeOfUser(Date from, Date to, int userId);
 
     Rating getRatingByStoryAndUser(int storyId, int userId);
@@ -423,6 +425,48 @@ class StoryServiceImpl implements StoryService {
             storyRepository.save(story);
             result.setData(rating);
             result.setSuccess(true);
+        }
+        return result;
+    }
+
+    @Override
+    public ResultDto revertOldCensoredVersion(int storyId, int userId) {
+        ResultDto result = new ResultDto();
+        result.setSuccess(false);
+        result.setData(null);
+
+        Story story = storyRepository.findById(storyId).orElse(null);
+
+        if (story == null) {
+            result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
+        } else if (!story.isActive() || story.isDeactiveByAdmin()) {
+            result.getErrors().put("DELETED", "Truyện này đã bị xóa");
+        } else if (userId != story.getUserId()) {
+            result.getErrors().put("NOT_OWN", "Truyện này không thuộc về bạn");
+        } else if (StringUtils.isEmpty(story.getCensorshipStatus())) {
+            result.getErrors().put("NOT_FOUND", "Truyện này không có bản cũ được kiểm duyệt gần đây");
+        } else {
+            User user = userRepository.findById(story.getUserId()).orElse(null);
+            if(user == null || (!user.isActive() || user.isDeactiveByAdmin())){
+                result.getErrors().put("", "Truyện này thuộc về người dùng bị vô hiệu tài khoản");
+            } else {
+                DraftStory draftStory = draftStoryRepository.findById(story.getId()).orElse(null);
+                if(draftStory.getCensorshipStatus() != null){
+                    result.getErrors().put("NOT_FOUND", "Không thể quay về bản cũ do bản mới đã hoặc đang được kiểm duyệt");
+                } else {
+                    ReadStoryDto oldStory = getReadingStory(story);
+                    CreateStoryDto createStoryDto = mapReadStoryToCreateStoryDto(oldStory);
+                    try {
+                        String json = objectMapper.writeValueAsString(createStoryDto);
+                        draftStory.setContent(json);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                    draftStory.setCensorshipStatus(CensorshipStatus.APPROVED);
+                    draftStoryRepository.save(draftStory);
+                    result.setSuccess(true);
+                }
+            }
         }
         return result;
     }

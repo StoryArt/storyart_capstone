@@ -11,6 +11,11 @@ class StoryService {
     const url = baseUrl;
     return axios.post(url, story);
   }
+
+  static async revertOldCensoredVersion(storyId) {
+    const url = baseUrl + '/revert/' + storyId;
+    return axios.put(url);
+  }
   
   static async getRatingByStoryAndUser(storyId) {
     const url = baseUrl + '/rate/' + storyId;

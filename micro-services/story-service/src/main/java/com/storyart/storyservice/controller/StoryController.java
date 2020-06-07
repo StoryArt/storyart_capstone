@@ -108,6 +108,16 @@ public class StoryController {
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
+    @PutMapping("revert/{storyId}")
+    @Secured({"ROLE_USER"})
+//    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity revertOldCensoredVersion(
+            @PathVariable int storyId,
+            @CurrentUser UserPrincipal userPrincipal){
+        ResultDto result = storyService.revertOldCensoredVersion(storyId, userPrincipal.getId());
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
+
     @GetMapping("get_by_author")
     @Secured({"ROLE_USER"})
     public ResponseEntity getStoriesByAuthor(
