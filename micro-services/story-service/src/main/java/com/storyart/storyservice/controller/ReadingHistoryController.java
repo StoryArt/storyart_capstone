@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -46,7 +47,7 @@ public class ReadingHistoryController {
         ResultDto result = historyService.saveScreenReadTime(screenReadTimeDto);
         return new ResponseEntity(result, HttpStatus.OK);
     }
-
+    @Secured({"ROLE_USER"})
     @GetMapping("getReadingHistory")
     public Page<ReadingHistoryResponse> getReadingHistory(
             @RequestParam(defaultValue = "0") Integer userId,

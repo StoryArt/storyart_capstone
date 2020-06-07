@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -32,29 +33,31 @@ public class CommentController {
         }
         return commentService.findAllByStoryId(storyId, pageNo, pageSize, sortBy);
     }
+    @Secured({"ROLE_USER"})
     @PostMapping
     public ResponseListCommentDTO create(@RequestBody @Valid CreateCommentDTO createCommentDTO){
         
         return commentService.create(createCommentDTO);
     }
+    @Secured({"ROLE_USER"})
     @PutMapping("/update")
     public Comment update(@RequestBody @Valid UpdateCommentDTO updateCommentDTO){
 
         return commentService.update(updateCommentDTO);
     }
-
+    @Secured({"ROLE_USER"})
     @PostMapping("/delete")
     public Comment delete(@RequestBody @Valid DeleteCommentDTO deleteCommentDTO){
 
         return commentService.delete(deleteCommentDTO);
     }
-
+    @Secured({"ROLE_ADMIN"})
     @PostMapping("/disableAndEnableCommentByAdmin")
     public ResponseEntity<Boolean> disableByAdmin(@RequestParam (defaultValue = "0") Integer commentId ){
         commentService.disableAndEnableComment(commentId);
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
     }
-
+    @Secured({"ROLE_USER"})
     @GetMapping("/getCommentHistory")
     public Page<CommentHistoryResponseDTO> getCommentHistory(
             @RequestParam(defaultValue = "0") Integer userId,
