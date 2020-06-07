@@ -255,8 +255,13 @@ const UserProfilePage = (props) => {
 
   const changeStoryTab = (value) => {
     setUserStoryTab(value);
+    let arr = getStoriesByCensorshipStatus(value);
+    setStories(arr);
+  }
+
+  const getStoriesByCensorshipStatus = (statusValue) => {
     let arr = [];
-    switch(value){
+    switch(statusValue){
       case 0: 
         arr = allStories.filter(s => s.censorshipStatus == null);
         break;
@@ -270,14 +275,16 @@ const UserProfilePage = (props) => {
         arr = allStories.filter(s => s.censorshipStatus == CENSORSHIP_STATUS.REJECTED);
         break;
     }
-    setStories(arr);
-  }
+    return arr;
+  } 
 
   const filterStories = (filters) => {
     const { keyword, orderBy, asc } = filters;
     console.log(orderBy);
+
+    let myStories = getStoriesByCensorshipStatus(userStoryTab);
     
-    let newStories = stories.filter(s => {
+    let newStories = myStories.filter(s => {
       return s.title.toLowerCase().indexOf(keyword.toLowerCase()) > -1;
     });
 
