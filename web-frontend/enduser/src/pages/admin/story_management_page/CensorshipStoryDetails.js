@@ -7,10 +7,18 @@ import ScreenTypes from '../../enduser/create-story-page/ScreenTypes';
 import ValidationUtils from '../../../utils/validation';
 import StringUtils from '../../../utils/string';
 
+
+
 const CensorshipStoryDetails = (props) => {
     const { story } = props;
+    const [urls, setUrls] = useState([]);
+    
 
     const [currentScreen, setCurrentScreen] = useState(null);
+
+    React.useEffect(() => {
+        setUrls(getStoryUrls());
+    }, [story]);
 
     const getStoryUrls = () => {
         const urls = [];
@@ -74,30 +82,48 @@ const CensorshipStoryDetails = (props) => {
                                 </ListItem>
                                 <ListItem button>
                                     <div>
-                                        <div className="font-weight-bold">Thông tin: </div>
-                                        {story.informations.map(info => (
-                                            <div key={info.id}>
-                                                <div className="pl-2">
-                                                    {info.name}: {info.value} ({info.type === INFORMATION_TYPES.NUMBER ? 'Số': 'Chuối kí tự'})
+                                        <div>
+                                            <span className="font-weight-bold">Thông tin:</span> {story.informations.length == 0 && <span>Không có</span>}
+                                        </div>
+                                        
+                                        {story.informations.length != 0 && <>
+                                            {story.informations.map(info => (
+                                                <div key={info.id}>
+                                                    <div className="pl-2">
+                                                        {info.name}: {info.value} ({info.type === INFORMATION_TYPES.NUMBER ? 'Số': 'Chuối kí tự'})
+                                                    </div>
+                                                    <div className="pl-4">
+                                                        <strong>Điều kiện:</strong>
+                                                        {info.conditions.map(cond => (
+                                                            <div key={cond.id}>
+                                                                <strong>{info.name} {cond.type} {cond.value}</strong> ({getScreenById(cond.nextScreenId).title})
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                                <div className="pl-4">
-                                                    <strong>Điều kiện:</strong>
-                                                    {info.conditions.map(cond => (
-                                                        <div key={cond.id}>
-                                                            <strong>{info.name} {cond.type} {cond.value}</strong> ({getScreenById(cond.nextScreenId).title})
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </>}
+                                        
                                     </div>
                                 </ListItem>
                                 <ListItem button>
                                     <div>
-                                    <strong>Các đường dẫn: </strong>
-                                        {getStoryUrls().map(url => (
-                                            <div className="pl-2 mb-2"><a href={url} target="_blank">{url}</a></div>
-                                        ))}
+                                        <strong>Các đường dẫn: </strong>
+                                        {urls.length == 0 && <span>Không có</span>}
+                                    
+                                        {urls.length != 0 && <>
+                                            {urls.map(url => (
+                                                <div className="pl-2 mb-2"><a href={url} target="_blank">{url}</a></div>
+                                            ))}
+                                        </>}
+                                    </div>
+                                </ListItem>
+                                <ListItem button>
+                                    <div>
+                                        <strong>Nội dung giới thiệu: </strong> 
+                                        <div className="ql-editor">
+                                            {StringUtils.parseHtml(story.intro)}
+                                        </div>
                                     </div>
                                 </ListItem>
                             </List>

@@ -49,23 +49,22 @@ const styles = theme => ({
     submit: {
         margin: theme.spacing(3, 0, 2),
     },
-  });
-
+});
 
   
-  const DialogTitle = withStyles(styles)(props => {
+const DialogTitle = withStyles(styles)(props => {
     const { children, classes, onClose, ...other } = props;
     return (
-      <MuiDialogTitle disableTypography className={classes.root} {...other}>
+        <MuiDialogTitle disableTypography className={classes.root} {...other}>
         <Typography variant="h6">{children}</Typography>
         {onClose ? (
-          <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+            <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
             <CloseIcon />
-          </IconButton>
+            </IconButton>
         ) : null}
-      </MuiDialogTitle>
+        </MuiDialogTitle>
     );
-  });
+});
   
 const DialogContent = withStyles(theme => ({
     root: {
@@ -111,9 +110,7 @@ const StoryView = (props) => {
    
     const changeCensorship = (prop, value) => {
         setCensorship({ ...censorShip, [prop]: value });
-        if(prop === 'censorshipStatus'){
-           
-        }
+       
     }
 
     const handleCensorshipByAdmin = async (e) => {
@@ -126,7 +123,7 @@ const StoryView = (props) => {
             if(success){
                 setAlert({ content: 'Cập nhật thành công', type: "success", open: true });  
                 changeCurrentStory(censorShip);
-                // onClose();
+                onClose();
             } else {
                 setAlert({ content: Object.values(errors), type: 'error', open: true });
             }
