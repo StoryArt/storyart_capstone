@@ -146,7 +146,7 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
     //end for user
 
     @Query(value = "SELECT s.id FROM storyart_db.story s, storyart_db.user u " +
-            "where s.published = '1' and s.active ='1' and s.deactive_by_admin ='0' " +
+            "where s.published = '1' and s.active ='1' and s.censorship_status = 'APPROVED' and s.deactive_by_admin ='0' " +
             "and s.user_id = u.id and u.is_deactive_by_admin = '0' group by s.id", nativeQuery = true)
     List<Integer> findAllStoryActive ();
 
