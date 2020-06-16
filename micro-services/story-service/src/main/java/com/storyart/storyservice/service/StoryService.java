@@ -552,7 +552,7 @@ class StoryServiceImpl implements StoryService {
 
         if (story == null) {
             result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
-        } else if (!story.isActive() || story.isDeactiveByAdmin()) {
+        } else if (!story.isActive()) {
             result.getErrors().put("DELETED", "Truyện này đã bị xóa");
         } else {
             User user = userRepository.findById(story.getUserId()).orElse(null);
