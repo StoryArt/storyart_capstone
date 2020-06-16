@@ -107,6 +107,11 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
             countQuery = MyQueries.countStoriesByKeyword, nativeQuery = true)
     Page<Story> findForAdminOrderByNumOfReadDESC(String keyword, String censorshipStatus, Pageable pageable);
 
+    @Query(value = MyQueries.getDeactiveStoriesForAdmin ,
+            countQuery = MyQueries.countDeactiveStoriesForAdmin, nativeQuery = true)
+    Page<Story> findDeactiveStoriesForAdmin(String keyword, Pageable pageable);
+
+
     //for users
     @Query(value = MyQueries.getStoriesForUserOrderByDate + " ASC", nativeQuery = true)
     Page<Story> findForUserOrderByDateASC(int userId, String keyword, Pageable pageable);

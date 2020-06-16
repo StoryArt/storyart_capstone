@@ -22,6 +22,7 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import CancelIcon from '@material-ui/icons/Cancel';
 import PauseIcon from '@material-ui/icons/Pause';
 import CensorshipSelect from './CensorshipSelect';
+import StoryManagementTabs from './StoryManagementTabs';
 
 let searchTimeout = null;
 let currentStory = null;
@@ -52,6 +53,7 @@ const StoryManagementPage =  (props) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogContent, setDialogContent] = useState('');
   // const [story, setStory] = useState(null);
+  const [storyListTab, setStoryListTab] = useState(0);
   
   const [alert, setAlert] = useState({ content: '', type: 'success', open: false });
   const [filters, setFilters] = useState({
@@ -65,7 +67,7 @@ const StoryManagementPage =  (props) => {
 
 
   useEffect(() => {
-    searchStories();
+    searchStories(filters);
 
     layoutContext.setOpenSidebar(false);
 
@@ -78,31 +80,18 @@ const StoryManagementPage =  (props) => {
 
 
   const changeFilters = (prop, value) => {
-    filters[prop] = value;
-    setFilters({ ...filters });
+    let newFilters = { ...filters };
+    newFilters[prop] = value;
+    setFilters(newFilters);
     if(prop === 'page'){
-      searchStories();
+      
+      console.log(newFilters);
+      searchStories(newFilters);
     } 
   }
 
   const changePage = (e, value) => {
     changeFilters('page', value);
-  }
-
-  const getStories = async () => {
-      let data = [];
-      setIsLoadingStories(true);
-      try {
-          const res = await StoryService.getStoriesForAdmin({ ...filters });
-          console.log(res);
-          
-          data = res.data.content;
-          setTotalPages(res.data.totalPages);
-      } catch (error) {
-          console.log(error);
-      }
-      setIsLoadingStories(false);
-      return data;
   }
 
   const getReadingStory = async (storyId) => {
@@ -126,9 +115,19 @@ const StoryManagementPage =  (props) => {
     setLoadingStory(false);
 }
 
-  const searchStories = async () => {
-      const stories = await getStories();
-      setStories(stories);
+  const searchStories = async (filters) => {
+      setIsLoadingStories(true);
+      try {
+          const res = await StoryService.getStoriesForAdmin({ ...filters });
+          console.log(res);
+          
+          let data = res.data.content;
+          setStories(data);
+          setTotalPages(res.data.totalPages);
+      } catch (error) {
+          console.log(error);
+      }
+      setIsLoadingStories(false);
   }
 
   const viewStory = (story) => {
@@ -142,9 +141,10 @@ const StoryManagementPage =  (props) => {
       const res = await StoryService.changeStoryStatusByAdmin(currentStory.id, enable);
       console.log(res);
       if(res.data.success){
-        const s = stories.find(st => st.id === currentStory.id);
-        s.deactiveByAdmin = enable ? false : true;
-        setStories([...stories]);
+        // const s = stories.find(st => st.id === currentStory.id);
+        // s.deactiveByAdmin = enable ? false : true;
+        // setStories([...stories]);
+        searchStories(filters);
         setAlert({ content: 'Cập nhật thành công', type: 'success', open: true });
       } else {
         setAlert({ content: Object.values(res.data.errors)[0], type: 'error', open: true });
@@ -197,7 +197,22 @@ const StoryManagementPage =  (props) => {
           <div className="col-12">
           <h3 className="">Tất cả truyện</h3>
           <hr style={{ border: '1px solid #ccc' }} />
-          <Paper style={{ padding: '20px' }}>
+        
+          <StoryManagementTabs 
+            value={storyListTab}
+            onChange={async (e, value) => {
+              setStoryListTab(value);
+              let newFilters = {};
+              if(value === 1) {
+                newFilters = { ...filters, censorshipStatus: 'LOCKED', page: 1 };
+              } else {
+                newFilters = { ...filters, censorshipStatus: CENSORSHIP_STATUS.PENDING, page: 1 };
+              }
+              setFilters(newFilters);
+              searchStories(newFilters);
+            }}
+          >
+              <Paper style={{ padding: '20px' }}>
             <div className="row">
               <div className="col-sm-3">
                 <FormControl style={{ width: '100%' }}>
@@ -217,140 +232,146 @@ const StoryManagementPage =  (props) => {
                     />
                 </FormControl>
               </div>
-              <div className="col-sm-2">
-                <FormControl style={{ width: '100%' }}>
-                    <InputLabel>Sắp xếp theo</InputLabel>
-                    <Select
-                        value={filters.orderBy}
-                        onChange={(e) => changeFilters('orderBy', e.target.value)}
-                    >
-                        {orderBys.map((orderBy) => (
-                            <MenuItem key={orderBy.value} value={orderBy.value}>
-                                {orderBy.title}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-              </div>
-              <div className="col-sm-1">
-                <FormControl style={{ width: '100%' }}>
-                    <InputLabel>Thứ tự</InputLabel>
-                    <Select
-                        value={filters.asc}
-                        onChange={(e) => changeFilters('asc', e.target.value)}
-                    >
-                          <MenuItem value={true}>
-                              Tăng dần
-                          </MenuItem>
-                          <MenuItem value={false}>
-                              Giảm dần
-                          </MenuItem>
-                    </Select>
-                </FormControl>
-              </div>
-              <div className="col-sm-2">
-                <CensorshipSelect 
-                  onChange={(e) => changeFilters('censorshipStatus', e.target.value)} 
-                  value={filters.censorshipStatus} />
-              </div>
+              {storyListTab === 0 && (
+                <>
+                  <div className="col-sm-2">
+                    <FormControl style={{ width: '100%' }}>
+                        <InputLabel>Sắp xếp theo</InputLabel>
+                        <Select
+                            value={filters.orderBy}
+                            onChange={(e) => changeFilters('orderBy', e.target.value)}
+                        >
+                            {orderBys.map((orderBy) => (
+                                <MenuItem key={orderBy.value} value={orderBy.value}>
+                                    {orderBy.title}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                  </div>
+                  <div className="col-sm-1">
+                    <FormControl style={{ width: '100%' }}>
+                        <InputLabel>Thứ tự</InputLabel>
+                        <Select
+                            value={filters.asc}
+                            onChange={(e) => changeFilters('asc', e.target.value)}
+                        >
+                              <MenuItem value={true}>
+                                  Tăng dần
+                              </MenuItem>
+                              <MenuItem value={false}>
+                                  Giảm dần
+                              </MenuItem>
+                        </Select>
+                    </FormControl>
+                  </div>`
+                  <div className="col-sm-2">
+                    <CensorshipSelect 
+                      onChange={(e) => changeFilters('censorshipStatus', e.target.value)} 
+                      value={filters.censorshipStatus} />
+                  </div>
+                </>
+              )}
             </div>
             <div className="row">
               <div className="col-12 text-right">
-                <Button color="primary" onClick={searchStories}>Tìm kiếm</Button>
+                <Button color="primary" onClick={() => searchStories(filters)}>Tìm kiếm</Button>
               </div>
             </div>
           </Paper>
-          <div className="row my-3">
-            <div className="col-12">
-              <Pagination 
-                  style={{float: 'right'}}
-                  count={totalPages} 
-                  page={filters.page}
-                  color="primary" 
-                  onChange={() => {
-                    setFilters({ ...filters, page: 1 });
-                    changePage();
-                  }} />
-            </div>
-          </div>
-          {isLoadingStories && <MySpinner/>}
           
-          <TableContainer component={Paper}>
-              <Table className={classes.table} aria-label="caption table">
-                <caption>Tất cả truyện</caption>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>#</TableCell>
-                    <TableCell align="center">Tiêu đề</TableCell>
-                    <TableCell align="center">Ảnh</TableCell>
-                    <TableCell align="center">Ngày tạo</TableCell>
-                    <TableCell align="center">Số màn hình</TableCell>
-                    <TableCell align="center">Lượt đọc</TableCell>
-                    <TableCell align="center">Lượt bình luận</TableCell>
-                    <TableCell align="center">Lượt đánh giá</TableCell>
-                    <TableCell align="center">Đánh giá trung bình</TableCell>
-                    <TableCell align="center">Trạng thái</TableCell>
-                    <TableCell align="center">Tác giả</TableCell>
-                    <TableCell align="center">Nhãn</TableCell>
-                    <TableCell align="center"></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  { stories.map((story, index) => (
-                    <TableRow key={story.id}>
-                      <TableCell align="center">{(filters.page - 1) * filters.itemsPerPage + index + 1}</TableCell>
-                      <TableCell align="center">{ story.title }</TableCell>
-                      <TableCell align="center">
-                        <img style={{ width: '80px' }}  src={story.image}/>
-                      </TableCell>
-                      <TableCell align="center">
-                        {DateTimeUtils.getDate(story.createdAt)}
-                      </TableCell>
-                      <TableCell align="center">{story.numOfScreen}</TableCell>
-                      <TableCell align="center">{story.numOfRead}</TableCell>
-                      <TableCell align="center">{story.numOfComment}</TableCell>
-                      <TableCell align="center">{story.numOfRate}</TableCell>
-                      <TableCell align="center">{story.avgRate}</TableCell>
-                      <TableCell align="center" style={{ whiteSpace: 'nowrap' }}>
-                        {story.deactiveByAdmin ? <strong className="text-danger">ĐÃ BỊ KHÓA</strong> : <strong className="text-success">CHƯA KHÓA</strong>}</TableCell>
-                      <TableCell align="center">
-                        {ValidationUtils.isEmpty(story.user) ? '' : <a href={`/user/profile/${story.user.id}`} target="_blank">{story.user.name}</a>}
-                      </TableCell>
-                      <TableCell align="center">
-                        <div style={{ maxWidth: '150px' }}>
-                          <small>
-                            <TagList tags={story.tags} />
-                          </small>
-                        </div>
-                      </TableCell>
-                      <TableCell align="center">
-                        <MyDropdownMenu>
-                          <MenuItem onClick={() => viewStory(story)}>
-                             Xem truyện
-                          </MenuItem>
-                          {/* <MenuItem>Chi tiết</MenuItem> */}
-                          <Divider/>
-                          <MenuItem onClick={() => handleUpdateByAdmin(story)}>
-                            {story.deactiveByAdmin ? 'Khôi phục truyện' : 'Khóa truyện'}
-                          </MenuItem>
-                        </MyDropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-
-          <div className="row my-3">
-            <div className="col-12">
-              <Pagination 
-                  style={{float: 'right'}}
-                  count={totalPages} 
-                  page={filters.page}
-                  color="primary" 
-                  onChange={changePage} />
+        
+            <div className="row my-3">
+              <div className="col-12">
+                <Pagination 
+                    style={{float: 'right'}}
+                    count={totalPages} 
+                    page={filters.page}
+                    color="primary" 
+                    onChange={(e, value) => {
+                      changeFilters('page', value);
+                    }} />
+              </div>
             </div>
-          </div>
+              {isLoadingStories && <MySpinner/>}
+              <TableContainer component={Paper}>
+                <Table className={classes.table} aria-label="caption table">
+                  <caption>Tất cả truyện</caption>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>#</TableCell>
+                      <TableCell align="center">Tiêu đề</TableCell>
+                      <TableCell align="center">Ảnh</TableCell>
+                      <TableCell align="center">Ngày tạo</TableCell>
+                      <TableCell align="center">Số màn hình</TableCell>
+                      <TableCell align="center">Lượt đọc</TableCell>
+                      <TableCell align="center">Lượt bình luận</TableCell>
+                      <TableCell align="center">Lượt đánh giá</TableCell>
+                      <TableCell align="center">Đánh giá trung bình</TableCell>
+                      <TableCell align="center">Tác giả</TableCell>
+                      <TableCell align="center">Nhãn</TableCell>
+                      <TableCell align="center"></TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    { stories.map((story, index) => (
+                      <TableRow key={story.id}>
+                        <TableCell align="center">
+                          {(filters.page - 1) * filters.itemsPerPage + index + 1}
+                        </TableCell>
+                        <TableCell align="center">{ story.title }</TableCell>
+                        <TableCell align="center">
+                          <img style={{ width: '80px' }}  src={story.image}/>
+                        </TableCell>
+                        <TableCell align="center">
+                          {DateTimeUtils.getDate(story.createdAt)}
+                        </TableCell>
+                        <TableCell align="center">{story.numOfScreen}</TableCell>
+                        <TableCell align="center">{story.numOfRead}</TableCell>
+                        <TableCell align="center">{story.numOfComment}</TableCell>
+                        <TableCell align="center">{story.numOfRate}</TableCell>
+                        <TableCell align="center">{story.avgRate}</TableCell>
+                      
+                        <TableCell align="center">
+                          {ValidationUtils.isEmpty(story.user) ? '' : <a href={`/user/profile/${story.user.id}`} target="_blank">{story.user.name}</a>}
+                        </TableCell>
+                        <TableCell align="center">
+                          <div style={{ maxWidth: '150px' }}>
+                            <small>
+                              <TagList tags={story.tags} />
+                            </small>
+                          </div>
+                        </TableCell>
+                        <TableCell align="center">
+                          <MyDropdownMenu>
+                            <MenuItem onClick={() => viewStory(story)}>
+                              Xem truyện
+                            </MenuItem>
+                            {/* <MenuItem>Chi tiết</MenuItem> */}
+                            <Divider/>
+                            <MenuItem onClick={() => handleUpdateByAdmin(story)}>
+                              {story.deactiveByAdmin ? 'Khôi phục truyện' : 'Khóa truyện'}
+                            </MenuItem>
+                          </MyDropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+          
+              <div className="row my-3">
+                <div className="col-12">
+                  <Pagination 
+                      style={{float: 'right'}}
+                      count={totalPages} 
+                      page={filters.page}
+                      color="primary" 
+                      onChange={(e, value) => changeFilters('page', value)} />
+                </div>
+              </div>
+          </StoryManagementTabs>
+
             <ConfirmDialog
               openDialog={openDialog}
               cancel={cancel}

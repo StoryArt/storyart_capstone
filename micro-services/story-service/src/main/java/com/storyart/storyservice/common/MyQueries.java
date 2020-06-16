@@ -3,13 +3,21 @@ package com.storyart.storyservice.common;
 public class MyQueries {
     public static final String countStoriesByKeyword = "select count(s.id) from story s " +
             "WHERE (select censorship_status from draft_story ds where ds.id = s.id) = ?2 " +
-            "and ((s.title like %?1% " +
+            "and s.active = true and s.deactive_by_admin = false and ((s.title like %?1% " +
             "or (select name from user u where u.id = s.user_id) like %?1%))";
 
     public static final String getStoriesByKeyword = "select * from story s " +
             "WHERE (select censorship_status from draft_story ds where ds.id = s.id) = ?2 " +
-            "and ((s.title like %?1% " +
+            "and s.active = true and s.deactive_by_admin = false and ((s.title like %?1% " +
             "or (select name from user u where u.id = s.user_id) like %?1%))";
+
+    public static final String getDeactiveStoriesForAdmin = "select * from story s " +
+            "WHERE s.deactive_by_admin = true and s.active = true " +
+            "and (s.title like %?1% or (select name from user u where u.id = s.user_id) like %?1%)";
+
+    public static final String countDeactiveStoriesForAdmin = "select count(*) from story s " +
+            "WHERE s.deactive_by_admin = true and s.active = true " +
+            "and (s.title like %?1% or (select name from user u where u.id = s.user_id) like %?1%)";
 
     public static final String getStoriesByUser = "select * from story s " +
             "WHERE s.user_id = ?1 and s.active = true and s.deactive_by_admin = false " +

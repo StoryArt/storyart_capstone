@@ -1182,31 +1182,36 @@ class StoryServiceImpl implements StoryService {
 
         Pageable pageable = PageRequest.of(page - 1, itemsPerPage);
         Page<Story> page1 = null;
-        switch (orderBy) {
-            case "avg_rate":
-                if (asc) page1 = storyRepository.findForAdminOrderByAvgRateASC(keyword, censorshipStatus, pageable);
-                else page1 = storyRepository.findForAdminOrderByAvgRateDESC(keyword, censorshipStatus, pageable);
-                break;
-            case "comment":
-                if (asc) page1 = storyRepository.findForAdminOrderByNumOfCommentASC(keyword, censorshipStatus, pageable);
-                else page1 = storyRepository.findForAdminOrderByNumOfCommentDESC(keyword, censorshipStatus, pageable);
-                break;
-            case "rating":
-                if (asc) page1 = storyRepository.findForAdminOrderByNumOfRatingASC(keyword, censorshipStatus, pageable);
-                else page1 = storyRepository.findForAdminOrderByNumOfRatingDESC(keyword, censorshipStatus, pageable);
-                break;
-            case "screen":
-                if (asc) page1 = storyRepository.findForAdminOrderByNumOfScreenASC(keyword, censorshipStatus, pageable);
-                else page1 = storyRepository.findForAdminOrderByNumOfScreenDESC(keyword, censorshipStatus, pageable);
-                break;
-            case "read":
-                if (asc) page1 = storyRepository.findForAdminOrderByNumOfReadASC(keyword, censorshipStatus, pageable);
-                else page1 = storyRepository.findForAdminOrderByNumOfReadDESC(keyword, censorshipStatus, pageable);
-                break;
-            case "date":
-                if(asc) page1 = storyRepository.findForAdminOrderDateASC(keyword, censorshipStatus, pageable);
-                else page1 = storyRepository.findForAdminOrderDateDESC(keyword, censorshipStatus, pageable);
-                break;
+        boolean deactiveByAdmin = true;
+        if("LOCKED".equals(censorshipStatus)) {
+            page1 = storyRepository.findDeactiveStoriesForAdmin(keyword, pageable);
+        } else {
+            switch (orderBy) {
+                case "avg_rate":
+                    if (asc) page1 = storyRepository.findForAdminOrderByAvgRateASC(keyword, censorshipStatus, pageable);
+                    else page1 = storyRepository.findForAdminOrderByAvgRateDESC(keyword, censorshipStatus,  pageable);
+                    break;
+                case "comment":
+                    if (asc) page1 = storyRepository.findForAdminOrderByNumOfCommentASC(keyword, censorshipStatus, pageable);
+                    else page1 = storyRepository.findForAdminOrderByNumOfCommentDESC(keyword, censorshipStatus, pageable);
+                    break;
+                case "rating":
+                    if (asc) page1 = storyRepository.findForAdminOrderByNumOfRatingASC(keyword, censorshipStatus, pageable);
+                    else page1 = storyRepository.findForAdminOrderByNumOfRatingDESC(keyword, censorshipStatus, pageable);
+                    break;
+                case "screen":
+                    if (asc) page1 = storyRepository.findForAdminOrderByNumOfScreenASC(keyword, censorshipStatus,  pageable);
+                    else page1 = storyRepository.findForAdminOrderByNumOfScreenDESC(keyword, censorshipStatus, pageable);
+                    break;
+                case "read":
+                    if (asc) page1 = storyRepository.findForAdminOrderByNumOfReadASC(keyword, censorshipStatus, pageable);
+                    else page1 = storyRepository.findForAdminOrderByNumOfReadDESC(keyword, censorshipStatus, pageable);
+                    break;
+                case "date":
+                    if(asc) page1 = storyRepository.findForAdminOrderDateASC(keyword, censorshipStatus, pageable);
+                    else page1 = storyRepository.findForAdminOrderDateDESC(keyword, censorshipStatus, pageable);
+                    break;
+            }
         }
 
         if (page1 == null) return null;

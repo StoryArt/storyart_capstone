@@ -56,7 +56,7 @@ class CensorshipServiceImpl implements CensorshipService{
         if(story == null){
             result.getErrors().put("STORY_NOTFOUND", "Không tìm thấy truyện này");
         } else if(!story.isActive() || story.isDeactiveByAdmin()){
-            result.getErrors().put("STORY_NOTFOUND", "Truyện này đã bị xóa");
+            result.getErrors().put("STORY_NOTFOUND", "Truyện này đã bị xóa hoặc bị khóa bởi admin");
         } else {
             Censorship latestCensorship = censorshipRepository.findLatestCensorshipByStory(censorship.getStoryId());
             //check if admin already censored this story

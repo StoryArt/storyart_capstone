@@ -9,7 +9,7 @@ const CensorshipSelect = (props) => {
 
     return (
         <FormControl size="small" style={{ width: '100%' }}>
-            <InputLabel>Trạng thái kiểm duyệt</InputLabel>
+            <InputLabel>Trạng thái</InputLabel>
             <Select
                 size="small"
                 value={value}
