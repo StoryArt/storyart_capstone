@@ -16,6 +16,7 @@ import StoryService from '../../../services/story.service';
 import CensorshipService from '../../../services/censorship.service';
 import CensorshipHistory from './CensorshipHistory';
 import CensorshipStoryDetails from './CensorshipStoryDetails';
+import MySpinner from '../../../components/common/MySpinner';
 
 
 const styles = theme => ({
@@ -92,6 +93,7 @@ const StoryView = (props) => {
     const classes = withStyles(styles);
 
     useEffect(() => {
+        
         if(!ValidationUtils.isEmpty(story)){
             setCensorship({ 
                 adminNote: '', 
@@ -110,7 +112,6 @@ const StoryView = (props) => {
    
     const changeCensorship = (prop, value) => {
         setCensorship({ ...censorShip, [prop]: value });
-       
     }
 
     const handleCensorshipByAdmin = async (e) => {
@@ -219,7 +220,7 @@ const StoryView = (props) => {
                                                     color="primary"
                                                     className={classes.submit}
                                                 >
-                                                Lưu
+                                                  Lưu
                                                 </Button>
                                         </form>
                                         

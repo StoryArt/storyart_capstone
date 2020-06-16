@@ -207,7 +207,7 @@ const UserProfilePage = (props) => {
       if (success) {
         setAlert({
           type: 'success',
-          content: 'Đổi trạng thái xuất bản thành công',
+          content: 'Cập nhật thành công',
           open: true
         });
         const index = stories.findIndex(s => s.id === story.id);

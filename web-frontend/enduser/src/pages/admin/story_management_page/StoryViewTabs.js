@@ -62,8 +62,8 @@ const StoryViewTabs = (props) => {
             textColor="primary"
             aria-label="scrollable force tabs example"
           >
-            <Tab label="Nội dung được chấp thuận lần gần nhất" icon={<MenuBookIcon />} {...a11yProps(0)} />
-            <Tab label="Nội dung kiểm duyệt" icon={<SupervisorAccountIcon />} {...a11yProps(1)} />
+            <Tab label="Nội dung được admin chấp thuận gần nhất" icon={<MenuBookIcon />} {...a11yProps(0)} />
+            <Tab label="Nội dung cần kiểm duyệt" icon={<MenuBookIcon />} {...a11yProps(1)} />
             <Tab label="Kiểm duyệt" icon={<SupervisorAccountIcon />} {...a11yProps(2)} />
           </Tabs>
         </AppBar>

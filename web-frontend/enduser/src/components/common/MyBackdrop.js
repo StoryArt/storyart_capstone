@@ -19,6 +19,7 @@ const MyBackdrop = (props) => {
     return (
         <div>
             <Backdrop 
+                style={{ zIndex: 4000 }}
                 className={classes.backdrop} 
                 open={open} 
                 onClick={() => {}}>
