@@ -39,9 +39,9 @@ const CensorshipStoryDetails = (props) => {
     const handleSelectAction = (action) => {
         if (action.type === ACTION_TYPES.REDIRECT) {
            window.open(action.value, '_blank');
-       } else if (action.type === ACTION_TYPES.NEXT_SCREEN) {
+        } else if (action.type === ACTION_TYPES.NEXT_SCREEN) {
            changeCurrentScreen(action.value);
-       }
+        }
    }
 
    const changeCurrentScreen = (screenId) => {

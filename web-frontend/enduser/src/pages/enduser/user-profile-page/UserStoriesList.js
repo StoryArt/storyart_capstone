@@ -62,7 +62,7 @@ const UserStoriesList = (props) => {
                                         <strong style={{ fontSize: '1.1em' }}>{story.avgRate}</strong>
                                     </TableCell>
                                     <TableCell align="center">
-                                        {story.published ? <span className="text-success font-weight-bold">Hoàn chỉnh</span> : <span className="text-danger font-weight-bold">Nháp</span>}
+                                        {story.published ? <span className="text-success font-weight-bold">Công khai</span> : <span className="text-danger font-weight-bold">Riêng tư</span>}
                                     </TableCell>
                                     <TableCell align="center">
                                         <div style={{ maxWidth: '150px' }}>
@@ -92,7 +92,7 @@ const UserStoriesList = (props) => {
                                                 Cập nhật
                                             </MenuItem>
                                             <MenuItem onClick={() => changePublishedStatus(story)}>
-                                                {story.published ? 'Ẩn truyện' : 'Hiện truyện trên hệ thống'}
+                                                {story.published ? 'Bật chế độ riêng tư' : 'Bật chế độ công khai'}
                                             </MenuItem>
                                             {/* {story.censorshipStatus == null && ( */}
                                                 <MenuItem onClick={() => onRequestCensorship(story)}>
