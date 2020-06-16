@@ -22,6 +22,10 @@ const CensorshipStoryDetails = (props) => {
 
     const getStoryUrls = () => {
         const urls = [];
+        if(ValidationUtils.isEmpty(story)) {
+            return [];
+        }
+
         story.screens.forEach(scr => {
             scr.actions.forEach(action => {
                 if(action.type === ACTION_TYPES.REDIRECT){
@@ -167,6 +171,9 @@ const CensorshipStoryDetails = (props) => {
                         </div>
                     </div>
                 </div>
+            )}
+            {ValidationUtils.isEmpty(story) && (
+                <h3 className="text-center">Không có bản này</h3>
             )}
         </div>
     );
