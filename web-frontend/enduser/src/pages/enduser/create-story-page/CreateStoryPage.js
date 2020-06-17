@@ -314,7 +314,7 @@ const CreateStoryPage = (props) => {
 
     const ok = () => {
         setDialog({ ...dialog, open: false })
-        if(dialog.deleteStory){
+        if (dialog.deleteStory) {
             deleteStory();
         } else {
             revertOldCensoredVersion();
@@ -387,7 +387,7 @@ const CreateStoryPage = (props) => {
             })
         });
 
-        
+
         storyParameters.forEach(param => {
             param.conditions.forEach((c, index) => c.myIndex = index + 1);
         });
@@ -396,7 +396,7 @@ const CreateStoryPage = (props) => {
         story.tags = selectedTags.map(t => t.id);
         story.informations = storyParameters;
         story.informationActions = informationActions;
-        if(requestCensorship){
+        if (requestCensorship) {
             story.requestCensorship = true;
             story.userNote = noteDialog.note;
         }
@@ -450,7 +450,7 @@ const CreateStoryPage = (props) => {
         setNoteDialog({ ...noteDialog, open: false });
         saveStory(true);
     }
- 
+
     return (
         <MainLayout>
 
@@ -468,7 +468,7 @@ const CreateStoryPage = (props) => {
                 }}
             />
 
-            <UserNoteDialog 
+            <UserNoteDialog
                 open={noteDialog.open}
                 onClose={() => setNoteDialog({ ...noteDialog, open: false })}
                 note={noteDialog.note}
@@ -611,7 +611,7 @@ const CreateStoryPage = (props) => {
                                     </h3>
                                     <hr style={{ border: '1px solid #ccc' }} />
 
-                                 
+
                                     <StoryPreview
                                         firstScreenId={story.firstScreenId}
                                         setCurrentScreen={(id) => {
@@ -666,7 +666,7 @@ const CreateStoryPage = (props) => {
                         <button
                             className="btn btn-warning float-right"
                             onClick={() => setDialog({ ...dialog, open: true, content: 'Bạn có chắc muốn quay lại bản kiểm duyệt cũ không?', deleteStory: false })}>
-                            Quay lại bản kiểm duyệt gần nhất</button>
+                            Quay lại bản được chấp thuận gần nhất</button>
                     )}
 
                     <MyAlert

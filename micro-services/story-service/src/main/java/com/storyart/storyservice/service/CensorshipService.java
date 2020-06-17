@@ -96,9 +96,9 @@ class CensorshipServiceImpl implements CensorshipService{
                 storyRepository.save(story);
                 draftStoryRepository.save(draftStory);
             } else {
-                story.setCensorshipStatus(CensorshipStatus.REJECTED);
+                //story.setCensorshipStatus(CensorshipStatus.REJECTED);
                 draftStory.setCensorshipStatus(CensorshipStatus.REJECTED);
-                storyRepository.save(story);
+                //storyRepository.save(story);
                 draftStoryRepository.save(draftStory);
             }
 
