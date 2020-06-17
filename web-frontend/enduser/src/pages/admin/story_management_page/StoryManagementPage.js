@@ -309,7 +309,7 @@ const StoryManagementPage =  (props) => {
                       <TableCell align="center">Lượt đánh giá</TableCell>
                       <TableCell align="center">Đánh giá trung bình</TableCell>
                       <TableCell align="center">Tác giả</TableCell>
-                      <TableCell align="center">Nhãn</TableCell>
+                      {/* <TableCell align="center">Nhãn</TableCell> */}
                       <TableCell align="center"></TableCell>
                     </TableRow>
                   </TableHead>
@@ -335,13 +335,13 @@ const StoryManagementPage =  (props) => {
                         <TableCell align="center">
                           {ValidationUtils.isEmpty(story.user) ? '' : <a href={`/user/profile/${story.user.id}`} target="_blank">{story.user.name}</a>}
                         </TableCell>
-                        <TableCell align="center">
+                        {/* <TableCell align="center">
                           <div style={{ maxWidth: '150px' }}>
                             <small>
                               <TagList tags={story.tags} />
                             </small>
                           </div>
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell align="center">
                           <MyDropdownMenu>
                             <MenuItem onClick={() => viewStory(story)}>

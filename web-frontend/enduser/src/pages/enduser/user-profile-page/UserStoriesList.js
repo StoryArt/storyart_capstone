@@ -32,7 +32,7 @@ const UserStoriesList = (props) => {
                                 <TableCell align="center">Lượt đánh giá</TableCell>
                                 <TableCell align="center">Đánh giá trung bình</TableCell>
                                 <TableCell align="center">Trạng thái</TableCell>
-                                <TableCell align="center">Nhãn</TableCell>
+                                {/* <TableCell align="center">Nhãn</TableCell> */}
                                 <TableCell align="center"></TableCell>
                                 <TableCell align="center"></TableCell>
                             </TableRow>
@@ -64,13 +64,13 @@ const UserStoriesList = (props) => {
                                     <TableCell align="center">
                                         {story.published ? <span className="text-success font-weight-bold">Công khai</span> : <span className="text-danger font-weight-bold">Riêng tư</span>}
                                     </TableCell>
-                                    <TableCell align="center">
+                                    {/* <TableCell align="center">
                                         <div style={{ maxWidth: '150px' }}>
                                             <small>
                                                 <TagList tags={story.tags} />
                                             </small>
                                         </div>
-                                    </TableCell>
+                                    </TableCell> */}
                                     <TableCell>
                                         <Tooltip title="Xem thống kê" style={{ display: 'inline-block' }}>
                                             <IconButton

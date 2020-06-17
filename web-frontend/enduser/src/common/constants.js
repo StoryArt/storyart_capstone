@@ -116,7 +116,7 @@ export const getOrderBys = () => {
         { value: AVG_RATE, title: 'Đánh giá trung bình' },
         { value: READ, title: 'Lượt đọc' },
         { value: COMEMENT, title: 'Lượt bình luận' },
-        { value: SCREEN, title: 'Số màn hình' },
+        // { value: SCREEN, title: 'Số màn hình' },
         { value: RATING, title: 'Lượt đánh giá' },
         { value: DATE, title: 'Ngày tạo' },
     ]

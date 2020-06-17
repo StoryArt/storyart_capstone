@@ -1230,7 +1230,7 @@ class StoryServiceImpl implements StoryService {
         GetStoryDto dto = modelMapper.map(story, GetStoryDto.class);
         dto.setTags(tagService.mapModelToDto(tagList));
         dto.setNumOfComment(commentRepository.countCommentByStoryId(story.getId()));
-        dto.setNumOfScreen(screenRepository.countAllByStoryId(story.getId()));
+//        dto.setNumOfScreen(screenRepository.countAllByStoryId(story.getId()));
         dto.setNumOfRate(ratingRepository.countRatingByStoryId(story.getId()));
         User user = userRepository.findById(story.getUserId()).orElse(null);
         if(user != null) user.setPassword(null);
@@ -1238,6 +1238,20 @@ class StoryServiceImpl implements StoryService {
         dto.setNumOfRead(historyRepository.countAllByStoryId(story.getId()));
         dto.setCensorshipStatus(draftStoryRepository.getCensorshipStatusOfStoryDraft(dto.getId()));
         dto.setCensorships(censorshipRepository.findAllByStory(dto.getId()));
+        DraftStory draftStory = draftStoryRepository.findById(story.getId()).orElse(null);
+
+        CreateStoryDto createStoryDto = null;
+        try {
+            createStoryDto = objectMapper.readValue(draftStory.getContent(), CreateStoryDto.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        if(createStoryDto != null){
+            dto.setNumOfScreen(createStoryDto.getScreens().size());
+            dto.setTitle(createStoryDto.getTitle());
+            dto.setImage(createStoryDto.getImage());
+        }
+
         return dto;
     }
 
