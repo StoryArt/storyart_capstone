@@ -311,7 +311,7 @@ class StoryServiceImpl implements StoryService {
         } else if (!story.isActive()) {
             result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
         } else if (!story.isPublished()){
-            result.getErrors().put("NOT_FOUND", "Truyện này chưa xuất bản");
+            result.getErrors().put("NOT_FOUND", "Truyện này tác giả chưa công khai");
         } else {
             story.setCensorshipStatus(censorshipDto.getCensorshipStatus());
             storyRepository.save(story);
@@ -332,10 +332,10 @@ class StoryServiceImpl implements StoryService {
             result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa bởi admin");
         } else if (!story.isActive()) {
             result.getErrors().put("NOT_FOUND", "Truyện này đã bị xóa");
-        } else if (!story.isPublished()){
-            result.getErrors().put("NOT_FOUND", "Truyện này chưa xuất bản");
         } else if (!CensorshipStatus.APPROVED.equals(story.getCensorshipStatus())){
             result.getErrors().put("NOT_FOUND", "Truyện này chưa được kiểm duyệt");
+        } else if (!story.isPublished()){
+            result.getErrors().put("NOT_FOUND", "Truyện này tác giả chưa công khai");
         }
 
         if(result.getErrors().size() > 0) return result;
@@ -634,11 +634,11 @@ class StoryServiceImpl implements StoryService {
             result.getErrors().put("NOT_FOUND", "Không tìm thấy truyện này");
         } else if (!story.isActive() || story.isDeactiveByAdmin()) {
             result.getErrors().put("DELETED", "Truyện này đã bị xóa");
-        } else if(!story.isPublished()){
-            result.getErrors().put("NOT_PUBLISHED", "Truyện này chưa xuất bản");
         } else if(!CensorshipStatus.APPROVED.equals(story.getCensorshipStatus())){
             result.getErrors().put("NOT_CENSORED", "Truyện này chưa được kiểm duyệt");
-        } else {
+        } else if(!story.isPublished()){
+            result.getErrors().put("NOT_PUBLISHED", "Truyện này tác giả chưa công khai");
+        }  else {
             User user = userRepository.findById(story.getUserId()).orElse(null);
             if(user == null || (!user.isActive() || user.isDeactiveByAdmin())){
                 result.getErrors().put("DELETED", "Truyện này thuộc về người dùng bị vô hiệu tài khoản");
