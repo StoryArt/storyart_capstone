@@ -32,7 +32,7 @@ const UserStoriesList = (props) => {
                                 <TableCell align="center">Lượt bình luận</TableCell>
                                 <TableCell align="center">Lượt đánh giá</TableCell>
                                 <TableCell align="center">Đánh giá trung bình</TableCell>
-                                <TableCell align="center">Trạng thái</TableCell>
+                                <TableCell align="center"></TableCell>
                                 {/* <TableCell align="center">Nhãn</TableCell> */}
                                 <TableCell align="center"></TableCell>
                                 <TableCell align="center"></TableCell>
