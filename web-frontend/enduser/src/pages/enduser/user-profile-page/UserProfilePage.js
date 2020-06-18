@@ -326,10 +326,10 @@ const UserProfilePage = (props) => {
     closeAlert();
   }
 
-  const cancelRequestCensorship = async () => {
+  const cancelRequestCensorship = async (story) => {
     setOpenBackdrop(true);
     try {
-      const res = await CensorshipService.cancelRequestCensorship({ storyId: story.id });
+        const res = await CensorshipService.cancelRequestCensorship({ storyId: story.id });
         console.log(res);
         const { success, errors } = res.data;
         if(success){
