@@ -58,7 +58,7 @@ const StoryManagementPage =  (props) => {
   const [alert, setAlert] = useState({ content: '', type: 'success', open: false });
   const [filters, setFilters] = useState({
       keyword: '',
-      orderBy: ORDER_BYS.DATE,
+      orderBy: ORDER_BYS.CENSORSHIP_REQUEST_TIME,
       asc: true,
       censorshipStatus: CENSORSHIP_STATUS.PENDING,
       page: 1,
@@ -234,7 +234,7 @@ const StoryManagementPage =  (props) => {
               </div>
               {storyListTab === 0 && (
                 <>
-                  <div className="col-sm-2">
+                  <div className="col-sm-3">
                     <FormControl style={{ width: '100%' }}>
                         <InputLabel>Sắp xếp theo</InputLabel>
                         <Select
@@ -249,7 +249,7 @@ const StoryManagementPage =  (props) => {
                         </Select>
                     </FormControl>
                   </div>
-                  <div className="col-sm-1">
+                  <div className="col-sm-2">
                     <FormControl style={{ width: '100%' }}>
                         <InputLabel>Thứ tự</InputLabel>
                         <Select
@@ -265,8 +265,9 @@ const StoryManagementPage =  (props) => {
                         </Select>
                     </FormControl>
                   </div>`
-                  <div className="col-sm-2">
+                  <div className="col-sm-3">
                     <CensorshipSelect 
+                      timeRequestCensorship={true}
                       onChange={(e) => changeFilters('censorshipStatus', e.target.value)} 
                       value={filters.censorshipStatus} />
                   </div>
@@ -309,7 +310,7 @@ const StoryManagementPage =  (props) => {
                       <TableCell align="center">Lượt đánh giá</TableCell>
                       <TableCell align="center">Đánh giá trung bình</TableCell>
                       <TableCell align="center">Tác giả</TableCell>
-                      {/* <TableCell align="center">Nhãn</TableCell> */}
+                      <TableCell align="center">Thời gian yêu cầu kiểm duyệt</TableCell>
                       <TableCell align="center"></TableCell>
                     </TableRow>
                   </TableHead>
@@ -335,13 +336,9 @@ const StoryManagementPage =  (props) => {
                         <TableCell align="center">
                           {ValidationUtils.isEmpty(story.user) ? '' : <a href={`/user/profile/${story.user.id}`} target="_blank">{story.user.name}</a>}
                         </TableCell>
-                        {/* <TableCell align="center">
-                          <div style={{ maxWidth: '150px' }}>
-                            <small>
-                              <TagList tags={story.tags} />
-                            </small>
-                          </div>
-                        </TableCell> */}
+                        <TableCell align="center">
+                          {DateTimeUtils.getDateTime(story.requestedCensorshipAt)}
+                        </TableCell>
                         <TableCell align="center">
                           <MyDropdownMenu>
                             <MenuItem onClick={() => viewStory(story)}>

@@ -1213,6 +1213,10 @@ class StoryServiceImpl implements StoryService {
                     if(asc) page1 = storyRepository.findForAdminOrderDateASC(keyword, censorshipStatus, pageable);
                     else page1 = storyRepository.findForAdminOrderDateDESC(keyword, censorshipStatus, pageable);
                     break;
+                case "censorship_request_time":
+                    if(asc) page1 = storyRepository.findForAdminOrderRequestTimeASC(keyword, censorshipStatus, pageable);
+                    else page1 = storyRepository.findForAdminOrderRequestTimeDESC(keyword, censorshipStatus, pageable);
+                    break;
             }
         }
 
@@ -1252,6 +1256,10 @@ class StoryServiceImpl implements StoryService {
             dto.setNumOfScreen(createStoryDto.getScreens().size());
             dto.setTitle(createStoryDto.getTitle());
             dto.setImage(createStoryDto.getImage());
+        }
+        Censorship censorship = censorshipRepository.findLatestCensorshipByStory(dto.getId());
+        if(censorship != null){
+            dto.setRequestedCensorshipAt(censorship.getCreatedAt());
         }
 
         return dto;

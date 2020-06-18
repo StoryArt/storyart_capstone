@@ -102,6 +102,7 @@ export const ORDER_BYS = {
     SCREEN: 'screen',
     RATING: 'rating',
     DATE: 'date',
+    CENSORSHIP_REQUEST_TIME: 'censorship_request_time',
 }
 
 export const SCREEN_COLORS = {
@@ -111,7 +112,7 @@ export const SCREEN_COLORS = {
 }
 
 export const getOrderBys = () => {
-    const { AVG_RATE, READ, COMEMENT, SCREEN, RATING, DATE } = ORDER_BYS;
+    const { AVG_RATE, READ, COMEMENT, SCREEN, RATING, DATE, CENSORSHIP_REQUEST_TIME } = ORDER_BYS;
     return [
         { value: AVG_RATE, title: 'Đánh giá trung bình' },
         { value: READ, title: 'Lượt đọc' },
@@ -119,6 +120,8 @@ export const getOrderBys = () => {
         // { value: SCREEN, title: 'Số màn hình' },
         { value: RATING, title: 'Lượt đánh giá' },
         { value: DATE, title: 'Ngày tạo' },
+        { value: CENSORSHIP_REQUEST_TIME, title: 'Thời gian đề nghị kiểm duyệt' },
+        
     ]
 }
 

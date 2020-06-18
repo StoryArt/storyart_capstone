@@ -19,8 +19,6 @@ class CensorshipService {
     const url = baseUrl + '/cancel-request/' + storyId;
     return axios.put(url);
   }
-  
-  
 }
 
 export default CensorshipService;

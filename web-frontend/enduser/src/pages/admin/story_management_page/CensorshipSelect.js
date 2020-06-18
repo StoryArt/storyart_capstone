@@ -1,11 +1,15 @@
 import React from 'react';
 import { FormControl, InputLabel, Select, MenuItem } from '@material-ui/core';
-import { getCensorshipStatus } from '../../../common/constants';
+import { getCensorshipStatus, ORDER_BYS } from '../../../common/constants';
 
-const censorships = getCensorshipStatus();
+let censorships = getCensorshipStatus();
 
 const CensorshipSelect = (props) => {
-    const { value, onChange } = props;
+    const { value, onChange, timeRequestCensorship } = props;
+    censorships = censorships.filter(c => {
+        if(c.value === ORDER_BYS.CENSORSHIP_REQUEST_TIME && !timeRequestCensorship) return false;
+        return true;
+    })
 
     return (
         <FormControl size="small" style={{ width: '100%' }}>

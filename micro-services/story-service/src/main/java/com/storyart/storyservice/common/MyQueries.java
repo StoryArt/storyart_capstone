@@ -29,6 +29,9 @@ public class MyQueries {
     public static final String orderByRead = "order by (select count(*) from reading_history rd where rd.story_id = s.id)";
     public static final String orderByAvgRate = "order by s.avg_rate";
     public static final String orderByScreen = "order by (select count(sc.id) from screen sc where sc.story_id = s.id)";
+    public static final String orderByRequestCensorshipTime = "order by (select c.created_at from censorship c where c.story_id = s.id order by id DESC limit 1)";
+
+
 
     public static final String getStoriesForAdminOrderByDate = getStoriesByKeyword + " " + orderByDate;
     public static final String getStoriesForAdminOrderByComment = getStoriesByKeyword + " " + orderByComment;
@@ -36,6 +39,7 @@ public class MyQueries {
     public static final String getStoriesForAdminOrderByRead = getStoriesByKeyword + " " + orderByRead;
     public static final String getStoriesForAdminOrderByAvgRate = getStoriesByKeyword + " " + orderByAvgRate;
     public static final String getStoriesForAdminOrderByScreen = getStoriesByKeyword + " " + orderByScreen;
+    public static final String getStoriesForAdminOrderByRequestCensorshipTime = getStoriesByKeyword + " " + orderByRequestCensorshipTime;
 
     public static final String getStoriesForUserOrderByDate = getStoriesByUser + " " + orderByDate;
     public static final String getStoriesForUserOrderByComment = getStoriesByUser + " " + orderByComment;

@@ -24,6 +24,7 @@ public class GetStoryDto {
     private float avgRate;
     private Date createdAt;
     private Date updatedAt;
+    private Date requestedCensorshipAt;
     private boolean deactiveByAdmin;
     private boolean active;
     private boolean published;
