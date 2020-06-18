@@ -36,7 +36,11 @@ import CensorshipService from "../../../services/censorship.service";
 import CensorshipHistoryDialog from "./CensorshipHistoryDialog";
 
 
-const orderBys = getOrderBys();
+let orderBys = getOrderBys();
+orderBys = orderBys.filter(item => {
+  if(item.value === ORDER_BYS.CENSORSHIP_REQUEST_TIME) return false;
+  return true;
+})
 
 let searchTimeout;
 
