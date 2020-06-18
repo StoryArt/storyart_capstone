@@ -399,6 +399,9 @@ const CreateStoryPage = (props) => {
         if (requestCensorship) {
             story.requestCensorship = true;
             story.userNote = noteDialog.note;
+        } else {
+            story.requestCensorship = false;
+            story.userNote = '';
         }
 
         try {
