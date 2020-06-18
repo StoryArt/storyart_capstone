@@ -172,8 +172,15 @@ public interface StoryRepository extends JpaRepository<Story, Integer> {
 
     @Query(value = "SELECT * FROM story s where s.user_id = ?1 " +
             "and s.active = true and s.deactive_by_admin = false " +
+            "and (select censorship_status from draft_story ds where ds.id = s.id) = ?2 " +
             "order by s.created_at desc", nativeQuery = true)
-    List<Story> findAllByUserId(int userId);
+    List<Story> findAllByUserId(int userId, String censorshipStatus);
+
+    @Query(value = "SELECT * FROM story s where s.user_id = ?1 " +
+            "and s.active = true and s.deactive_by_admin = false " +
+            "and (select ds.censorship_status from draft_story ds where ds.id = s.id) is null " +
+            "order by s.created_at desc", nativeQuery = true)
+    List<Story> findDraftByUserId(int userId);
 
    //ta: use for get comment
     @Query("select s.id from Story s where s.userId = ?1 and s.active = true and s.deactiveByAdmin=false")

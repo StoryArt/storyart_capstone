@@ -24,7 +24,7 @@ public interface CensorshipService {
     ResultDto requestCensorship(RequestCensorshipDto requestCensorshipDto);
     ResultDto handleCensorship(AdminHandleCensorshipDto censorship);
     List<Censorship> getStoryCensorships(int storyId);
-
+    ResultDto cancelRequestCensorship(int storyId);
 }
 
 @Service
@@ -143,5 +143,34 @@ class CensorshipServiceImpl implements CensorshipService{
     @Override
     public List<Censorship> getStoryCensorships(int storyId) {
         return censorshipRepository.findAllByStory(storyId);
+    }
+
+    @Override
+    public ResultDto cancelRequestCensorship(int storyId) {
+        ResultDto result = new ResultDto();
+        result.setSuccess(false);
+        Story story = storyRepository.findById(storyId).orElse(null);
+        if(story == null){
+            result.getErrors().put("STORY_NOTFOUND", "Không tìm thấy truyện này");
+        } else if(!story.isActive() || story.isDeactiveByAdmin()){
+            result.getErrors().put("STORY_NOTFOUND", "Truyện này đã bị xóa");
+        } else {
+            Censorship latestCensorship = censorshipRepository.findLatestCensorshipByStory(storyId);
+            if(latestCensorship == null || !CensorshipStatus.PENDING.equals(latestCensorship.getCensorshipStatus())){
+                result.getErrors().put("REQUESTED", "Truyện này chưa được yêu cầu kiểm duyệt hoặc đã được kiểm duyệt rồi");
+            } else {
+//                List<Censorship> censorships = censorshipRepository.findAllByStory(storyId);
+//                String censorshipStatus = "";
+//                if(censorships.size() > 1){
+//                    censorshipStatus = censorships.get(1).getCensorshipStatus();
+//                } else {
+//                    censorshipStatus = null;
+//                }
+                draftStoryRepository.updateCensorshipStatus(null, storyId);
+                censorshipRepository.deleteById(latestCensorship.getId());
+                result.setSuccess(true);
+            }
+        }
+        return result;
     }
 }

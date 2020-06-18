@@ -127,9 +127,10 @@ public class StoryController {
 //            @RequestParam boolean censored,
 //            @RequestParam int page,
 //            @RequestParam int itemsPerPage,
+            @RequestParam String censorshipStatus,
             @CurrentUser UserPrincipal userPrincipal){
 //        Page<GetStoryDto> stories = storyService.getStoriesForUser(userPrincipal.getId(), keyword, censored, orderBy, asc, page, itemsPerPage);
-        List<GetStoryDto> stories = storyService.getStoriesForUser(userPrincipal.getId());
+        List<GetStoryDto> stories = storyService.getStoriesForUser(userPrincipal.getId(), censorshipStatus);
         return new ResponseEntity(stories, HttpStatus.OK);
     }
 

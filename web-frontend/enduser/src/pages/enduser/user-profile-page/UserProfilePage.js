@@ -54,7 +54,7 @@ const UserProfilePage = (props) => {
   const [userNotfoundMessage, setUserNotfoundMessage] = useState('');
   const [stories, setStories] = useState([]);
   const [story, setStory] = useState(null);
-  const [allStories, setAllStories] = useState([]);
+  const [renderedStories, setRenderedStories] = useState([]);
   const [isLoadingstories, setIsLoadingStories] = useState(false);
   const [dateRange, setDateRange] = useState({ from: getDateAgo(7), to: new Date() });
   const [readingStatisticData, setReadingStatisticData] = useState([]);
@@ -63,9 +63,8 @@ const UserProfilePage = (props) => {
     keyword: '',
     orderBy: 'avg_rate',
     asc: false,
-    page: 1,
-    itemsPerPage: 10,
-    censored: true
+    // page: 1,
+    // itemsPerPage: 10,
   });
 
   const [alert, setAlert] = useState({ content: '', type: 'success', open: false });
@@ -82,7 +81,7 @@ const UserProfilePage = (props) => {
     await getUserInfo();
     
     if (!userNotfound && isUserAuth(userInfo)) {
-      getStoriesByAuthor();
+      getStoriesByAuthor(userStoryTab);
       // getReadStatistic();
     }
   }
@@ -113,14 +112,29 @@ const UserProfilePage = (props) => {
     setLoadingReadingStatisticData(false);
   }
 
-  const getStoriesByAuthor = async () => {
+  const getStoriesByAuthor = async (userStoryTab) => {
     setAuthHeader(getTokenFromLocal());
     setIsLoadingStories(true);
     try {
-      const res = await StoryService.getStoriesByAuthor(user.id, filters);
+      let censorshipStatus = null;
+      switch(userStoryTab){
+        case 0: 
+          censorshipStatus = null;
+          break;
+        case 1: 
+          censorshipStatus = CENSORSHIP_STATUS.APPROVED;
+          break;
+        case 2: 
+          censorshipStatus = CENSORSHIP_STATUS.PENDING;
+          break;
+        case 3: 
+          censorshipStatus = CENSORSHIP_STATUS.REJECTED;
+          break;
+      }
+      const res = await StoryService.getStoriesByAuthor(censorshipStatus);
       console.log(res);
-      setAllStories(res.data);
-      setStories(res.data.filter(item => item.censorshipStatus == null));
+      setStories(res.data);
+      filterStories(res.data, filters);
     } catch (error) {
       console.log(error);
     }
@@ -155,10 +169,10 @@ const UserProfilePage = (props) => {
     if(prop === 'keyword'){
         clearTimeout(searchTimeout);
         searchTimeout = window.setTimeout(() => {
-          filterStories(filters);
+          filterStories(stories, filters);
         }, 300);
     } else {
-      filterStories(filters);
+      filterStories(stories, filters);
     }
   }
 
@@ -178,7 +192,7 @@ const UserProfilePage = (props) => {
       const { success, errors } = res.data;
       if (success) {
         setAlert({ type: 'success', content: 'Xóa thành công', open: true });
-        getStoriesByAuthor();
+        getStoriesByAuthor(userStoryTab);
       } else {
         setAlert({ type: 'error', content: Object.values(errors)[0], open: true });
       }
@@ -255,36 +269,13 @@ const UserProfilePage = (props) => {
 
   const changeStoryTab = (value) => {
     setUserStoryTab(value);
-    let arr = getStoriesByCensorshipStatus(value);
-    setStories(arr);
+    getStoriesByAuthor(value);
   }
 
-  const getStoriesByCensorshipStatus = (statusValue) => {
-    let arr = [];
-    switch(statusValue){
-      case 0: 
-        arr = allStories.filter(s => ValidationUtils.isEmpty(s.censorshipStatus));
-        break;
-      case 1: 
-        arr = allStories.filter(s => s.censorshipStatus == CENSORSHIP_STATUS.APPROVED);
-        break;
-      case 2: 
-        arr = allStories.filter(s => s.censorshipStatus == CENSORSHIP_STATUS.PENDING);
-        break;
-      case 3: 
-        arr = allStories.filter(s => s.censorshipStatus == CENSORSHIP_STATUS.REJECTED);
-        break;
-    }
-    return arr;
-  } 
-
-  const filterStories = (filters) => {
+  const filterStories = (stories, filters) => {
     const { keyword, orderBy, asc } = filters;
-    console.log(orderBy);
-
-    let myStories = getStoriesByCensorshipStatus(userStoryTab);
     
-    let newStories = myStories.filter(s => {
+    let newStories = stories.filter(s => {
       return s.title.toLowerCase().indexOf(keyword.toLowerCase()) > -1;
     });
 
@@ -303,7 +294,7 @@ const UserProfilePage = (props) => {
       return asc ? exp : -exp;
     });
 
-    setStories([...newStories]);
+    setRenderedStories([...newStories]);
   }
 
   const requestCensorship = async () => {
@@ -314,13 +305,7 @@ const UserProfilePage = (props) => {
         const { success, errors } = res.data;
         if(success){
             setAlert({ content: 'Cập nhật thành công', type: "success", open: true });  
-           
-            const index = allStories.findIndex(s => s.id == story.id);
-            allStories[index].censorshipStatus = CENSORSHIP_STATUS.PENDING;
-            setAllStories([...allStories]);
-            let i = stories.findIndex(s => s.id == story.id);
-            stories.splice(i, 1);
-            setStories([...stories]);
+            getStoriesByAuthor(userStoryTab);
         } else {
             setAlert({ content: Object.values(errors), type: 'error', open: true });
         }
@@ -330,6 +315,31 @@ const UserProfilePage = (props) => {
             setAlert({ content: Object.values(error.response.data)[0], type: 'error', open: true });
         } else {
             setAlert({ content: 'Không thể lưu kiểm duyệt', type: 'error', open: true });
+        }
+    }
+    setNoteDialog({ ...noteDialog, open: false });
+    setOpenBackdrop(false);
+    closeAlert();
+  }
+
+  const cancelRequestCensorship = async () => {
+    setOpenBackdrop(true);
+    try {
+      const res = await CensorshipService.cancelRequestCensorship({ storyId: story.id });
+        console.log(res);
+        const { success, errors } = res.data;
+        if(success){
+            setAlert({ content: 'Hủy yêu cầu kiểm duyệt thành công', type: "success", open: true });  
+            getStoriesByAuthor(userStoryTab);
+        } else {
+            setAlert({ content: Object.values(errors), type: 'error', open: true });
+        }
+    } catch (error) {
+        console.log(error);
+        if (!ValidationUtils.isEmpty(error.response)) {
+            setAlert({ content: Object.values(error.response.data)[0], type: 'error', open: true });
+        } else {
+            setAlert({ content: 'Không thể hủy yêu cầu kiểm duyệt', type: 'error', open: true });
         }
     }
     setNoteDialog({ ...noteDialog, open: false });
@@ -401,7 +411,9 @@ const UserProfilePage = (props) => {
                   ) }
                     <UserStoriesTabs
                       value={userStoryTab}
-                      onChange={(e, value) => changeStoryTab(value)}
+                      onChange={(e, value) => {
+                        changeStoryTab(value);
+                      }}
                     ></UserStoriesTabs>
 
                       <div className="row mb-5">
@@ -461,17 +473,13 @@ const UserProfilePage = (props) => {
                           </div>
                          
                     </div>
-                 
-               
-                     
-                        
                     </div>
                      </div>
                
 
                   {!isLoadingstories && (
                       <UserStoriesList 
-                        stories={stories}
+                        stories={renderedStories}
                         readStory={readStory}
                         changePublishedStatus={changePublishedStatus}
                         handleDeleteStory={handleDeleteStory}
@@ -479,7 +487,9 @@ const UserProfilePage = (props) => {
                         onRequestCensorship={(story) => {
                           setStory({ ...story });
                           setNoteDialog({ ...noteDialog, open: true });
-                        }}  />
+                        }} 
+                        onCancelRequestCensorship={cancelRequestCensorship}
+                        userStoryTab={userStoryTab} />
                     )}
                               
                   {/* <div className="row my-3">

@@ -12,7 +12,8 @@ import PauseIcon from '@material-ui/icons/Pause';
 import { withRouter } from 'react-router-dom';
 
 const UserStoriesList = (props) => {
-    const { stories, readStory, handleDeleteStory, changePublishedStatus, editStory, onRequestCensorship } = props;
+    const { stories, readStory, handleDeleteStory, 
+        changePublishedStatus, editStory, onRequestCensorship, userStoryTab, onCancelRequestCensorship } = props;
 
     return (
        <div>
@@ -94,11 +95,15 @@ const UserStoriesList = (props) => {
                                             <MenuItem onClick={() => changePublishedStatus(story)}>
                                                 {story.published ? 'Bật chế độ riêng tư' : 'Bật chế độ công khai'}
                                             </MenuItem>
-                                            {/* {story.censorshipStatus == null && ( */}
-                                                <MenuItem onClick={() => onRequestCensorship(story)}>
-                                                    Xem kiểm duyệt
+                                           
+                                            <MenuItem onClick={() => onRequestCensorship(story)}>
+                                                Xem kiểm duyệt
+                                            </MenuItem>
+                                            {userStoryTab === 2 && (
+                                                 <MenuItem onClick={() => onCancelRequestCensorship(story)}>
+                                                    Hủy yêu cầu kiểm duyệt
                                                 </MenuItem>
-                                            {/* )} */}
+                                            )}
                                             <Divider/>
                                             <MenuItem onClick={() => handleDeleteStory(story)}>
                                                 Xóa truyện

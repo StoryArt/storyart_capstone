@@ -47,14 +47,12 @@ class StoryService {
     return axios.get(url);
   }
 
-  static async getStoriesByAuthor(
-    userId,
-    { orderBy, asc, keyword, page, itemsPerPage, censored }
-  ) {
-    const url =
-      baseUrl +
-      "/get_by_author" +
-      `?orderBy=${orderBy}&asc=${asc}&keyword=${keyword}&page=${page}&itemsPerPage=${itemsPerPage}$censored=${censored}`;
+  static async getStoriesByAuthor(censorshipStatus) {
+    // const url =
+    //   baseUrl +
+    //   "/get_by_author" +
+    //   `?orderBy=${orderBy}&asc=${asc}&keyword=${keyword}&page=${page}&itemsPerPage=${itemsPerPage}$censored=${censored}`;
+    const url = baseUrl + "/get_by_author?censorshipStatus=" + censorshipStatus;
     return axios.get(url);
   }
 

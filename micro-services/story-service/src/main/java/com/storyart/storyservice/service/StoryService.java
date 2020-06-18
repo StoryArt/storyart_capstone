@@ -61,7 +61,7 @@ public interface StoryService {
     Page<GetStoryDto> getStoriesForAdmin(String keyword, String orderBy, String censorshipStatus, boolean asc, int page, int itemsPerPage);
 
 //    Page<GetStoryDto> getStoriesForUser(int userId, String keyword, boolean censored, String orderBy, boolean asc, int page, int itemsPerPage);
-    List<GetStoryDto> getStoriesForUser(int userId);
+    List<GetStoryDto> getStoriesForUser(int userId, String censorshipStatus);
     ResultDto changeStoryStatusByAdmin(int storyId, boolean disable);
 
     ResultDto changeStoryStatusByUser(int storyId, int userId);
@@ -1021,23 +1021,25 @@ class StoryServiceImpl implements StoryService {
         } else {
 
             DraftStory draftStory = draftStoryRepository.findById(storyDto.getId()).orElse(null);
-            draftStory.setContent(parseObjectToJson(storyDto));
-            if(storyDto.isRequestCensorship()){
-                if(!CensorshipStatus.PENDING.equals(draftStory.getCensorshipStatus())){
+            if(CensorshipStatus.PENDING.equals(draftStory.getCensorshipStatus())){
+                resultDto.getErrors().put("REQUESTED", "Truyện này đang được kiểm duyệt, không thể lưu truyện!");
+            } else {
+                draftStory.setContent(parseObjectToJson(storyDto));
+                if(storyDto.isRequestCensorship()){
                     Censorship censorship = new Censorship();
                     censorship.setCensorshipStatus(CensorshipStatus.PENDING);
                     censorship.setUserNote(storyDto.getUserNote());
                     censorship.setStoryId(storyDto.getId());
                     censorshipRepository.save(censorship);
+                    draftStory.setCensorshipStatus(CensorshipStatus.PENDING);
+                } else {
+                    draftStory.setCensorshipStatus(null);
                 }
-                draftStory.setCensorshipStatus(CensorshipStatus.PENDING);
-            } else {
-                draftStory.setCensorshipStatus(null);
-            }
-            draftStoryRepository.save(draftStory);
+                draftStoryRepository.save(draftStory);
 
-            resultDto.setSuccess(true);
-            resultDto.setData(foundStory);
+                resultDto.setSuccess(true);
+                resultDto.setData(foundStory);
+            }
         }
         return resultDto;
     }
@@ -1256,7 +1258,7 @@ class StoryServiceImpl implements StoryService {
     }
 
     @Override
-    public List<GetStoryDto> getStoriesForUser(int userId) {
+    public List<GetStoryDto> getStoriesForUser(int userId, String censorshipStatus) {
 //        Pageable pageable = PageRequest.of(page - 1, itemsPerPage);
 //        Page<Story> page1 = null;
 //        switch (orderBy) {
@@ -1295,7 +1297,12 @@ class StoryServiceImpl implements StoryService {
 //            }
 //        });
 //        return page2;
-        List<Story> stories = storyRepository.findAllByUserId(userId);
+        List<Story> stories = new ArrayList<>();
+        if(StringUtils.isEmpty(censorshipStatus) || censorshipStatus.equalsIgnoreCase("null")){
+            stories = storyRepository.findDraftByUserId(userId);
+        } else {
+            stories = storyRepository.findAllByUserId(userId, censorshipStatus);
+        }
         List<GetStoryDto> getStoryDtos = stories.stream().map(st -> mapStoryModelToGetStoryDto(st)).collect(Collectors.toList());
         return getStoryDtos;
     }

@@ -61,4 +61,11 @@ public class CensorshipController {
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
+    @PutMapping("cancel-request/{storyId}")
+    @Secured({"ROLE_USER"})
+    public ResponseEntity cancelRequestCensorship(@PathVariable int storyId){
+        ResultDto result = censorshipService.cancelRequestCensorship(storyId);
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
+
 }

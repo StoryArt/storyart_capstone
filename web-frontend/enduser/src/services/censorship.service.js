@@ -14,6 +14,12 @@ class CensorshipService {
     const url = baseUrl;
     return axios.post(url, censorship);
   }
+
+  static async cancelRequestCensorship({ storyId }) {
+    const url = baseUrl + '/cancel-request/' + storyId;
+    return axios.put(url);
+  }
+  
   
 }
 
