@@ -59,13 +59,12 @@ class CensorshipServiceImpl implements CensorshipService{
             result.getErrors().put("STORY_NOTFOUND", "Truyện này đã bị xóa hoặc bị khóa bởi admin");
         } else {
             Censorship latestCensorship = censorshipRepository.findLatestCensorshipByStory(censorship.getStoryId());
+            DraftStory draftStory = draftStoryRepository.findById(story.getId()).orElse(null);
             //check if admin already censored this story
-            if(latestCensorship.getHandledAt() != null && !latestCensorship.getCensorshipStatus().equals(CensorshipStatus.PENDING)){
-                result.getErrors().put("HANDLED", "Truyện này đã kiểm duyệt rồi");
+            if(!draftStory.getCensorshipStatus().equals(CensorshipStatus.PENDING)){
+                result.getErrors().put("HANDLED", "Truyện này đã kiểm duyệt rồi hoặc chưa được yêu cầu kiểm duyệt");
                 return result;
             }
-
-            DraftStory draftStory = draftStoryRepository.findById(story.getId()).orElse(null);
 
             latestCensorship.setCensorshipStatus(censorship.getCensorshipStatus());
             latestCensorship.setAdminNote(censorship.getAdminNote());
