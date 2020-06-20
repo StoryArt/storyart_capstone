@@ -60,8 +60,9 @@ class CensorshipServiceImpl implements CensorshipService{
         } else {
             Censorship latestCensorship = censorshipRepository.findLatestCensorshipByStory(censorship.getStoryId());
             DraftStory draftStory = draftStoryRepository.findById(story.getId()).orElse(null);
+
             //check if admin already censored this story
-            if(!draftStory.getCensorshipStatus().equals(CensorshipStatus.PENDING)){
+            if(!CensorshipStatus.PENDING.equals(draftStory.getCensorshipStatus())){
                 result.getErrors().put("HANDLED", "Truyện này đã kiểm duyệt rồi hoặc chưa được yêu cầu kiểm duyệt");
                 return result;
             }
